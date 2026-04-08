@@ -1,0 +1,31 @@
+// Estilos base y de diseño global
+html, body {
+  height: 100%;
+  background-color: $light-color; // Fondo crema/arena global
+}
+
+ion-content {
+  --background: #{$light-color}; // Asegura que el contenido use el fondo cálido
+}
+
+// Custom common classes
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $spacing-md;
+  padding-right: $spacing-md;
+}
+
+.flex-center {
+  @include flex-center;
+}
+
+.text-primary {
+  color: $primary-color;
+}
+
+.bg-light {
+  background-color: $light-color;
+}

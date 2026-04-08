@@ -1,0 +1,143 @@
+@import '../abstracts/variables';
+
+// Estilos para el módulo de Reproducción (Premium & Simple)
+/**
+ * Estilos para el Ciclo de Gestación
+ * 100% Variable Sync - Forest & Earth
+ */
+
+.repro-bg {
+  background: var(--ion-background-color);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: $dark-color;
+  margin: $spacing-md 0;
+  padding-left: 4px;
+}
+
+// Cuadrícula de Gestaciones (Cartas Grandes)
+.gestation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.premium-card {
+  --background: #{$white};
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba($black, 0.06);
+  border: 1px solid rgba($primary-color, 0.1);
+  margin: 0;
+  transition: transform 0.3s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  ion-card-header {
+    padding-bottom: 8px;
+  }
+
+  ion-card-subtitle {
+    color: $primary-color;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  ion-card-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: $dark-color;
+  }
+
+  .status-badge {
+    margin-top: 10px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+  }
+}
+
+// Animación de Latido Suave para indicar vida/gestación
+.heart-pulse {
+  animation: pulseShadow 3s infinite ease-in-out;
+}
+
+@keyframes pulseShadow {
+  0% { box-shadow: 0 8px 24px rgba($black, 0.06); }
+  50% { box-shadow: 0 8px 30px rgba($primary-color, 0.15); }
+  100% { box-shadow: 0 8px 24px rgba($black, 0.06); }
+}
+
+// Separador Premium
+.premium-divider {
+  --background: transparent;
+  --padding-top: $spacing-lg;
+  --padding-bottom: $spacing-sm;
+  border-top: 1px solid rgba($gray-600, 0.1);
+  margin-top: $spacing-lg;
+
+  ion-icon {
+    color: $primary-color;
+    font-size: 1.4rem;
+  }
+
+  ion-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $gray-600;
+    text-transform: none;
+  }
+}
+
+// Lista de Historial
+.transparent-list {
+  background: transparent;
+  padding: 0;
+
+  .history-item {
+    --background: #{$white};
+    --border-radius: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba($black, 0.02);
+    
+    h3 {
+      font-weight: 700;
+      color: $dark-color;
+    }
+    
+    p {
+      color: $gray-600;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+// Estado Vacío (Empty State)
+.empty-state {
+  text-align: center;
+  padding: $spacing-xl 0;
+  color: $gray-600;
+
+  ion-icon {
+    font-size: 4rem;
+    color: rgba($primary-color, 0.2);
+    margin-bottom: $spacing-md;
+  }
+
+  p {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+}
+
+// Botón Flotante Premium
+.fab-btn {
+  --background: #{$primary-color};
+  --box-shadow: 0 8px 20px rgba($primary-color, 0.3);
+}

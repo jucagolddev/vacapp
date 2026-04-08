@@ -1,0 +1,187 @@
+// Estilos Premium para el Módulo de Sanidad (Calendario y Tratamientos)
+@import '../abstracts/variables';
+
+/**
+ * Estilos para el Historial Clínico y Sanitario
+ * 100% Variable Sync - Forest & Earth
+ */
+
+.sanidad-content {
+  --background: #{$gray-100};
+  padding: $spacing-md;
+}
+
+// Buscador Premium
+.premium-searchbar {
+  --border-radius: 16px;
+  --box-shadow: 0 4px 12px rgba($black, 0.05);
+  --background: #{$white};
+  --placeholder-color: #{$gray-600};
+  --icon-color: #{$primary-color};
+  margin-bottom: $spacing-lg;
+  padding: 0;
+  
+  ion-searchbar {
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+  }
+}
+
+// Historial/Tabla de Datos (ion-grid)
+.health-table-container {
+  background: $white;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba($black, 0.06);
+  overflow: hidden;
+  border: 1px solid rgba($primary-color, 0.08);
+  margin-bottom: 80px; // Espacio para el FAB
+
+  .table-header {
+    background: rgba($primary-color, 0.04);
+    border-bottom: 1px solid rgba($primary-color, 0.1);
+    
+    ion-col {
+      font-weight: 700;
+      color: $primary-color;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 12px;
+    }
+  }
+
+  .table-row {
+    border-bottom: 1px solid rgba($gray-200, 0.5);
+    transition: background 0.2s ease;
+    align-items: center;
+
+    &:hover {
+      background: rgba($primary-color, 0.02);
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    ion-col {
+      padding: 14px 12px;
+      font-size: 0.95rem;
+      color: $dark-color;
+      display: flex;
+      align-items: center;
+    }
+
+    .date-cell {
+      font-weight: 600;
+      color: $gray-600;
+    }
+
+    .animal-cell {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      .animal-name {
+        font-weight: 700;
+        color: $primary-color;
+      }
+      .animal-crotal {
+        font-size: 0.8rem;
+        color: $gray-600;
+      }
+    }
+
+    .type-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      
+      &.vacunacion { background: rgba($success-color, 0.1); color: $success-color; }
+      &.desparasitacion { background: rgba($primary-color, 0.1); color: $primary-color; }
+      &.saneamiento { background: rgba($warning-color, 0.1); color: $warning-color; }
+      &.enfermedad { background: rgba($danger-color, 0.1); color: $danger-color; }
+    }
+  }
+}
+
+// Modal de Sanidad
+.health-modal {
+  --border-radius: 28px 28px 0 0;
+  --height: 85%;
+  align-items: flex-end;
+
+  ion-header {
+    --background: transparent;
+    ion-toolbar {
+      --background: transparent;
+      --border-style: none;
+      padding: 10px;
+    }
+  }
+
+  .modal-content {
+    padding: $spacing-lg;
+    
+    .modal-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: $primary-color;
+      margin-bottom: 8px;
+    }
+
+    .modal-subtitle {
+      font-size: 1rem;
+      color: $gray-600;
+      margin-bottom: $spacing-xl;
+    }
+  }
+}
+
+// Botón Flotante Premium
+.fab-btn {
+  --background: #{$primary-color};
+  --background-activated: #{$primary-color};
+  --box-shadow: 0 10px 20px rgba($primary-color, 0.3);
+  width: 65px;
+  height: 65px;
+  
+  ion-icon {
+    font-size: 32px;
+  }
+}
+
+// Estados Vacíos
+.empty-history {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  text-align: center;
+  
+  ion-icon {
+    font-size: 4rem;
+    color: rgba($primary-color, 0.1);
+    margin-bottom: $spacing-md;
+  }
+  
+  h3 {
+    font-weight: 700;
+    color: $dark-color;
+  }
+  
+  p {
+    color: $gray-600;
+  }
+}
+
+// Animaciones
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

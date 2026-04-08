@@ -1,0 +1,32 @@
+:root {
+  --ion-color-primary: #{$primary-color};
+  --ion-color-primary-rgb: 45, 90, 39;
+  --ion-color-primary-contrast: #{$white};
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: darken($primary-color, 10%);
+  --ion-color-primary-tint: lighten($primary-color, 10%);
+
+  --ion-color-secondary: #{$secondary-color};
+  --ion-color-secondary-rgb: 124, 92, 78;
+  --ion-color-secondary-contrast: #{$white};
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: darken($secondary-color, 10%);
+  --ion-color-secondary-tint: lighten($secondary-color, 10%);
+
+  --ion-color-tertiary: #{$tertiary-color};
+  --ion-color-tertiary-rgb: 141, 182, 0;
+  --ion-color-tertiary-contrast: #{$white};
+  
+  --ion-color-success: #{$success-color};
+  --ion-color-warning: #{$warning-color};
+  --ion-color-danger: #{$danger-color};
+
+  --ion-font-family: #{$font-family-base};
+  --ion-background-color: #{$light-color};
+  --ion-text-color: #{$dark-color};
+}
+
+// Side menu customization
+ion-menu {
+  --ion-background-color: #{$white};
+}

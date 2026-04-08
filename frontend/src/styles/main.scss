@@ -1,0 +1,25 @@
+// 1. Abstracts (No output)
+@import './abstracts/variables';
+@import './abstracts/mixins';
+
+// 2. Base styles
+@import './base/reset';
+@import './base/typography';
+
+// 3. Core/Integration
+@import './core/ionic';
+@import 'core/layout';
+@import './core/luxe';
+
+// Características (Módulos de negocio)
+@import 'features/dashboard';
+@import 'features/manejo';
+@import 'features/reproduccion';
+@import 'features/sanidad';
+
+
+// 4. Custom global blocks
+@import './base/_base.scss';
+
+// 5. Utility classes (Optional)
+// .u-mb-4 { margin-bottom: 1rem; }

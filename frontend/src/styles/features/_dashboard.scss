@@ -1,0 +1,90 @@
+@import '../abstracts/variables';
+
+// Estilos específicos para el Dashboard de Vacapp
+/**
+ * Estilos para el Cuadro de Mando (Dashboard)
+ * Enfocados en una estética rústica vibrante con predominio de verdes y marrones.
+ * 100% Variable Sync - Elite Forest & Earth
+ */
+
+.dashboard-title {
+  font-weight: 800;
+  color: $primary-color;
+  margin-bottom: $spacing-lg;
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $spacing-lg;
+}
+
+.dashboard-card {
+  background: $white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-lg;
+  padding: 0; 
+  overflow: hidden;
+  border: 4px solid $primary-color; 
+  transition: $transition-base;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba($black, 0.15);
+  }
+
+  // Cabecera interna de cada tarjeta
+  .card-header {
+    background-color: $primary-color;
+    padding: $spacing-md;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: $white;
+
+    ion-icon {
+      font-size: 2rem;
+      color: $tertiary-color;
+    }
+  }
+
+  // Contenido de la tarjeta
+  .card-content {
+    padding: $spacing-lg;
+    background-color: $white;
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: $secondary-color; 
+      text-transform: uppercase;
+      margin: 0 0 5px 0;
+    }
+
+    .card-value {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: $primary-color; 
+    }
+
+    p {
+      color: $gray-600;
+      margin: 5px 0 0 0;
+      font-size: 0.95rem;
+    }
+  }
+
+  // Variante Marrón para algunas tarjetas
+  &.card-brown {
+    border-color: $secondary-color;
+    .card-header {
+      background-color: $secondary-color;
+    }
+    .card-content .card-value {
+      color: $secondary-color;
+    }
+  }
+}
