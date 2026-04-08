@@ -59,36 +59,32 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of bovinos">
               <div class="tag-body-luxe animate-slide-up">
-                <div class="animal-header-luxe">
-                  <div class="animal-avatar-luxe" [ngClass]="b.sexo === 'Macho' ? 'avatar-bull' : 'avatar-cow'">
-                     <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
+                <div class="card-header-flex">
+                  <div class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
+                    <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
                   </div>
-                  <div class="animal-info-luxe">
-                    <h3 class="animal-name-txt">{{ b.nombre }}</h3>
-                    <span class="crotal-ref-txt">ID CROTAL: {{ b.crotal }}</span>
-                  </div>
-                </div>
-
-                <div class="tag-stats-grid">
-                  <div class="stat-item-luxe">
-                    <div class="stat-val-stack">
-                      <span>Raza</span>
-                      <strong>{{ b.raza }}</strong>
-                    </div>
-                  </div>
-                  <div class="stat-item-luxe">
-                    <div class="stat-val-stack">
-                      <span>Edad</span>
-                      <strong class="color-forest">{{ getEdadDesc(b) }}</strong>
-                    </div>
+                  <div class="card-title-stack">
+                    <strong>{{ b.nombre }}</strong>
+                    <span>ID CROTAL: {{ b.crotal }}</span>
                   </div>
                 </div>
 
-                <div class="tag-actions-luxe">
-                  <ion-button fill="clear" (click)="openEditModal(b)" class="btn-action-edit">
+                <div class="card-data-grid">
+                  <div class="card-data-item">
+                    <span class="label">Raza</span>
+                    <span class="value">{{ b.raza || 'No asig.' }}</span>
+                  </div>
+                  <div class="card-data-item">
+                    <span class="label">Edad</span>
+                    <span class="value highlight">{{ getEdadDesc(b) }}</span>
+                  </div>
+                </div>
+
+                <div class="card-footer-actions">
+                  <ion-button fill="clear" (click)="openEditModal(b)" color="dark">
                     <ion-icon name="pencil" slot="start"></ion-icon> Editar
                   </ion-button>
-                  <ion-button fill="clear" (click)="confirmDelete(b.id)" class="btn-action-delete">
+                  <ion-button fill="clear" (click)="confirmDelete(b.id)" color="danger">
                     <ion-icon name="trash" slot="start"></ion-icon> Borrar
                   </ion-button>
                 </div>

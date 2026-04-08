@@ -59,33 +59,33 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of gestacionesActivas">
               <div class="repro-card-body-luxe animate-slide-up">
-                <div class="repro-header-luxe">
-                  <ion-icon name="pulse" class="pulse-icon-luxe"></ion-icon>
-                  <div class="countdown-parto">
-                    <span class="days-num-txt">{{ getDaysToCalving(r) }}</span>
-                    <span class="days-lbl-txt">Días para el parto</span>
+                <div class="card-header-flex">
+                  <div class="card-icon-box bg-danger">
+                    <ion-icon name="pulse"></ion-icon>
                   </div>
-                </div>
-                
-                <div class="repro-animal-luxe">
-                  <h3 class="animal-ref-txt">{{ r.bovino?.nombre || 'Res S/N' }}</h3>
-                  <span class="crotal-ref-txt">ID CROTAL: {{ r.bovino?.crotal }}</span>
-                </div>
-
-                <div class="luxe-details-panel">
-                  <div class="detail-row">
-                    <span class="detail-lbl">Parto Previsto</span>
-                    <strong class="detail-val">{{ r.fecha_parto_prevista | date:'dd/MM/yyyy' }}</strong>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-lbl">Tipo Cubrición</span>
-                    <strong class="detail-val">{{ r.tipo_cubricion }}</strong>
+                  <div class="card-title-stack">
+                    <strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong>
+                    <span>ID: {{ r.bovino?.crotal }} - Parto: {{ getDaysToCalving(r) }} d</span>
                   </div>
                 </div>
 
-                <div class="repro-actions-footer">
-                  <ion-button fill="clear" (click)="openEditModal(r)" class="color-forest">
+                <div class="card-data-grid">
+                  <div class="card-data-item">
+                    <span class="label">Parto Previsto</span>
+                    <span class="value highlight">{{ r.fecha_parto_prevista | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                  <div class="card-data-item">
+                    <span class="label">Método</span>
+                    <span class="value">{{ r.tipo_cubricion }}</span>
+                  </div>
+                </div>
+
+                <div class="card-footer-actions">
+                  <ion-button fill="clear" (click)="openEditModal(r)" color="dark">
                     <ion-icon name="pencil" slot="start"></ion-icon> Gestionar
+                  </ion-button>
+                  <ion-button fill="clear" (click)="confirmDelete(r)" color="danger">
+                    <ion-icon name="trash" slot="start"></ion-icon> Borrar
                   </ion-button>
                 </div>
               </div>

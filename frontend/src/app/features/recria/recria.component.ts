@@ -67,44 +67,36 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajes">
               <div class="weight-card-body-luxe animate-slide-up">
-                <div class="weight-header-luxe">
-                  <div class="animal-ref-luxe">
-                    <ion-badge color="secondary" mode="ios">
-                      {{ p.bovino?.crotal || 'S/N' }}
-                    </ion-badge>
-                    <h3 class="animal-name-txt">{{ p.bovino?.nombre || 'Ejemplar S/N' }}</h3>
+                <div class="card-header-flex">
+                  <div class="card-icon-box bg-tertiary">
+                     <ion-icon name="speedometer"></ion-icon>
                   </div>
-                  <div class="weight-date-luxe">
-                    <ion-icon name="calendar" class="color-earth"></ion-icon>
-                    <span>{{ p.fecha_pesaje | date:'dd MMM yyyy' }}</span>
+                  <div class="card-title-stack">
+                    <strong>{{ p.bovino?.nombre || 'Ejemplar S/N' }}</strong>
+                    <span>{{ p.bovino?.crotal || 'S/N' }} - {{ p.fecha_pesaje | date:'dd MMM yyyy' }}</span>
                   </div>
                 </div>
 
-                <div class="luxe-details-panel">
-                  <div class="detail-row">
-                    <span class="detail-lbl">Masa Actual</span>
-                    <div class="data-val-luxe">
-                      <span class="num-txt">{{ p.peso_kg }}</span>
-                      <span class="unit-txt">KG</span>
-                    </div>
+                <div class="card-data-grid">
+                  <div class="card-data-item">
+                    <span class="label">Masa Actual</span>
+                    <span class="value highlight">{{ p.peso_kg }} <small>KG</small></span>
                   </div>
-                  
-                  <div class="detail-row" *ngIf="p.gain !== null">
-                     <span class="detail-lbl">Ganancia / Pérdida</span>
-                     <div class="gain-val-luxe" [ngClass]="p.gain >= 0 ? 'color-forest' : 'color-earth'">
+                  <div class="card-data-item" *ngIf="p.gain !== null">
+                     <span class="label">Balance</span>
+                     <span class="value" [ngClass]="p.gain >= 0 ? 'color-forest' : 'color-danger'">
                         <ion-icon [name]="p.gain >= 0 ? 'trending-up' : 'trending-down'"></ion-icon>
-                        <span>{{ p.gain > 0 ? '+' : '' }}{{ p.gain | number:'1.1-2' }} kg</span>
-                     </div>
+                        {{ p.gain > 0 ? '+' : '' }}{{ p.gain | number:'1.1-2' }} kg
+                     </span>
                   </div>
                 </div>
 
-                <div class="luxe-card-footer">
-                  <div class="tag-pesaje-luxe">
-                    <ion-icon name="bar-chart" class="color-earth"></ion-icon>
-                    <span>{{ p.tipo_pesaje }}</span>
-                  </div>
-                  <ion-button fill="clear" (click)="deletePesaje(p.id)" class="color-earth">
-                    <ion-icon name="trash" slot="icon-only"></ion-icon>
+                <div class="card-footer-actions">
+                  <ion-button fill="clear" disabled color="dark" style="opacity: 0.8; font-size: 0.75rem;">
+                    <ion-icon name="bar-chart" slot="start"></ion-icon> {{ p.tipo_pesaje }}
+                  </ion-button>
+                  <ion-button fill="clear" (click)="deletePesaje(p.id)" color="danger">
+                    <ion-icon name="trash" slot="start"></ion-icon> Borrar
                   </ion-button>
                 </div>
               </div>

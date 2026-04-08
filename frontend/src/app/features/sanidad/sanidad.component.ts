@@ -69,41 +69,36 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of filteredSanidad">
               <div class="health-card-body-luxe animate-slide-up">
-                <div class="health-card-header-luxe">
-                  <div class="avatar-mini-luxe">
+                <div class="card-header-flex">
+                  <div class="card-icon-box bg-primary">
                      <ion-icon [name]="getHealthIcon(s.tipo)"></ion-icon>
                   </div>
-                  <div class="health-animal-meta">
-                    <h3 class="animal-name-txt">{{ s.bovino?.nombre || 'Ejemplar' }}</h3>
-                    <span class="crotal-ref-txt">ID: {{ s.bovino?.crotal || 'S/N' }}</span>
-                  </div>
-                  <div class="health-status-badge">
-                    <span class="type-badge-luxe" [ngClass]="s.tipo.toLowerCase()">
-                      {{ s.tipo }}
-                    </span>
+                  <div class="card-title-stack">
+                    <strong>{{ s.bovino?.nombre || 'Ejemplar' }}</strong>
+                    <span>ID: {{ s.bovino?.crotal || 'S/N' }} - {{ s.tipo }}</span>
                   </div>
                 </div>
 
-                <div class="luxe-details-panel">
-                  <div class="detail-row">
-                    <span class="detail-lbl">Tratamiento / Producto</span>
-                    <strong class="detail-val">{{ s.producto }}</strong>
+                <div class="card-data-grid" style="grid-template-columns: 1fr;">
+                  <div class="card-data-item">
+                    <span class="label">Producto</span>
+                    <span class="value">{{ s.producto }}</span>
                   </div>
-                  <div class="detail-row">
-                    <span class="detail-lbl">Fecha de Aplicación</span>
-                    <strong class="detail-val">{{ s.fecha | date:'dd MMMM, yyyy' }}</strong>
+                  <div class="card-data-item">
+                    <span class="label">Fecha Aplicación</span>
+                    <span class="value">{{ s.fecha | date:'dd MMM yyyy' }}</span>
                   </div>
-                  <div class="detail-notes-luxe" *ngIf="s.observaciones">
-                    <span class="detail-lbl">Prescripción</span>
-                    <p class="notes-txt-luxe">"{{ s.observaciones }}"</p>
+                  <div class="card-data-item" *ngIf="s.observaciones">
+                    <span class="label">Prescripción</span>
+                    <span class="value" style="font-style: italic;">"{{ s.observaciones }}"</span>
                   </div>
                 </div>
 
-                <div class="luxe-card-footer">
-                  <ion-button fill="clear" (click)="openEditModal(s)" class="color-forest">
+                <div class="card-footer-actions">
+                  <ion-button fill="clear" (click)="openEditModal(s)" color="dark">
                     <ion-icon name="pencil" slot="start"></ion-icon> Editar
                   </ion-button>
-                  <ion-button fill="clear" (click)="confirmDelete(s)" class="color-earth">
+                  <ion-button fill="clear" (click)="confirmDelete(s)" color="danger">
                     <ion-icon name="trash" slot="start"></ion-icon> Borrar
                   </ion-button>
                 </div>

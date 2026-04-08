@@ -57,35 +57,32 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let lote of lotes">
               <div class="field-card-body-luxe animate-slide-up">
-                <div class="field-header-luxe">
-                  <div class="field-icon-box">
-                    <ion-icon name="leaf" class="color-forest"></ion-icon>
+                <div class="card-header-flex">
+                  <div class="card-icon-box bg-secondary">
+                    <ion-icon name="leaf"></ion-icon>
                   </div>
-                  <div class="field-info-luxe">
-                    <h3 class="animal-name-txt">{{ lote.nombre }}</h3>
-                    <div class="field-loc-luxe">
-                      <ion-icon name="location"></ion-icon>
-                      <span>{{ lote.ubicacion || 'Ubicación no definida' }}</span>
-                    </div>
+                  <div class="card-title-stack">
+                    <strong>{{ lote.nombre }}</strong>
+                    <span>{{ lote.ubicacion || 'Sin ubicación' }}</span>
                   </div>
                 </div>
 
-                <div class="luxe-details-panel">
-                  <div class="detail-row">
-                    <span class="detail-lbl">Ocupación Actual</span>
-                    <strong class="detail-val">-- Animales</strong>
+                <div class="card-data-grid">
+                  <div class="card-data-item">
+                    <span class="label">Ocupación Actual</span>
+                    <span class="value highlight">-- Cbzs</span>
                   </div>
-                  <div class="detail-row" *ngIf="lote.capacidad">
-                    <span class="detail-lbl">Capacidad Máxima</span>
-                    <strong class="detail-val">{{ lote.capacidad }} cabezas</strong>
+                  <div class="card-data-item" *ngIf="lote.capacidad">
+                    <span class="label">Capacidad Máxima</span>
+                    <span class="value">{{ lote.capacidad }} Cbzs</span>
                   </div>
                 </div>
 
-                <div class="luxe-card-footer">
-                  <ion-button fill="clear" (click)="openEditModal(lote)" class="color-forest">
+                <div class="card-footer-actions">
+                  <ion-button fill="clear" (click)="openEditModal(lote)" color="dark">
                     <ion-icon name="pencil" slot="start"></ion-icon> Editar
                   </ion-button>
-                  <ion-button fill="clear" (click)="confirmDelete(lote.id)" class="color-earth">
+                  <ion-button fill="clear" (click)="confirmDelete(lote.id)" color="danger">
                     <ion-icon name="trash" slot="start"></ion-icon> Purgar
                   </ion-button>
                 </div>
