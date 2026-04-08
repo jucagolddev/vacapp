@@ -1,25 +1,63 @@
+export interface UserProfile {
+  id: string; // Auth.uid
+  email: string;
+  rol: 'Propietario' | 'Veterinario' | 'Trabajador';
+  empresa_id?: string;
+  display_name?: string;
+  created_at?: string;
+}
+
+export interface Empresa {
+  id: string;
+  nombre: string;
+  nif?: string;
+  telefono?: string;
+  created_at?: string;
+}
+
+export interface Finca {
+  id: string;
+  empresa_id: string;
+  nombre: string;
+  ubicacion?: string;
+  codigo_explotacion?: string;
+  created_at?: string;
+  empresa?: Empresa; // Relación
+}
+
 export interface Lote {
   id: string;
+  finca_id: string;
   nombre: string;
   descripcion?: string;
   ubicacion?: string;
   capacidad?: number;
   created_at?: string;
+  finca?: Finca; // Relación
 }
 
 export interface Bovino {
   id: string;
   crotal: string;
+  finca_id: string;
   nombre?: string;
   fecha_nacimiento: string;
   sexo: 'Macho' | 'Hembra';
+  
+  // ERP Attributes
   raza?: string;
-  estado: 'Activo' | 'Vendido' | 'Muerto';
+  porcentaje_pureza?: number;
+  aptitud?: 'Carne' | 'Leche' | 'Doble Propósito' | 'Trabajo/Lidia';
+  estado_productivo: 'Alta' | 'Baja Venta' | 'Baja Muerte' | 'Baja Descarte';
+  estado_reproductivo?: 'Vacía' | 'Gestante' | 'Lactante' | 'Seca';
+  
   lote_id?: string;
+  foto_url?: string;
   
   // Genealogía
   padre_id?: string;
   madre_id?: string;
+  coeficiente_consanguinidad?: number;
   
   lote?: Lote; // Datos unidos
   created_at?: string;
@@ -30,6 +68,8 @@ export interface Semental {
   nombre: string;
   raza?: string;
   procedencia?: string;
+  finca_id: string;
+  finca?: Finca;
   created_at?: string;
 }
 
@@ -62,9 +102,13 @@ export interface Sanidad {
   id: string;
   bovino_id: string;
   fecha: string;
-  tipo: string; // Vacuna, Desparasitación, Tratamiento, Saneamiento
+  tipo: 'Vacunación' | 'Desparasitación' | 'Tratamiento' | 'Cirugía' | 'Test/Diagnóstico';
   producto: string;
+  lote_medicamento?: string;
+  dias_retiro_carne?: number;
+  dias_retiro_leche?: number;
   observaciones?: string;
+  costo_aplicacion?: number;
   created_at?: string;
   bovino?: Bovino; // Unido
 }
@@ -92,10 +136,24 @@ export interface Alimentacion {
 export interface Finanzas {
   id: string;
   tipo: 'Ingreso' | 'Gasto';
-  categoria: string; // Venta, Alimentación, Veterinaria, Otros
+  categoria: string; // Venta, Alimentación, Veterinaria, Adquisición, Otros
   monto: number;
   fecha: string;
   descripcion?: string;
   bovino_id?: string;
+  finca_id?: string;
   created_at?: string;
+}
+
+export interface Tarea {
+  id: string;
+  finca_id: string;
+  bovino_id?: string;
+  titulo: string;
+  fecha_vencimiento: string;
+  estado: 'Pendiente' | 'Completada' | 'Omitida';
+  tipo_tarea?: string;
+  creada_por_sistema: boolean;
+  created_at?: string;
+  bovino?: Bovino;
 }

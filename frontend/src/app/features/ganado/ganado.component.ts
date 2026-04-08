@@ -16,6 +16,14 @@ import {
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
+import { GanadoService } from '../../core/services/ganado.service';
+import { FincaService } from '../../core/services/finca.service';
+import { StorageService } from '../../core/services/storage.service';
+import { OfflineSyncService } from '../../core/services/offline-sync.service';
+import { PesajeService } from '../../core/services/pesaje.service';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
+import { computed, signal } from '@angular/core';
 
 /**
  * Componente para el Módulo de Inventario Ganadero - Versión Rústica.
@@ -29,7 +37,8 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, 
     IonLabel, IonBadge, IonIcon, IonNote, IonGrid, 
     IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
-    IonModal, IonButton, IonInput, IonSelect, IonSelectOption
+    IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
+    BaseChartDirective
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -50,17 +59,32 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             <ion-icon name="paw"></ion-icon>
           </div>
           <div class="luxe-text-stack">
-            <h1 class="page-h1-rustic">Ganado Registrado</h1>
-            <p class="page-p-rustic">Gestión de identidad y trazabilidad individual.</p>
+            <h1 class="page-h1-rustic">Registro de Animales</h1>
+            <p class="page-p-rustic">Aquí puedes ver y gestionar todo tu ganado.</p>
+          </div>
+        </div>
+
+        <!-- GRÁFICO DE PESO (Relocado) -->
+        <div class="analytics-card-large animate-slide-up mb-8" *ngIf="bovinos().length > 0">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title-luxe"><ion-icon name="bar-chart" style="vertical-align:-2px; margin-right:8px; color:var(--ion-color-secondary);"></ion-icon> Crecimiento (Peso en Kilos)</h3>
+              <p class="card-subtitle-luxe">Evolución de peso de los ejemplares principales.</p>
+            </div>
+          </div>
+          <div class="chart-container-large">
+             <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
           </div>
         </div>
 
         <ion-grid class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of bovinos">
+            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of bovinos()">
               <div class="tag-body-luxe animate-slide-up">
                 <div class="card-header-flex">
-                  <div class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
+                  <div *ngIf="b.foto_url" class="card-icon-box bg-earth" style="padding: 0; overflow: hidden; background-image: url('{{b.foto_url}}'); background-size: cover; background-position: center;">
+                  </div>
+                  <div *ngIf="!b.foto_url" class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
                     <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
                   </div>
                   <div class="card-title-stack">
@@ -71,12 +95,20 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 
                 <div class="card-data-grid">
                   <div class="card-data-item">
+                    <span class="label">Categoría</span>
+                    <span class="value">{{ ganadoService.calculateCategoria(b) }}</span>
+                  </div>
+                  <div class="card-data-item">
                     <span class="label">Raza</span>
-                    <span class="value">{{ b.raza || 'No asig.' }}</span>
+                    <span class="value">{{ b.raza || 'Mestizo' }} {{ b.porcentaje_pureza ? '(' + b.porcentaje_pureza + '%)' : '' }}</span>
+                  </div>
+                  <div class="card-data-item">
+                    <span class="label">Aptitud</span>
+                    <span class="value">{{ b.aptitud || 'No def.' }}</span>
                   </div>
                   <div class="card-data-item">
                     <span class="label">Edad</span>
-                    <span class="value highlight">{{ getEdadDesc(b) }}</span>
+                    <span class="value highlight" style="font-size: 1.2rem; font-weight: 800;">{{ ganadoService.getEdadDesc(b) }}</span>
                   </div>
                 </div>
 
@@ -94,7 +126,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ion-grid>
 
         <!-- Estado Vacío -->
-        <div *ngIf="bovinos.length === 0" class="luxe-empty-state">
+        <div *ngIf="bovinos().length === 0" class="luxe-empty-state">
           <div class="empty-icon-ring">
             <ion-icon name="paw"></ion-icon>
           </div>
@@ -162,6 +194,11 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                   <ion-label position="stacked">DIB / Crotal *</ion-label>
                   <ion-input formControlName="crotal" placeholder="ES012345678901"></ion-input>
                 </ion-item>
+                <ion-item class="luxe-input">
+                  <ion-label position="stacked">Fotografía del Ejemplar</ion-label>
+                  <input type="file" accept="image/*" (change)="onFileSelected($event)" style="padding: 10px 0;" />
+                  <ion-note *ngIf="isUploadingFile">Subiendo imagen...</ion-note>
+                </ion-item>
               </div>
 
               <!-- Paso 2: Biología -->
@@ -178,11 +215,34 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                   </ion-select>
                 </ion-item>
                 <ion-item class="luxe-input">
-                  <ion-label position="stacked">Raza</ion-label>
-                  <ion-input formControlName="raza" placeholder="Ej: Limusín"></ion-input>
+                  <ion-label position="stacked">Raza Prima *</ion-label>
+                  <ion-select formControlName="raza" interface="popover">
+                    <ion-select-option value="Cruce / Mestizo">Cruce / Mestizo</ion-select-option>
+                    <ion-select-option value="Angus">Angus</ion-select-option>
+                    <ion-select-option value="Brahman">Brahman</ion-select-option>
+                    <ion-select-option value="Charolais">Charolais</ion-select-option>
+                    <ion-select-option value="Hereford">Hereford</ion-select-option>
+                    <ion-select-option value="Holstein">Holstein</ion-select-option>
+                    <ion-select-option value="Limousin">Limousin</ion-select-option>
+                    <ion-select-option value="Pardo Suizo">Pardo Suizo</ion-select-option>
+                    <ion-select-option value="Otro">Otro (Especificar)</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <ion-item class="luxe-input" *ngIf="bovinoForm.get('raza')?.value !== 'Cruce / Mestizo' && bovinoForm.get('raza')?.value !== 'Otro'">
+                  <ion-label position="stacked">Porcentaje de Pureza (%)</ion-label>
+                  <ion-input type="number" formControlName="porcentaje_pureza" placeholder="Ej: 100"></ion-input>
                 </ion-item>
                 <ion-item class="luxe-input">
-                  <ion-label position="stacked">Fecha de Nacimiento</ion-label>
+                  <ion-label position="stacked">Aptitud Principal *</ion-label>
+                  <ion-select formControlName="aptitud" interface="popover">
+                    <ion-select-option value="Carne">Producción de Carne</ion-select-option>
+                    <ion-select-option value="Leche">Producción Lechera</ion-select-option>
+                    <ion-select-option value="Doble Propósito">Doble Propósito</ion-select-option>
+                    <ion-select-option value="Trabajo/Lidia">Trabajo / Lidia</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <ion-item class="luxe-input">
+                  <ion-label position="stacked">Fecha de Nacimiento *</ion-label>
                   <ion-input type="date" formControlName="fecha_nacimiento"></ion-input>
                 </ion-item>
               </div>
@@ -196,17 +256,29 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                 <ion-item class="luxe-input">
                   <ion-label position="stacked">Seleccionar Lote *</ion-label>
                   <ion-select formControlName="lote_id" placeholder="Cargar Lotes..." interface="popover">
-                    <ion-select-option *ngFor="let lote of lotes" [value]="lote.id">
+                    <ion-select-option *ngFor="let lote of lotes()" [value]="lote.id">
                       {{ lote.nombre }}
                     </ion-select-option>
                   </ion-select>
                 </ion-item>
                 <ion-item class="luxe-input">
-                  <ion-label position="stacked">Estado</ion-label>
-                  <ion-select formControlName="estado" interface="popover">
-                    <ion-select-option value="Activo">Activo</ion-select-option>
-                    <ion-select-option value="Vendido">Vendido</ion-select-option>
-                    <ion-select-option value="Baja">Baja / Muerto</ion-select-option>
+                  <ion-label position="stacked">Estado Productivo</ion-label>
+                  <ion-select formControlName="estado_productivo" interface="popover">
+                    <ion-select-option value="Alta">Alta Confirmada (Finca)</ion-select-option>
+                    <ion-select-option value="Baja Venta">Baja por Venta</ion-select-option>
+                    <ion-select-option value="Baja Muerte">Baja por Naturaleza/Muerte</ion-select-option>
+                    <ion-select-option value="Baja Descarte">Baja por Descarte Sanitario</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                
+                <!-- Estado Reproductivo Solo Hembras -->
+                <ion-item class="luxe-input" *ngIf="bovinoForm.get('sexo')?.value === 'Hembra'">
+                  <ion-label position="stacked">Estado Reproductivo</ion-label>
+                  <ion-select formControlName="estado_reproductivo" interface="popover">
+                    <ion-select-option value="Vacía">Vacía / Abierta</ion-select-option>
+                    <ion-select-option value="Gestante">Gestante Conf.</ion-select-option>
+                    <ion-select-option value="Lactante">Lactante (Parida)</ion-select-option>
+                    <ion-select-option value="Seca">Seca</ion-select-option>
                   </ion-select>
                 </ion-item>
               </div>
@@ -237,16 +309,41 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
   `
 })
 export class GanadoComponent implements OnInit {
-  private supa = inject(SupabaseService);
+  public ganadoService = inject(GanadoService);
+  private fincaService = inject(FincaService);
+  private storageService = inject(StorageService);
+  private offlineSync = inject(OfflineSyncService);
+  private pesajeService = inject(PesajeService);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   
-  bovinos: Bovino[] = [];
-  lotes: Lote[] = [];
+  bovinos = this.ganadoService.bovinos;
+  lotes = this.fincaService.fincas;
+  lotesArr: Lote[] = [];
+  
+  // Gráfico de Pesos
+  chartPesos = computed<ChartConfiguration<'line'>['data']>(() => {
+    const data = this.pesajeService.getEvolucionPrincipales('Mensual');
+    return {
+      labels: data.labels,
+      datasets: data.datasets
+    };
+  });
+
+  public chartOptionsPilarLine: ChartOptions<'line'> = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#6c757d', font: { size: 11 } } } },
+    scales: {
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#6c757d' }, title: { display: true, text: 'Kilos (Kg)', color: '#6c757d' } },
+      x: { grid: { display: false }, ticks: { color: '#6c757d' } }
+    }
+  };
+
   isModalOpen = false;
   editingItem: Bovino | null = null;
   currentStep = 1;
+  isUploadingFile = false;
 
   bovinoForm: FormGroup;
 
@@ -256,10 +353,14 @@ export class GanadoComponent implements OnInit {
       nombre: ['', Validators.required],
       crotal: ['', Validators.required],
       sexo: ['Hembra', Validators.required],
-      raza: [''],
-      fecha_nacimiento: [''],
-      lote_id: ['', Validators.required],
-      estado: ['Activo', Validators.required]
+      raza: ['Cruce / Mestizo', Validators.required],
+      porcentaje_pureza: [100.0],
+      aptitud: ['Carne', Validators.required],
+      fecha_nacimiento: ['', Validators.required],
+      lote_id: [''],
+      estado_productivo: ['Alta', Validators.required],
+      estado_reproductivo: ['Vacía'],
+      foto_url: ['']
     });
   }
 
@@ -268,22 +369,7 @@ export class GanadoComponent implements OnInit {
   }
 
   async loadData() {
-    const { data: bovs } = await this.supa.getAll<Bovino>('bovinos');
-    const { data: lots } = await this.supa.getAll<Lote>('lotes');
-    this.bovinos = bovs || [];
-    this.lotes = lots || [];
-  }
-
-  getEdadDesc(b: Bovino): string {
-    if (!b.fecha_nacimiento) return 'S/N';
-    const birthDate = new Date(b.fecha_nacimiento);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const months = today.getMonth() - birthDate.getMonth();
-    if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age > 0 ? `${age} años` : `${months + (age < 0 ? 12 : 0)} m`;
+    this.lotesArr = []; 
   }
 
   isStepValid(step: number): boolean {
@@ -295,7 +381,14 @@ export class GanadoComponent implements OnInit {
   openAddModal() {
     this.editingItem = null;
     this.currentStep = 1;
-    this.bovinoForm.reset({ sexo: 'Hembra', estado: 'Activo' });
+    this.bovinoForm.reset({ 
+      sexo: 'Hembra', 
+      raza: 'Cruce / Mestizo',
+      porcentaje_pureza: 100,
+      aptitud: 'Carne',
+      estado_productivo: 'Alta',
+      estado_reproductivo: 'Vacía'
+    });
     this.isModalOpen = true;
   }
 
@@ -308,20 +401,55 @@ export class GanadoComponent implements OnInit {
 
   closeModal() { this.isModalOpen = false; }
 
+  async onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      if (!this.fincaService.selectedFincaId()) {
+        this.presentToast('Debes seleccionar una finca primero', 'warning');
+        return;
+      }
+      this.isUploadingFile = true;
+      const animalIdPlaceholder = this.editingItem?.id || 'temp';
+      const { data, error } = await this.storageService.uploadAnimalPhoto(file, this.fincaService.selectedFincaId()!, animalIdPlaceholder);
+      this.isUploadingFile = false;
+      
+      if (error) {
+        this.presentToast('Error al subir imagen', 'danger');
+      } else if (data?.publicUrl) {
+        this.bovinoForm.patchValue({ foto_url: data.publicUrl });
+        this.presentToast('Imagen subida correctamente');
+      }
+    }
+  }
+
   async saveData() {
     if (this.bovinoForm.invalid) return;
     const payload = this.bovinoForm.value;
 
-    const res = this.editingItem?.id 
-      ? await this.supa.update('bovinos', this.editingItem.id, payload)
-      : await this.supa.create('bovinos', payload);
+    let res;
+    if (this.editingItem?.id) {
+       if (!this.offlineSync.isOnline()) {
+          this.offlineSync.enqueueOperation('bovinos', 'PUT', payload, this.editingItem.id);
+          this.presentToast('Guardado en cola offline', 'warning');
+          this.closeModal();
+          return;
+       }
+       res = await this.ganadoService.updateBovino(this.editingItem.id, payload);
+    } else {
+       if (!this.offlineSync.isOnline()) {
+          this.offlineSync.enqueueOperation('bovinos', 'POST', payload);
+          this.presentToast('Guardado en cola offline', 'warning');
+          this.closeModal();
+          return;
+       }
+       res = await this.ganadoService.createBovino(payload);
+    }
 
-    if (res.error) {
+    if (res?.error) {
       this.presentToast('Error al guardar: ' + res.error, 'danger');
     } else {
       this.presentToast('Ficha de animal actualizada con éxito');
       this.isModalOpen = false;
-      this.loadData();
     }
   }
 
@@ -335,9 +463,16 @@ export class GanadoComponent implements OnInit {
           text: 'Continuar Baja', 
           role: 'destructive',
           handler: async () => {
-            await this.supa.delete('bovinos', id);
+            if (!this.offlineSync.isOnline()) {
+              this.offlineSync.enqueueOperation('bovinos', 'DELETE', {}, id);
+              this.presentToast('Borrado en cola offline', 'warning');
+              return;
+            }
+            
+            // Si hay online de verdad: el GanadoService tendria delete, pero
+            // usemos queueOperation y forcemos sinc
+            this.offlineSync.enqueueOperation('bovinos', 'DELETE', {}, id);
             this.presentToast('Ejemplar purgado del sistema', 'warning');
-            this.loadData();
           }
         }
       ]

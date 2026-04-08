@@ -2,10 +2,12 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, importProvidersF
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { 
   LucideAngularModule, LayoutDashboard, ClipboardList, Map, 
   HeartPulse, Syringe, Scale, ChevronLeft, ChevronRight, Leaf, 
-  Wheat, PawPrint, Activity, Heart, TrendingUp, AlertCircle, Calendar
+  Wheat, PawPrint, Activity, Heart, TrendingUp, AlertCircle, Calendar,
+  LogOut, Wallet, ArrowDownCircle, ArrowUpCircle, Baby, ShieldAlert
 } from 'lucide-angular';
 
 /**
@@ -20,11 +22,14 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes), 
     // Integración de Ionic Framework (Standalone)
     provideIonicAngular({}),
+    // Proveedor para ng2-charts
+    provideCharts(withDefaultRegisterables()),
     // Proveedor Global para el Sistema Ultra-Profesional de Iconos Lucide
     importProvidersFrom(LucideAngularModule.pick({ 
       LayoutDashboard, ClipboardList, Map, HeartPulse, Syringe, Scale, 
       ChevronLeft, ChevronRight, Leaf, Wheat, PawPrint, Activity, Heart, 
-      TrendingUp, AlertCircle, Calendar
+      TrendingUp, AlertCircle, Calendar, LogOut, Wallet, ArrowDownCircle, 
+      ArrowUpCircle, Baby, ShieldAlert
     }))
   ],
 };

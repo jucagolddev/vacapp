@@ -7,6 +7,7 @@ import {
   IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
+import { GanadoService } from '../../core/services/ganado.service';
 import { Lote } from '../../core/models/vacapp.models';
 import { addIcons } from 'ionicons';
 import { 
@@ -35,7 +36,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         <ion-buttons slot="start">
           <ion-menu-button class="text-white"></ion-menu-button>
         </ion-buttons>
-        <ion-title class="luxe-title">Gestión de Lotes</ion-title>
+        <ion-title class="luxe-title">Potreros y Recintos</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -69,12 +70,12 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 
                 <div class="card-data-grid">
                   <div class="card-data-item">
-                    <span class="label">Ocupación Actual</span>
-                    <span class="value highlight">-- Cbzs</span>
+                    <span class="label">Animales hoy</span>
+                    <span class="value highlight" style="font-size: 1.3rem;">{{ getAnimalCount(lote.id) }} Cabezas</span>
                   </div>
-                  <div class="card-data-item" *ngIf="lote.capacidad">
-                    <span class="label">Capacidad Máxima</span>
-                    <span class="value">{{ lote.capacidad }} Cbzs</span>
+                  <div class="card-data-item">
+                    <span class="label">Carga de Pasto (UGB)</span>
+                    <span class="value" style="color: var(--ion-color-success); font-weight: 700;">{{ getUgbForLote(lote.id) }}</span>
                   </div>
                 </div>
 
@@ -161,6 +162,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 })
 export class LotesComponent implements OnInit {
   private supa = inject(SupabaseService);
+  public ganadoService = inject(GanadoService);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
@@ -186,6 +188,16 @@ export class LotesComponent implements OnInit {
   async loadData() {
     const { data } = await this.supa.getAll<Lote>('lotes');
     this.lotes = data || [];
+  }
+
+  getAnimalCount(loteId: string): number {
+    return this.ganadoService.bovinos().filter(b => b.lote_id === loteId).length;
+  }
+
+  getUgbForLote(loteId: string): number {
+    const animals = this.ganadoService.bovinos().filter(b => b.lote_id === loteId);
+    const total = animals.reduce((acc, b) => acc + this.ganadoService.getUgb(b), 0);
+    return Number(total.toFixed(1));
   }
 
   openAddModal() {

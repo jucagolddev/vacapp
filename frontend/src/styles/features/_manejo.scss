@@ -10,6 +10,77 @@
   background: var(--ion-background-color);
 }
 
+// Barra de Filtros Rústica
+.rustic-filter-bar {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    .search-icon {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 1.2rem;
+      margin-right: 10px;
+    }
+
+    input {
+      background: transparent;
+      border: none;
+      color: white;
+      padding: 12px 0;
+      width: 100%;
+      outline: none;
+      font-size: 0.95rem;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+    }
+  }
+
+  .filter-chips {
+    display: flex;
+    gap: 8px;
+
+    .chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+
+      &.active {
+        background: $tertiary-color;
+        color: $dark-color;
+        border-color: $tertiary-color;
+        box-shadow: 0 4px 10px rgba($tertiary-color, 0.3);
+      }
+
+      &:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+}
+
 // Segmento Rustic (Botones grandes y fáciles de tocar)
 .rustic-segment {
   margin: $spacing-md 0;

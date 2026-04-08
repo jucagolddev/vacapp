@@ -45,16 +45,21 @@ export class SupabaseService {
         return { data, error: null };
       }
 
-      // Semilla de datos iniciales para el modo Mock
       const mockInitial: any = {
+        empresas: [
+          { id: 'emp-1', nombre: 'Ganadería Premium SL', nif: 'B12345678', created_at: new Date().toISOString() }
+        ],
+        fincas: [
+          { id: 'finca-1', empresa_id: 'emp-1', nombre: 'Finca Principal', ubicacion: 'Valle Central', created_at: new Date().toISOString() }
+        ],
         bovinos: [
-          { id: '1', crotal: 'ES0123456789', nombre: 'Vaca Lola', raza: 'Limousin', sexo: 'Hembra', estado: 'Activo', fecha_nacimiento: '2023-01-01', created_at: new Date().toISOString() },
-          { id: '2', crotal: 'ES9876543210', nombre: 'Toro Gitano', raza: 'Charolais', sexo: 'Macho', estado: 'Activo', fecha_nacimiento: '2022-05-15', created_at: new Date().toISOString() },
-          { id: '3', crotal: 'ES4455667788', nombre: 'Ternera Linda', raza: 'Limousin Cross', sexo: 'Hembra', estado: 'Activo', fecha_nacimiento: '2024-02-10', created_at: new Date().toISOString() }
+          { id: '1', crotal: 'ES0123456789', nombre: 'Vaca Lola', raza: 'Limousin', sexo: 'Hembra', estado: 'Activo', fecha_nacimiento: '2023-01-01', finca_id: 'finca-1', created_at: new Date().toISOString() },
+          { id: '2', crotal: 'ES9876543210', nombre: 'Toro Gitano', raza: 'Charolais', sexo: 'Macho', estado: 'Activo', fecha_nacimiento: '2022-05-15', finca_id: 'finca-1', created_at: new Date().toISOString() },
+          { id: '3', crotal: 'ES4455667788', nombre: 'Ternera Linda', raza: 'Limousin Cross', sexo: 'Hembra', estado: 'Activo', fecha_nacimiento: '2024-02-10', finca_id: 'finca-1', created_at: new Date().toISOString() }
         ],
         lotes: [
-          { id: '1', nombre: 'Prado Alto', ubicacion: 'Zona Norte', created_at: new Date().toISOString() },
-          { id: '2', nombre: 'Recría Hembras', ubicacion: 'Cercado Central', created_at: new Date().toISOString() }
+          { id: '1', finca_id: 'finca-1', nombre: 'Prado Alto', ubicacion: 'Zona Norte', created_at: new Date().toISOString() },
+          { id: '2', finca_id: 'finca-1', nombre: 'Recría Hembras', ubicacion: 'Cercado Central', created_at: new Date().toISOString() }
         ],
         reproduccion: [
           { id: '1', bovino_id: '1', fecha_cubricion: '2026-01-15', tipo_cubricion: 'Monta Natural', fecha_parto_prevista: '2026-10-25', estado_gestacion: 'Confirmada' }

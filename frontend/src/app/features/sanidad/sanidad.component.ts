@@ -12,7 +12,7 @@ import { addIcons } from 'ionicons';
 import { 
   medkit, flask, medical, add, close, save, search, 
   calendar, person, pencil, trash, leaf, pulse, water, 
-  thermometer, bandage
+  thermometer, bandage, warning
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
@@ -37,7 +37,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         <ion-buttons slot="start">
           <ion-menu-button class="text-white"></ion-menu-button>
         </ion-buttons>
-        <ion-title class="luxe-title">Bioseguridad & Salud</ion-title>
+        <ion-title class="luxe-title">Salud y Medicinas</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -74,19 +74,30 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                      <ion-icon [name]="getHealthIcon(s.tipo)"></ion-icon>
                   </div>
                   <div class="card-title-stack">
-                    <strong>{{ s.bovino?.nombre || 'Ejemplar' }}</strong>
-                    <span>ID: {{ s.bovino?.crotal || 'S/N' }} - {{ s.tipo }}</span>
+                    <strong style="font-size: 1.3rem;">{{ s.bovino?.nombre || 'Vaca' }}</strong>
+                    <span style="font-size: 1.05rem;">Crotal: {{ s.bovino?.crotal || 'S/N' }} - {{ s.tipo }}</span>
                   </div>
                 </div>
 
                 <div class="card-data-grid" style="grid-template-columns: 1fr;">
                   <div class="card-data-item">
-                    <span class="label">Producto</span>
+                    <span class="label">P. Activo / Producto</span>
                     <span class="value">{{ s.producto }}</span>
                   </div>
                   <div class="card-data-item">
                     <span class="label">Fecha Aplicación</span>
                     <span class="value">{{ s.fecha | date:'dd MMM yyyy' }}</span>
+                  </div>
+                  <div class="card-data-item" *ngIf="s.dias_retiro_carne || s.dias_retiro_leche">
+                    <span class="label">Seguridad alimentaria (Retiro)</span>
+                    <span class="value color-danger" style="font-weight: 800; font-size: 1.15rem;">
+                      <ion-icon name="warning" style="vertical-align:-2px; margin-right:4px;"></ion-icon> Carne: {{ s.dias_retiro_carne }}d | Leche: {{ s.dias_retiro_leche }}d
+                    </span>
+                    <div style="margin-top: 8px;">
+                      <ion-badge [color]="getDiasRestantes(s) > 0 ? 'danger' : 'success'" style="font-size: 1.1rem; padding: 10px 16px;">
+                        {{ getDiasRestantes(s) > 0 ? 'Faltan ' + getDiasRestantes(s) + ' días de espera' : '¡Ya se puede vender/consumir!' }}
+                      </ion-badge>
+                    </div>
                   </div>
                   <div class="card-data-item" *ngIf="s.observaciones">
                     <span class="label">Prescripción</span>
@@ -180,6 +191,27 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
               </ion-item>
 
               <ion-item class="luxe-input">
+                <ion-label position="stacked">Lote del Medicamento / Lote Nº</ion-label>
+                <ion-input formControlName="lote_medicamento" placeholder="L-XYZ-1234"></ion-input>
+              </ion-item>
+
+              <div class="luxe-item-group">
+                <ion-item class="luxe-input half">
+                  <ion-label position="stacked">Días Retiro (Carne)</ion-label>
+                  <ion-input type="number" formControlName="dias_retiro_carne" placeholder="0"></ion-input>
+                </ion-item>
+                <ion-item class="luxe-input half">
+                  <ion-label position="stacked">Días Retiro (Leche)</ion-label>
+                  <ion-input type="number" formControlName="dias_retiro_leche" placeholder="0"></ion-input>
+                </ion-item>
+              </div>
+
+              <ion-item class="luxe-input">
+                <ion-label position="stacked">Coste Aplicación (€/$/£)</ion-label>
+                <ion-input type="number" formControlName="costo_aplicacion" placeholder="0.00"></ion-input>
+              </ion-item>
+
+              <ion-item class="luxe-input">
                 <ion-label position="stacked">Observaciones Veterinarias</ion-label>
                 <ion-input formControlName="observaciones" placeholder="Dosis, vía, notas clínicas..."></ion-input>
               </ion-item>
@@ -213,7 +245,7 @@ export class SanidadComponent implements OnInit {
   constructor() {
     addIcons({ 
       medkit, flask, medical, add, close, save, search, calendar, 
-      person, pencil, trash, leaf, pulse, water, thermometer, bandage 
+      person, pencil, trash, leaf, pulse, water, thermometer, bandage, warning 
     });
     
     this.healthForm = this.fb.group({
@@ -221,6 +253,10 @@ export class SanidadComponent implements OnInit {
       tipo: ['Vacunación', Validators.required],
       fecha: [new Date().toISOString().split('T')[0], Validators.required],
       producto: ['', Validators.required],
+      lote_medicamento: [''],
+      dias_retiro_carne: [0],
+      dias_retiro_leche: [0],
+      costo_aplicacion: [0],
       observaciones: ['']
     });
   }
@@ -236,7 +272,7 @@ export class SanidadComponent implements OnInit {
       
       this.sanidadRecords = records || [];
       this.filteredSanidad = [...this.sanidadRecords];
-      this.bovinos = (bovs || []).filter(b => b.estado === 'Activo');
+      this.bovinos = (bovs || []).filter(b => b.estado_productivo === 'Alta');
     } catch (e) {
       console.error('Error cargando datos sanitarios:', e);
     }
@@ -265,6 +301,24 @@ export class SanidadComponent implements OnInit {
       case 'Enfermedad': return 'thermometer';
       default: return 'medkit';
     }
+  }
+
+  getDiasRestantes(s: Sanidad): number {
+    if (!s.fecha) return 0;
+    const maxRetiro = Math.max(s.dias_retiro_carne || 0, s.dias_retiro_leche || 0);
+    if (maxRetiro === 0) return 0;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const fechaAplicacion = new Date(s.fecha);
+    const fechaFin = new Date(fechaAplicacion);
+    fechaFin.setDate(fechaFin.getDate() + maxRetiro);
+
+    const diffTime = fechaFin.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays > 0 ? diffDays : 0;
   }
 
   openAddModal() {

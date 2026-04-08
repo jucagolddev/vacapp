@@ -1,14 +1,21 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './core/layout/main-layout/main-layout.component';
+import { authGuard } from './core/guards/auth.guard';
 
 /**
  * Configuración de las rutas principales de la aplicación.
  * Define la jerarquía de navegación y la carga perezosa (lazy-loading) de los módulos.
  */
 export const routes: Routes = [
+  // Módulo de Autenticación Público
+  {
+    path: 'auth/login',
+    loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent)
+  },
   {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [authGuard],
     children: [
       // Ruta por defecto: Redirige al Dashboard
       {
@@ -45,6 +52,11 @@ export const routes: Routes = [
       {
         path: 'recria',
         loadComponent: () => import('./features/recria/recria.component').then(m => m.RecriaComponent)
+      },
+      // Módulo de Finanzas (Economía)
+      {
+        path: 'finanzas',
+        loadComponent: () => import('./features/finanzas/finanzas.component').then(m => m.FinanzasComponent)
       }
     ]
   },

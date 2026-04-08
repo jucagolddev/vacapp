@@ -1,11 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
-  IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, 
-  IonLabel, IonBadge, IonIcon, IonNote, IonGrid, 
+  IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
+  IonLabel, IonIcon, IonGrid, 
   IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption, 
-  IonSpinner, IonText
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Pesaje, Bovino } from '../../core/models/vacapp.models';
@@ -27,11 +27,11 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule,
-    IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, 
-    IonLabel, IonBadge, IonIcon, IonNote, IonGrid, 
+    IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
+    IonLabel, IonIcon, IonGrid, 
     IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
     IonModal, IonButton, IonInput, IonSelect, IonSelectOption, 
-    IonSpinner, IonText
+    IonSpinner
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -222,7 +222,7 @@ export class RecriaComponent implements OnInit {
         this.supabase.getAll<Bovino>('bovinos')
       ]);
 
-      this.bovinos = (bovinosRes.data || []).filter(b => b.estado === 'Activo');
+      this.bovinos = (bovinosRes.data || []).filter(b => b.estado_productivo === 'Alta');
       this.pesajes = this.processPesajes(pesajesRes.data || []);
     } catch (error) {
       this.showToast('Error de sincronización', 'danger');

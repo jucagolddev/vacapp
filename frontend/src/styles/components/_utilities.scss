@@ -68,6 +68,16 @@
 
 
 /* ==========================================
-   ESTILOS EXTRAÍDOS DE COMPONENTES (.ts)
+   ESTILOS EXTRAÍDOS DE COMPONENTES (.ts) Y UTILIDADES
    ========================================== */
 
+.pt-8 { padding-top: 2rem; }
+.mb-8 { margin-bottom: 2rem; }
+.text-medium { color: var(--ion-color-medium); }
+.text-lg { font-size: 1.1rem; }
+.flex-center { display: flex; align-items: center; }
+.gap-2 { gap: 8px; }
+.font-bold { font-weight: 700; }
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }

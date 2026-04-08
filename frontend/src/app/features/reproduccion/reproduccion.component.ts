@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
@@ -7,6 +7,7 @@ import {
   IonButton, IonInput, IonSelect, IonSelectOption,
   IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
+import { BaseChartDirective } from 'ng2-charts';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Reproduccion, Bovino } from '../../core/models/vacapp.models';
 import { addIcons } from 'ionicons';
@@ -16,6 +17,8 @@ import {
 } from 'ionicons/icons';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
+import { ReproduccionService } from '../../core/services/reproduccion.service';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
  * Componente para el Módulo de Reproducción y Ginecología - Versión Rústica.
@@ -28,7 +31,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonItem, IonLabel, IonBadge, IonIcon,
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal, IonButton,
-    IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol
+    IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol, BaseChartDirective
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -36,7 +39,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         <ion-buttons slot="start">
           <ion-menu-button class="text-white"></ion-menu-button>
         </ion-buttons>
-        <ion-title class="luxe-title">Reproducción & Linaje</ion-title>
+        <ion-title class="luxe-title">Montas y Cría</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -49,12 +52,25 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             <ion-icon name="heart"></ion-icon>
           </div>
           <div class="luxe-text-stack">
-            <h1 class="page-h1-rustic">Control de Gestación</h1>
-            <p class="page-p-rustic">Seguimiento exhaustivo del ciclo reproductivo.</p>
+            <h1 class="page-h1-rustic">Control de Vacas Preñadas</h1>
+            <p class="page-p-rustic">Seguimiento de partos y efectividad de las montas.</p>
           </div>
         </div>
 
-        <h2 class="luxe-section-title">Gestaciones Confirmadas</h2>
+        <!-- GRÁFICO DE FERTILIDAD (Relocado) -->
+        <div class="analytics-card-large animate-slide-up mb-8">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title-luxe"><ion-icon name="heart" style="vertical-align:-2px; margin-right:8px; color:var(--ion-color-danger);"></ion-icon> Preñeces con éxito</h3>
+              <p class="card-subtitle-luxe">Compara cuántas vacas quedaron preñadas vs las que fallaron.</p>
+            </div>
+          </div>
+          <div class="chart-container-large">
+             <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
+          </div>
+        </div>
+
+        <h2 class="luxe-section-title">Próximos Partos</h2>
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of gestacionesActivas">
@@ -197,9 +213,31 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 })
 export class ReproduccionComponent implements OnInit {
   private supa = inject(SupabaseService);
+  private reproService = inject(ReproduccionService);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
+  
+  // Gráfico de Fertilidad
+  chartFertilidad = computed<ChartConfiguration<'bar'>['data']>(() => {
+    const data = this.reproService.getEstadisticasConcepcion('Mensual');
+    return {
+      labels: data.map(d => d.label),
+      datasets: [
+        { label: 'Gestación Exitosa', data: data.map(d => d.exitos), backgroundColor: '#52b788', borderRadius: 4 },
+        { label: 'Fallo/Absorción', data: data.map(d => d.fallos), backgroundColor: '#ef4444', borderRadius: 4 }
+      ]
+    };
+  });
+
+  public chartOptionsPilarStacked: ChartOptions<'bar'> = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#6c757d' } } },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { color: '#6c757d' } },
+      y: { stacked: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#6c757d' } }
+    }
+  };
   
   reproducciones: Reproduccion[] = [];
   gestacionesActivas: Reproduccion[] = [];
