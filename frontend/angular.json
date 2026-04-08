@@ -3,7 +3,10 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "schematicCollections": ["@ionic/angular-toolkit"]
+    "schematicCollections": [
+      "@ionic/angular-toolkit"
+    ],
+    "analytics": "ae291886-87ed-447d-8d4d-a78069bb0a9d"
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -31,7 +34,6 @@
               }
             ],
             "styles": [
-              "src/styles.scss",
               {
                 "input": "node_modules/@ionic/angular/css/core.css"
               },
@@ -61,7 +63,8 @@
               },
               {
                 "input": "node_modules/@ionic/angular/css/flex-utils.css"
-              }
+              },
+              "src/styles.scss"
             ]
           },
           "configurations": {

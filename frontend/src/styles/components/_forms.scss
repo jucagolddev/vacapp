@@ -1,0 +1,68 @@
+/* 10. ELEMENTOS DE FORMULARIO LUXE */
+.luxe-input {
+  --background: #{$gray-100};
+  --border-radius: 14px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  --padding-start: 1rem;
+}
+
+.btn-luxe-save {
+  --background: var(--ion-color-primary);
+  --color: #{$white};
+  --border-radius: 14px;
+  height: 52px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba($primary-color, 0.2);
+}
+
+
+/* 11. Buscador */
+.rustic-search-wrapper { 
+  margin: 10px 12px 25px; 
+  background: $white; 
+  border-radius: 20px; 
+  display: flex; 
+  align-items: center; 
+  padding: 0 18px; 
+  box-shadow: 0 10px 30px rgba($primary-color, 0.04); 
+  border: 1px solid rgba($secondary-color, 0.08);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+}
+
+.rustic-search-wrapper:focus-within {
+  box-shadow: 0 15px 40px rgba($secondary-color, 0.15);
+  border-color: var(--ion-color-secondary);
+  transform: translateY(-2px);
+}
+
+.rustic-search-icon {
+  color: var(--ion-color-secondary);
+  font-size: 20px;
+  margin-right: 12px;
+  transition: transform 0.4s ease, color 0.4s ease;
+}
+
+.rustic-search-wrapper:focus-within .rustic-search-icon {
+  transform: scale(1.1) rotate(5deg);
+  color: var(--ion-color-primary);
+}
+
+.rustic-search-input-field {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 18px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: $black;
+  transition: all 0.3s ease;
+}
+
+.rustic-search-input-field::placeholder {
+  color: $gray-600;
+  font-weight: 500;
+}
+

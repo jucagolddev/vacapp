@@ -1,6 +1,6 @@
 @import '../abstracts/variables';
 
-// Estilos para el módulo de Reproducción (Premium & Simple)
+// Estilos para el módulo de Reproducción (Rustic & Simple)
 /**
  * Estilos para el Ciclo de Gestación
  * 100% Variable Sync - Forest & Earth
@@ -26,7 +26,7 @@
   margin-bottom: $spacing-lg;
 }
 
-.premium-card {
+.rustic-card {
   --background: #{$white};
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba($black, 0.06);
@@ -74,8 +74,8 @@
   100% { box-shadow: 0 8px 24px rgba($black, 0.06); }
 }
 
-// Separador Premium
-.premium-divider {
+// Separador Rustic
+.rustic-divider {
   --background: transparent;
   --padding-top: $spacing-lg;
   --padding-bottom: $spacing-sm;
@@ -136,7 +136,7 @@
   }
 }
 
-// Botón Flotante Premium
+// Botón Flotante Rustic
 .fab-btn {
   --background: #{$primary-color};
   --box-shadow: 0 8px 20px rgba($primary-color, 0.3);

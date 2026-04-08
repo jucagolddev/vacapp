@@ -18,7 +18,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 
 /**
- * Componente para el Módulo de Inventario Ganadero - Edición Lujo.
+ * Componente para el Módulo de Inventario Ganadero - Versión Rústica.
  * Refactorizado: 100% Sincronización de colores con _variables.scss.
  */
 @Component({
@@ -50,8 +50,8 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             <ion-icon name="paw"></ion-icon>
           </div>
           <div class="luxe-text-stack">
-            <h1 class="luxe-h1-premium">Ganado Registrado</h1>
-            <p class="luxe-p-premium">Gestión de identidad y trazabilidad individual.</p>
+            <h1 class="page-h1-rustic">Ganado Registrado</h1>
+            <p class="page-p-rustic">Gestión de identidad y trazabilidad individual.</p>
           </div>
         </div>
 
@@ -238,12 +238,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ng-template>
       </ion-modal>
     </ion-content>
-  `,
-  styles: [`
-    /* Ganado: Estilos estructurales mínimos (Heredados de _luxe.scss) */
-    .animal-header-luxe { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-    .animal-info-luxe { flex: 1; }
-  `]
+  `
 })
 export class GanadoComponent implements OnInit {
   private supa = inject(SupabaseService);

@@ -5,21 +5,27 @@
 // 2. Base styles
 @import './base/reset';
 @import './base/typography';
+@import './base/base';
 
 // 3. Core/Integration
 @import './core/ionic';
-@import 'core/layout';
-@import './core/luxe';
+@import './core/layout';
 
-// Características (Módulos de negocio)
-@import 'features/dashboard';
-@import 'features/manejo';
-@import 'features/reproduccion';
-@import 'features/sanidad';
+// Modulos Re-arquitecturizados
+@import './layout/sidebar';
+@import './layout/containers';
+@import './components/cards';
+@import './components/forms';
+@import './components/animations';
+@import './components/utilities';
+@import './components/component_overrides';
 
 
-// 4. Custom global blocks
-@import './base/_base.scss';
+// 4. Características (Módulos de negocio)
+@import './features/dashboard';
+@import './features/manejo';
+@import './features/reproduccion';
+@import './features/sanidad';
 
 // 5. Utility classes (Optional)
 // .u-mb-4 { margin-bottom: 1rem; }

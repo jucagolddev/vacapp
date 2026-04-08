@@ -1,0 +1,112 @@
+/* From main-layout.component.ts */
+
+    /* Estilos estructurales mínimos (el resto en _luxe.scss) */
+    .sidebar-bottom-badge {
+      position: absolute;
+      bottom: 30px;
+      left: 15px;
+      right: 15px;
+    }
+
+    .badge-content {
+      background: rgba(156, 102, 68, 0.15);
+      border: 1px solid rgba(156, 102, 68, 0.2);
+      padding: 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #d4a373;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+      .hide-on-mobile { display: none; }
+      ion-split-pane.collapsed { --side-width: 280px; }
+    }
+  
+
+
+/* From dashboard.component.ts */
+
+    /* Dashboard: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    .welcome-header-main { display: flex; align-items: center; gap: 15px; }
+    .luxe-chart-mock { height: 200px; display: flex; align-items: flex-end; gap: 20px; padding: 20px 0; border-bottom: 2px solid var(--ion-color-light); }
+    .chart-row-luxe { flex: 1; display: flex; align-items: flex-end; height: 100%; }
+    
+    .luxe-alert-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.1); padding: 15px; border-radius: 20px; }
+    .alert-text strong { display: block; font-size: 0.95rem; }
+    .alert-text p { font-size: 0.8rem; margin: 2px 0 0; opacity: 0.8; }
+    
+    .luxe-progress-section { margin-top: 30px; }
+    .progress-info { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
+  
+
+
+/* From ganado.component.ts */
+
+    /* Ganado: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    .animal-header-luxe { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .animal-info-luxe { flex: 1; }
+  
+
+
+/* From lotes.component.ts */
+
+    /* Lotes: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    .field-header-luxe { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .field-icon-box { 
+      width: 48px; height: 48px; background: rgba(27, 67, 50, 0.05); 
+      border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; 
+    }
+    .field-info-luxe { flex: 1; }
+    .field-loc-luxe { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ion-color-secondary); font-weight: 700; margin-top: 4px; }
+    .detail-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  
+
+
+/* From recria.component.ts */
+
+    /* Recría: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    .weight-header-luxe { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .animal-name-txt { font-size: 1.3rem; font-weight: 900; color: var(--ion-color-primary); margin: 5px 0 0; }
+    .weight-date-luxe { display: flex; align-items: center; gap: 5px; color: var(--ion-color-tertiary); font-weight: 700; font-size: 0.8rem; }
+    
+    .detail-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .data-val-luxe { display: flex; align-items: baseline; gap: 4px; }
+    .data-val-luxe .num-txt { font-size: 2rem; font-weight: 900; color: var(--ion-color-primary); }
+    .data-val-luxe .unit-txt { font-size: 0.85rem; font-weight: 800; color: var(--ion-color-secondary); }
+
+    .gain-val-luxe { display: flex; align-items: center; gap: 5px; font-size: 1.2rem; font-weight: 900; }
+    .tag-pesaje-luxe { display: flex; align-items: center; gap: 6px; color: var(--ion-color-secondary); font-weight: 800; font-size: 0.85rem; }
+    
+    .luxe-loading-state { text-align: center; padding: 40px; color: var(--ion-color-primary); }
+    .luxe-loading-state p { margin-top: 15px; font-weight: 600; font-size: 1.1rem; }
+  
+
+
+/* From reproduccion.component.ts */
+
+    /* Reproducción: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    .repro-header-luxe { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .pulse-icon-luxe { font-size: 28px; color: var(--ion-color-danger); animation: pulse-luxe 2s infinite; }
+    @keyframes pulse-luxe { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
+
+    .countdown-parto { text-align: right; }
+    .days-num-txt { font-size: 2.1rem; font-weight: 900; color: var(--ion-color-primary); display: block; line-height: 1; }
+    .days-lbl-txt { font-size: 0.65rem; font-weight: 800; color: var(--ion-color-tertiary); text-transform: uppercase; }
+
+    .repro-animal-luxe { margin-bottom: 15px; }
+    .animal-ref-txt { font-size: 1.35rem; font-weight: 900; color: var(--ion-color-primary); margin: 0; }
+    .crotal-ref-txt { font-size: 0.8rem; color: var(--ion-color-secondary); font-weight: 700; margin-top: 2px; display: block; }
+    
+    .detail-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .repro-actions-footer { display: flex; justify-content: flex-end; border-top: 1px solid var(--ion-color-light); padding-top: 10px; }
+    .btn-group-history { display: flex; justify-content: flex-end; margin-top: 5px; }
+  
+
+
+/* From sanidad.component.ts */
+
+    

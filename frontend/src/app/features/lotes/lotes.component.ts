@@ -17,7 +17,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 
 /**
- * Componente para el Módulo de Lotes/Recintos - Edición Lujo.
+ * Componente para el Módulo de Lotes/Recintos - Versión Rústica.
  * Refactorizado: 100% Sincronización de colores con _variables.scss.
  */
 @Component({
@@ -48,8 +48,8 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             <ion-icon name="grid"></ion-icon>
           </div>
           <div class="luxe-text-stack">
-            <h1 class="luxe-h1-premium">Recintos & Potreros</h1>
-            <p class="luxe-p-premium">Organización espacial y rotación de pastos.</p>
+            <h1 class="page-h1-rustic">Recintos & Potreros</h1>
+            <p class="page-p-rustic">Organización espacial y rotación de pastos.</p>
           </div>
         </div>
 
@@ -160,18 +160,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ng-template>
       </ion-modal>
     </ion-content>
-  `,
-  styles: [`
-    /* Lotes: Estilos estructurales mínimos (Heredados de _luxe.scss) */
-    .field-header-luxe { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-    .field-icon-box { 
-      width: 48px; height: 48px; background: rgba(27, 67, 50, 0.05); 
-      border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; 
-    }
-    .field-info-luxe { flex: 1; }
-    .field-loc-luxe { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ion-color-secondary); font-weight: 700; margin-top: 4px; }
-    .detail-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-  `]
+  `
 })
 export class LotesComponent implements OnInit {
   private supa = inject(SupabaseService);

@@ -42,8 +42,8 @@ import {
     </ion-header>
 
     <ion-content class="ion-padding manejo-content">
-      <!-- Selector de pestañas: Diseño Premium -->
-      <ion-segment [value]="selectedSegment" (ionChange)="segmentChanged($event)" class="premium-segment">
+      <!-- Selector de pestañas: Diseño Base -->
+      <ion-segment [value]="selectedSegment" (ionChange)="segmentChanged($event)" class="rustic-segment">
         <ion-segment-button value="bovinos">
           <ion-icon name="list"></ion-icon>
           <ion-label>Bovinos</ion-label>
@@ -66,7 +66,7 @@ import {
                 <p class="cow-details">{{ b.raza }} · {{ b.sexo }}</p>
                 <p class="cow-lote" *ngIf="b.lote_id">Lote: {{ getLoteName(b.lote_id) }}</p>
               </ion-label>
-              <ion-badge slot="end" [color]="b.estado === 'Activo' ? 'success' : 'medium'" class="premium-badge">
+              <ion-badge slot="end" [color]="b.estado === 'Activo' ? 'success' : 'medium'" class="rustic-badge">
                 {{ b.estado }}
               </ion-badge>
             </ion-item>
@@ -93,7 +93,7 @@ import {
       <!-- VISTA DE LOTES -->
       <div *ngIf="selectedSegment === 'lotes'" class="fade-in">
         <div class="list-container">
-          <ion-card *ngFor="let l of lotes" class="premium-lote-card">
+          <ion-card *ngFor="let l of lotes" class="rustic-lote-card">
             <ion-item-sliding>
               <ion-item lines="none" class="lote-item">
                 <ion-icon slot="start" name="business" color="primary"></ion-icon>
@@ -129,7 +129,7 @@ import {
       </div>
 
       <!-- MODAL BOVINOS (WIZARD REACTIVO) -->
-      <ion-modal [isOpen]="isBovinoModalOpen" (didDismiss)="isBovinoModalOpen = false" class="premium-modal">
+      <ion-modal [isOpen]="isBovinoModalOpen" (didDismiss)="isBovinoModalOpen = false" class="rustic-modal">
         <ng-template>
           <ion-header class="ion-no-border">
             <ion-toolbar class="modal-toolbar">
@@ -152,15 +152,15 @@ import {
               <!-- PASO 1 -->
               <div *ngIf="currentStep === 1" class="step-container">
                 <h2 class="step-title">Identificación</h2>
-                <ion-item class="premium-input">
+                <ion-item class="rustic-input">
                   <ion-label position="stacked">Crotal / Identificación *</ion-label>
                   <ion-input formControlName="crotal" placeholder="ES0123..."></ion-input>
                 </ion-item>
-                <ion-item class="premium-input">
+                <ion-item class="rustic-input">
                   <ion-label position="stacked">Nombre o Apodo</ion-label>
                   <ion-input formControlName="nombre" placeholder="Parda, Estrella..."></ion-input>
                 </ion-item>
-                <ion-item class="premium-input">
+                <ion-item class="rustic-input">
                   <ion-label position="stacked">Sexo</ion-label>
                   <ion-select formControlName="sexo">
                     <ion-select-option value="Hembra">Hembra</ion-select-option>
@@ -172,13 +172,13 @@ import {
               <!-- PASO 2 -->
               <div *ngIf="currentStep === 2" class="step-container">
                 <h2 class="step-title">Genealogía</h2>
-                <ion-item class="premium-input">
+                <ion-item class="rustic-input">
                   <ion-label position="stacked">Madre</ion-label>
                   <ion-select formControlName="madre_id" placeholder="Ninguna">
                     <ion-select-option *ngFor="let m of selectMadres" [value]="m.id">{{ m.nombre }} ({{ m.crotal }})</ion-select-option>
                   </ion-select>
                 </ion-item>
-                <ion-item class="premium-input">
+                <ion-item class="rustic-input">
                   <ion-label position="stacked">Padre</ion-label>
                   <ion-select formControlName="padre_id" placeholder="Ninguno">
                     <ion-select-option *ngFor="let p of selectPadres" [value]="p.id">{{ p.nombre }} ({{ p.crotal }})</ion-select-option>
@@ -189,17 +189,17 @@ import {
               <!-- PASO 3 -->
               <div *ngIf="currentStep === 3" class="step-container">
                 <h2 class="step-title">Ubicación y Raza</h2>
-                <ion-item class="premium-input">
+                <ion-item class="rustic-input">
                   <ion-label position="stacked">Raza</ion-label>
                   <ion-input formControlName="raza" placeholder="Limousin, Angus..."></ion-input>
                 </ion-item>
-                <ion-item class="premium-input">
+                <ion-item class="rustic-input">
                   <ion-label position="stacked">Asignar a Lote</ion-label>
                   <ion-select formControlName="lote_id" placeholder="Seleccionar lote">
                     <ion-select-option *ngFor="let l of lotes" [value]="l.id">{{ l.nombre }}</ion-select-option>
                   </ion-select>
                 </ion-item>
-                <ion-item class="premium-input">
+                <ion-item class="rustic-input">
                   <ion-label position="stacked">Estado</ion-label>
                   <ion-select formControlName="estado">
                     <ion-select-option value="Activo">Activo</ion-select-option>
@@ -236,11 +236,11 @@ import {
           </ion-header>
           <ion-content class="ion-padding">
             <form [formGroup]="loteForm">
-              <ion-item class="premium-input">
+              <ion-item class="rustic-input">
                 <ion-label position="stacked">Nombre del Lote / Recinto *</ion-label>
                 <ion-input formControlName="nombre" placeholder="Ej: Prado Sur"></ion-input>
               </ion-item>
-              <ion-item class="premium-input">
+              <ion-item class="rustic-input">
                 <ion-label position="stacked">Descripción / Ubicación</ion-label>
                 <ion-input formControlName="ubicacion" placeholder="Ej: Junto al río"></ion-input>
               </ion-item>

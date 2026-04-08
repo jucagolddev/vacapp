@@ -1,4 +1,7 @@
 // Estilos base y de diseño global
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 html, body {
   height: 100%;
   background-color: $light-color; // Fondo crema/arena global

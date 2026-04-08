@@ -1,0 +1,178 @@
+/* 1. LAYOUT PRINCIPAL & SIDEBAR */
+ion-split-pane {
+  --side-width: 280px;
+  --side-min-width: 280px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--ion-background-color);
+}
+
+ion-split-pane.collapsed {
+  --side-width: 80px;
+  --side-min-width: 80px;
+}
+
+.rustic-sidebar {
+  --background: #{$primary-color} !important;
+  border-right: 1px solid rgba($secondary-color, 0.4);
+}
+
+.rustic-sidebar::part(container) {
+  background: #{$primary-color};
+  box-shadow: 5px 0 30px rgba(0,0,0,0.1);
+}
+
+.rustic-sidebar ion-content,
+.rustic-sidebar ion-list {
+  --background: transparent;
+  background: transparent !important;
+  --ion-item-background: transparent !important;
+}
+
+.rustic-sidebar ion-content {
+  --background: #{$primary-color};
+  --padding-bottom: 80px;
+}
+
+.sidebar-header-luxe {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: linear-gradient(135deg, rgba($black, 0.25), transparent);
+  border-bottom: 1px solid rgba($secondary-color, 0.2);
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-circle {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #{$tertiary-color}, #{$success-color});
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 8px 16px rgba($black, 0.3);
+}
+
+.main-brand {
+  color: #{$white};
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 1.5px;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.sub-brand {
+  color: #{$tertiary-color};
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  display: block;
+  margin-top: 2px;
+}
+
+.toggle-btn-luxe {
+  --color: #{$white};
+  background: rgba($white, 0.1);
+  border-radius: 10px;
+  height: 36px;
+  width: 36px;
+  transition: all 0.3s ease;
+}
+.toggle-btn-luxe:hover {
+  background: rgba($white, 0.2);
+}
+
+.nav-container-luxe {
+  padding-top: 15px;
+}
+
+.nav-item-luxe {
+  margin: 8px 12px;
+  --background: transparent;
+  --border-radius: 14px;
+  border-radius: 14px;
+  --color: rgba(255, 255, 255, 0.7);
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  height: 52px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nav-item-luxe:hover {
+  --background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-item-luxe .label-luxe {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 700;
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.nav-item-luxe .icon-frame {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.nav-item-luxe.selected {
+  --color: #{$white} !important;
+}
+
+.nav-item-luxe.selected::part(native) {
+  background: #{$secondary-color} !important;
+  box-shadow: 0 4px 15px rgba($black, 0.2);
+}
+
+.nav-item-luxe.selected .label-luxe {
+  color: #{$white} !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.nav-item-luxe.selected .icon-frame {
+  background: rgba(255, 255, 255, 0.15);
+  color: #{$white};
+}
+
+
+/* Fixes aplicados a Sidebar */
+.nav-item-luxe .icon-frame {
+  flex-shrink: 0;
+  min-width: 36px;
+}
+.nav-item-luxe.selected lucide-icon, .nav-item-luxe.selected .icon-frame, .nav-item-luxe.selected .label-luxe {
+  color: #ffffff !important;
+}
+.nav-item-luxe.selected {
+  background: var(--ion-color-secondary) !important;
+  color: #ffffff !important;
+}
+.rustic-sidebar.collapsed {
+  --width: 90px !important;
+  min-width: 90px !important;
+}
+/* Fix outline removing for ionic items */
+.nav-item-luxe::part(native) {
+  border: none;
+  outline: none;
+  border-radius: 14px;
+  background: transparent;
+}
+

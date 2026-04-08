@@ -19,7 +19,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AlertController, ToastController } from '@ionic/angular/standalone';
 
 /**
- * Componente para el Módulo de Recría y Control de Pesaje - Edición Lujo.
+ * Componente para el Módulo de Recría y Control de Pesaje - Versión Rústica.
  * Refactorizado: 100% Sincronización de colores con _variables.scss.
  */
 @Component({
@@ -52,8 +52,8 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
             <ion-icon name="speedometer"></ion-icon>
           </div>
           <div class="luxe-text-stack">
-            <h1 class="luxe-h1-premium">Control de Pesaje</h1>
-            <p class="luxe-p-premium">Monitoreo de crecimiento y ganancia de masa.</p>
+            <h1 class="page-h1-rustic">Control de Pesaje</h1>
+            <p class="page-p-rustic">Monitoreo de crecimiento y ganancia de masa.</p>
           </div>
         </div>
 
@@ -194,24 +194,7 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
         </ng-template>
       </ion-modal>
     </ion-content>
-  `,
-  styles: [`
-    /* Recría: Estilos estructurales mínimos (Heredados de _luxe.scss) */
-    .weight-header-luxe { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-    .animal-name-txt { font-size: 1.3rem; font-weight: 900; color: var(--ion-color-primary); margin: 5px 0 0; }
-    .weight-date-luxe { display: flex; align-items: center; gap: 5px; color: var(--ion-color-tertiary); font-weight: 700; font-size: 0.8rem; }
-    
-    .detail-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-    .data-val-luxe { display: flex; align-items: baseline; gap: 4px; }
-    .data-val-luxe .num-txt { font-size: 2rem; font-weight: 900; color: var(--ion-color-primary); }
-    .data-val-luxe .unit-txt { font-size: 0.85rem; font-weight: 800; color: var(--ion-color-secondary); }
-
-    .gain-val-luxe { display: flex; align-items: center; gap: 5px; font-size: 1.2rem; font-weight: 900; }
-    .tag-pesaje-luxe { display: flex; align-items: center; gap: 6px; color: var(--ion-color-secondary); font-weight: 800; font-size: 0.85rem; }
-    
-    .luxe-loading-state { text-align: center; padding: 40px; color: var(--ion-color-primary); }
-    .luxe-loading-state p { margin-top: 15px; font-weight: 600; font-size: 1.1rem; }
-  `]
+  `
 })
 export class RecriaComponent implements OnInit {
   private supabase = inject(SupabaseService);

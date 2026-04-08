@@ -1,45 +1,45 @@
 // Colores - Paleta Rústica y Natural Vibrante
-$primary-color: #1b4332;   // Verde Bosque Profundo (Más intenso)
-$secondary-color: #582f0e; // Marrón Tierra Oscuro (Más rico)
-$tertiary-color: #70e000;  // Verde Lima Brillante (Para destacar)
-$success-color: #2d6a4f;   // Verde Éxito Natural
-$warning-color: #e67e22;   // Naranja Cosecha
-$danger-color: #941b0c;    // Rojo Arcilla
+$primary-color: #1b4332;   // Verde Bosque Profundo
+$secondary-color: #582f0e; // Marrón Tierra Oscuro
+$tertiary-color: #d4a373;  // Arena/Canela Suave (Harmonious accent)
+$success-color: #40916c;   // Verde Éxito Natural y Suave
+$warning-color: #dda15e;   // Naranja Cosecha Muteado
+$danger-color: #bc4749;    // Rojo Ladrillo/Arcilla
 $light-color: #fefae0;     // Crema/Arena (Fondo más cálido)
 $medium-color: #a3b18a;    // Verde Salvia
-$dark-color: #081c15;      // Negro Bosque
+$dark-color: #2b3a32;      // Gris Bosque Muy Oscuro (No negro puro)
 
-// Grayscale - Contrastes mejorados para legibilidad
+// Grayscale
 $white: #ffffff;
-$black: #212529; // No negro puro para mayor confort visual
+$black: #212529;
 $gray-100: #f8f9fa;
 $gray-200: #e9ecef;
-$gray-600: #525c65; // Más oscuro para texto secundario legible
+$gray-600: #6c757d; // Texto secundario
 
-// Tipografía Accesible (Gente de campo, todas las edades)
-$font-family-base: 'Outfit', 'Inter', system-ui, sans-serif; // Outfit es más redondeada y legible
-$font-size-base: 1.15rem;   // Aumentado para mejor visión
-$font-size-lg: 1.4rem;
-$font-size-sm: 0.95rem;
-$line-height-base: 1.6;
+// Tipografía Accesible
+$font-family-base: 'Outfit', 'Inter', system-ui, sans-serif;
+$font-size-base: 0.9rem;
+$font-size-lg: 1.1rem;
+$font-size-sm: 0.75rem;
+$line-height-base: 1.4;
 
-// Spacing (Logical naming)
-$spacing-xs: 0.25rem;
-$spacing-sm: 0.5rem;
-$spacing-md: 1rem;
-$spacing-lg: 1.5rem;
-$spacing-xl: 3rem;
+// Spacing
+$spacing-xs: 0.15rem;
+$spacing-sm: 0.35rem;
+$spacing-md: 0.75rem;
+$spacing-lg: 1.25rem;
+$spacing-xl: 2rem;
 
-// Borders & Radius
+// Borders & Radius (Muted, more rustic)
 $border-radius-sm: 4px;
 $border-radius-md: 8px;
-$border-radius-lg: 16px;
+$border-radius-lg: 12px;
 $border-radius-full: 9999px;
 
-// Shadows
+// Shadows (Subtle, realistic, not rustic/exaggerated)
 $shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 4px 8px -2px rgba(0, 0, 0, 0.1);
 
 // Transitions
 $transition-base: all 0.2s ease-in-out;

@@ -1,4 +1,4 @@
-// Estilos Premium para el Módulo de Sanidad (Calendario y Tratamientos)
+// Estilos Rustic para el Módulo de Sanidad (Calendario y Tratamientos)
 @import '../abstracts/variables';
 
 /**
@@ -11,8 +11,8 @@
   padding: $spacing-md;
 }
 
-// Buscador Premium
-.premium-searchbar {
+// Buscador Rustic
+.rustic-searchbar {
   --border-radius: 16px;
   --box-shadow: 0 4px 12px rgba($black, 0.05);
   --background: #{$white};
@@ -138,7 +138,7 @@
   }
 }
 
-// Botón Flotante Premium
+// Botón Flotante Rustic
 .fab-btn {
   --background: #{$primary-color};
   --background-activated: #{$primary-color};

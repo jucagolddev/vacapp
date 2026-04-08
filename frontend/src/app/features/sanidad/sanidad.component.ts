@@ -18,7 +18,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 
 /**
- * Componente para el Módulo de Sanidad Animal - Edición Lujo.
+ * Componente para el Módulo de Sanidad Animal - Versión Rústica.
  * Refactorizado: 100% Sincronización de colores con _variables.scss.
  * Corregido: Nombres de propiedades sincronizados con Interfaz Sanidad (fecha, tipo).
  */
@@ -50,18 +50,18 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             <ion-icon name="medkit"></ion-icon>
           </div>
           <div class="luxe-text-stack">
-            <h1 class="luxe-h1-premium">Historial Clínico</h1>
-            <p class="luxe-p-premium">Registro de tratamientos y protocolos sanitarios.</p>
+            <h1 class="page-h1-rustic">Historial Clínico</h1>
+            <p class="page-p-rustic">Registro de tratamientos y protocolos sanitarios.</p>
           </div>
         </div>
 
-        <!-- Buscador Premium -->
-        <div class="luxe-search-wrapper">
-          <ion-icon name="search" class="search-icon-luxe"></ion-icon>
+        <!-- Buscador -->
+        <div class="rustic-search-wrapper">
+          <ion-icon name="search" class="rustic-search-icon"></ion-icon>
           <input 
             type="text" 
             placeholder="Buscar por crotal o tratamiento..." 
-            class="luxe-search-input-field"
+            class="rustic-search-input-field"
             (input)="onSearch($event)">
         </div>
 
@@ -199,14 +199,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ng-template>
       </ion-modal>
     </ion-content>
-  `,
-  styles: [`
-    /* Sanidad: Estilos estructurales mínimos */
-    .health-card-header-luxe { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-    .health-animal-meta { flex: 1; }
-    .health-status-badge { text-align: right; }
-    .detail-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-  `]
+  `
 })
 export class SanidadComponent implements OnInit {
   private supa = inject(SupabaseService);

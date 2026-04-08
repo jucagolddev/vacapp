@@ -1,5 +1,5 @@
 :root {
-  /** 100% Sincronizado con _variables.scss - Elite Forest & Earth **/
+  /** 100% Sincronizado con _variables.scss - Tema Rústico y Armónico **/
   
   /* Verde Bosque Profundo ($primary-color) */
   --ion-color-primary: #1b4332;
@@ -15,27 +15,27 @@
   --ion-color-secondary-shade: #4d290c;
   --ion-color-secondary-tint: #694426;
 
-  /* Verde Lima Brillante ($tertiary-color) */
-  --ion-color-tertiary: #70e000;
-  --ion-color-tertiary-rgb: 112, 224, 0;
-  --ion-color-tertiary-contrast: #081c15;
-  --ion-color-tertiary-shade: #63c600;
-  --ion-color-tertiary-tint: #7ee31a;
+  /* Arena/Canela Suave ($tertiary-color) */
+  --ion-color-tertiary: #d4a373;
+  --ion-color-tertiary-rgb: 212, 163, 115;
+  --ion-color-tertiary-contrast: #212529;
+  --ion-color-tertiary-shade: #ba8f65;
+  --ion-color-tertiary-tint: #d8ac81;
 
-  /* Éxito: Verde Natural ($success-color) */
-  --ion-color-success: #2d6a4f;
-  --ion-color-success-rgb: 45, 106, 79;
+  /* Éxito: Verde Natural Suave ($success-color) */
+  --ion-color-success: #40916c;
+  --ion-color-success-rgb: 64, 145, 108;
   --ion-color-success-contrast: #ffffff;
 
-  /* Peligro: Rojo Arcilla ($danger-color) */
-  --ion-color-danger: #941b0c;
-  --ion-color-danger-rgb: 148, 27, 12;
+  /* Peligro: Rojo Ladrillo ($danger-color) */
+  --ion-color-danger: #bc4749;
+  --ion-color-danger-rgb: 188, 71, 73;
   --ion-color-danger-contrast: #ffffff;
 
-  /* Advertencia: Naranja Cosecha ($warning-color) */
-  --ion-color-warning: #e67e22;
-  --ion-color-warning-rgb: 230, 126, 34;
-  --ion-color-warning-contrast: #ffffff;
+  /* Advertencia: Naranja Cosecha Muteado ($warning-color) */
+  --ion-color-warning: #dda15e;
+  --ion-color-warning-rgb: 221, 161, 94;
+  --ion-color-warning-contrast: #212529;
 
   /** Fondos Orgánicos **/
   --ion-background-color: #fefae0; /* Arena/Crema ($light-color) */
@@ -43,13 +43,6 @@
 
   --ion-item-background: #ffffff;
   --ion-card-background: #ffffff;
-
-  /** Tokens de Lujo Centralizados **/
-  --premium-border-radius: 28px;
-  --premium-shadow: 0 20px 50px rgba(27, 67, 50, 0.12);
-  --premium-glass: blur(15px) saturate(160%);
-  --premium-gradient: linear-gradient(135deg, #1b4332 0%, #081c15 100%);
-  --earth-gradient: linear-gradient(135deg, #582f0e 0%, #331a08 100%);
 }
 
 body {
@@ -57,17 +50,17 @@ body {
   background-color: var(--ion-background-color);
 }
 
-/* Efectos Globales de Personalización */
-.premium-card {
-  --border-radius: var(--premium-border-radius);
-  box-shadow: var(--premium-shadow);
-  border: 1px solid rgba(27, 67, 50, 0.05);
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+/* Efectos Globales de Personalización (Rústicos, no exagerados) */
+.rustic-card {
+  --border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(88, 47, 14, 0.1);
+  transition: all 0.3s ease;
 }
 
-.premium-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 30px 60px rgba(27, 67, 50, 0.18);
+.rustic-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .text-forest { color: #1b4332; }
@@ -76,5 +69,5 @@ body {
 /* Scrollbars rústicos sincronizados ($secondary-color) */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #f8f9fa; }
-::-webkit-scrollbar-thumb { background: #582f0e; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #4d290c; }
+::-webkit-scrollbar-thumb { background: #d4a373; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #ba8f65; }

@@ -18,7 +18,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 
 /**
- * Componente para el Módulo de Reproducción y Ginecología - Edición Lujo.
+ * Componente para el Módulo de Reproducción y Ginecología - Versión Rústica.
  * Refactorizado: 100% Sincronización de colores con _variables.scss.
  */
 @Component({
@@ -49,8 +49,8 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             <ion-icon name="heart"></ion-icon>
           </div>
           <div class="luxe-text-stack">
-            <h1 class="luxe-h1-premium">Control de Gestación</h1>
-            <p class="luxe-p-premium">Seguimiento exhaustivo del ciclo reproductivo.</p>
+            <h1 class="page-h1-rustic">Control de Gestación</h1>
+            <p class="page-p-rustic">Seguimiento exhaustivo del ciclo reproductivo.</p>
           </div>
         </div>
 
@@ -193,25 +193,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ng-template>
       </ion-modal>
     </ion-content>
-  `,
-  styles: [`
-    /* Reproducción: Estilos estructurales mínimos (Heredados de _luxe.scss) */
-    .repro-header-luxe { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .pulse-icon-luxe { font-size: 28px; color: var(--ion-color-danger); animation: pulse-luxe 2s infinite; }
-    @keyframes pulse-luxe { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
-
-    .countdown-parto { text-align: right; }
-    .days-num-txt { font-size: 2.1rem; font-weight: 900; color: var(--ion-color-primary); display: block; line-height: 1; }
-    .days-lbl-txt { font-size: 0.65rem; font-weight: 800; color: var(--ion-color-tertiary); text-transform: uppercase; }
-
-    .repro-animal-luxe { margin-bottom: 15px; }
-    .animal-ref-txt { font-size: 1.35rem; font-weight: 900; color: var(--ion-color-primary); margin: 0; }
-    .crotal-ref-txt { font-size: 0.8rem; color: var(--ion-color-secondary); font-weight: 700; margin-top: 2px; display: block; }
-    
-    .detail-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-    .repro-actions-footer { display: flex; justify-content: flex-end; border-top: 1px solid var(--ion-color-light); padding-top: 10px; }
-    .btn-group-history { display: flex; justify-content: flex-end; margin-top: 5px; }
-  `]
+  `
 })
 export class ReproduccionComponent implements OnInit {
   private supa = inject(SupabaseService);
