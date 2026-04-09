@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
-  IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, 
-  IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
-  IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
+  IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
+  IonLabel, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
+  IonModal, IonButton, IonInput,
   IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -26,8 +26,8 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
-    IonList, IonItem, IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, 
-    IonFab, IonFabButton, IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
+    IonItem, IonLabel, IonIcon, IonButtons, IonMenuButton, 
+    IonFab, IonFabButton, IonModal, IonButton, IonInput, 
     IonGrid, IonRow, IonCol
   ],
   template: `
@@ -71,11 +71,11 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                 <div class="card-data-grid">
                   <div class="card-data-item">
                     <span class="label">Animales hoy</span>
-                    <span class="value highlight" style="font-size: 1.3rem;">{{ getAnimalCount(lote.id) }} Cabezas</span>
+                    <span class="value highlight text-xl">{{ getAnimalCount(lote.id) }} Cabezas</span>
                   </div>
                   <div class="card-data-item">
                     <span class="label">Carga de Pasto (UGB)</span>
-                    <span class="value" style="color: var(--ion-color-success); font-weight: 700;">{{ getUgbForLote(lote.id) }}</span>
+                    <span class="value color-success font-bold">{{ getUgbForLote(lote.id) }}</span>
                   </div>
                 </div>
 
@@ -106,7 +106,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" style="--background: var(--ion-color-secondary)">
+        <ion-fab-button (click)="openAddModal()" class="bg-var-secondary">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>

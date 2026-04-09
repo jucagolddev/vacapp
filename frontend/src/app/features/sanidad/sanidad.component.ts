@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
-  IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, 
+  IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
   IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
   IonGrid, IonRow, IonCol
@@ -27,7 +27,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
-    IonList, IonItem, IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, 
+    IonItem, IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, 
     IonFab, IonFabButton, IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
     IonGrid, IonRow, IonCol
   ],
@@ -74,12 +74,12 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                      <ion-icon [name]="getHealthIcon(s.tipo)"></ion-icon>
                   </div>
                   <div class="card-title-stack">
-                    <strong style="font-size: 1.3rem;">{{ s.bovino?.nombre || 'Vaca' }}</strong>
-                    <span style="font-size: 1.05rem;">Crotal: {{ s.bovino?.crotal || 'S/N' }} - {{ s.tipo }}</span>
+                    <strong class="text-xl">{{ s.bovino?.nombre || 'Vaca' }}</strong>
+                    <span class="text-md">Crotal: {{ s.bovino?.crotal || 'S/N' }} - {{ s.tipo }}</span>
                   </div>
                 </div>
 
-                <div class="card-data-grid" style="grid-template-columns: 1fr;">
+                <div class="card-data-grid grid-cols-1">
                   <div class="card-data-item">
                     <span class="label">P. Activo / Producto</span>
                     <span class="value">{{ s.producto }}</span>
@@ -90,18 +90,18 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                   </div>
                   <div class="card-data-item" *ngIf="s.dias_retiro_carne || s.dias_retiro_leche">
                     <span class="label">Seguridad alimentaria (Retiro)</span>
-                    <span class="value color-danger" style="font-weight: 800; font-size: 1.15rem;">
-                      <ion-icon name="warning" style="vertical-align:-2px; margin-right:4px;"></ion-icon> Carne: {{ s.dias_retiro_carne }}d | Leche: {{ s.dias_retiro_leche }}d
+                    <span class="value color-danger font-heavy text-lg">
+                      <ion-icon name="warning" class="icon-inline-baseline icon-mr-sm"></ion-icon> Carne: {{ s.dias_retiro_carne }}d | Leche: {{ s.dias_retiro_leche }}d
                     </span>
-                    <div style="margin-top: 8px;">
-                      <ion-badge [color]="getDiasRestantes(s) > 0 ? 'danger' : 'success'" style="font-size: 1.1rem; padding: 10px 16px;">
+                    <div class="mt-xs">
+                      <ion-badge [color]="getDiasRestantes(s) > 0 ? 'danger' : 'success'" class="badge-luxe text-lg">
                         {{ getDiasRestantes(s) > 0 ? 'Faltan ' + getDiasRestantes(s) + ' días de espera' : '¡Ya se puede vender/consumir!' }}
                       </ion-badge>
                     </div>
                   </div>
                   <div class="card-data-item" *ngIf="s.observaciones">
                     <span class="label">Prescripción</span>
-                    <span class="value" style="font-style: italic;">"{{ s.observaciones }}"</span>
+                    <span class="value font-italic">"{{ s.observaciones }}"</span>
                   </div>
                 </div>
 
@@ -133,7 +133,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" style="--background: var(--ion-color-secondary)">
+        <ion-fab-button (click)="openAddModal()" class="bg-var-secondary">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>

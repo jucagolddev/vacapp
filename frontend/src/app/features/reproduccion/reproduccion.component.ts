@@ -61,7 +61,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
         <div class="analytics-card-large animate-slide-up mb-8">
           <div class="card-header-flex">
             <div>
-              <h3 class="card-title-luxe"><ion-icon name="heart" style="vertical-align:-2px; margin-right:8px; color:var(--ion-color-danger);"></ion-icon> Preñeces con éxito</h3>
+              <h3 class="card-title-luxe"><ion-icon name="heart" class="icon-inline-baseline icon-mr color-danger"></ion-icon> Preñeces con éxito</h3>
               <p class="card-subtitle-luxe">Compara cuántas vacas quedaron preñadas vs las que fallaron.</p>
             </div>
           </div>
@@ -134,7 +134,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" style="--background: var(--ion-color-secondary)">
+        <ion-fab-button (click)="openAddModal()" class="bg-var-secondary">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>

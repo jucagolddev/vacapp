@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
-  IonContent, IonHeader, IonToolbar, IonTitle, IonGrid, IonRow, IonCol, 
+  IonContent, IonHeader, IonToolbar, IonTitle, 
   IonButtons, IonMenuButton, IonBadge, IonProgressBar
 } from '@ionic/angular/standalone';
 import { GanadoService } from '../../core/services/ganado.service';
@@ -17,7 +17,7 @@ import {
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule, IonContent, IonHeader, IonToolbar, IonTitle, IonGrid, IonRow, IonCol, 
+    CommonModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonButtons, IonMenuButton, IonBadge, IonProgressBar,
     LucideAngularModule
   ],
@@ -38,15 +38,15 @@ import {
         <div class="dashboard-header-glass">
           <div class="header-flex">
             <div>
-              <h1 class="text-3xl font-bold tracking-tight mb-1" style="color: var(--ion-color-dark);">Resumen de mi Finca</h1>
-              <p class="flex items-center gap-2" style="color: var(--ion-color-medium); font-size: 1.1rem;">
+              <h1 class="text-3xl font-bold tracking-tight mb-1 color-dark">Resumen de mi Finca</h1>
+              <p class="flex items-center gap-2 color-medium text-lg">
                 <lucide-icon name="paw-print" size="18"></lucide-icon>
                 Viendo la finca: <strong>{{ finca()?.nombre }}</strong>
               </p>
             </div>
             <div class="status-chips">
               <ion-badge *ngIf="!isOnline()" color="warning" class="glass-badge">
-                <lucide-icon name="alert-circle" size="14" style="display:inline-block; margin-right:4px; margin-bottom:-2px;"></lucide-icon> Sin Internet (Modo Offline)
+                <lucide-icon name="alert-circle" size="14" class="icon-inline-baseline icon-mr-sm"></lucide-icon> Sin Internet (Modo Offline)
               </ion-badge>
               <div class="online-dot" [class.offline]="!isOnline()"></div>
             </div>
@@ -82,36 +82,36 @@ import {
             <div class="kpi-data">
               <span class="kpi-label">Avisos Médicos</span>
               <div class="kpi-value" [class.text-danger]="sanidadService.retirosActivos().length > 0">{{ sanidadService.retirosActivos().length }}</div>
-              <div class="kpi-sub" style="font-weight: bold;">Ver alertas abajo</div>
+              <div class="kpi-sub font-bold">Ver alertas abajo</div>
             </div>
           </div>
         </div>
 
         <!-- Feed de Alertas Críticas: EL CABALLO DE BATALLA DE LA UX PARA EL GANADERO -->
         <div class="action-center mt-12 animate-slide-up delay-400" *ngIf="sanidadService.retirosActivos().length > 0 || reproService.partosInminentes().length > 0">
-           <h2 class="section-title-luxe" style="font-size: 1.8rem; text-transform: uppercase; color: #bc4749;"><lucide-icon name="alert-circle" size="28" style="display:inline-block; vertical-align:middle; margin-right:8px;"></lucide-icon> Avisos Urgentes de Hoy</h2>
+           <h2 class="section-title-luxe text-3xl uppercase color-danger"><lucide-icon name="alert-circle" size="28" class="icon-inline icon-mr"></lucide-icon> Avisos Urgentes de Hoy</h2>
            
-           <div class="luxe-alert-row bg-red-glass" *ngFor="let a of sanidadService.retirosActivos()" style="border-left: 10px solid #bc4749;">
+           <div class="luxe-alert-row bg-red-glass border-left-danger" *ngFor="let a of sanidadService.retirosActivos()">
               <lucide-icon name="shield-alert" class="text-danger" size="48"></lucide-icon>
               <div class="alert-info">
-                <strong style="font-size: 1.4rem; color: #bc4749;">PROHIBIDO ORDEÑAR/VENDER: {{ a.bovino?.nombre || 'Animal' }} ({{ a.bovino?.crotal }})</strong>
-                <span style="font-size: 1.2rem; color: #444;">Todavía está bajo los efectos de: <strong>{{ a.producto }}</strong>.</span>
+                <strong class="text-xl color-danger">PROHIBIDO ORDEÑAR/VENDER: {{ a.bovino?.nombre || 'Animal' }} ({{ a.bovino?.crotal }})</strong>
+                <span class="text-lg color-dark">Todavía está bajo los efectos de: <strong>{{ a.producto }}</strong>.</span>
               </div>
            </div>
 
-           <div class="luxe-alert-row bg-gold-glass" *ngFor="let p of reproService.partosInminentes()" style="border-left: 10px solid #d4a373;">
+           <div class="luxe-alert-row bg-gold-glass border-left-tertiary" *ngFor="let p of reproService.partosInminentes()">
               <lucide-icon name="baby" class="text-earth" size="48"></lucide-icon>
               <div class="alert-info">
-                <strong style="font-size: 1.4rem; color: #582f0e;">PARTO PRÓXIMO: {{ p.bovino?.nombre || 'Vaca' }}</strong>
-                <span style="font-size: 1.2rem; color: #444;">Prepárate para el parto el día <strong>{{ p.fecha_parto_prevista | date:'dd de MMMM' }}</strong>.</span>
+                <strong class="text-xl color-secondary">PARTO PRÓXIMO: {{ p.bovino?.nombre || 'Vaca' }}</strong>
+                <span class="text-lg color-dark">Prepárate para el parto el día <strong>{{ p.fecha_parto_prevista | date:'dd de MMMM' }}</strong>.</span>
               </div>
            </div>
         </div>
 
         <!-- Mensaje de Bienvenida Rústico -->
-        <div *ngIf="sanidadService.retirosActivos().length === 0 && reproService.partosInminentes().length === 0" class="luxe-empty-state" style="margin-top: 4rem;">
-            <lucide-icon name="paw-print" size="64" style="color: #ddd;"></lucide-icon>
-            <h2 style="font-size: 1.5rem; color: #666;">Todo está en orden hoy.</h2>
+        <div *ngIf="sanidadService.retirosActivos().length === 0 && reproService.partosInminentes().length === 0" class="luxe-empty-state mt-lg">
+            <lucide-icon name="paw-print" size="64" class="color-muted opacity-80"></lucide-icon>
+            <h2 class="text-2xl color-muted">Todo está en orden hoy.</h2>
             <p>No tienes alertas médicas ni partos previstos para esta semana.</p>
         </div>
 

@@ -1,14 +1,14 @@
 // Estilos base y de diseño global
-@import '../abstracts/variables';
-@import '../abstracts/mixins';
+@use '../abstracts/variables';
+@use '../abstracts/mixins';
 
 html, body {
   height: 100%;
-  background-color: $light-color; // Fondo crema/arena global
+  background-color: variables.$light-color; // Fondo crema/arena global
 }
 
 ion-content {
-  --background: #{$light-color}; // Asegura que el contenido use el fondo cálido
+  --background: #{variables.$light-color}; // Asegura que el contenido use el fondo cálido
 }
 
 // Custom common classes
@@ -17,18 +17,104 @@ ion-content {
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: $spacing-md;
-  padding-right: $spacing-md;
+  padding-left: variables.$spacing-md;
+  padding-right: variables.$spacing-md;
 }
 
 .flex-center {
-  @include flex-center;
+  @include mixins.flex-center;
 }
 
 .text-primary {
-  color: $primary-color;
+  color: variables.$primary-color;
 }
 
 .bg-light {
-  background-color: $light-color;
+  background-color: variables.$light-color;
+}
+
+// ------------------------------------
+// Scrollbars Personalizadas (Rústico)
+// ------------------------------------
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(variables.$primary-color, 0.05);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(variables.$primary-color, 0.3);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  
+  &:hover {
+    background: rgba(variables.$primary-color, 0.6);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+}
+
+// Firefox Scrollbars
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(variables.$primary-color, 0.4) transparent;
+}
+
+// ------------------------------------
+// Estilos Globales Sistema (Alertas y Toasts)
+// ------------------------------------
+ion-toast {
+  --background: #{variables.$dark-color};
+  --color: #{variables.$white};
+  --border-radius: 16px;
+  --box-shadow: 0 10px 30px rgba(variables.$black, 0.2);
+  font-family: variables.$font-family-base;
+  font-weight: 600;
+  
+  &::part(button) {
+    color: variables.$tertiary-color;
+    font-weight: 800;
+  }
+}
+
+ion-alert {
+  --background: #{variables.$white};
+  --backdrop-opacity: 0.6;
+  font-family: variables.$font-family-base;
+  
+  .alert-wrapper {
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(variables.$black, 0.15);
+  }
+  
+  .alert-title {
+    font-size: 1.4rem;
+    color: variables.$dark-color;
+    font-weight: 900;
+  }
+  
+  .alert-message {
+    color: variables.$gray-600;
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+  
+  .alert-button {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    &.alert-button-role-cancel {
+      color: variables.$gray-600;
+    }
+    
+    &.alert-button-role-destructive {
+      color: variables.$danger-color;
+    }
+  }
 }

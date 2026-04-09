@@ -1,3 +1,5 @@
+@use "../abstracts/variables";
+
 /* 1. LAYOUT PRINCIPAL & SIDEBAR */
 ion-split-pane {
   --side-width: 280px;
@@ -12,12 +14,12 @@ ion-split-pane.collapsed {
 }
 
 .rustic-sidebar {
-  --background: #{$primary-color} !important;
-  border-right: 1px solid rgba($secondary-color, 0.4);
+  --background: #{variables.$primary-color} !important;
+  border-right: 1px solid rgba(variables.$secondary-color, 0.4);
 }
 
 .rustic-sidebar::part(container) {
-  background: #{$primary-color};
+  background: #{variables.$primary-color};
   box-shadow: 5px 0 30px rgba(0,0,0,0.1);
 }
 
@@ -29,7 +31,7 @@ ion-split-pane.collapsed {
 }
 
 .rustic-sidebar ion-content {
-  --background: #{$primary-color};
+  --background: #{variables.$primary-color};
   --padding-bottom: 80px;
 }
 
@@ -39,8 +41,8 @@ ion-split-pane.collapsed {
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  background: linear-gradient(135deg, rgba($black, 0.25), transparent);
-  border-bottom: 1px solid rgba($secondary-color, 0.2);
+  background: linear-gradient(135deg, rgba(variables.$black, 0.25), transparent);
+  border-bottom: 1px solid rgba(variables.$secondary-color, 0.2);
 }
 
 .brand-wrapper {
@@ -52,17 +54,17 @@ ion-split-pane.collapsed {
 .logo-circle {
   width: 42px;
   height: 42px;
-  background: linear-gradient(135deg, #{$tertiary-color}, #{$success-color});
+  background: linear-gradient(135deg, #{variables.$tertiary-color}, #{variables.$success-color});
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  box-shadow: 0 8px 16px rgba($black, 0.3);
+  box-shadow: 0 8px 16px rgba(variables.$black, 0.3);
 }
 
 .main-brand {
-  color: #{$white};
+  color: #{variables.$white};
   font-weight: 900;
   font-size: 20px;
   letter-spacing: 1.5px;
@@ -71,7 +73,7 @@ ion-split-pane.collapsed {
 }
 
 .sub-brand {
-  color: #{$tertiary-color};
+  color: #{variables.$tertiary-color};
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -80,15 +82,15 @@ ion-split-pane.collapsed {
 }
 
 .toggle-btn-luxe {
-  --color: #{$white};
-  background: rgba($white, 0.1);
+  --color: #{variables.$white};
+  background: rgba(variables.$white, 0.1);
   border-radius: 10px;
   height: 36px;
   width: 36px;
   transition: all 0.3s ease;
 }
 .toggle-btn-luxe:hover {
-  background: rgba($white, 0.2);
+  background: rgba(variables.$white, 0.2);
 }
 
 .nav-container-luxe {
@@ -133,22 +135,22 @@ ion-split-pane.collapsed {
 }
 
 .nav-item-luxe.selected {
-  --color: #{$white} !important;
+  --color: #{variables.$white} !important;
 }
 
 .nav-item-luxe.selected::part(native) {
-  background: #{$secondary-color} !important;
-  box-shadow: 0 4px 15px rgba($black, 0.2);
+  background: #{variables.$secondary-color} !important;
+  box-shadow: 0 4px 15px rgba(variables.$black, 0.2);
 }
 
 .nav-item-luxe.selected .label-luxe {
-  color: #{$white} !important;
+  color: #{variables.$white} !important;
   text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .nav-item-luxe.selected .icon-frame {
   background: rgba(255, 255, 255, 0.15);
-  color: #{$white};
+  color: #{variables.$white};
 }
 
 

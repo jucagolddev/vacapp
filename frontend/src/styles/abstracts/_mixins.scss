@@ -1,3 +1,5 @@
+@use "sass:map";
+@use "sass:math";
 // Flex Centering
 @mixin flex-center {
   display: flex;
@@ -15,12 +17,12 @@ $breakpoints: (
 );
 
 @mixin respond-to($breakpoint) {
-  @if map-has-key($breakpoints, $breakpoint) {
-    @media (min-width: #{map-get($breakpoints, $breakpoint)}) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (min-width: #{map.get($breakpoints, $breakpoint)}) {
       @content;
     }
   } @else {
-    @warn "No breakpoint found for #{$breakpoint}. Available: #{map-keys($breakpoints)}";
+    @warn "No breakpoint found for #{$breakpoint}. Available: #{map.keys($breakpoints)}";
   }
 }
 
@@ -46,7 +48,7 @@ $breakpoints: (
   &::before {
     content: "";
     display: block;
-    padding-top: percentage($ratio-y / $ratio-x);
+    padding-top: math.percentage($ratio-y / $ratio-x);
   }
   & > * {
     position: absolute;

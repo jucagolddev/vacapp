@@ -1,4 +1,4 @@
-@import '../abstracts/variables';
+@use '../abstracts/variables';
 
 // Simple Modern CSS Reset
 *,
@@ -32,13 +32,13 @@ html:focus-within {
 body {
   min-height: 100vh;
   text-rendering: optimizeSpeed;
-  line-height: $line-height-base;
+  line-height: variables.$line-height-base;
 }
 
 a {
   text-decoration: none;
   color: inherit;
-  transition: $transition-base;
+  transition: variables.$transition-base;
 }
 
 img,

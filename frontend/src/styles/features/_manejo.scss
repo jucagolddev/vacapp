@@ -1,4 +1,4 @@
-@import '../abstracts/variables';
+@use '../abstracts/variables';
 
 // Estilos para el módulo de Manejo (Rustic & Simple)
 /**
@@ -68,10 +68,10 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
 
       &.active {
-        background: $tertiary-color;
-        color: $dark-color;
-        border-color: $tertiary-color;
-        box-shadow: 0 4px 10px rgba($tertiary-color, 0.3);
+        background: variables.$tertiary-color;
+        color: variables.$dark-color;
+        border-color: variables.$tertiary-color;
+        box-shadow: 0 4px 10px rgba(variables.$tertiary-color, 0.3);
       }
 
       &:hover:not(.active) {
@@ -83,15 +83,15 @@
 
 // Segmento Rustic (Botones grandes y fáciles de tocar)
 .rustic-segment {
-  margin: $spacing-md 0;
-  --background: #{$gray-100};
+  margin: variables.$spacing-md 0;
+  --background: #{variables.$gray-100};
   border-radius: 12px;
   padding: 4px;
 
   ion-segment-button {
-    --indicator-color: #{$primary-color};
-    --color: #{$gray-600};
-    --color-checked: #{$white};
+    --indicator-color: #{variables.$primary-color};
+    --color: #{variables.$gray-600};
+    --color-checked: #{variables.$white};
     --indicator-box-shadow: 0 4px 12px rgba($black, 0.1);
     min-height: 60px;
     font-weight: 600;
@@ -105,36 +105,36 @@
 
 // Tarjeta de Vaca (Rustic) - Grande y Clara
 .cow-card {
-  --background: #{$white};
+  --background: #{variables.$white};
   --padding-top: $spacing-md;
   --padding-bottom: $spacing-md;
   --border-radius: 16px;
   margin-bottom: 8px;
-  box-shadow: 0 4px 10px rgba($black, 0.03);
-  border: 1px solid rgba($primary-color, 0.1);
+  box-shadow: 0 4px 10px rgba(variables.$black, 0.03);
+  border: 1px solid rgba(variables.$primary-color, 0.1);
 
   .cow-icon {
     font-size: 2.2rem;
-    color: $primary-color;
-    margin-right: $spacing-sm;
+    color: variables.$primary-color;
+    margin-right: variables.$spacing-sm;
   }
 
   .cow-name {
-    font-size: $font-size-lg;
+    font-size: variables.$font-size-lg;
     font-weight: 700;
-    color: $dark-color;
+    color: variables.$dark-color;
     margin-bottom: 2px;
   }
 
   .cow-id {
     font-size: 0.95rem;
-    color: $gray-600;
+    color: variables.$gray-600;
     margin: 2px 0;
   }
 
   .cow-details {
     font-size: 0.9rem;
-    color: $primary-color;
+    color: variables.$primary-color;
     font-weight: 500;
   }
 
@@ -159,8 +159,8 @@
   --box-shadow: 0 28px 48px rgba($black, 0.4);
 
   .modal-toolbar {
-    --background: #{$primary-color};
-    --color: #{$white};
+    --background: #{variables.$primary-color};
+    --color: #{variables.$white};
     padding-top: 10px;
     
     ion-title {
@@ -177,27 +177,27 @@
   align-items: center;
   gap: 15px;
   padding: 15px 0;
-  background: $primary-color;
+  background: variables.$primary-color;
 
   div {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: rgba($white, 0.2);
-    color: $white;
+    background: rgba(variables.$white, 0.2);
+    color: variables.$white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: 0.9rem;
-    border: 1px solid rgba($white, 0.3);
+    border: 1px solid rgba(variables.$white, 0.3);
     transition: all 0.3s ease;
 
     &.active {
-      background: $white;
-      color: $primary-color;
+      background: variables.$white;
+      color: variables.$primary-color;
       transform: scale(1.15);
-      box-shadow: 0 4px 10px rgba($black, 0.2);
+      box-shadow: 0 4px 10px rgba(variables.$black, 0.2);
     }
   }
 }
@@ -205,35 +205,35 @@
 // Contenedor de cada paso (Glassmorphism ligero)
 .step-container {
   animation: slideUp 0.4s ease-out;
-  padding: $spacing-md;
+  padding: variables.$spacing-md;
 
   .step-title {
     font-size: 1.6rem;
     font-weight: 800;
-    color: $dark-color;
+    color: variables.$dark-color;
     margin-bottom: 8px;
   }
 
   .step-desc {
     font-size: 1.05rem;
-    color: $gray-600;
-    margin-bottom: $spacing-lg;
+    color: variables.$gray-600;
+    margin-bottom: variables.$spacing-lg;
     line-height: 1.4;
   }
 }
 
 // Campos de entrada Rustic (Más grandes)
 .rustic-input {
-  --background: #{$gray-100};
+  --background: #{variables.$gray-100};
   --border-radius: 12px;
-  margin-bottom: $spacing-md;
+  margin-bottom: variables.$spacing-md;
   --padding-start: 16px;
   --padding-top: 10px;
   --padding-bottom: 10px;
 
   ion-label {
     font-weight: 600;
-    color: $primary-color;
+    color: variables.$primary-color;
     letter-spacing: 0.5px;
     margin-bottom: 4px;
   }
@@ -247,7 +247,7 @@
 
 // Botones de Navegación del Wizard
 .wizard-buttons {
-  margin-top: $spacing-xl;
+  margin-top: variables.$spacing-xl;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -261,24 +261,24 @@
   }
 
   .next-btn {
-    --background: #{$primary-color};
+    --background: #{variables.$primary-color};
   }
 
   .save-btn {
-    --background: #{$tertiary-color};
-    --color: #{$dark-color};
+    --background: #{variables.$tertiary-color};
+    --color: #{variables.$dark-color};
     margin-top: 10px;
   }
 }
 
 // Tarjeta de Lote (Rustic) - Diseño Diferenciado
 .rustic-lote-card {
-  --background: #{$white};
+  --background: #{variables.$white};
   border-radius: 16px;
-  margin-bottom: $spacing-md;
-  box-shadow: 0 4px 15px rgba($black, 0.05);
+  margin-bottom: variables.$spacing-md;
+  box-shadow: 0 4px 15px rgba(variables.$black, 0.05);
   overflow: hidden;
-  border: 1px solid rgba($primary-color, 0.05);
+  border: 1px solid rgba(variables.$primary-color, 0.05);
 
   .lote-item {
     --padding-top: $spacing-md;
@@ -292,12 +292,12 @@
   .lote-name {
     font-size: 1.25rem;
     font-weight: 700;
-    color: $dark-color;
+    color: variables.$dark-color;
   }
 
   .lote-desc {
     font-size: 1rem;
-    color: $gray-600;
+    color: variables.$gray-600;
   }
 }
 
@@ -309,31 +309,31 @@
   justify-content: center;
   padding: 60px 20px;
   text-align: center;
-  background: rgba($gray-100, 0.4);
+  background: rgba(variables.$gray-100, 0.4);
   border-radius: 20px;
-  margin-top: $spacing-xl;
-  border: 2px dashed rgba($primary-color, 0.1);
+  margin-top: variables.$spacing-xl;
+  border: 2px dashed rgba(variables.$primary-color, 0.1);
 
   .faded-icon {
     font-size: 5rem;
-    color: rgba($primary-color, 0.1);
-    margin-bottom: $spacing-md;
+    color: rgba(variables.$primary-color, 0.1);
+    margin-bottom: variables.$spacing-md;
   }
 
   p {
     font-size: 1.1rem;
-    color: $gray-600;
+    color: variables.$gray-600;
     font-weight: 500;
   }
 }
 
 // Botones de acción lateral (Sliding)
 .option-btn {
-  --background: #{$primary-color};
+  --background: #{variables.$primary-color};
   font-weight: 600;
   
   &[color="danger"] {
-    --background: #{$danger-color};
+    --background: #{variables.$danger-color};
   }
 }
 

@@ -52,7 +52,7 @@ import { add, close, save, pencil, trash } from 'ionicons/icons';
         <div class="analytics-card-large animate-slide-up mb-8">
           <div class="card-header-flex">
             <div>
-              <h3 class="card-title-luxe"><lucide-icon name="wallet" size="24" style="display:inline-block; vertical-align:middle; margin-right:8px; color:var(--ion-color-primary)"></lucide-icon> Mi Dinero (Ingresos vs Gastos)</h3>
+              <h3 class="card-title-luxe"><lucide-icon name="wallet" size="24" class="icon-inline icon-mr color-primary"></lucide-icon> Mi Dinero (Ingresos vs Gastos)</h3>
               <p class="card-subtitle-luxe">Las barras verdes son ventas. Las naranjas son gastos (comida, medicinas).</p>
             </div>
             <lucide-icon name="trending-up" class="text-forest/30" size="32"></lucide-icon>
@@ -70,14 +70,14 @@ import { add, close, save, pencil, trash } from 'ionicons/icons';
                 <lucide-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-circle' : 'arrow-down-circle'" class="text-white"></lucide-icon>
               </div>
               <div class="history-data-luxe">
-                <h4 style="font-size: 1.1rem; font-weight: 700;">{{ r.categoria }}</h4>
+                <h4 class="text-lg font-bold">{{ r.categoria }}</h4>
                 <p>{{ r.fecha | date:'dd MMMM yyyy' }}</p>
               </div>
               <div class="history-actions-luxe">
-                 <div [style.color]="r.tipo === 'Ingreso' ? '#2d6a4f' : '#bc6c25'" style="font-size: 1.3rem; font-weight: 800;">
+                 <div class="text-xl font-heavy" [class.color-finance-up]="r.tipo === 'Ingreso'" [class.color-finance-down]="r.tipo !== 'Ingreso'">
                   {{ r.tipo === 'Ingreso' ? '+' : '-' }} {{ r.monto | number:'1.2-2' }}€
                 </div>
-                <div class="btn-group-history" style="display:flex; margin-top:8px;">
+                <div class="btn-group-history flex-row mt-xs">
                    <ion-button fill="clear" (click)="openEditModal(r)"><ion-icon name="pencil"></ion-icon></ion-button>
                    <ion-button fill="clear" (click)="confirmDelete(r)"><ion-icon name="trash" color="danger"></ion-icon></ion-button>
                 </div>
@@ -88,7 +88,7 @@ import { add, close, save, pencil, trash } from 'ionicons/icons';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" style="--background: var(--ion-color-secondary)">
+        <ion-fab-button (click)="openAddModal()" class="bg-var-secondary">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>

@@ -1,31 +1,32 @@
 // 1. Abstracts (No output)
-@import './abstracts/variables';
-@import './abstracts/mixins';
+@use 'abstracts/variables';
+@use 'abstracts/mixins';
 
 // 2. Base styles
-@import './base/reset';
-@import './base/typography';
-@import './base/base';
+@use 'base/reset';
+@use 'base/typography';
+@use 'base/base';
 
 // 3. Core/Integration
-@import './core/ionic';
-@import './core/layout';
+@use 'core/ionic';
+@use 'core/layout';
 
 // Modulos Re-arquitecturizados
-@import './layout/sidebar';
-@import './layout/containers';
-@import './components/cards';
-@import './components/forms';
-@import './components/animations';
-@import './components/utilities';
-@import './components/component_overrides';
+@use 'layout/sidebar';
+@use 'layout/containers';
+@use 'components/cards';
+@use 'components/forms';
+@use 'components/animations';
+@use 'components/icons';
+@use 'components/utilities';
+@use 'components/component_overrides';
 
 
 // 4. Características (Módulos de negocio)
-@import './features/dashboard';
-@import './features/manejo';
-@import './features/reproduccion';
-@import './features/sanidad';
+@use 'features/dashboard';
+@use 'features/manejo';
+@use 'features/reproduccion';
+@use 'features/sanidad';
 
 // 5. Utility classes (Optional)
 // .u-mb-4 { margin-bottom: 1rem; }

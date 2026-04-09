@@ -1,6 +1,6 @@
 // Estilos para el Layout Principal (Shell) de la aplicación
 // Se aplican tanto en modo Material Design (Android) como en iOS
-@import '../abstracts/variables';
+@use '../abstracts/variables';
 
 ion-menu {
   // Ancho de la barra de navegación lateral (más pequeña según petición)
@@ -9,7 +9,7 @@ ion-menu {
 
 ion-menu ion-content {
   // Color de fondo del contenido del menú
-  --background: #{$white};
+  --background: #{variables.$white};
 }
 
 // Estilos generales para el listado del menú
@@ -19,8 +19,8 @@ ion-menu ion-list {
 
 // Cabecera del menú (Título de la App) con fondo Marrón
 ion-menu ion-list-header {
-  background-color: $secondary-color;
-  color: $white;
+  background-color: variables.$secondary-color;
+  color: variables.$white;
   padding: 20px 16px 5px 16px;
   font-size: 1.25rem;
   font-weight: 800;
@@ -30,7 +30,7 @@ ion-menu ion-list-header {
 
 // Nota debajo del título con fondo Marrón
 ion-menu ion-note {
-  background-color: $secondary-color;
+  background-color: variables.$secondary-color;
   color: rgba(255, 255, 255, 0.8);
   display: block;
   margin: 0 0 10px 0;
@@ -44,7 +44,7 @@ ion-menu ion-item {
   --padding-end: 12px;
   --min-height: 40px;
   --border-radius: 6px;
-  margin: 0 8px $spacing-xs 8px;
+  margin: 0 8px variables.$spacing-xs 8px;
   --transition: 0.3s;
 }
 
@@ -52,11 +52,11 @@ ion-menu ion-item {
 ion-menu ion-item.selected {
   // Fondo suave con el color primario
   --background: rgba(#{45, 90, 39}, 0.1); 
-  --color: #{$primary-color};
+  --color: #{variables.$primary-color};
   font-weight: 600;
 
   ion-icon {
-    color: $primary-color; // Icono en verde al estar seleccionado
+    color: variables.$primary-color; // Icono en verde al estar seleccionado
   }
 }
 
@@ -73,13 +73,13 @@ ion-menu ion-label {
 
 // Ajuste global para ítems seleccionados fuera del menú si fuera necesario
 ion-item.selected {
-  --color: #{$primary-color};
+  --color: #{variables.$primary-color};
 }
 
 // BARRA SUPERIOR (Toolbar) - Verde Bosque con Texto Blanco
 ion-toolbar {
-  --background: #{$primary-color};
-  --color: #{$white};
+  --background: #{variables.$primary-color};
+  --color: #{variables.$white};
   --border-style: none;
 
   ion-title {
@@ -88,10 +88,10 @@ ion-toolbar {
   }
 
   ion-menu-button {
-    --color: #{$white};
+    --color: #{variables.$white};
   }
 
   ion-buttons {
-    --color: #{$white};
+    --color: #{variables.$white};
   }
 }

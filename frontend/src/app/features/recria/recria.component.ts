@@ -92,7 +92,7 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
                 </div>
 
                 <div class="card-footer-actions">
-                  <ion-button fill="clear" disabled color="dark" style="opacity: 0.8; font-size: 0.75rem;">
+                  <ion-button fill="clear" disabled color="dark" class="opacity-80 text-xs">
                     <ion-icon name="bar-chart" slot="start"></ion-icon> {{ p.tipo_pesaje }}
                   </ion-button>
                   <ion-button fill="clear" (click)="deletePesaje(p.id)" color="danger">
@@ -118,7 +118,7 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="setOpen(true)" style="--background: var(--ion-color-primary)">
+        <ion-fab-button (click)="setOpen(true)" class="bg-var-primary">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>

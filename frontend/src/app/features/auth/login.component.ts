@@ -13,10 +13,10 @@ import { AuthService } from '../../core/services/auth.service';
   imports: [CommonModule, FormsModule, IonContent, IonCard, IonCardContent, IonInput, IonButton, IonSpinner, IonText],
   template: `
     <ion-content color="light">
-      <div class="flex-center" style="height: 100%; justify-content: center;">
-        <ion-card style="width: 100%; max-width: 400px; border-radius: 12px; padding: 20px;">
+      <div class="flex-center justify-center h-full">
+        <ion-card class="login-card">
           <ion-card-content>
-            <h2 class="font-bold text-lg mb-8 text-center" style="color: var(--ion-color-primary)">
+            <h2 class="font-bold text-lg mb-8 text-center color-primary">
               Bienvenido a Vacapp
             </h2>
             
@@ -39,11 +39,11 @@ import { AuthService } from '../../core/services/auth.service';
             </ion-button>
 
             <ion-text color="danger" *ngIf="error()">
-              <p class="text-center" style="margin-top: 15px;">{{ error() }}</p>
+              <p class="text-center mt-sm">{{ error() }}</p>
             </ion-text>
             
             <ion-text color="success" *ngIf="success()">
-              <p class="text-center" style="margin-top: 15px;">Hemos enviado un enlace mágico a tu correo.</p>
+              <p class="text-center mt-sm">Hemos enviado un enlace mágico a tu correo.</p>
             </ion-text>
 
           </ion-card-content>

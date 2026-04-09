@@ -1,10 +1,12 @@
+@use "../abstracts/variables";
+
 /* BASE CARD */
 .rustic-base-card {
-  background: $white;
-  border-radius: $border-radius-lg;
+  background: variables.$white;
+  border-radius: variables.$border-radius-lg;
   padding: 1rem;
-  box-shadow: $shadow-sm;
-  border: 1px solid $gray-200;
+  box-shadow: variables.$shadow-sm;
+  border: 1px solid variables.$gray-200;
   border-left: 6px solid var(--ion-color-secondary);
   margin: 8px;
   position: relative;
@@ -12,7 +14,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: $shadow-md;
+    box-shadow: variables.$shadow-md;
   }
 }
 
@@ -33,12 +35,12 @@
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  color: $white;
+  color: variables.$white;
   flex-shrink: 0;
   
   &.bg-primary { background: var(--ion-color-primary); }
   &.bg-secondary { background: var(--ion-color-secondary); }
-  &.bg-tertiary { background: var(--ion-color-tertiary); }
+  &.bg-tertiary { background: var(--ion-color-tertiary); color: variables.$secondary-color; ion-icon, lucide-icon { color: variables.$secondary-color !important; } }
   &.bg-danger { background: var(--ion-color-danger); }
 }
 
@@ -48,7 +50,7 @@
 
   strong {
     font-size: 0.95rem; /* Smaller, high-density */
-    color: $black;
+    color: variables.$black;
     font-weight: 800;
   }
   span {
@@ -72,13 +74,13 @@
 
   span.label {
     font-size: 0.65rem;
-    color: $gray-600;
+    color: variables.$gray-600;
     text-transform: uppercase;
     font-weight: 800;
   }
   span.value {
     font-size: 0.85rem;
-    color: $black;
+    color: variables.$black;
     font-weight: 800;
     margin-top: 2px;
   }
@@ -93,7 +95,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 10px;
-  border-top: 1px solid $gray-100;
+  border-top: 1px solid variables.$gray-100;
   
   ion-button {
     font-weight: 700;
@@ -118,35 +120,34 @@
   cursor: pointer;
 
   &:hover {
-    border-color: rgba($secondary-color, 0.2);
+    border-color: rgba(variables.$secondary-color, 0.2);
   }
 }
 
-.stat-label { font-size: 0.72rem; text-transform: uppercase; font-weight: 800; color: $secondary-color; letter-spacing: 0.8px; margin-bottom: 4px; display: block; }
+.stat-label { font-size: 0.72rem; text-transform: uppercase; font-weight: 800; color: variables.$secondary-color; letter-spacing: 0.8px; margin-bottom: 4px; display: block; }
 .stat-trend { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; font-weight: 700; margin-top: 5px; }
 
 
 /* 9. PANELES DETALLADOS */
 .luxe-panel-glass {
-  background: $white;
-  border-radius: $border-radius-lg;
+  background: variables.$white;
+  border-radius: variables.$border-radius-lg;
   padding: 1rem;
   min-height: 250px;
-  box-shadow: $shadow-sm;
-  border: 1px solid $gray-200;
+  box-shadow: variables.$shadow-sm;
+  border: 1px solid variables.$gray-200;
   margin: 8px;
 }
 
 .luxe-panel-dark {
   background: var(--ion-color-primary);
-  color: $white;
-  border-radius: $border-radius-lg;
+  color: variables.$white;
+  border-radius: variables.$border-radius-lg;
   padding: 1rem;
   min-height: 250px;
-  box-shadow: $shadow-sm;
-  border: 1px solid rgba($black, 0.05);
+  box-shadow: variables.$shadow-sm;
+  border: 1px solid rgba(variables.$black, 0.05);
   margin: 8px;
 }
 
-.luxe-panel-dark h3 { color: $white; }
-
+.luxe-panel-dark h3 { color: variables.$white; }

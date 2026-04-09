@@ -1,38 +1,84 @@
+@use "../abstracts/variables";
+
 /* 10. ELEMENTOS DE FORMULARIO LUXE */
 .luxe-input {
-  --background: #{$gray-100};
-  --border-radius: 14px;
-  margin-bottom: 1rem;
-  font-weight: 600;
-  --padding-start: 1rem;
+  --background: #{variables.$white};
+  --border-radius: 16px;
+  margin-bottom: 1.5rem;
+  --padding-start: 1.2rem;
+  --padding-end: 1rem;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --inner-padding-end: 0;
+  box-shadow: 0 4px 10px rgba(variables.$black, 0.03);
+  border: 1px solid rgba(variables.$primary-color, 0.1);
+  transition: all 0.3s ease;
+
+  &.item-has-focus {
+    --background: #{variables.$white};
+    border-color: var(--ion-color-secondary);
+    box-shadow: 0 6px 20px rgba(variables.$secondary-color, 0.15);
+  }
+
+  ion-label {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: variables.$gray-600 !important;
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+  }
+  
+  ion-input, ion-select {
+    font-size: 1.2rem !important;
+    font-weight: 600;
+    color: variables.$dark-color;
+  }
+  
+  ion-select::part(icon) {
+    color: var(--ion-color-secondary);
+    opacity: 1;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+}
+
+.luxe-item-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    .half { 
+        flex: 1; 
+        min-width: 140px; 
+    }
 }
 
 .btn-luxe-save {
   --background: var(--ion-color-primary);
-  --color: #{$white};
+  --color: #{variables.$white};
   --border-radius: 14px;
   height: 52px;
   font-weight: 800;
-  box-shadow: 0 8px 20px rgba($primary-color, 0.2);
+  box-shadow: 0 8px 20px rgba(variables.$primary-color, 0.2);
 }
 
 
 /* 11. Buscador */
 .rustic-search-wrapper { 
   margin: 10px 12px 25px; 
-  background: $white; 
+  background: variables.$white; 
   border-radius: 20px; 
   display: flex; 
   align-items: center; 
   padding: 0 18px; 
-  box-shadow: 0 10px 30px rgba($primary-color, 0.04); 
-  border: 1px solid rgba($secondary-color, 0.08);
+  box-shadow: 0 10px 30px rgba(variables.$primary-color, 0.04); 
+  border: 1px solid rgba(variables.$secondary-color, 0.08);
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   overflow: hidden;
 }
 
 .rustic-search-wrapper:focus-within {
-  box-shadow: 0 15px 40px rgba($secondary-color, 0.15);
+  box-shadow: 0 15px 40px rgba(variables.$secondary-color, 0.15);
   border-color: var(--ion-color-secondary);
   transform: translateY(-2px);
 }
@@ -57,12 +103,47 @@
   padding: 18px 0;
   font-size: 1rem;
   font-weight: 600;
-  color: $black;
+  color: variables.$black;
   transition: all 0.3s ease;
 }
 
 .rustic-search-input-field::placeholder {
-  color: $gray-600;
+  color: variables.$gray-600;
   font-weight: 500;
 }
+/* 12. Estilos para Desplegables (Selects) y Calendarios (Dates) */
+ion-input[type="date"] {
+  --padding-start: 1.2rem;
+  font-family: inherit;
+  color: variables.$dark-color;
+}
 
+// Estilos globales para los popovers de los Selects (Desplegables)
+ion-popover.select-popover {
+  --background: variables.$white;
+  --max-width: 90%;
+  --border-radius: 16px;
+  --box-shadow: 0 10px 40px rgba(variables.$black, 0.15);
+  
+  ion-item {
+    --background: transparent;
+    --color: variables.$dark-color;
+    font-weight: 600;
+    
+    &.item-has-focus, &:hover {
+       --background: rgba(variables.$primary-color, 0.05);
+    }
+  }
+
+  ion-radio {
+    --color-checked: var(--ion-color-secondary);
+  }
+}
+
+/* Modificadores globales para Calendarios */
+ion-datetime {
+  --background: variables.$white;
+  --title-color: var(--ion-color-secondary);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}

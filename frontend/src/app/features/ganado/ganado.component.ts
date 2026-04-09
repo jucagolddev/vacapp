@@ -1,8 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
-  IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, 
-  IonLabel, IonBadge, IonIcon, IonNote, IonGrid, 
+  IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
+  IonLabel, IonIcon, IonNote, IonGrid, 
   IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption
 } from '@ionic/angular/standalone';
@@ -34,8 +34,8 @@ import { computed, signal } from '@angular/core';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, 
-    IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, 
-    IonLabel, IonBadge, IonIcon, IonNote, IonGrid, 
+    IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
+    IonLabel, IonIcon, IonNote, IonGrid, 
     IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
     IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
     BaseChartDirective
@@ -68,7 +68,7 @@ import { computed, signal } from '@angular/core';
         <div class="analytics-card-large animate-slide-up mb-8" *ngIf="bovinos().length > 0">
           <div class="card-header-flex">
             <div>
-              <h3 class="card-title-luxe"><ion-icon name="bar-chart" style="vertical-align:-2px; margin-right:8px; color:var(--ion-color-secondary);"></ion-icon> Crecimiento (Peso en Kilos)</h3>
+              <h3 class="card-title-luxe"><ion-icon name="bar-chart" class="icon-inline-baseline icon-mr color-secondary"></ion-icon> Crecimiento (Peso en Kilos)</h3>
               <p class="card-subtitle-luxe">Evolución de peso de los ejemplares principales.</p>
             </div>
           </div>
@@ -82,7 +82,7 @@ import { computed, signal } from '@angular/core';
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of bovinos()">
               <div class="tag-body-luxe animate-slide-up">
                 <div class="card-header-flex">
-                  <div *ngIf="b.foto_url" class="card-icon-box bg-earth" style="padding: 0; overflow: hidden; background-image: url('{{b.foto_url}}'); background-size: cover; background-position: center;">
+                  <div *ngIf="b.foto_url" class="card-icon-box bg-earth card-icon-box-img" [style.background-image]="'url(' + b.foto_url + ')'">
                   </div>
                   <div *ngIf="!b.foto_url" class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
                     <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
@@ -108,7 +108,7 @@ import { computed, signal } from '@angular/core';
                   </div>
                   <div class="card-data-item">
                     <span class="label">Edad</span>
-                    <span class="value highlight" style="font-size: 1.2rem; font-weight: 800;">{{ ganadoService.getEdadDesc(b) }}</span>
+                    <span class="value highlight text-lg font-heavy">{{ ganadoService.getEdadDesc(b) }}</span>
                   </div>
                 </div>
 
@@ -140,7 +140,7 @@ import { computed, signal } from '@angular/core';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" style="--background: var(--ion-color-secondary)">
+        <ion-fab-button (click)="openAddModal()" class="bg-var-secondary">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -196,7 +196,7 @@ import { computed, signal } from '@angular/core';
                 </ion-item>
                 <ion-item class="luxe-input">
                   <ion-label position="stacked">Fotografía del Ejemplar</ion-label>
-                  <input type="file" accept="image/*" (change)="onFileSelected($event)" style="padding: 10px 0;" />
+                  <input type="file" accept="image/*" (change)="onFileSelected($event)" class="py-sm" />
                   <ion-note *ngIf="isUploadingFile">Subiendo imagen...</ion-note>
                 </ion-item>
               </div>

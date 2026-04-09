@@ -1,0 +1,32 @@
+/* ==========================================
+   ICONS SCSS (Centralized Icon Styling)
+   ========================================== */
+
+.icon-inline {
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+.icon-inline-baseline {
+  display: inline-block !important;
+  margin-bottom: -2px !important;
+}
+
+.icon-mr { margin-right: 8px !important; }
+.icon-mr-sm { margin-right: 4px !important; }
+
+/* Icon Wrapper Backgrounds */
+.icon-bg-danger-light {
+  background: rgba(var(--ion-color-danger-rgb), 0.1) !important;
+}
+
+.icon-bg-white-10 {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Base icon sizing */
+.icon-size-sm { width: 14px; height: 14px; font-size: 14px; }
+.icon-size-md { width: 18px; height: 18px; font-size: 18px; }
+.icon-size-lg { width: 24px; height: 24px; font-size: 24px; }
+.icon-size-xl { width: 28px; height: 28px; font-size: 28px; }
+

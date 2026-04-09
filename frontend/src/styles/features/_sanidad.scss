@@ -1,5 +1,5 @@
 // Estilos Rustic para el Módulo de Sanidad (Calendario y Tratamientos)
-@import '../abstracts/variables';
+@use '../abstracts/variables';
 
 /**
  * Estilos para el Historial Clínico y Sanitario
@@ -7,18 +7,18 @@
  */
 
 .sanidad-content {
-  --background: #{$gray-100};
-  padding: $spacing-md;
+  --background: #{variables.$gray-100};
+  padding: variables.$spacing-md;
 }
 
 // Buscador Rustic
 .rustic-searchbar {
   --border-radius: 16px;
   --box-shadow: 0 4px 12px rgba($black, 0.05);
-  --background: #{$white};
-  --placeholder-color: #{$gray-600};
-  --icon-color: #{$primary-color};
-  margin-bottom: $spacing-lg;
+  --background: #{variables.$white};
+  --placeholder-color: #{variables.$gray-600};
+  --icon-color: #{variables.$primary-color};
+  margin-bottom: variables.$spacing-lg;
   padding: 0;
   
   ion-searchbar {
@@ -29,20 +29,20 @@
 
 // Historial/Tabla de Datos (ion-grid)
 .health-table-container {
-  background: $white;
+  background: variables.$white;
   border-radius: 20px;
-  box-shadow: 0 8px 24px rgba($black, 0.06);
+  box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
   overflow: hidden;
-  border: 1px solid rgba($primary-color, 0.08);
+  border: 1px solid rgba(variables.$primary-color, 0.08);
   margin-bottom: 80px; // Espacio para el FAB
 
   .table-header {
-    background: rgba($primary-color, 0.04);
-    border-bottom: 1px solid rgba($primary-color, 0.1);
+    background: rgba(variables.$primary-color, 0.04);
+    border-bottom: 1px solid rgba(variables.$primary-color, 0.1);
     
     ion-col {
       font-weight: 700;
-      color: $primary-color;
+      color: variables.$primary-color;
       font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -51,12 +51,12 @@
   }
 
   .table-row {
-    border-bottom: 1px solid rgba($gray-200, 0.5);
+    border-bottom: 1px solid rgba(variables.$gray-200, 0.5);
     transition: background 0.2s ease;
     align-items: center;
 
     &:hover {
-      background: rgba($primary-color, 0.02);
+      background: rgba(variables.$primary-color, 0.02);
     }
 
     &:last-child {
@@ -66,14 +66,14 @@
     ion-col {
       padding: 14px 12px;
       font-size: 0.95rem;
-      color: $dark-color;
+      color: variables.$dark-color;
       display: flex;
       align-items: center;
     }
 
     .date-cell {
       font-weight: 600;
-      color: $gray-600;
+      color: variables.$gray-600;
     }
 
     .animal-cell {
@@ -82,11 +82,11 @@
       
       .animal-name {
         font-weight: 700;
-        color: $primary-color;
+        color: variables.$primary-color;
       }
       .animal-crotal {
         font-size: 0.8rem;
-        color: $gray-600;
+        color: variables.$gray-600;
       }
     }
 
@@ -97,10 +97,10 @@
       font-weight: 700;
       text-transform: uppercase;
       
-      &.vacunacion { background: rgba($success-color, 0.1); color: $success-color; }
-      &.desparasitacion { background: rgba($primary-color, 0.1); color: $primary-color; }
-      &.saneamiento { background: rgba($warning-color, 0.1); color: $warning-color; }
-      &.enfermedad { background: rgba($danger-color, 0.1); color: $danger-color; }
+      &.vacunacion { background: rgba(variables.$success-color, 0.1); color: variables.$success-color; }
+      &.desparasitacion { background: rgba(variables.$primary-color, 0.1); color: variables.$primary-color; }
+      &.saneamiento { background: rgba(variables.$warning-color, 0.1); color: variables.$warning-color; }
+      &.enfermedad { background: rgba(variables.$danger-color, 0.1); color: variables.$danger-color; }
     }
   }
 }
@@ -121,27 +121,27 @@
   }
 
   .modal-content {
-    padding: $spacing-lg;
+    padding: variables.$spacing-lg;
     
     .modal-title {
       font-size: 1.8rem;
       font-weight: 800;
-      color: $primary-color;
+      color: variables.$primary-color;
       margin-bottom: 8px;
     }
 
     .modal-subtitle {
       font-size: 1rem;
-      color: $gray-600;
-      margin-bottom: $spacing-xl;
+      color: variables.$gray-600;
+      margin-bottom: variables.$spacing-xl;
     }
   }
 }
 
 // Botón Flotante Rustic
 .fab-btn {
-  --background: #{$primary-color};
-  --background-activated: #{$primary-color};
+  --background: #{variables.$primary-color};
+  --background-activated: #{variables.$primary-color};
   --box-shadow: 0 10px 20px rgba($primary-color, 0.3);
   width: 65px;
   height: 65px;
@@ -162,17 +162,17 @@
   
   ion-icon {
     font-size: 4rem;
-    color: rgba($primary-color, 0.1);
-    margin-bottom: $spacing-md;
+    color: rgba(variables.$primary-color, 0.1);
+    margin-bottom: variables.$spacing-md;
   }
   
   h3 {
     font-weight: 700;
-    color: $dark-color;
+    color: variables.$dark-color;
   }
   
   p {
-    color: $gray-600;
+    color: variables.$gray-600;
   }
 }
 
