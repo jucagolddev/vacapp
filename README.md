@@ -1,6 +1,6 @@
-# 🐄 Vacapp: Gestión Ganadera Inteligente
+# 🐄 Vacapp: Gestión Ganadera Profesional
 
-[![Angular](https://img.shields.io/badge/Angular-18+-DD0031?style=flat-square&logo=angular)](https://angular.dev/)
+[![Angular](https://img.shields.io/badge/Angular-21+-DD0031?style=flat-square&logo=angular)](https://angular.dev/)
 [![Ionic](https://img.shields.io/badge/Ionic-8+-3880FF?style=flat-square&logo=ionic)](https://ionicframework.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
 
@@ -10,12 +10,12 @@
 
 ## ✨ Características Principales
 
-- **📊 Cuadro de Mando (Dashboard)**: Visualización rápida del estado de la finca, alertas de salud y resúmenes financieros.
-- **🐂 Gestión de Ganado**: Registro detallado de vacas (crotales, razas, genealogía) y organización por lotes o pastos.
+- **📊 Panel de Control (Dashboard)**: Visualización rápida del estado de la explotación, alertas sanitarias y resúmenes de rendimiento.
+- **🐂 Gestión de Ganado**: Registro detallado de bovinos (crotales, razas, genealogía) y organización estandarizada por lotes.
 - **❤️ Reproducción**: Control de celos, cubriciones e inseminaciones. Cálculo automático de la fecha prevista de parto (Gestación de 283 días).
-- **⚖️ Recría y Pesajes**: Seguimiento del crecimiento con cálculo automático de Ganancia de Peso (ADG).
-- **💉 Sanidad**: Historial médico completo, registro de vacunas y tratamientos por animal.
-- **💾 Modo Offline/Demo**: Persistencia en `localStorage` que permite usar la app sin configurar una base de datos real inicialmente.
+- **⚖️ Recría y Pesajes**: Seguimiento del crecimiento con cálculo automático de Ganancia Diaria de Peso.
+- **💉 Sanidad**: Historial médico completo, incluyendo vacunaciones y tratamientos específicos por animal.
+- **💾 Modo Offline/Demo**: Persistencia de datos local (`localStorage`) que permite probar y utilizar la aplicación sin necesidad de una base de datos externa configurada.
 
 ---
 
@@ -27,16 +27,16 @@
 
 ### Instalación
 1. Clona el repositorio:
-   ```powershell
+   ```bash
    git clone https://github.com/TU_USUARIO/vacapp.git
    cd vacapp/frontend
    ```
 2. Instala las dependencias:
-   ```powershell
+   ```bash
    npm install
    ```
 3. Inicia el servidor de desarrollo:
-   ```powershell
+   ```bash
    npm run start
    ```
 4. Abre [http://localhost:4200](http://localhost:4200) en tu navegador.
@@ -45,14 +45,14 @@
 
 ## 🛠️ Configuración de Producción (Supabase)
 
-Para conectar tu propia base de datos real, sigue las instrucciones detalladas en:
+Para conectar la aplicación a una base de datos real (PostgreSQL), sigue las instrucciones detalladas en:
 👉 [Guía de Configuración de Supabase](documentation/supabase_setup.md)
 
 ---
 
 ## 📁 Estructura del Proyecto
 
-Consulta el [Mapa del Proyecto](documentation/tree.md) para más detalles sobre la arquitectura de carpetas.
+Consulta la [Estructura del Proyecto](documentation/tree.md) para más detalles sobre la arquitectura de directorios.
 
 ---
 
@@ -60,5 +60,5 @@ Consulta el [Mapa del Proyecto](documentation/tree.md) para más detalles sobre 
 Este proyecto es de uso libre para fines educativos y de gestión ganadera personal.
 
 ---
-*Desarrollado con ❤️ para el sector ganadero.*
- Riverside, CA. 2026.
+*Desarrollado para el sector ganadero.*
+Riverside, CA. 2026.
