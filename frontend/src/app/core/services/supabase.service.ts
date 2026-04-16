@@ -270,4 +270,64 @@ export class SupabaseService {
   async deletePesaje(id: string) {
     return this.delete('recria_pesajes', id);
   }
+
+  /**
+   * Actualiza el lote de un bovino basándose en su peso (Lógica Determinista).
+   */
+  async updateBovinoLote(bovinoId: string, peso: number) {
+    let nuevoLoteId = '';
+    let nombreLote = '';
+
+    if (peso < 150) {
+      nuevoLoteId = 'UUID_LOTE_RECRIA_INICIAL';
+      nombreLote = 'Recría Inicial';
+    } else if (peso >= 150 && peso <= 300) {
+      nuevoLoteId = 'UUID_LOTE_DESARROLLO';
+      nombreLote = 'Desarrollo';
+    } else {
+      nuevoLoteId = 'UUID_LOTE_FINALIZACION';
+      nombreLote = 'Finalización';
+    }
+
+    try {
+      if (!this.supabase) {
+        // Mock Update
+        const { data: bovinos } = await this.getRawMock('bovinos');
+        const index = bovinos.findIndex((b: any) => b.id === bovinoId);
+        if (index !== -1) {
+          const oldLoteId = bovinos[index].lote_id;
+          bovinos[index].lote_id = nuevoLoteId;
+          localStorage.setItem('mock_bovinos', JSON.stringify(bovinos));
+          return { data: { id: nuevoLoteId, nombre: nombreLote, changed: oldLoteId !== nuevoLoteId }, error: null };
+        }
+        return { data: null, error: 'Animal no encontrado' };
+      }
+
+      // Supabase Update
+      const { data: currentBovino } = await this.supabase
+        .from('bovinos')
+        .select('lote_id')
+        .eq('id', bovinoId)
+        .single();
+
+      const { error } = await this.supabase
+        .from('bovinos')
+        .update({ lote_id: nuevoLoteId })
+        .eq('id', bovinoId);
+
+      if (error) throw error;
+
+      return { 
+        data: { 
+          id: nuevoLoteId, 
+          nombre: nombreLote, 
+          changed: currentBovino?.lote_id !== nuevoLoteId 
+        }, 
+        error: null 
+      };
+    } catch (e: any) {
+      console.error('Error en updateBovinoLote:', e);
+      return { data: null, error: e.message || 'Error técnico al actualizar lote' };
+    }
+  }
 }

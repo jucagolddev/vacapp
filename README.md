@@ -22,10 +22,12 @@
 ## 🚀 Cómo empezar
 
 ### Requisitos previos
+
 - [Node.js](https://nodejs.org/) (versión 18 o superior)
 - [Angular CLI](https://angular.dev/tools/cli) (`npm install -g @angular/cli`)
 
 ### Instalación
+
 1. Clona el repositorio:
    ```bash
    git clone https://github.com/TU_USUARIO/vacapp.git
@@ -37,9 +39,9 @@
    ```
 3. Inicia el servidor de desarrollo:
    ```bash
-   npm run start
+   npm run starthttp://localhost:4200
    ```
-4. Abre [http://localhost:4200](http://localhost:4200) en tu navegador.
+4. Abre [](http://localhost:4200) en tu navegador.
 
 ---
 
@@ -57,8 +59,10 @@ Consulta la [Estructura del Proyecto](documentation/tree.md) para más detalles 
 ---
 
 ## 📄 Licencia
+
 Este proyecto es de uso libre para fines educativos y de gestión ganadera personal.
 
 ---
-*Desarrollado para el sector ganadero.*
+
+_Desarrollado para el sector ganadero._
 Riverside, CA. 2026.

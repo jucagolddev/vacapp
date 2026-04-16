@@ -120,6 +120,35 @@ export class PesajeService {
     };
   }
 
+  // Obtiene la evolución media mensual de peso de todo el hato
+  getEvolucionMensualHerd() {
+    const records = this.pesajesSignal();
+    if (records.length === 0) return { labels: [], datasets: [] };
+
+    const map = new Map<string, { suma: number, count: number }>();
+
+    records.forEach(r => {
+      const date = new Date(r.fecha_pesaje);
+      const key = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+      
+      if (!map.has(key)) map.set(key, { suma: 0, count: 0 });
+      const stats = map.get(key)!;
+      stats.suma += r.peso_kg;
+      stats.count += 1;
+    });
+
+    const sortedLabels = Array.from(map.keys()).sort();
+    const data = sortedLabels.map(k => {
+      const stats = map.get(k)!;
+      return Math.round(stats.suma / stats.count);
+    });
+
+    return {
+      labels: sortedLabels,
+      data: data
+    };
+  }
+
   private generateMockPesajes(): Pesaje[] {
     const mocks: Pesaje[] = [];
     const today = new Date();

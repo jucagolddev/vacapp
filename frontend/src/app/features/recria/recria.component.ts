@@ -265,16 +265,29 @@ export class RecriaComponent implements OnInit {
     if (this.pesajeForm.invalid) return;
 
     try {
-      const res = await this.supabase.createPesaje(this.pesajeForm.value);
+      const pesajeData = this.pesajeForm.value;
+      const res = await this.supabase.createPesaje(pesajeData);
+      
       if (res.error) {
         this.showToast('Error al guardar: ' + res.error, 'danger');
       } else {
-        this.showToast('Registro completado');
+        // Lógica de reasignación automática de lote (Hardcoded por peso)
+        const reasignacion = await this.supabase.updateBovinoLote(
+          pesajeData.bovino_id, 
+          pesajeData.peso_kg
+        );
+
+        if (reasignacion.data?.changed) {
+          this.showToast(`¡Animal reasignado a ${reasignacion.data.nombre}!`, 'tertiary');
+        } else {
+          this.showToast('Peso registrado correctamente');
+        }
+
         this.setOpen(false);
         await this.loadData();
       }
     } catch (e) {
-      this.showToast('Error técnico', 'danger');
+      this.showToast('Error técnico al procesar el pesaje', 'danger');
     }
   }
 

@@ -45,6 +45,16 @@ export class GanadoService {
     return map;
   });
 
+  // Distribución por Lotes
+  readonly distLotes = computed(() => {
+    const map: Record<string, number> = {};
+    this.bovinosSignal().forEach(b => {
+      const loteName = b.lote?.nombre || 'Sin Lote';
+      map[loteName] = (map[loteName] || 0) + 1;
+    });
+    return map;
+  });
+
   // Lógica de cálculo centralizada
   calculateCategoria(b: Bovino): string {
     if (!b.fecha_nacimiento) return 'Sin Categoría';

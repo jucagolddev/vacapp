@@ -81,9 +81,9 @@ print(f"¡Listo! Archivos binarios ignorados correctamente. Todo se guardó en {
 ARCHIVO: .\README.md
 ==================================================
 
-# 🐄 Vacapp: Gestión Ganadera Inteligente
+# 🐄 Vacapp: Gestión Ganadera Profesional
 
-[![Angular](https://img.shields.io/badge/Angular-18+-DD0031?style=flat-square&logo=angular)](https://angular.dev/)
+[![Angular](https://img.shields.io/badge/Angular-21+-DD0031?style=flat-square&logo=angular)](https://angular.dev/)
 [![Ionic](https://img.shields.io/badge/Ionic-8+-3880FF?style=flat-square&logo=ionic)](https://ionicframework.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
 
@@ -93,12 +93,12 @@ ARCHIVO: .\README.md
 
 ## ✨ Características Principales
 
-- **📊 Cuadro de Mando (Dashboard)**: Visualización rápida del estado de la finca, alertas de salud y resúmenes financieros.
-- **🐂 Gestión de Ganado**: Registro detallado de vacas (crotales, razas, genealogía) y organización por lotes o pastos.
+- **📊 Panel de Control (Dashboard)**: Visualización rápida del estado de la explotación, alertas sanitarias y resúmenes de rendimiento.
+- **🐂 Gestión de Ganado**: Registro detallado de bovinos (crotales, razas, genealogía) y organización estandarizada por lotes.
 - **❤️ Reproducción**: Control de celos, cubriciones e inseminaciones. Cálculo automático de la fecha prevista de parto (Gestación de 283 días).
-- **⚖️ Recría y Pesajes**: Seguimiento del crecimiento con cálculo automático de Ganancia de Peso (ADG).
-- **💉 Sanidad**: Historial médico completo, registro de vacunas y tratamientos por animal.
-- **💾 Modo Offline/Demo**: Persistencia en `localStorage` que permite usar la app sin configurar una base de datos real inicialmente.
+- **⚖️ Recría y Pesajes**: Seguimiento del crecimiento con cálculo automático de Ganancia Diaria de Peso.
+- **💉 Sanidad**: Historial médico completo, incluyendo vacunaciones y tratamientos específicos por animal.
+- **💾 Modo Offline/Demo**: Persistencia de datos local (`localStorage`) que permite probar y utilizar la aplicación sin necesidad de una base de datos externa configurada.
 
 ---
 
@@ -110,16 +110,16 @@ ARCHIVO: .\README.md
 
 ### Instalación
 1. Clona el repositorio:
-   ```powershell
+   ```bash
    git clone https://github.com/TU_USUARIO/vacapp.git
    cd vacapp/frontend
    ```
 2. Instala las dependencias:
-   ```powershell
+   ```bash
    npm install
    ```
 3. Inicia el servidor de desarrollo:
-   ```powershell
+   ```bash
    npm run start
    ```
 4. Abre [http://localhost:4200](http://localhost:4200) en tu navegador.
@@ -128,14 +128,14 @@ ARCHIVO: .\README.md
 
 ## 🛠️ Configuración de Producción (Supabase)
 
-Para conectar tu propia base de datos real, sigue las instrucciones detalladas en:
+Para conectar la aplicación a una base de datos real (PostgreSQL), sigue las instrucciones detalladas en:
 👉 [Guía de Configuración de Supabase](documentation/supabase_setup.md)
 
 ---
 
 ## 📁 Estructura del Proyecto
 
-Consulta el [Mapa del Proyecto](documentation/tree.md) para más detalles sobre la arquitectura de carpetas.
+Consulta la [Estructura del Proyecto](documentation/tree.md) para más detalles sobre la arquitectura de directorios.
 
 ---
 
@@ -143,8 +143,8 @@ Consulta el [Mapa del Proyecto](documentation/tree.md) para más detalles sobre 
 Este proyecto es de uso libre para fines educativos y de gestión ganadera personal.
 
 ---
-*Desarrollado con ❤️ para el sector ganadero.*
- Riverside, CA. 2026.
+*Desarrollado para el sector ganadero.*
+Riverside, CA. 2026.
 
 
 ==================================================
@@ -1207,7 +1207,8 @@ ARCHIVO: .\frontend\angular.json
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,
@@ -1584,6 +1585,42 @@ Si experimenta problemas de sincronización:
 
 
 ==================================================
+ARCHIVO: .\frontend\ngsw-config.json
+==================================================
+
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.csr.html",
+          "/index.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
+        ]
+      }
+    }
+  ]
+}
+
+
+==================================================
 ARCHIVO: .\frontend\package.json
 ==================================================
 
@@ -1606,10 +1643,12 @@ ARCHIVO: .\frontend\package.json
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
+    "@angular/service-worker": "^21.2.8",
     "@capacitor/core": "^8.3.0",
     "@ionic/angular": "^8.8.3",
     "@supabase/supabase-js": "^2.102.1",
     "chart.js": "^4.5.1",
+    "localforage": "^1.10.0",
     "lucide-angular": "^1.0.0",
     "ng2-charts": "^10.0.0",
     "rxjs": "~7.8.0",
@@ -1920,6 +1959,69 @@ ARCHIVO: .\frontend\tsconfig.spec.json
 
 
 ==================================================
+ARCHIVO: .\frontend\public\manifest.webmanifest
+==================================================
+
+{
+  "name": "vacapp",
+  "short_name": "vacapp",
+  "display": "standalone",
+  "scope": "./",
+  "start_url": "./",
+  "icons": [
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}
+
+
+==================================================
 ARCHIVO: .\frontend\src\index.html
 ==================================================
 
@@ -1935,9 +2037,11 @@ ARCHIVO: .\frontend\src\index.html
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
   <app-root></app-root>
+  <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>
 </html>
 
@@ -1989,7 +2093,8 @@ export class AppComponent {
 ARCHIVO: .\frontend\src\app\app.config.ts
 ==================================================
 
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, importProvidersFrom, ErrorHandler, isDevMode } from '@angular/core';
+import { GlobalErrorHandler } from './core/services/global-error-handler';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideIonicAngular } from '@ionic/angular/standalone';
@@ -2000,6 +2105,7 @@ import {
   Wheat, PawPrint, Activity, Heart, TrendingUp, AlertCircle, Calendar,
   LogOut, Wallet, ArrowDownCircle, ArrowUpCircle, Baby, ShieldAlert
 } from 'lucide-angular';
+import { provideServiceWorker } from '@angular/service-worker';
 
 /**
  * Configuración global de la Aplicación Angular.
@@ -2009,6 +2115,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     // Manejo global de errores en el navegador
     provideBrowserGlobalErrorListeners(),
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
     // Configuración del enrutamiento de la aplicación
     provideRouter(routes), 
     // Integración de Ionic Framework (Standalone)
@@ -2021,7 +2128,10 @@ export const appConfig: ApplicationConfig = {
       ChevronLeft, ChevronRight, Leaf, Wheat, PawPrint, Activity, Heart, 
       TrendingUp, AlertCircle, Calendar, LogOut, Wallet, ArrowDownCircle, 
       ArrowUpCircle, Baby, ShieldAlert
-    }))
+    })), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          })
   ],
 };
 
@@ -2971,10 +3081,50 @@ export class GanadoService {
 
 
 ==================================================
+ARCHIVO: .\frontend\src\app\core\services\global-error-handler.ts
+==================================================
+
+import { ErrorHandler, Injectable, Injector } from '@angular/core';
+import { ToastController, AlertController } from '@ionic/angular/standalone';
+
+@Injectable()
+export class GlobalErrorHandler implements ErrorHandler {
+  constructor(private injector: Injector) {}
+
+  async handleError(error: any) {
+    // Evita inyectar dependencias directamente en el constructor para evitar ciclos.
+    const toastCtrl = this.injector.get(ToastController);
+    
+    // Loguear el error original en consola
+    console.error('⚠️ [Global Error Handler] Capturado:', error);
+    
+    const message = error.message ? error.message : error.toString();
+    
+    // Mostrar Toast amigable al usuario en la UI
+    try {
+       const toast = await toastCtrl.create({
+         message: 'Ha ocurrido un error inesperado. Por favor contácte a soporte o reintente.',
+         duration: 4000,
+         color: 'danger',
+         position: 'top',
+         icon: 'warning'
+       });
+       await toast.present();
+    } catch(e) {
+       console.error('Error presentando Toast de error global:', e);
+    }
+  }
+}
+
+
+==================================================
 ARCHIVO: .\frontend\src\app\core\services\offline-sync.service.ts
 ==================================================
 
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, signal, inject } from '@angular/core';
+import localforage from 'localforage';
+import { SupabaseService } from './supabase.service';
+import { AlertController, ToastController } from '@ionic/angular/standalone';
 
 export interface SyncOperation {
   id: string;
@@ -2985,43 +3135,56 @@ export interface SyncOperation {
   timestamp: number;
 }
 
+export type SyncState = 'Online' | 'Offline' | 'Sincronizando' | 'Conflicto';
+
 @Injectable({
   providedIn: 'root'
 })
 export class OfflineSyncService {
+  private supa = inject(SupabaseService);
+  private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
+
   private networkStatusSignal = signal<boolean>(navigator.onLine);
-  private syncQueueSignal = signal<SyncOperation[]>(this.loadQueue());
+  private syncQueueSignal = signal<SyncOperation[]>([]);
+  private syncStateSignal = signal<SyncState>(navigator.onLine ? 'Online' : 'Offline');
 
   readonly isOnline = computed(() => this.networkStatusSignal());
+  readonly syncState = computed(() => this.syncStateSignal());
   readonly pendingOperations = computed(() => this.syncQueueSignal());
   readonly pendingCount = computed(() => this.syncQueueSignal().length);
 
   constructor() {
+    this.initStorage();
     window.addEventListener('online', () => this.setNetworkStatus(true));
     window.addEventListener('offline', () => this.setNetworkStatus(false));
   }
 
-  private setNetworkStatus(isOnline: boolean) {
-    this.networkStatusSignal.set(isOnline);
-    if (isOnline) {
-      this.processQueue(); // Intentar sincronizar cuando vuelva la red
+  private async initStorage() {
+    localforage.config({
+      name: 'VacaApp',
+      storeName: 'sync_queue'
+    });
+    const queue = await localforage.getItem<SyncOperation[]>('vacapp_sync_queue');
+    if (queue) {
+      this.syncQueueSignal.set(queue);
     }
   }
 
-  private loadQueue(): SyncOperation[] {
-    const queue = localStorage.getItem('vacapp_sync_queue');
-    return queue ? JSON.parse(queue) : [];
-  }
-
-  private saveQueue(queue: SyncOperation[]) {
-    localStorage.setItem('vacapp_sync_queue', JSON.stringify(queue));
+  private async saveQueue(queue: SyncOperation[]) {
+    await localforage.setItem('vacapp_sync_queue', queue);
     this.syncQueueSignal.set(queue);
   }
 
-  /**
-   * Encola una operación para ser sincronizada con el backend más tarde.
-   */
-  enqueueOperation(table: string, method: 'POST' | 'PUT' | 'DELETE', payload: any, recordId?: string) {
+  private setNetworkStatus(isOnline: boolean) {
+    this.networkStatusSignal.set(isOnline);
+    this.syncStateSignal.set(isOnline ? 'Online' : 'Offline');
+    if (isOnline) {
+      this.processQueue();
+    }
+  }
+
+  async enqueueOperation(table: string, method: 'POST' | 'PUT' | 'DELETE', payload: any, recordId?: string) {
     const operation: SyncOperation = {
       id: Math.random().toString(36).substr(2, 9),
       table,
@@ -3031,35 +3194,139 @@ export class OfflineSyncService {
       timestamp: Date.now()
     };
     
-    const queue = this.loadQueue();
-    queue.push(operation);
-    this.saveQueue(queue);
+    const queue = [...this.syncQueueSignal(), operation];
+    await this.saveQueue(queue);
     
-    // Si estamos online, intentamos vaciar la cola rápido
     if (this.isOnline()) {
       this.processQueue();
     }
   }
 
-  /**
-   * Intenta procesar toda la cola. Las operaciones exitosas se retiran.
-   */
   async processQueue() {
-    if (!this.isOnline()) return;
+    if (!this.isOnline() || this.syncState() === 'Sincronizando' || this.syncState() === 'Conflicto') return;
 
-    const queue = this.loadQueue();
+    let queue = [...this.syncQueueSignal()];
     if (queue.length === 0) return;
 
-    console.log(`[OfflineSync] Procesando ${queue.length} operaciones pendientes...`);
-    const remainingQueue: SyncOperation[] = [];
+    this.syncStateSignal.set('Sincronizando');
 
-    // En un escenario real, aquí inyectaríamos el SupabaseService y ejecutaríamos las operaciones reales.
-    // Como SupabaseService injecta a OfflineSync (circular), el procesamiento real puede desencadenarse por SupabaseService, o podemos emitir un evento.
-    // Para simplificar, expondremos la cola y dejaremos que SupabaseService la consuma.
+    // Autenticación Offline (Renovación de token si estuvimos mucho tiempo offline)
+    if (this.supa.client) {
+      const { data, error } = await this.supa.client.auth.getSession();
+      if (!data.session || error) {
+         await this.supa.client.auth.refreshSession();
+      }
+    }
+
+    let remainingQueue: SyncOperation[] = [];
+    let hasConflict = false;
+
+    for (const op of queue) {
+      if (op.method === 'PUT' && op.recordId && this.supa.client) {
+         // Verificar last updated_at
+         const { data: currentDbRecord } = await this.supa.client
+            .from(op.table)
+            .select('updated_at')
+            .eq('id', op.recordId)
+            .single();
+
+         if (currentDbRecord && currentDbRecord.updated_at) {
+            const dbTimestamp = new Date(currentDbRecord.updated_at).getTime();
+            if (dbTimestamp > op.timestamp) {
+               this.syncStateSignal.set('Conflicto');
+               hasConflict = true;
+               
+               const resolve = await this.promptConflict(op.table, dbTimestamp, op.timestamp);
+               if (resolve === 'discard') {
+                 continue; // Ignorar esta op y continuar (Soft-Conflict Drop)
+               }
+               // Si resolve es 'force', seguimos con el loop y lo sobrescribe
+            }
+         }
+      }
+
+      // Procesar en Supabase nativo/mock
+      let reqError = null;
+      if (op.method === 'POST') {
+         const { error } = await this.supa.create(op.table, op.payload);
+         reqError = error;
+      } else if (op.method === 'PUT' && op.recordId) {
+         const { error } = await this.supa.update(op.table, op.recordId, op.payload);
+         reqError = error;
+      } else if (op.method === 'DELETE' && op.recordId) {
+         const { error } = await this.supa.delete(op.table, op.recordId);
+         reqError = error;
+      }
+
+      if (reqError) {
+         console.error('[OfflineSync] Error sincronizando operation', op, reqError);
+         remainingQueue.push(op); // Reencolar si falló transitoriamente
+      }
+    }
+
+    await this.saveQueue(remainingQueue);
+    
+    if (!hasConflict) {
+      this.syncStateSignal.set(this.isOnline() ? 'Online' : 'Offline');
+      if (queue.length > remainingQueue.length) {
+         const toast = await this.toastCtrl.create({
+            message: 'Sincronización offline completada.',
+            duration: 3000,
+            color: 'success',
+            position: 'bottom',
+         });
+         toast.present();
+      }
+    }
   }
-  
-  clearQueue() {
-    this.saveQueue([]);
+
+  private async promptConflict(table: string, dbDataTime: number, localDataTime: number): Promise<'force' | 'discard'> {
+    return new Promise(async (resolve) => {
+       const alert = await this.alertCtrl.create({
+         header: 'Conflicto de Sincronización',
+         message: `Alguien modificó un registro en ${table}. Tu versión guardada offline es más antigua. ¿Qué deseas hacer?`,
+         buttons: [
+           { 
+             text: 'Descartar mis cambios', 
+             role: 'cancel', 
+             handler: () => {
+                this.syncStateSignal.set(this.isOnline() ? 'Online' : 'Offline');
+                resolve('discard')
+             } 
+           },
+           { 
+             text: 'Sobrescribir datos', 
+             role: 'destructive', 
+             handler: () => {
+                this.syncStateSignal.set(this.isOnline() ? 'Online' : 'Offline');
+                resolve('force')
+             } 
+           }
+         ]
+       });
+       await alert.present();
+    });
+  }
+
+  /**
+   * Worker background simulado: Ejecuta descarga masiva a IndexedDB
+   * para consultas sin conexión.
+   */
+  async cacheFullDatasetBackground() {
+    if (!this.supa.client || !this.isOnline()) return;
+    try {
+      const { data, error } = await this.supa.client.from('bovinos').select('*');
+      if (data && !error) {
+        await localforage.setItem('vacapp_bovinos_offline_cache', data);
+        console.log('[OfflineSync] Caché de catálogo primario Bovinos actualizado en IndexedDB.');
+      }
+    } catch(e) {
+      console.error('[OfflineSync] Error al cachear background dataset', e);
+    }
+  }
+
+  async clearQueue() {
+    await this.saveQueue([]);
   }
 }
 
@@ -3620,11 +3887,12 @@ export class SupabaseService {
       return { data: enriched as T[], error: null };
     }
     
-    // Consulta real a Supabase con ordenamiento por fecha de creación
+    // Consulta real a Supabase con ordenamiento por fecha de creación (Paginado para rendimiento)
     const { data, error } = await this.supabase
       .from(table)
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(0, 49);
     return { data: data as T[], error };
   }
 
@@ -3722,6 +3990,20 @@ export class SupabaseService {
       .delete()
       .eq('id', id);
     return { error };
+  }
+
+  /** --- REALTIME Y SUSCRIPCIONES --- **/
+
+  /**
+   * Suscribirse a cambios en tiempo real en una tabla específica.
+   */
+  subscribeToTableChanges(table: string, callback: (payload: any) => void) {
+    if (!this.supabase) return null;
+    return this.supabase.channel(`public:${table}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: table }, payload => {
+        callback(payload);
+      })
+      .subscribe();
   }
 
   /** --- MÉTODOS DE ABSTRACCIÓN POR MÓDULO --- **/
@@ -5448,6 +5730,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.ts
 ==================================================
 
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
@@ -5708,7 +5991,7 @@ export class ReproduccionComponent implements OnInit {
       fecha_parto_prevista: ['']
     });
 
-    this.reproForm.get('fecha_cubricion')?.valueChanges.subscribe(val => {
+    this.reproForm.get('fecha_cubricion')?.valueChanges.pipe(takeUntilDestroyed()).subscribe(val => {
       this.calculateParto(val);
     });
   }
@@ -6256,7 +6539,7 @@ ARCHIVO: .\frontend\src\environments\environment.ts
 ==================================================
 
 export const environment = {
-  production: true,
+  production: false,
   supabaseUrl: '',
   supabaseKey: ''
 };
