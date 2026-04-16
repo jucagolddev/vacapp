@@ -79,11 +79,12 @@ export class SupabaseService {
       return { data: enriched as T[], error: null };
     }
     
-    // Consulta real a Supabase con ordenamiento por fecha de creación
+    // Consulta real a Supabase con ordenamiento por fecha de creación (Paginado para rendimiento)
     const { data, error } = await this.supabase
       .from(table)
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(0, 49);
     return { data: data as T[], error };
   }
 
@@ -181,6 +182,20 @@ export class SupabaseService {
       .delete()
       .eq('id', id);
     return { error };
+  }
+
+  /** --- REALTIME Y SUSCRIPCIONES --- **/
+
+  /**
+   * Suscribirse a cambios en tiempo real en una tabla específica.
+   */
+  subscribeToTableChanges(table: string, callback: (payload: any) => void) {
+    if (!this.supabase) return null;
+    return this.supabase.channel(`public:${table}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: table }, payload => {
+        callback(payload);
+      })
+      .subscribe();
   }
 
   /** --- MÉTODOS DE ABSTRACCIÓN POR MÓDULO --- **/

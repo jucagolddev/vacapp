@@ -1,4 +1,7 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, signal, inject } from '@angular/core';
+import localforage from 'localforage';
+import { SupabaseService } from './supabase.service';
+import { AlertController, ToastController } from '@ionic/angular/standalone';
 
 export interface SyncOperation {
   id: string;
@@ -9,43 +12,56 @@ export interface SyncOperation {
   timestamp: number;
 }
 
+export type SyncState = 'Online' | 'Offline' | 'Sincronizando' | 'Conflicto';
+
 @Injectable({
   providedIn: 'root'
 })
 export class OfflineSyncService {
+  private supa = inject(SupabaseService);
+  private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
+
   private networkStatusSignal = signal<boolean>(navigator.onLine);
-  private syncQueueSignal = signal<SyncOperation[]>(this.loadQueue());
+  private syncQueueSignal = signal<SyncOperation[]>([]);
+  private syncStateSignal = signal<SyncState>(navigator.onLine ? 'Online' : 'Offline');
 
   readonly isOnline = computed(() => this.networkStatusSignal());
+  readonly syncState = computed(() => this.syncStateSignal());
   readonly pendingOperations = computed(() => this.syncQueueSignal());
   readonly pendingCount = computed(() => this.syncQueueSignal().length);
 
   constructor() {
+    this.initStorage();
     window.addEventListener('online', () => this.setNetworkStatus(true));
     window.addEventListener('offline', () => this.setNetworkStatus(false));
   }
 
-  private setNetworkStatus(isOnline: boolean) {
-    this.networkStatusSignal.set(isOnline);
-    if (isOnline) {
-      this.processQueue(); // Intentar sincronizar cuando vuelva la red
+  private async initStorage() {
+    localforage.config({
+      name: 'VacaApp',
+      storeName: 'sync_queue'
+    });
+    const queue = await localforage.getItem<SyncOperation[]>('vacapp_sync_queue');
+    if (queue) {
+      this.syncQueueSignal.set(queue);
     }
   }
 
-  private loadQueue(): SyncOperation[] {
-    const queue = localStorage.getItem('vacapp_sync_queue');
-    return queue ? JSON.parse(queue) : [];
-  }
-
-  private saveQueue(queue: SyncOperation[]) {
-    localStorage.setItem('vacapp_sync_queue', JSON.stringify(queue));
+  private async saveQueue(queue: SyncOperation[]) {
+    await localforage.setItem('vacapp_sync_queue', queue);
     this.syncQueueSignal.set(queue);
   }
 
-  /**
-   * Encola una operación para ser sincronizada con el backend más tarde.
-   */
-  enqueueOperation(table: string, method: 'POST' | 'PUT' | 'DELETE', payload: any, recordId?: string) {
+  private setNetworkStatus(isOnline: boolean) {
+    this.networkStatusSignal.set(isOnline);
+    this.syncStateSignal.set(isOnline ? 'Online' : 'Offline');
+    if (isOnline) {
+      this.processQueue();
+    }
+  }
+
+  async enqueueOperation(table: string, method: 'POST' | 'PUT' | 'DELETE', payload: any, recordId?: string) {
     const operation: SyncOperation = {
       id: Math.random().toString(36).substr(2, 9),
       table,
@@ -55,34 +71,138 @@ export class OfflineSyncService {
       timestamp: Date.now()
     };
     
-    const queue = this.loadQueue();
-    queue.push(operation);
-    this.saveQueue(queue);
+    const queue = [...this.syncQueueSignal(), operation];
+    await this.saveQueue(queue);
     
-    // Si estamos online, intentamos vaciar la cola rápido
     if (this.isOnline()) {
       this.processQueue();
     }
   }
 
-  /**
-   * Intenta procesar toda la cola. Las operaciones exitosas se retiran.
-   */
   async processQueue() {
-    if (!this.isOnline()) return;
+    if (!this.isOnline() || this.syncState() === 'Sincronizando' || this.syncState() === 'Conflicto') return;
 
-    const queue = this.loadQueue();
+    let queue = [...this.syncQueueSignal()];
     if (queue.length === 0) return;
 
-    console.log(`[OfflineSync] Procesando ${queue.length} operaciones pendientes...`);
-    const remainingQueue: SyncOperation[] = [];
+    this.syncStateSignal.set('Sincronizando');
 
-    // En un escenario real, aquí inyectaríamos el SupabaseService y ejecutaríamos las operaciones reales.
-    // Como SupabaseService injecta a OfflineSync (circular), el procesamiento real puede desencadenarse por SupabaseService, o podemos emitir un evento.
-    // Para simplificar, expondremos la cola y dejaremos que SupabaseService la consuma.
+    // Autenticación Offline (Renovación de token si estuvimos mucho tiempo offline)
+    if (this.supa.client) {
+      const { data, error } = await this.supa.client.auth.getSession();
+      if (!data.session || error) {
+         await this.supa.client.auth.refreshSession();
+      }
+    }
+
+    let remainingQueue: SyncOperation[] = [];
+    let hasConflict = false;
+
+    for (const op of queue) {
+      if (op.method === 'PUT' && op.recordId && this.supa.client) {
+         // Verificar last updated_at
+         const { data: currentDbRecord } = await this.supa.client
+            .from(op.table)
+            .select('updated_at')
+            .eq('id', op.recordId)
+            .single();
+
+         if (currentDbRecord && currentDbRecord.updated_at) {
+            const dbTimestamp = new Date(currentDbRecord.updated_at).getTime();
+            if (dbTimestamp > op.timestamp) {
+               this.syncStateSignal.set('Conflicto');
+               hasConflict = true;
+               
+               const resolve = await this.promptConflict(op.table, dbTimestamp, op.timestamp);
+               if (resolve === 'discard') {
+                 continue; // Ignorar esta op y continuar (Soft-Conflict Drop)
+               }
+               // Si resolve es 'force', seguimos con el loop y lo sobrescribe
+            }
+         }
+      }
+
+      // Procesar en Supabase nativo/mock
+      let reqError = null;
+      if (op.method === 'POST') {
+         const { error } = await this.supa.create(op.table, op.payload);
+         reqError = error;
+      } else if (op.method === 'PUT' && op.recordId) {
+         const { error } = await this.supa.update(op.table, op.recordId, op.payload);
+         reqError = error;
+      } else if (op.method === 'DELETE' && op.recordId) {
+         const { error } = await this.supa.delete(op.table, op.recordId);
+         reqError = error;
+      }
+
+      if (reqError) {
+         console.error('[OfflineSync] Error sincronizando operation', op, reqError);
+         remainingQueue.push(op); // Reencolar si falló transitoriamente
+      }
+    }
+
+    await this.saveQueue(remainingQueue);
+    
+    if (!hasConflict) {
+      this.syncStateSignal.set(this.isOnline() ? 'Online' : 'Offline');
+      if (queue.length > remainingQueue.length) {
+         const toast = await this.toastCtrl.create({
+            message: 'Sincronización offline completada.',
+            duration: 3000,
+            color: 'success',
+            position: 'bottom',
+         });
+         toast.present();
+      }
+    }
   }
-  
-  clearQueue() {
-    this.saveQueue([]);
+
+  private async promptConflict(table: string, dbDataTime: number, localDataTime: number): Promise<'force' | 'discard'> {
+    return new Promise(async (resolve) => {
+       const alert = await this.alertCtrl.create({
+         header: 'Conflicto de Sincronización',
+         message: `Alguien modificó un registro en ${table}. Tu versión guardada offline es más antigua. ¿Qué deseas hacer?`,
+         buttons: [
+           { 
+             text: 'Descartar mis cambios', 
+             role: 'cancel', 
+             handler: () => {
+                this.syncStateSignal.set(this.isOnline() ? 'Online' : 'Offline');
+                resolve('discard')
+             } 
+           },
+           { 
+             text: 'Sobrescribir datos', 
+             role: 'destructive', 
+             handler: () => {
+                this.syncStateSignal.set(this.isOnline() ? 'Online' : 'Offline');
+                resolve('force')
+             } 
+           }
+         ]
+       });
+       await alert.present();
+    });
+  }
+
+  /**
+   * Worker background simulado: Ejecuta descarga masiva a IndexedDB
+   * para consultas sin conexión.
+   */
+  async cacheFullDatasetBackground() {
+    if (!this.supa.client || !this.isOnline()) return;
+    try {
+      const { data, error } = await this.supa.client.from('bovinos').select('*');
+      if (data && !error) {
+        await localforage.setItem('vacapp_bovinos_offline_cache', data);
+        console.log('[OfflineSync] Caché de catálogo primario Bovinos actualizado en IndexedDB.');
+      }
+    } catch(e) {
+      console.error('[OfflineSync] Error al cachear background dataset', e);
+    }
+  }
+
+  async clearQueue() {
+    await this.saveQueue([]);
   }
 }

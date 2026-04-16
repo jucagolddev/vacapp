@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
@@ -259,7 +260,7 @@ export class ReproduccionComponent implements OnInit {
       fecha_parto_prevista: ['']
     });
 
-    this.reproForm.get('fecha_cubricion')?.valueChanges.subscribe(val => {
+    this.reproForm.get('fecha_cubricion')?.valueChanges.pipe(takeUntilDestroyed()).subscribe(val => {
       this.calculateParto(val);
     });
   }
