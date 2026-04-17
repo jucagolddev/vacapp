@@ -14,174 +14,183 @@ ion-split-pane.collapsed {
 }
 
 .rustic-sidebar {
-  --background: #{variables.$primary-color} !important;
-  border-right: 1px solid rgba(variables.$secondary-color, 0.4);
+  --background: linear-gradient(180deg, #{variables.$primary-color} 0%, #{variables.$dark-color} 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  transition: variables.$transition-base;
 }
 
 .rustic-sidebar::part(container) {
-  background: #{variables.$primary-color};
-  box-shadow: 5px 0 30px rgba(0,0,0,0.1);
-}
-
-.rustic-sidebar ion-content,
-.rustic-sidebar ion-list {
-  --background: transparent;
-  background: transparent !important;
-  --ion-item-background: transparent !important;
+  background: transparent;
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2);
 }
 
 .rustic-sidebar ion-content {
-  --background: #{variables.$primary-color};
-  --padding-bottom: 80px;
+  --background: transparent;
+  --padding-bottom: 20px;
 }
 
 .sidebar-header-luxe {
-  height: variables.$header-height;
+  height: 100px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 1.5rem;
-  background: variables.$primary-color;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.05);
 }
 
 .brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 1;
-  min-width: 0;
+  gap: 15px;
 }
 
 .logo-circle {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   background: linear-gradient(135deg, #{variables.$tertiary-color}, #{variables.$success-color});
-  border-radius: 12px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  box-shadow: 0 8px 16px rgba(variables.$black, 0.3);
-  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transform: rotate(-5deg);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
 }
 
 .main-brand {
-  color: #{variables.$white};
+  color: variables.$white;
   font-weight: 900;
-  font-size: 20px;
-  letter-spacing: 1.5px;
+  font-size: 22px;
+  letter-spacing: 2px;
   line-height: 1;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .sub-brand {
-  color: #{variables.$tertiary-color};
-  font-size: 9px;
+  color: variables.$tertiary-color;
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 1.5px;
-  display: block;
-  margin-top: 2px;
-}
-
-.toggle-btn-luxe {
-  --color: #{variables.$white};
-  background: rgba(variables.$white, 0.1);
-  border-radius: 10px;
-  height: 36px;
-  width: 36px;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-.toggle-btn-luxe:hover {
-  background: rgba(variables.$white, 0.2);
+  letter-spacing: 2px;
+  margin-top: 4px;
+  opacity: 0.8;
 }
 
 .nav-container-luxe {
-  padding-top: 15px;
+  padding: 20px 10px;
 }
 
 .nav-item-luxe {
-  margin: 8px 12px;
   --background: transparent;
-  --border-radius: 14px;
-  border-radius: 14px;
-  --color: rgba(255, 255, 255, 0.7);
-  --padding-start: 10px;
-  --inner-padding-end: 10px;
-  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-  height: 52px;
-  font-weight: 600;
-  cursor: pointer;
+  --background-focused: rgba(255, 255, 255, 0.05);
+  --background-hover: rgba(255, 255, 255, 0.08);
+  --border-radius: 16px;
+  margin-bottom: 8px;
+  height: 56px;
+  transition: variables.$transition-base;
+  --color: rgba(255, 255, 255, 0.6);
+  
+  &::part(native) {
+    padding-inline-start: 12px;
+  }
+
+  &.active-link {
+    --color: #{variables.$white};
+    --background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .icon-frame {
+      background: variables.$tertiary-color;
+      color: variables.$primary-color;
+      box-shadow: 0 4px 12px rgba(variables.$tertiary-color, 0.3);
+    }
+    
+    .label-luxe {
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  &:hover:not(.active-link) {
+    --background: rgba(255, 255, 255, 0.05);
+    transform: translateX(5px);
+    
+    .icon-frame {
+      background: rgba(255, 255, 255, 0.1);
+      color: variables.$white;
+    }
+  }
 }
 
-.nav-item-luxe:hover {
-  --background: rgba(255, 255, 255, 0.05);
-}
-
-.nav-item-luxe .label-luxe {
-  color: rgba(255, 255, 255, 0.95) !important;
-  font-weight: 700;
-  font-size: 14px;
-  margin-left: 10px;
-}
-
-.nav-item-luxe .icon-frame {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+.icon-frame {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.05);
-  transition: all 0.3s ease;
-  color: rgba(255, 255, 255, 0.8);
-  flex-shrink: 0;
+  margin-right: 15px;
+  font-size: 20px;
+  transition: variables.$transition-fast;
+  color: rgba(255, 255, 255, 0.5);
+
+  &.danger {
+    color: variables.$danger-color;
+    background: rgba(variables.$danger-color, 0.1);
+  }
 }
 
-.nav-item-luxe.active-link {
-  --color: #{variables.$white} !important;
+.label-luxe {
+  font-size: 14px;
+  font-weight: 600;
+  transition: variables.$transition-fast;
 }
 
-.nav-item-luxe.active-link::part(native) {
-  background: #{variables.$secondary-color} !important;
-  box-shadow: 0 4px 15px rgba(variables.$black, 0.2);
+.nav-separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  margin: 20px 15px;
 }
 
-.nav-item-luxe.active-link .label-luxe {
-  color: #{variables.$white} !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+.logout-item {
+  &:hover {
+    --background: rgba(variables.$danger-color, 0.05) !important;
+    .icon-frame.danger {
+      background: variables.$danger-color;
+      color: white;
+      box-shadow: 0 4px 12px rgba(variables.$danger-color, 0.3);
+    }
+    .label-luxe {
+      color: variables.$danger-color;
+    }
+  }
 }
 
-.nav-item-luxe.active-link .icon-frame {
-  background: rgba(255, 255, 255, 0.15);
-  color: #{variables.$white};
+/* Theme Toggle Refined */
+.theme-toggle-btn {
+  --background: rgba(255, 255, 255, 0.05);
+  --border-radius: 14px;
+  --color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  margin: 20px 15px;
+  width: calc(100% - 30px);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 10px;
+  
+  &:hover {
+    --background: rgba(255, 255, 255, 0.1);
+    --color: white;
+  }
 }
 
-
-/* Overrides & Fixes */
-.nav-item-luxe.active-link lucide-icon, 
-.nav-item-luxe.active-link .icon-frame, 
-.nav-item-luxe.active-link .label-luxe {
-  color: var(--ion-color-tertiary) !important;
-}
-
-.nav-item-luxe.active-link {
-  background: rgba(var(--ion-color-tertiary-rgb), 0.15) !important;
-  color: var(--ion-color-tertiary) !important;
-}
-
-.rustic-sidebar.collapsed {
-  --width: 90px !important;
-  min-width: 90px !important;
-}
-
-.nav-item-luxe::part(native) {
-  border: none;
-  outline: none;
-  border-radius: 14px;
-  background: transparent;
+.sidebar-bottom-badge {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }

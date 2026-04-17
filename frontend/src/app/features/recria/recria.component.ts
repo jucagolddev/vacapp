@@ -2,15 +2,20 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { 
-  IonicModule, 
+  IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
+  IonIcon, IonButton, IonGrid, IonRow, IonCol, IonCard, IonItem, 
+  IonAvatar, IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
+  IonSelect, IonSelectOption, IonLabel, IonCardContent
+} from '@ionic/angular/standalone';
+import { 
   AlertController, 
   ToastController 
-} from '@ionic/angular';
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
-  speedometer, trendingDown, person, search, male, 
-  female, chevronForward, trash, add, close, scale, 
-  barChart, fitness, save, pencil, trendingUp, calendar, leaf, paw 
+  speedometerOutline, trendingDownOutline, personOutline, searchOutline, maleOutline, 
+  femaleOutline, chevronForwardOutline, trashOutline, addCircle, closeOutline, scaleOutline, 
+  barChartOutline, fitnessOutline, saveOutline, createOutline, trendingUpOutline, calendarOutline, leafOutline, pawOutline, filterOutline 
 } from 'ionicons/icons';
 
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -28,39 +33,50 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 @Component({
   selector: 'app-recria',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, BaseChartDirective],
+  imports: [
+    CommonModule, FormsModule, ReactiveFormsModule, BaseChartDirective,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
+    IonIcon, IonButton, IonGrid, IonRow, IonCol, IonCard, IonItem, 
+    IonAvatar, IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
+    IonSelect, IonSelectOption, IonLabel, IonCardContent
+  ],
   template: `
-    <ion-header class="ion-no-border">
-      <ion-toolbar color="primary" class="luxe-toolbar">
+    <ion-header class="ion-no-border header-luxe">
+      <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button class="text-white"></ion-menu-button>
+          <ion-menu-button class="color-forest"></ion-menu-button>
         </ion-buttons>
-        <ion-title class="luxe-title">Recría & Rendimiento</ion-title>
+        <ion-title>Recría & Rendimiento</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" class="color-forest">
+            <ion-icon name="filter-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="luxe-bg-forest">
+    <ion-content class="ion-padding-vertical">
       <div class="luxe-container animate-fade-in">
         
-        <!-- Cabecera de Sección -->
-        <div class="luxe-header-content">
-          <div class="luxe-icon-box bg-forest">
-            <ion-icon name="speedometer"></ion-icon>
-          </div>
+        <!-- Cabecera de Selección -->
+        <div *ngIf="selectedBovino" class="flex items-center justify-between mb-8 animate-fade-in">
           <div class="luxe-text-stack">
-            <h1 class="page-h1-rustic">{{ selectedBovino ? selectedBovino.nombre : 'Control de Pesaje' }}</h1>
-            <p class="page-p-rustic">
-              {{ selectedBovino ? 'Evolución de peso: ' + selectedBovino.crotal : 'Selecciona un animal para gestionar su rendimiento.' }}
-            </p>
+            <h1 class="page-h1-rustic">{{ selectedBovino.nombre }}</h1>
+            <p class="page-p-rustic">Seguimiento de maduración y conversión</p>
           </div>
-          <ion-button *ngIf="selectedBovino" fill="clear" (click)="selectedBovino = null" color="dark" slot="end" class="mt-4">
-             <ion-icon name="close" slot="start"></ion-icon> Cambiar Animal
+          <ion-button fill="outline" (click)="selectedBovino = null" color="dark" class="btn-luxe-outline">
+             <ion-icon name="close" slot="start"></ion-icon> Cambiar
           </ion-button>
         </div>
 
         <!-- LISTADO DE ANIMALES PARA SELECCIÓN -->
         <div *ngIf="!selectedBovino" class="animate-fade-in">
-           <div class="rustic-search-wrapper mb-6">
+           <div class="luxe-text-stack mb-6">
+             <h1 class="page-h1-rustic">Seleccionar Animal</h1>
+             <p class="page-p-rustic">Busca el ejemplar para registrar su pesaje</p>
+           </div>
+
+           <div class="rustic-search-wrapper mb-8">
               <ion-icon name="search" class="rustic-search-icon"></ion-icon>
               <input 
                 type="text" 
@@ -69,38 +85,33 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                 [(ngModel)]="searchTerm">
            </div>
 
+           <!-- LISTA ESTANDARIZADA -->
            <ion-grid class="ion-no-padding">
-              <ion-row>
-                 <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-                    <ion-card class="pro-card-luxe animate-slide-up cursor-pointer" (click)="selectBovino(b)" tabindex="0" (keydown.enter)="selectBovino(b)">
-                       <ion-card-header>
-                          <div class="card-header-flex">
-                             <div *ngIf="b.foto_url" class="card-icon-box bg-earth card-icon-box-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
-                             <div *ngIf="!b.foto_url" class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
-                                <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
-                             </div>
-                             <div class="card-title-stack">
-                                <strong>{{ b.nombre }}</strong>
-                                <span>Crotal: {{ b.crotal }}</span>
-                             </div>
-                             <ion-icon name="chevron-forward" class="opacity-30" slot="end" style="margin-left:auto;"></ion-icon>
-                          </div>
-                       </ion-card-header>
-                       <ion-card-content>
-                          <div class="card-data-grid">
-                            <div class="card-data-item">
-                              <span class="label">Categoría</span>
-                              <span class="value">{{ ganadoService.calculateCategoria(b) }}</span>
-                            </div>
-                            <div class="card-data-item">
-                              <span class="label">Raza</span>
-                              <span class="value">{{ b.raza || 'Mestizo' }}</span>
-                            </div>
-                          </div>
-                       </ion-card-content>
-                    </ion-card>
-                 </ion-col>
-              </ion-row>
+             <ion-row>
+               <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+                 <div class="tag-body-luxe mb-4" (click)="selectBovino(b)" style="cursor: pointer;">
+                   <div class="luxe-item-header">
+                     <div class="luxe-avatar-wrapper">
+                       <div *ngIf="b.foto_url" class="luxe-avatar" [style.background-image]="'url(' + b.foto_url + ')'"></div>
+                       <div *ngIf="!b.foto_url" class="luxe-avatar-placeholder">
+                         <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+                       </div>
+                     </div>
+                     <div class="luxe-title-stack">
+                       <h3>{{ b.nombre }}</h3>
+                       <p>{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</p>
+                     </div>
+                     <div class="luxe-badge-status-simple">
+                        <ion-icon name="chevron-forward-outline"></ion-icon>
+                     </div>
+                   </div>
+                   <div class="luxe-item-footer mt-3 pt-3 border-t">
+                     <span class="luxe-tag-mini">{{ ganadoService.calculateCategoria(b) }}</span>
+                     <span class="luxe-info-label ml-auto">Consultar Ficha</span>
+                   </div>
+                 </div>
+               </ion-col>
+             </ion-row>
            </ion-grid>
         </div>
 
@@ -111,73 +122,105 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <ion-grid class="ion-no-padding mb-8">
               <ion-row>
                  <ion-col size="12" size-md="6">
-                    <div class="metric-card-luxe bg-white">
-                       <span class="label">Último Peso</span>
-                       <span class="value">{{ getUltimoPeso() }} <small>KG</small></span>
+                    <div class="metric-card-luxe">
+                       <div class="metric-icon-box bg-wheat">
+                          <ion-icon name="scale-outline" class="color-earth"></ion-icon>
+                       </div>
+                       <div class="metric-content">
+                          <span class="label">Último Peso</span>
+                          <span class="value">{{ getUltimoPeso() }} <small>KG</small></span>
+                       </div>
                     </div>
                  </ion-col>
                  <ion-col size="12" size-md="6">
-                    <div class="metric-card-luxe bg-white">
-                       <span class="label">GMD (Ganancia Diaria)</span>
-                       <span class="value" [ngClass]="getGMD() >= 0 ? 'color-forest' : 'color-danger'">
-                          {{ getGMD() > 0 ? '+' : '' }}{{ getGMD() | number:'1.2-2' }} <small>kg/día</small>
-                       </span>
+                    <div class="metric-card-luxe">
+                       <div class="metric-icon-box bg-forest-light">
+                          <ion-icon name="trending-up-outline" class="color-forest"></ion-icon>
+                       </div>
+                       <div class="metric-content">
+                          <span class="label">Ganancia Diaria (GMD)</span>
+                          <span class="value" [ngClass]="getGMD() >= 0 ? 'color-forest' : 'color-danger'">
+                             {{ getGMD() > 0 ? '+' : '' }}{{ getGMD() | number:'1.2-2' }} <small>kg/día</small>
+                          </span>
+                       </div>
                     </div>
                  </ion-col>
               </ion-row>
            </ion-grid>
 
            <!-- GRÁFICO INDIVIDUAL -->
-           <div class="analytics-card-large mb-8">
+           <div class="bi-main-card mb-8">
               <div class="card-header-flex">
-                 <h3 class="card-title-luxe">Curva de Crecimiento Individual</h3>
+                 <div class="card-title-stack">
+                    <h3 class="card-title-luxe">Curva de Crecimiento</h3>
+                    <p class="card-subtitle-luxe">Evolución del peso en el tiempo</p>
+                 </div>
+                 <div class="luxe-icon-circle bg-wheat">
+                    <ion-icon name="bar-chart-outline" class="color-earth"></ion-icon>
+                 </div>
               </div>
-              <div class="chart-container-large">
+              <div class="chart-wrapper mt-6" style="height: 300px;">
                  <canvas baseChart [data]="chartDataIndividual" [options]="chartOptions" [type]="'line'"></canvas>
               </div>
            </div>
 
            <!-- HISTORIAL -->
-           <h2 class="luxe-section-title">Historial de Pesadas</h2>
-           <div class="history-panel-bi">
-              <div *ngFor="let p of pesajesFiltrados" class="weight-card-row animate-slide-up">
-                 <div class="card-content-flex">
-                    <div class="date-box">
-                       <strong>{{ p.fecha_pesaje | date:'dd' }}</strong>
-                       <span>{{ p.fecha_pesaje | date:'MMM' }}</span>
-                    </div>
-                    <div class="data-box">
-                       <span class="weight">{{ p.peso_kg }} KG</span>
-                       <span class="type">{{ p.tipo_pesaje }}</span>
-                    </div>
-                    <ion-button fill="clear" color="danger" (click)="deletePesaje(p.id)" class="ml-auto">
-                       <ion-icon name="trash" slot="icon-only"></ion-icon>
-                    </ion-button>
-                 </div>
-              </div>
+           <div class="flex items-center justify-between mb-6">
+             <h2 class="luxe-section-title ion-no-margin">Historial de Pesadas</h2>
+             <span class="luxe-badge-count">{{ pesajesFiltrados.length }} Registros</span>
            </div>
+           
+           <ion-grid class="ion-no-padding">
+             <ion-row>
+               <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajesFiltrados">
+                 <div class="tag-body-luxe mb-4">
+                   <div class="luxe-item-header">
+                     <div class="luxe-icon-avatar bg-light">
+                        <ion-icon name="calendar-outline" class="color-medium"></ion-icon>
+                     </div>
+                     <div class="luxe-title-stack">
+                       <h3 class="text-lg font-bold">{{ p.peso_kg }} KG</h3>
+                       <p>{{ p.tipo_pesaje }}</p>
+                     </div>
+                     <button class="luxe-btn-icon color-danger ml-auto" (click)="deletePesaje(p.id)">
+                        <ion-icon name="trash-outline"></ion-icon>
+                     </button>
+                   </div>
+                   <div class="luxe-item-footer mt-3 pt-3 border-t">
+                     <span class="luxe-date-label">
+                       <ion-icon name="time-outline" class="mr-1"></ion-icon>
+                       {{ p.fecha_pesaje | date:'dd MMM yyyy' }}
+                     </span>
+                     <ion-badge slot="end" class="badge-luxe bg-forest ml-auto">Completado</ion-badge>
+                   </div>
+                 </div>
+               </ion-col>
+             </ion-row>
+           </ion-grid>
 
            <div *ngIf="pesajesFiltrados.length === 0" class="luxe-empty-state">
-              <p>No hay pesajes registrados para este animal.</p>
+             <div class="empty-icon-ring">
+               <ion-icon name="scale-outline"></ion-icon>
+             </div>
+             <h2>Sin pesajes registrados</h2>
+             <p>Comienza capturando el primer peso para ver el rendimiento.</p>
            </div>
         </div>
 
       </div>
 
-      <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="setOpen(true)" class="bg-var-primary">
+      <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
+        <ion-fab-button (click)="setOpen(true)" class="fab-luxe">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
-      </ion-fab>
-
-      <!-- MODAL DE PESAJE -->
+         <!-- MODAL DE PESAJE -->
       <ion-modal [isOpen]="isModalOpen" (didDismiss)="setOpen(false)" class="luxe-modal">
         <ng-template>
           <ion-header class="ion-no-border">
-            <ion-toolbar color="primary">
-              <ion-title>Ficha de Pesaje</ion-title>
+            <ion-toolbar>
+              <ion-title>Registrar Pesaje</ion-title>
               <ion-buttons slot="end">
-                <ion-button (click)="setOpen(false)">
+                <ion-button (click)="setOpen(false)" class="color-medium">
                   <ion-icon name="close"></ion-icon>
                 </ion-button>
               </ion-buttons>
@@ -185,48 +228,53 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
           </ion-header>
 
           <ion-content class="ion-padding luxe-modal-content">
-            <div class="form-intro">
-               <ion-icon name="scale" class="color-earth text-3xl"></ion-icon>
-               <h3>Registro de Rendimiento</h3>
-               <p>Introduce los datos capturados en báscula.</p>
+            <div class="form-intro mb-6">
+               <div class="icon-ring-luxe bg-wheat mb-3">
+                  <ion-icon name="scale-outline" class="color-earth text-3xl"></ion-icon>
+               </div>
+               <h3>Entrada de Datos</h3>
+               <p>Registra el peso actual detectado en báscula.</p>
             </div>
 
-            <form [formGroup]="pesajeForm" (ngSubmit)="onSubmit()">
-              <ion-item class="luxe-input">
-                <ion-label position="stacked">Animal Seleccionado</ion-label>
-                <ion-input [value]="selectedBovino?.nombre + ' (' + selectedBovino?.crotal + ')'" [readonly]="true"></ion-input>
-              </ion-item>
-
-              <div class="luxe-item-group">
-                <ion-item class="luxe-input half">
-                  <ion-label position="stacked">Fecha</ion-label>
-                  <ion-input type="date" formControlName="fecha_pesaje"></ion-input>
-                </ion-item>
-                <ion-item class="luxe-input half">
-                  <ion-label position="stacked">KG *</ion-label>
-                  <ion-input type="number" formControlName="peso_kg" placeholder="0.00"></ion-input>
-                </ion-item>
+            <form [formGroup]="pesajeForm" (ngSubmit)="onSubmit()" class="luxe-form-stack">
+              <div class="luxe-input-group">
+                <label class="luxe-label">Animal</label>
+                <div class="luxe-readonly-input">
+                   {{ selectedBovino?.nombre }} ({{ selectedBovino?.crotal }})
+                </div>
               </div>
 
-              <ion-item class="luxe-input">
-                 <ion-label position="stacked">Tipo Control</ion-label>
-                 <ion-select formControlName="tipo_pesaje" interface="popover">
-                   <ion-select-option *ngFor="let t of ganadoService.constants.TIPOS_PESAJE" [value]="t">
-                     {{ t }}
-                   </ion-select-option>
-                 </ion-select>
-              </ion-item>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="luxe-input-group">
+                  <label class="luxe-label">Fecha del Pesaje</label>
+                  <input type="date" formControlName="fecha_pesaje" class="luxe-input-field">
+                </div>
+                <div class="luxe-input-group">
+                  <label class="luxe-label">KG *</label>
+                  <input type="number" formControlName="peso_kg" placeholder="0.00" class="luxe-input-field">
+                </div>
+              </div>
 
-              <div class="luxe-modal-footer">
-                <ion-button type="submit" [disabled]="pesajeForm.invalid" class="btn-luxe-save w-full">
-                  <ion-icon slot="start" name="save"></ion-icon>
-                  Registrar Pesaje
+              <div class="luxe-input-group">
+                 <label class="luxe-label">Tipo de Control</label>
+                 <select formControlName="tipo_pesaje" class="luxe-select-field">
+                   <option *ngFor="let t of ganadoService.constants.TIPOS_PESAJE" [value]="t">
+                     {{ t }}
+                   </option>
+                 </select>
+              </div>
+
+              <div class="mt-8 pt-6 border-t border-gray-100">
+                <ion-button type="submit" expand="block" [disabled]="pesajeForm.invalid" class="btn-luxe-save">
+                  <ion-icon name="save-outline" slot="start"></ion-icon>
+                  Guardar Pesaje
                 </ion-button>
               </div>
             </form>
           </ion-content>
         </ng-template>
       </ion-modal>
+    </ion-fab>
     </ion-content>
   `
 })
@@ -260,9 +308,9 @@ export class RecriaComponent implements OnInit {
 
   constructor() {
     addIcons({ 
-      fitness, scale, add, close, save, pencil, trash, 
-      trendingUp, trendingDown, calendar, barChart, 
-      leaf, paw, speedometer, person, search, male, female, chevronForward 
+      fitnessOutline, scaleOutline, addCircle, closeOutline, saveOutline, createOutline, trashOutline, 
+      trendingUpOutline, trendingDownOutline, calendarOutline, barChartOutline, 
+      leafOutline, pawOutline, speedometerOutline, personOutline, searchOutline, maleOutline, femaleOutline, chevronForwardOutline, filterOutline 
     });
     this.pesajeForm = this.fb.group({
       bovino_id: ['', Validators.required],

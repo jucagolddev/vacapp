@@ -6,15 +6,15 @@ import {
   IonLabel, IonBadge, IonIcon,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
   IonButton, IonInput, IonSelect, IonSelectOption,
-  IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardContent
+  IonGrid, IonRow, IonCol, IonCard, IonAvatar, IonCardContent, IonCardHeader
 } from '@ionic/angular/standalone';
 import { BaseChartDirective } from 'ng2-charts';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Reproduccion, Bovino } from '../../core/models/vacapp.models';
 import { addIcons } from 'ionicons';
 import { 
-  calendar, heart, flask, hourglass, add, close, save, 
-  time, pencil, female, trash, statsChart, ribbon, pulse, paw
+  calendarOutline, heartOutline, flaskOutline, hourglassOutline, addCircle, closeOutline, saveOutline, 
+  timeOutline, createOutline, femaleOutline, trashOutline, statsChartOutline, ribbonOutline, pulseOutline, filterOutline, layersOutline
 } from 'ionicons/icons';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
@@ -35,43 +35,46 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonItem, IonLabel, IonBadge, IonIcon,
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal, IonButton,
     IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol, IonCard, 
-    IonCardHeader, IonCardContent, BaseChartDirective
+    IonAvatar, IonCardContent, IonCardHeader,
+    BaseChartDirective
   ],
   template: `
-    <ion-header class="ion-no-border" [translucent]="true">
-      <ion-toolbar color="primary" class="luxe-toolbar">
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button class="text-white"></ion-menu-button>
+          <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title class="luxe-title">Montas y Cría</ion-title>
+        <ion-title class="ion-text-center">Montas y Cría</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear">
+            <ion-icon name="filter-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="luxe-bg-forest">
+    <ion-content class="ion-padding-vertical">
       <div class="luxe-container animate-fade-in">
-        
-        <!-- Cabecera de Sección -->
-        <div class="luxe-header-content">
-          <div class="luxe-icon-box bg-earth">
-            <ion-icon name="heart"></ion-icon>
-          </div>
-          <div class="luxe-text-stack">
-            <h1 class="page-h1-rustic">Control de Vacas Preñadas</h1>
-            <p class="page-p-rustic">Seguimiento de partos y efectividad de las montas.</p>
-          </div>
-        </div>
 
         <!-- GRÁFICO DE FERTILIDAD -->
-        <div class="analytics-card-large animate-slide-up mb-8">
-          <div class="card-header-flex">
-            <div>
-              <h3 class="card-title-luxe"><ion-icon name="heart" class="icon-inline-baseline icon-mr color-danger"></ion-icon> Preñeces con éxito</h3>
-              <p class="card-subtitle-luxe">Análisis de efectividad en ciclos reproductivos.</p>
+        <div class="bi-main-card animate-slide-up mb-8">
+          <ion-card-header>
+            <div class="bi-card-head">
+              <div class="card-title-stack">
+                <span>EFICIENCIA REPRODUCTIVA</span>
+                <strong>Preñeces con éxito</strong>
+              </div>
+              <div class="bi-mini-stat bg-danger-soft">
+                <ion-icon name="heart-outline"></ion-icon>
+                <span>Tasa de éxito: 82%</span>
+              </div>
             </div>
-          </div>
-          <div class="chart-container-large">
-             <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
-          </div>
+          </ion-card-header>
+          <ion-card-content>
+             <div class="chart-container-large" style="height: 300px;">
+                <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
+             </div>
+          </ion-card-content>
         </div>
 
         <h2 class="luxe-section-title">Próximos Partos</h2>
@@ -79,51 +82,44 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
         <!-- Estado Vacío -->
         <div *ngIf="gestacionesActivas.length === 0" class="luxe-empty-state">
           <div class="empty-icon-ring">
-            <ion-icon name="logo-buffer"></ion-icon>
+            <ion-icon name="heart-half-outline"></ion-icon>
           </div>
-          <h2>No hay animales registrados</h2>
+          <h2>No hay gestaciones registradas</h2>
           <p>La lista de gestaciones confirmadas está vacía.</p>
         </div>
 
         <ion-grid class="ion-no-padding" *ngIf="gestacionesActivas.length > 0">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of gestacionesActivas">
-              <ion-card class="pro-card-luxe animate-slide-up">
-                <ion-card-header>
-                  <div class="card-header-flex">
-                    <div class="card-icon-box bg-danger">
-                      <ion-icon name="pulse"></ion-icon>
-                    </div>
-                    <div class="card-title-stack">
-                      <strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong>
-                      <span>Parto: {{ getDaysToCalving(r) }} d restantes</span>
-                    </div>
-                    <ion-badge color="success" slot="end" mode="ios">Gestante</ion-badge>
+              <div class="tag-body-luxe">
+                <div class="card-header-flex">
+                  <div class="card-icon-box bg-danger-soft">
+                    <ion-icon name="pulse-outline" color="danger"></ion-icon>
                   </div>
-                </ion-card-header>
+                  <div class="card-title-stack">
+                    <strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong>
+                    <span>FPP: {{ r.fecha_parto_prevista | date:'dd MMM yyyy' }}</span>
+                  </div>
+                  <div class="flex-1"></div>
+                  <ion-badge color="success" mode="ios">Gestante</ion-badge>
+                </div>
 
-                <ion-card-content>
-                  <div class="card-data-grid">
-                    <div class="card-data-item">
-                      <span class="label">Parto Previsto</span>
-                      <span class="value highlight">{{ r.fecha_parto_prevista | date:'dd MMM yyyy' }}</span>
-                    </div>
-                    <div class="card-data-item">
-                      <span class="label">Método</span>
-                      <span class="value">{{ r.tipo_cubricion }}</span>
-                    </div>
+                <div class="card-data-grid">
+                  <div class="card-data-item">
+                    <span class="label">Cuenta Atrás</span>
+                    <span class="value">{{ getDaysToCalving(r) }} días para parto</span>
                   </div>
+                </div>
 
-                  <div class="card-footer-actions-bi mt-4">
-                    <ion-button fill="clear" (click)="openEditModal(r)" color="dark" size="small">
-                      <ion-icon name="pencil" slot="start"></ion-icon> Editar
-                    </ion-button>
-                    <ion-button fill="clear" (click)="confirmDelete(r)" color="danger" size="small">
-                      <ion-icon name="trash" slot="start"></ion-icon> Borrar
-                    </ion-button>
-                  </div>
-                </ion-card-content>
-              </ion-card>
+                <div class="card-footer-actions">
+                  <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
+                    <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                  <ion-button fill="clear" color="danger" (click)="confirmDelete(r)">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -131,39 +127,59 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
         <h2 class="luxe-section-title mt-8">Historial Reproductivo</h2>
         
         <!-- Historial en Tarjetas Pro -->
-        <div class="history-panel-bi" *ngIf="reproducciones.length > 0">
-           <ion-card class="pro-card-row animate-slide-up" *ngFor="let r of reproducciones">
-              <ion-item lines="none" class="item-card-pro">
-                <div class="history-avatar-bi bg-earth-soft" slot="start">
-                  <ion-icon name="female"></ion-icon>
+        <ion-grid class="ion-no-padding" *ngIf="reproducciones.length > 0">
+          <ion-row>
+            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of reproducciones">
+              <div class="tag-body-luxe">
+                <div class="card-header-flex">
+                  <div class="card-icon-box bg-primary-soft">
+                    <ion-icon name="female-outline" color="primary"></ion-icon>
+                  </div>
+                  <div class="card-title-stack">
+                    <strong>{{ r.bovino?.nombre }}</strong>
+                    <span>{{ r.bovino?.crotal }}</span>
+                  </div>
+                  <div class="flex-1"></div>
+                  <ion-badge [color]="getStatusColor(r.estado_gestacion)" mode="ios">{{ r.estado_gestacion }}</ion-badge>
                 </div>
-                <ion-label>
-                  <h3 class="font-bold">{{ r.bovino?.nombre }} <small class="opacity-60">({{ r.bovino?.crotal }})</small></h3>
-                  <p>{{ r.tipo_cubricion }} • {{ r.fecha_cubricion | date:'dd/MM/yyyy' }}</p>
-                </ion-label>
-                <div slot="end" class="flex flex-col items-end gap-2">
-                  <ion-badge [color]="getStatusColor(r.estado_gestacion)" mode="ios">
-                    {{ r.estado_gestacion }}
-                  </ion-badge>
-                  <div class="action-buttons-mini">
-                    <ion-button fill="clear" (click)="openEditModal(r)" size="small"><ion-icon name="pencil" slot="icon-only"></ion-icon></ion-button>
-                    <ion-button fill="clear" (click)="confirmDelete(r)" size="small" color="danger"><ion-icon name="trash" slot="icon-only"></ion-icon></ion-button>
+
+                <div class="card-data-grid">
+                  <div class="card-data-item">
+                    <span class="label">Método / Fecha</span>
+                    <span class="value">{{ r.tipo_cubricion }} • {{ r.fecha_cubricion | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                  <div class="card-data-item">
+                    <span class="label">FPP Estimada</span>
+                    <span class="value">{{ r.fecha_parto_prevista ? (r.fecha_parto_prevista | date:'dd MMM yyyy') : 'Pendiente' }}</span>
                   </div>
                 </div>
-              </ion-item>
-           </ion-card>
-        </div>
+
+                <div class="card-footer-actions">
+                  <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
+                    <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                  <ion-button fill="clear" color="danger" (click)="confirmDelete(r)">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
 
         <div *ngIf="reproducciones.length === 0" class="luxe-empty-state">
-           <ion-icon name="logo-buffer" class="text-6xl opacity-20"></ion-icon>
-           <p>No hay historial registrado.</p>
+          <div class="empty-icon-ring">
+            <ion-icon name="layers-outline"></ion-icon>
+          </div>
+          <h2>Sin historial</h2>
+          <p>No hay historial reproductivo registrado.</p>
         </div>
 
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" class="bg-var-secondary">
-          <ion-icon name="add"></ion-icon>
+        <ion-fab-button (click)="openAddModal()" color="primary">
+          <ion-icon name="add-circle"></ion-icon>
         </ion-fab-button>
       </ion-fab>
 
@@ -175,7 +191,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
               <ion-title>{{ editingItem ? 'Actualizar Ficha' : 'Nuevo Evento' }}</ion-title>
               <ion-buttons slot="end">
                 <ion-button (click)="closeModal()">
-                  <ion-icon name="close"></ion-icon>
+                  <ion-icon name="close-outline"></ion-icon>
                 </ion-button>
               </ion-buttons>
             </ion-toolbar>
@@ -228,8 +244,8 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
               </ion-item>
               
               <div class="luxe-modal-footer">
-                <ion-button (click)="saveData()" [disabled]="reproForm.invalid" class="btn-luxe-save w-full">
-                  <ion-icon name="save" slot="start"></ion-icon> Archivar Evento
+                <ion-button expand="block" (click)="saveData()" [disabled]="reproForm.invalid" class="btn-luxe-save">
+                  Guardar
                 </ion-button>
               </div>
             </form>
@@ -279,7 +295,7 @@ export class ReproduccionComponent implements OnInit {
   reproForm: FormGroup;
 
   constructor() {
-    addIcons({ calendar, heart, flask, hourglass, add, close, save, time, pencil, female, trash, statsChart, ribbon, pulse, paw });
+    addIcons({ calendarOutline, heartOutline, flaskOutline, hourglassOutline, addCircle, closeOutline, saveOutline, timeOutline, createOutline, femaleOutline, trashOutline, statsChartOutline, ribbonOutline, pulseOutline, filterOutline, layersOutline });
     
     this.reproForm = this.fb.group({
       bovino_id: ['', Validators.required],

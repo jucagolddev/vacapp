@@ -1,7 +1,7 @@
 /* --- Módulo de Recría y Control de Pesaje --- */
 
 .animal-selection-card {
-  background: white;
+  background: var(--ion-card-background);
   border-radius: 16px;
   padding: 1.25rem;
   margin-bottom: 1rem;
@@ -44,7 +44,7 @@
     strong {
       font-family: 'Outfit', sans-serif;
       font-size: 1.1rem;
-      color: #1a1a1a;
+      color: var(--ion-text-color);
       line-height: 1.2;
     }
 
@@ -60,7 +60,7 @@
 .metric-card-luxe {
   padding: 1.5rem;
   border-radius: 18px;
-  background: white;
+  background: var(--ion-card-background);
   box-shadow: 0 4px 20px rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
@@ -92,7 +92,7 @@
 
 /* HISTORIAL DE PESADA (Versión Row) */
 .weight-card-row {
-  background: white;
+  background: var(--ion-card-background);
   margin-bottom: 0.75rem;
   border-radius: 14px;
   padding: 1rem;
@@ -116,7 +116,7 @@
     strong {
       font-size: 1.4rem;
       line-height: 1;
-      color: #1a1a1a;
+      color: var(--ion-text-color);
     }
 
     span {
@@ -135,7 +135,7 @@
     .weight {
       font-size: 1.2rem;
       font-weight: 700;
-      color: #1a1a1a;
+      color: var(--ion-text-color);
       font-family: 'Outfit', sans-serif;
     }
 
@@ -151,7 +151,7 @@
 /* BUSCADOR RÚSTICO */
 .rustic-search-wrapper {
   position: relative;
-  background: white;
+  background: var(--ion-card-background);
   border-radius: 14px;
   padding: 0 1.25rem;
   display: flex;

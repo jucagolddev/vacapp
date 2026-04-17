@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
-  IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton
+  IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
+  IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCardSubtitle, IonAvatar
 } from '@ionic/angular/standalone';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
@@ -13,7 +14,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, close, save, pencil, trash } from 'ionicons/icons';
+import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-finanzas',
@@ -22,74 +23,94 @@ import { add, close, save, pencil, trash } from 'ionicons/icons';
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle,
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
     IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
+    IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCardSubtitle, IonAvatar,
     LucideAngularModule, BaseChartDirective
   ],
   template: `
     <ion-header class="ion-no-border">
-      <ion-toolbar color="primary" class="luxe-toolbar">
+      <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button class="text-white"></ion-menu-button>
+          <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title class="luxe-title">Gastos y Ganancias</ion-title>
+        <ion-title class="ion-text-center">Gastos y Ganancias</ion-title>
+        <ion-buttons slot="end">
+          <!-- Placeholder to balance the title -->
+          <ion-button fill="clear" disabled="true"></ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="luxe-bg-forest">
+    <ion-content class="ion-padding-vertical">
       <div class="luxe-container animate-fade-in pb-12">
         
-        <!-- Cabecera de Sección -->
-        <div class="luxe-header-content">
-          <div class="luxe-icon-box bg-earth">
-            <lucide-icon name="wallet" class="text-white"></lucide-icon>
-          </div>
-          <div class="luxe-text-stack">
-            <h1 class="page-h1-rustic">Economía de la Finca</h1>
-            <p class="page-p-rustic">Control de cuánto dinero entra y cuánto sale.</p>
-          </div>
-        </div>
 
         <!-- GRÁFICO DE ROI (Relocado) -->
-        <div class="analytics-card-large animate-slide-up mb-8">
-          <div class="card-header-flex">
-            <div>
-              <h3 class="card-title-luxe"><lucide-icon name="wallet" size="24" class="icon-inline icon-mr color-primary"></lucide-icon> Mi Dinero (Ingresos vs Gastos)</h3>
-              <p class="card-subtitle-luxe">Las barras verdes son ventas. Las naranjas son gastos (comida, medicinas).</p>
+        <div class="bi-main-card animate-slide-up mb-8">
+          <ion-card-header>
+            <div class="bi-card-head">
+              <div class="card-title-stack">
+                <span>ESTADO DE CUENTAS</span>
+                <strong>Ingresos vs Gastos Mensuales</strong>
+              </div>
+              <div class="bi-mini-stat bg-primary-soft">
+                <ion-icon name="trending-up-outline"></ion-icon>
+                <span>ROI en Crecimiento</span>
+              </div>
             </div>
-            <lucide-icon name="trending-up" class="text-forest/30" size="32"></lucide-icon>
-          </div>
-          <div class="chart-container-large">
+          </ion-card-header>
+          <ion-card-content>
              <canvas baseChart class="chart-canvas-finance" [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
-          </div>
+          </ion-card-content>
         </div>
 
         <!-- Listado de Movimientos Recientes -->
         <h2 class="luxe-section-title">Últimos Movimientos</h2>
-        <div class="history-panel-luxe">
-           <div class="history-row-luxe" *ngFor="let r of finanzasService.records().slice(0, 20)">
-              <div class="history-avatar-luxe" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning'">
-                <lucide-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-circle' : 'arrow-down-circle'" class="text-white"></lucide-icon>
-              </div>
-              <div class="history-data-luxe">
-                <h4 class="text-lg font-bold">{{ r.categoria }}</h4>
-                <p>{{ r.fecha | date:'dd MMMM yyyy' }}</p>
-              </div>
-              <div class="history-actions-luxe">
-                 <div class="text-xl font-heavy" [class.color-finance-up]="r.tipo === 'Ingreso'" [class.color-finance-down]="r.tipo !== 'Ingreso'">
-                  {{ r.tipo === 'Ingreso' ? '+' : '-' }} {{ r.monto | number:'1.2-2' }}€
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of finanzasService.records().slice(0, 20)">
+              <div class="tag-body-luxe">
+                <div class="card-header-flex">
+                  <div class="card-icon-box" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
+                    <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'" [color]="r.tipo === 'Ingreso' ? 'light' : 'warning'"></ion-icon>
+                  </div>
+                  <div class="card-title-stack">
+                    <strong>{{ r.categoria }}</strong>
+                    <span>{{ r.fecha | date:'dd MMM yyyy' }}</span>
+                  </div>
+                  <div class="flex-1"></div>
+                  <div class="ion-text-right">
+                    <h3 class="kpi-value-small" [ngStyle]="{'color': r.tipo === 'Ingreso' ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'}">
+                      {{ r.tipo === 'Ingreso' ? '+' : '-' }}{{ r.monto | number:'1.0-0' }}€
+                    </h3>
+                  </div>
                 </div>
-                <div class="btn-group-history flex-row mt-xs">
-                   <ion-button fill="clear" (click)="openEditModal(r)"><ion-icon name="pencil"></ion-icon></ion-button>
-                   <ion-button fill="clear" (click)="confirmDelete(r)"><ion-icon name="trash" color="danger"></ion-icon></ion-button>
+
+                <div class="card-footer-actions mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
+                  <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
+                    <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                  <ion-button fill="clear" color="danger" (click)="confirmDelete(r)">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
                 </div>
               </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        
+        <div *ngIf="finanzasService.records().length === 0" class="luxe-empty-state">
+           <div class="empty-icon-ring">
+              <ion-icon name="cash-outline"></ion-icon>
            </div>
+           <h2>Cero Movimientos</h2>
+           <p>Aún no has registrado ningún gasto o beneficio en tu cuenta.</p>
         </div>
 
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" class="bg-var-secondary">
-          <ion-icon name="add"></ion-icon>
+        <ion-fab-button (click)="openAddModal()" color="primary">
+          <ion-icon name="add-circle"></ion-icon>
         </ion-fab-button>
       </ion-fab>
 
@@ -101,17 +122,19 @@ import { add, close, save, pencil, trash } from 'ionicons/icons';
               <ion-title>{{ editingItem ? 'Actualizar Registro' : 'Añadir Movimiento' }}</ion-title>
               <ion-buttons slot="end">
                 <ion-button (click)="closeModal()">
-                  <ion-icon name="close"></ion-icon>
+                  <ion-icon name="close-outline"></ion-icon>
                 </ion-button>
               </ion-buttons>
             </ion-toolbar>
           </ion-header>
 
           <ion-content class="ion-padding luxe-modal-content">
-            <div class="form-intro">
-               <lucide-icon name="wallet" class="color-earth" size="48"></lucide-icon>
+            <div class="form-intro ion-text-center ion-padding-bottom">
+               <div class="empty-icon-ring" style="margin: 0 auto; margin-bottom: 16px;">
+                  <ion-icon name="wallet-outline"></ion-icon>
+               </div>
                <h3>Registro Contable</h3>
-               <p>Anota cualquier venta, compra o gasto asociado a tu actividad ganadera.</p>
+               <p style="color: var(--ion-color-medium);">Anota cualquier venta, compra o gasto asociado a tu actividad ganadera.</p>
             </div>
 
             <form [formGroup]="finanzasForm">
@@ -144,8 +167,8 @@ import { add, close, save, pencil, trash } from 'ionicons/icons';
               </div>
 
               <div class="luxe-modal-footer">
-                <ion-button (click)="saveData()" [disabled]="finanzasForm.invalid" class="btn-luxe-save w-full">
-                  <ion-icon slot="start" name="save"></ion-icon> Guardar Registro
+                <ion-button expand="block" (click)="saveData()" [disabled]="finanzasForm.invalid" class="btn-luxe-save">
+                  Guardar
                 </ion-button>
               </div>
             </form>
@@ -175,8 +198,8 @@ export class FinanzasComponent {
     return {
       labels: data.map(d => d.label),
       datasets: [
-        { label: 'Ingresos (€)', data: data.map(d => d.ingresos), backgroundColor: '#2d6a4f', borderRadius: 6 },
-        { label: 'Gastos (€)', data: data.map(d => -d.gastos), backgroundColor: '#bc6c25', borderRadius: 6 }
+        { label: 'Ingresos (€)', data: data.map(d => d.ingresos), backgroundColor: '#1b4332', borderRadius: 6 },
+        { label: 'Gastos (€)', data: data.map(d => -d.gastos), backgroundColor: '#bc4749', borderRadius: 6 }
       ]
     };
   });
@@ -195,7 +218,7 @@ export class FinanzasComponent {
   };
 
   constructor() {
-    addIcons({ add, close, save, pencil, trash });
+    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline });
     this.finanzasForm = this.fb.group({
       tipo: ['Gasto', Validators.required],
       categoria: ['Alimentación y Pastos', Validators.required],

@@ -5,16 +5,16 @@ import {
   IonLabel, IonIcon, IonNote, IonGrid, 
   IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-  IonCard, IonCardHeader, IonCardContent, IonBadge
+  IonCard, IonBadge, IonCardContent, IonAvatar, IonCardHeader
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Bovino, Lote } from '../../core/models/vacapp.models';
 import { addIcons } from 'ionicons';
 import { 
-  paw, list, add, close, save, person, 
-  male, female, calendar, barChart, leaf,
-  pencil, trash, arrowForward, chevronForward, megaphone,
-  logoBuffer
+  pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, 
+  maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline,
+  createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline,
+  layersOutline
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
@@ -40,100 +40,95 @@ import { computed, signal } from '@angular/core';
     IonLabel, IonIcon, IonNote, IonGrid, 
     IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
     IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-    IonCard, IonCardHeader, IonCardContent, IonBadge,
+    IonCard, IonBadge, IonCardContent, IonAvatar, IonCardHeader,
     BaseChartDirective
   ],
   template: `
-    <ion-header class="ion-no-border" [translucent]="true">
-      <ion-toolbar color="primary" class="luxe-toolbar">
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button class="text-white"></ion-menu-button>
+          <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title class="luxe-title">Inventario Ganadero</ion-title>
+        <ion-title class="ion-text-center">Inventario Ganadero</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear">
+            <ion-icon name="filter-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="luxe-bg-forest">
+    <ion-content class="ion-padding-vertical">
       <div class="luxe-container animate-fade-in">
-        
-        <!-- Cabecera de Sección -->
-        <div class="luxe-header-content">
-          <div class="luxe-icon-box bg-earth">
-            <ion-icon name="paw"></ion-icon>
-          </div>
-          <div class="luxe-text-stack">
-            <h1 class="page-h1-rustic">Registro de Animales</h1>
-            <p class="page-p-rustic">Aquí puedes ver y gestionar todo tu ganado.</p>
-          </div>
-        </div>
 
         <!-- GRÁFICO DE PESO -->
-        <div class="analytics-card-large animate-slide-up mb-8" *ngIf="bovinos().length > 0">
-          <div class="card-header-flex">
-            <div>
-              <h3 class="card-title-luxe"><ion-icon name="bar-chart" class="icon-inline-baseline icon-mr color-secondary"></ion-icon> Crecimiento (Peso en Kilos)</h3>
-              <p class="card-subtitle-luxe">Evolución de peso de los ejemplares principales.</p>
+        <div class="bi-main-card animate-slide-up mb-8" *ngIf="bovinos().length > 0">
+          <ion-card-header>
+            <div class="bi-card-head">
+              <div class="card-title-stack">
+                <span>ANÁLISIS DE RENDIMIENTO</span>
+                <strong>Crecimiento (Peso en Kilos)</strong>
+              </div>
+              <div class="bi-mini-stat bg-primary-soft">
+                <ion-icon name="trending-up-outline"></ion-icon>
+                <span>Hato Saludable</span>
+              </div>
             </div>
-          </div>
-          <div class="chart-container-large">
-             <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
-          </div>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="chart-container-large" style="height: 300px;">
+               <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
+            </div>
+          </ion-card-content>
         </div>
 
         <ion-grid class="ion-no-padding" *ngIf="bovinos().length > 0">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of bovinos()">
-              <ion-card class="pro-card-luxe animate-slide-up">
-                <ion-card-header>
-                  <div class="card-header-flex">
-                    <div *ngIf="b.foto_url" class="card-icon-box bg-earth card-icon-box-img" [style.background-image]="'url(' + b.foto_url + ')'">
+              <div class="tag-body-luxe">
+                <div class="card-header-flex">
+                  <ion-avatar class="luxe-avatar">
+                    <div *ngIf="b.foto_url" class="avatar-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
+                    <div *ngIf="!b.foto_url" class="avatar-placeholder">
+                      <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
                     </div>
-                    <div *ngIf="!b.foto_url" class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
-                      <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
-                    </div>
-                    <div class="card-title-stack">
-                      <strong>{{ b.nombre }}</strong>
-                      <span>ID CROTAL: {{ b.crotal }}</span>
-                    </div>
-                    
-                    <ion-badge *ngIf="b.estado_reproductivo" 
-                      [color]="b.estado_reproductivo === 'Gestante' ? 'success' : (b.estado_reproductivo === 'Seca' ? 'medium' : 'primary')" 
-                      mode="ios" slot="end" class="badge-card-top">
-                      {{ b.estado_reproductivo }}
-                    </ion-badge>
+                  </ion-avatar>
+                  <div class="card-title-stack">
+                    <strong>{{ b.nombre }}</strong>
+                    <span>{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</span>
                   </div>
-                </ion-card-header>
+                  <div class="flex-1"></div>
+                  <ion-badge *ngIf="b.estado_productivo === 'Alta'" color="success" mode="ios">
+                    Activo
+                  </ion-badge>
+                  <ion-badge *ngIf="b.estado_productivo !== 'Alta'" color="warning" mode="ios">
+                    {{ b.estado_productivo }}
+                  </ion-badge>
+                </div>
 
-                <ion-card-content>
-                  <div class="card-data-grid">
-                    <div class="card-data-item">
-                      <span class="label">Categoría</span>
-                      <span class="value">{{ ganadoService.calculateCategoria(b) }}</span>
-                    </div>
-                    <div class="card-data-item">
-                      <span class="label">Raza</span>
-                      <span class="value">{{ b.raza || 'Mestizo' }}</span>
-                    </div>
-                    <div class="card-data-item">
-                      <span class="label">Aptitud</span>
-                      <span class="value">{{ b.aptitud || 'No def.' }}</span>
-                    </div>
-                    <div class="card-data-item">
-                      <span class="label">Edad</span>
-                      <span class="value highlight font-heavy">{{ ganadoService.getEdadDesc(b) }}</span>
-                    </div>
+                <div class="card-data-grid">
+                  <div class="card-data-item">
+                    <span class="label">Sexo / Aptitud</span>
+                    <span class="value">{{ b.sexo }} • {{ b.aptitud }}</span>
                   </div>
+                  <div class="card-data-item">
+                    <span class="label">Edad Actual</span>
+                    <span class="value">{{ ganadoService.getEdadDesc(b) }}</span>
+                  </div>
+                </div>
 
-                  <div class="card-footer-actions-bi mt-4">
-                    <ion-button fill="clear" (click)="openEditModal(b)" color="dark" size="small">
-                      <ion-icon name="pencil" slot="start"></ion-icon> Editar
-                    </ion-button>
-                    <ion-button fill="clear" (click)="confirmDelete(b.id)" color="danger" size="small">
-                      <ion-icon name="trash" slot="start"></ion-icon> Borrar
-                    </ion-button>
-                  </div>
-                </ion-card-content>
-              </ion-card>
+                <div class="card-footer-actions">
+                  <ion-button fill="clear" color="medium" (click)="openEditModal(b)">
+                    <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                  <ion-button fill="clear" color="danger" (click)="confirmDelete(b.id)">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                  <ion-button fill="solid" color="primary" class="ion-no-margin">
+                    Ver Ficha
+                  </ion-button>
+                </div>
+              </div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -141,20 +136,20 @@ import { computed, signal } from '@angular/core';
         <!-- Estado Vacío -->
         <div *ngIf="bovinos().length === 0" class="luxe-empty-state">
           <div class="empty-icon-ring">
-            <ion-icon name="logo-buffer"></ion-icon>
+            <ion-icon name="layers-outline"></ion-icon>
           </div>
           <h2>No hay animales registrados</h2>
           <p>Comienza registrando tu primer animal en el sistema.</p>
-          <ion-button fill="solid" (click)="openAddModal()" class="btn-luxe-save">
-            <ion-icon name="add" slot="start"></ion-icon> Añadir Ejemplar
+          <ion-button fill="solid" (click)="openAddModal()" color="primary" style="--border-radius: 12px;">
+            <ion-icon name="add-circle" slot="start"></ion-icon> Añadir Ejemplar
           </ion-button>
         </div>
 
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" class="bg-var-secondary">
-          <ion-icon name="add"></ion-icon>
+        <ion-fab-button (click)="openAddModal()" color="primary">
+          <ion-icon name="add-circle"></ion-icon>
         </ion-fab-button>
       </ion-fab>
 
@@ -166,7 +161,7 @@ import { computed, signal } from '@angular/core';
               <ion-title>{{ editingItem ? 'Actualizar Ficha' : 'Nuevo Registro' }}</ion-title>
               <ion-buttons slot="end">
                 <ion-button (click)="closeModal()">
-                  <ion-icon name="close"></ion-icon>
+                  <ion-icon name="close-outline"></ion-icon>
                 </ion-button>
               </ion-buttons>
             </ion-toolbar>
@@ -353,7 +348,7 @@ export class GanadoComponent implements OnInit {
   bovinoForm: FormGroup;
 
   constructor() {
-    addIcons({ paw, list, add, close, save, person, male, female, calendar, barChart, leaf, pencil, trash, arrowForward, chevronForward, megaphone, logoBuffer });
+    addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, filterOutline: 'filter-outline' });
     this.bovinoForm = this.fb.group({
       nombre: ['', Validators.required],
       crotal: ['', Validators.required],

@@ -1,63 +1,147 @@
 @use "../abstracts/variables";
 
-/* BASE CARD */
+/* BASE CARD - The "Floating" Luxe Estate */
 .rustic-base-card {
   background: variables.$white;
-  border-radius: variables.$border-radius-lg;
-  padding: 1rem;
-  box-shadow: variables.$shadow-sm;
-  border: 1px solid variables.$gray-200;
-  border-left: 6px solid var(--ion-color-tertiary); /* Wheat left border */
-  margin: 8px;
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: variables.$shadow-luxe;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  margin: 12px 8px;
   position: relative;
-  transition: all 0.3s ease;
+  transition: variables.$transition-base;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, variables.$tertiary-color, transparent);
+    opacity: 0;
+    transition: variables.$transition-base;
+  }
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: variables.$shadow-md;
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    border-color: rgba(variables.$tertiary-color, 0.2);
+    
+    &::before {
+      opacity: 1;
+    }
   }
 }
 
-// GLOBAL CARD LAYOUT CLASSES
+/* KPI CARDS - Intelligence Center */
+.bi-kpi-card {
+  @extend .rustic-base-card;
+  &.glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
 
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+
+  .kpi-mini-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+
+  .kpi-content {
+    .kpi-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: variables.$secondary-color;
+      letter-spacing: 1px;
+      opacity: 0.7;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 900;
+      margin: 0;
+      color: variables.$primary-color;
+      letter-spacing: -0.5px;
+    }
+  }
+}
+
+/* MAIN DASHBOARD CARDS */
+.bi-main-card {
+  @extend .rustic-base-card;
+  padding: 0; /* Let header and content manage padding */
+
+  ion-card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+    
+    .bi-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  ion-card-content {
+    padding: 1.5rem;
+  }
+}
+
+.bi-mini-stat {
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &.bg-primary-soft {
+    background: rgba(variables.$primary-color, 0.1);
+    color: variables.$primary-color;
+  }
+}
+
+/* GLOBAL CARD LAYOUT CLASSES */
 .card-header-flex {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 15px;
+  margin-bottom: 15px;
 }
 
 .card-icon-box {
-  width: 46px; /* Slightly smaller */
-  height: 46px;
-  border-radius: 10px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 24px;
   color: variables.$white;
   flex-shrink: 0;
+  box-shadow: variables.$shadow-sm;
   
-  &.bg-primary { 
-    background: var(--ion-color-primary); 
-    color: var(--ion-color-tertiary); 
-    ion-icon { color: var(--ion-color-tertiary) !important; }
-  }
-  &.bg-secondary { 
-    background: var(--ion-color-secondary); 
-    color: var(--ion-color-tertiary); 
-    ion-icon { color: var(--ion-color-tertiary) !important; }
-  }
-  &.bg-tertiary { 
-    background: rgba(var(--ion-color-tertiary-rgb), 0.2); 
-    color: var(--ion-color-tertiary); 
-    ion-icon { color: var(--ion-color-tertiary) !important; } 
-  }
-  &.bg-danger { 
-    background: var(--ion-color-danger); 
-    color: var(--ion-color-tertiary); 
-    ion-icon { color: var(--ion-color-tertiary) !important; }
-  }
+  &.bg-primary { background: linear-gradient(135deg, variables.$primary-color, variables.$dark-color); }
+  &.bg-secondary { background: linear-gradient(135deg, variables.$secondary-color, #8b5a2b); }
+  &.bg-tertiary { background: linear-gradient(135deg, variables.$tertiary-color, #b48a5c); color: variables.$primary-color; }
+  &.bg-success { background: linear-gradient(135deg, variables.$success-color, #2d6a4f); }
 }
 
 .card-title-stack {
@@ -65,125 +149,75 @@
   flex-direction: column;
 
   strong {
-    font-size: 0.95rem; /* Smaller, high-density */
-    color: variables.$black;
-    font-weight: 800;
+    font-size: 1.1rem;
+    color: variables.$primary-color;
+    font-weight: 900;
+    letter-spacing: -0.2px;
   }
   span {
     font-size: 0.75rem;
-    color: var(--ion-color-secondary);
+    color: variables.$secondary-color;
     font-weight: 700;
-    margin-top: 2px;
+    opacity: 0.8;
   }
 }
 
 .card-data-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 15px;
+  margin: 15px 0;
+  padding: 15px;
+  background: rgba(variables.$light-color, 0.3);
+  border-radius: 12px;
 }
 
 .card-data-item {
   display: flex;
   flex-direction: column;
 
-  span.label {
+  .label {
     font-size: 0.65rem;
-    color: variables.$gray-600;
+    color: variables.$secondary-color;
     text-transform: uppercase;
     font-weight: 800;
+    letter-spacing: 0.5px;
+    opacity: 0.6;
   }
-  span.value {
-    font-size: 0.85rem;
-    color: variables.$black;
+  .value {
+    font-size: 1rem;
+    color: variables.$primary-color;
     font-weight: 800;
     margin-top: 2px;
   }
-  span.value.highlight {
-    font-size: 1.1rem;
-    color: var(--ion-color-primary);
+  &.highlight .value {
+    font-size: 1.25rem;
+    color: variables.$success-color;
   }
 }
 
 .card-footer-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 10px;
-  border-top: 1px solid variables.$gray-100;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(0,0,0,0.03);
   
   ion-button {
-    font-weight: 700;
+    --border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.75rem;
     letter-spacing: 0.5px;
-    text-transform: uppercase;
   }
 }
 
-/* Modifiers for Specific Modules (Extend Base Card) */
-.tag-body-luxe { @extend .rustic-base-card; }
-.field-card-body-luxe { @extend .rustic-base-card; }
-.health-card-body-luxe { @extend .rustic-base-card; }
-.repro-card-body-luxe { @extend .rustic-base-card; }
-.weight-card-body-luxe { @extend .rustic-base-card; }
-
-/* 8. TARJETAS DE ESTADÍSTICAS (KPIs) */
-.luxe-stat-card {
-  @extend .rustic-base-card;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-
-  &:hover, &:focus-visible {
-    border-color: rgba(var(--ion-color-tertiary-rgb), 0.5);
-    outline: none;
-    box-shadow: variables.$shadow-focus;
-  }
-}
-
-.stat-label { font-size: 0.72rem; text-transform: uppercase; font-weight: 800; color: variables.$secondary-color; letter-spacing: 0.8px; margin-bottom: 4px; display: block; }
-.stat-trend { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; font-weight: 700; margin-top: 5px; }
-
-
-/* 9. PANELES DETALLADOS */
-.luxe-panel-glass {
-  background: variables.$white;
-  border-radius: variables.$border-radius-lg;
-  padding: 1rem;
-  min-height: 250px;
-  box-shadow: variables.$shadow-sm;
-  border: 1px solid variables.$gray-200;
-  margin: 8px;
-}
-
-.luxe-panel-dark {
-  background: var(--ion-color-primary);
-  color: variables.$white;
-  border-radius: variables.$border-radius-lg;
-  padding: 1rem;
-  min-height: 250px;
-  box-shadow: variables.$shadow-sm;
-  border: 1px solid rgba(variables.$black, 0.05);
-  margin: 8px;
-}
-
-.luxe-panel-dark h3 { color: variables.$white; }
-
-/* PRO CARD LUXE */
+/* Modifiers for Specific Modules */
 .pro-card-luxe { 
-  border-radius: 20px; 
-  border-left: 5px solid var(--ion-color-primary); 
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-  margin: 12px 8px;
-  background: variables.$white;
+  @extend .rustic-base-card;
+  border-top: 4px solid variables.$tertiary-color;
 }
 
-.pro-card-row {
-  border-radius: 16px;
-  border-left: 5px solid var(--ion-color-primary);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-  margin-bottom: 12px;
-  overflow: hidden;
-  background: variables.$white;
+.tag-body-luxe, .field-card-body-luxe, .health-card-body-luxe, .repro-card-body-luxe, .weight-card-body-luxe {
+  @extend .rustic-base-card;
 }
