@@ -1,7 +1,7 @@
 @use "../abstracts/variables";
 
 /* BASE CARD - The "Floating" Luxe Estate */
-.rustic-base-card {
+.vac-base-card {
   background: variables.$white;
   border-radius: 20px;
   padding: 1.25rem;
@@ -37,7 +37,7 @@
 
 /* KPI CARDS - Intelligence Center */
 .bi-kpi-card {
-  @extend .rustic-base-card;
+  @extend .vac-base-card;
   &.glass {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
@@ -84,7 +84,7 @@
 
 /* MAIN DASHBOARD CARDS */
 .bi-main-card {
-  @extend .rustic-base-card;
+  @extend .vac-base-card;
   padding: 0; /* Let header and content manage padding */
 
   ion-card-header {
@@ -214,10 +214,10 @@
 
 /* Modifiers for Specific Modules */
 .pro-card-luxe { 
-  @extend .rustic-base-card;
+  @extend .vac-base-card;
   border-top: 4px solid variables.$tertiary-color;
 }
 
 .tag-body-luxe, .field-card-body-luxe, .health-card-body-luxe, .repro-card-body-luxe, .weight-card-body-luxe {
-  @extend .rustic-base-card;
+  @extend .vac-base-card;
 }

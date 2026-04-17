@@ -32,9 +32,9 @@ export const routes: Routes = [
       },
       // Gestión de Ganado (Inventario de Bovinos)
       {
-        path: 'ganado',
+        path: 'manejo',
         title: 'Vacapp | Registro Ganadero',
-        loadComponent: () => import('./features/ganado/ganado.component').then(m => m.GanadoComponent)
+        loadComponent: () => import('./features/manejo/manejo.component').then(m => m.ManejoComponent)
       },
       // Gestión de Lotes y Recintos
       {

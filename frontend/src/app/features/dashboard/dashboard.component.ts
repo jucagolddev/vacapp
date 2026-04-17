@@ -15,10 +15,11 @@ import { OfflineSyncService } from '../../core/services/offline-sync.service';
 import { 
   Chart, registerables
 } from 'chart.js';
+import { PdfService } from '../../core/services/pdf.service';
 import { addIcons } from 'ionicons';
 import { 
   pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
-  trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline 
+  trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline 
 } from 'ionicons/icons';
 
 Chart.register(...registerables);
@@ -39,13 +40,15 @@ Chart.register(...registerables);
         </ion-buttons>
         <ion-title class="ion-text-center">Centro de Inteligencia</ion-title>
         <ion-buttons slot="end">
-          <ion-button fill="clear" disabled="true"></ion-button>
+          <ion-button (click)="exportarPDF()" color="primary">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="luxe-container animate-fade-in pb-12">
+      <div class="vac-container animate-fade-in pb-12">
         
         <!-- Header con Identidad -->
         <div class="dashboard-header-bi mt-4">
@@ -198,6 +201,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   pesajeService = inject(PesajeService);
   finanzasService = inject(FinanzasService);
   offlineSync = inject(OfflineSyncService);
+  pdfService = inject(PdfService);
   
   finca = this.fincaService.currentFinca;
   isOnline = this.offlineSync.isOnline;
@@ -234,7 +238,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor() {
     addIcons({ 
       pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
-      trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline 
+      trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline 
     });
 
     // Configuración Global de Chart.js
@@ -258,6 +262,70 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {}
+
+  async exportarPDF() {
+    const doc = await this.pdfService.getNewDoc();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+
+    // Estilo Rustic-Luxe
+    const forestGreen: [number, number, number] = [27, 67, 50];
+
+    // Encabezado
+    doc.setFillColor(forestGreen[0], forestGreen[1], forestGreen[2]);
+    doc.rect(0, 0, 210, 40, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.text('REPORTE EJECUTIVO - VACAPP', 14, 25);
+    
+    doc.setFontSize(10);
+    doc.text(`FINCA: ${this.finca()?.nombre || 'General'} | EMISIÓN: ${dateStr}`, 14, 34);
+
+    // KPI Section
+    await this.pdfService.addTableToDoc(
+      doc,
+      'Indicadores Clave de Rendimiento (KPIs)',
+      [['KPI', 'Valor Total', 'Estado']],
+      [
+        ['Censo Total Bovinos', (this.totalBovinos() || 0) + ' Cabezas', 'Estable'],
+        ['Gestaciones Activas', (this.gestacionesActivas()?.length || 0) + ' Vacas', 'Controlado'],
+        ['Peso Medio del Hato', (this.pesoMedio() || 0) + ' KG', 'En Rango'],
+        ['Balance Financiero (Mes)', (this.saldoMensual() || 0) + ' €', 'Positivo']
+      ],
+      { 
+        startY: 55,
+        headStyles: { fillColor: forestGreen }
+      }
+    );
+
+    // Distribución por Lote
+    const lastY = this.pdfService.getLastY(doc);
+    const distData = this.ganadoService.distLotes();
+    const distBody = Object.entries(distData).map(([lote, count]) => [lote, count + ' Cabezas']);
+
+    await this.pdfService.addTableToDoc(
+      doc,
+      'Distribución de Población por Lote',
+      [['Lote / Potrero', 'Población']],
+      distBody,
+      { 
+        startY: lastY + 15,
+        headStyles: { fillColor: [88, 47, 14] as [number, number, number] } // Earth-brown
+      }
+    );
+
+    // Pie de página
+    const totalPages = doc.getNumberOfPages();
+    for(let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text('Documento generado automáticamente por Vacapp AgriTech ERP', 105, 285, { align: 'center' });
+    }
+
+    doc.save(`reporte_ejecutivo_vacapp_${now.getTime()}.pdf`);
+  }
 
   ngAfterViewInit() {
     this.initCharts();

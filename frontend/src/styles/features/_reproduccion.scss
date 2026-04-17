@@ -26,7 +26,7 @@
   margin-bottom: variables.$spacing-lg;
 }
 
-.rustic-card {
+.vac-card {
   --background: var(--ion-card-background);
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
@@ -75,7 +75,7 @@
 }
 
 // Separador Rustic
-.rustic-divider {
+.vac-divider {
   --background: transparent;
   --padding-top: $spacing-lg;
   --padding-bottom: $spacing-sm;

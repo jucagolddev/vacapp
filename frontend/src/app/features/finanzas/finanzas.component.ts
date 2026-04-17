@@ -10,11 +10,11 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { FinanzasService } from '../../core/services/finanzas.service';
 import { Finanzas } from '../../core/models/vacapp.models';
-import { LucideAngularModule } from 'lucide-angular';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline } from 'ionicons/icons';
+import { PdfService } from '../../core/services/pdf.service';
+import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline, documentTextOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-finanzas',
@@ -24,7 +24,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
     IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
     IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCardSubtitle, IonAvatar,
-    LucideAngularModule, BaseChartDirective
+    BaseChartDirective
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -34,14 +34,15 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </ion-buttons>
         <ion-title class="ion-text-center">Gastos y Ganancias</ion-title>
         <ion-buttons slot="end">
-          <!-- Placeholder to balance the title -->
-          <ion-button fill="clear" disabled="true"></ion-button>
+          <ion-button (click)="exportarPDF()" color="primary">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="luxe-container animate-fade-in pb-12">
+      <div class="vac-container animate-fade-in pb-12">
         
 
         <!-- GRÁFICO DE ROI (Relocado) -->
@@ -64,7 +65,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </div>
 
         <!-- Listado de Movimientos Recientes -->
-        <h2 class="luxe-section-title">Últimos Movimientos</h2>
+        <h2 class="vac-section-title">Últimos Movimientos</h2>
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of finanzasService.records().slice(0, 20)">
@@ -98,7 +99,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
           </ion-row>
         </ion-grid>
         
-        <div *ngIf="finanzasService.records().length === 0" class="luxe-empty-state">
+        <div *ngIf="finanzasService.records().length === 0" class="vac-empty-state">
            <div class="empty-icon-ring">
               <ion-icon name="cash-outline"></ion-icon>
            </div>
@@ -115,7 +116,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
       </ion-fab>
 
       <!-- MODAL DE MOVIMIENTO FINANCIERO -->
-      <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()" class="luxe-modal">
+      <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()" class="vac-modal">
         <ng-template>
           <ion-header class="ion-no-border">
             <ion-toolbar color="primary">
@@ -128,7 +129,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
             </ion-toolbar>
           </ion-header>
 
-          <ion-content class="ion-padding luxe-modal-content">
+          <ion-content class="ion-padding vac-modal-content">
             <div class="form-intro ion-text-center ion-padding-bottom">
                <div class="empty-icon-ring" style="margin: 0 auto; margin-bottom: 16px;">
                   <ion-icon name="wallet-outline"></ion-icon>
@@ -138,7 +139,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
             </div>
 
             <form [formGroup]="finanzasForm">
-              <ion-item class="luxe-input">
+              <ion-item class="vac-input">
                 <ion-label position="stacked">Naturaleza de Movimiento *</ion-label>
                 <ion-select formControlName="tipo" interface="popover" (ionChange)="onTipoChange()">
                   <ion-select-option value="Ingreso">Entrada (Ventas, Ayudas)</ion-select-option>
@@ -146,7 +147,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
                 </ion-select>
               </ion-item>
 
-              <ion-item class="luxe-input">
+              <ion-item class="vac-input">
                 <ion-label position="stacked">Categoría Principal *</ion-label>
                 <ion-select formControlName="categoria" interface="popover">
                    <ion-select-option *ngFor="let cat of categoriasDisponibles" [value]="cat">
@@ -155,19 +156,19 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
                 </ion-select>
               </ion-item>
 
-              <div class="luxe-item-group">
-                <ion-item class="luxe-input half">
+              <div class="vac-item-group">
+                <ion-item class="vac-input half">
                   <ion-label position="stacked">Fecha *</ion-label>
                   <ion-input type="date" formControlName="fecha"></ion-input>
                 </ion-item>
-                <ion-item class="luxe-input half">
+                <ion-item class="vac-input half">
                   <ion-label position="stacked">Monto (€) *</ion-label>
                   <ion-input type="number" formControlName="monto" placeholder="0.00"></ion-input>
                 </ion-item>
               </div>
 
-              <div class="luxe-modal-footer">
-                <ion-button expand="block" (click)="saveData()" [disabled]="finanzasForm.invalid" class="btn-luxe-save">
+              <div class="vac-modal-footer">
+                <ion-button expand="block" (click)="saveData()" [disabled]="finanzasForm.invalid" class="btn-vac-save">
                   Guardar
                 </ion-button>
               </div>
@@ -183,6 +184,7 @@ export class FinanzasComponent {
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
+  private pdfService = inject(PdfService);
   
   isModalOpen = false;
   editingItem: Finanzas | null = null;
@@ -218,7 +220,7 @@ export class FinanzasComponent {
   };
 
   constructor() {
-    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline });
+    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline, documentTextOutline });
     this.finanzasForm = this.fb.group({
       tipo: ['Gasto', Validators.required],
       categoria: ['Alimentación y Pastos', Validators.required],
@@ -226,6 +228,46 @@ export class FinanzasComponent {
       fecha: [new Date().toISOString().split('T')[0], Validators.required]
     });
     this.categoriasDisponibles = [...this.categoriasGasto];
+  }
+
+  async exportarPDF() {
+    const records = this.finanzasService.records();
+    const headers = [['Fecha', 'Tipo', 'Categoría', 'Descripción', 'Monto']];
+    const body = records.map(r => [
+      r.fecha ? new Date(r.fecha).toLocaleDateString() : 'N/A',
+      r.tipo || '-',
+      r.categoria || '-',
+      r.descripcion || '-',
+      (r.tipo === 'Ingreso' ? '+' : '-') + (r.monto || 0).toLocaleString() + '€'
+    ]);
+
+    const doc = await this.pdfService.getNewDoc();
+    await this.pdfService.addTableToDoc(
+      doc,
+      'Balance Financiero - Vacapp ERP',
+      headers,
+      body,
+      {
+        startY: 25,
+        columnStyles: {
+          4: { halign: 'right', fontStyle: 'bold' }
+        }
+      }
+    );
+
+    // Agregar resumen al final
+    const finalY = this.pdfService.getLastY(doc) + 10;
+    const totalIngresos = records.filter(r => r.tipo === 'Ingreso').reduce((acc, r) => acc + (r.monto || 0), 0);
+    const totalGastos = records.filter(r => r.tipo === 'Gasto').reduce((acc, r) => acc + (r.monto || 0), 0);
+    const balance = totalIngresos - totalGastos;
+    const now = new Date();
+    
+    doc.setFontSize(12);
+    // Verde (#2B5329) si es positivo, Rojo (#BC4749) si es negativo
+    doc.setTextColor(balance >= 0 ? 43 : 188, balance >= 0 ? 83 : 71, balance >= 0 ? 41 : 73); 
+    doc.text(`Balance Neto: ${balance.toLocaleString()}€`, 14, finalY + 16);
+
+    doc.save(`balance_financiero_vacapp_${now.getTime()}.pdf`);
   }
 
   onTipoChange() {

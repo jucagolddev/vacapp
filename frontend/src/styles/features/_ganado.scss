@@ -4,7 +4,7 @@
 @use '../abstracts/variables' as v;
 @use '../abstracts/mixins' as m;
 
-.luxe-bg-forest {
+.vac-bg-forest {
   --background: v.$light-color;
 }
 
@@ -47,7 +47,7 @@
 }
 
 // Empty state improvements
-.luxe-empty-state {
+.vac-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;

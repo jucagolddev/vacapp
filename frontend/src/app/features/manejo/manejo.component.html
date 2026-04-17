@@ -1,0 +1,319 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Inventario Ganadero</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="exportarPDF()" color="primary">
+        <ion-icon name="document-text-outline"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear">
+        <ion-icon name="filter-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-vertical">
+
+  <!-- Pull-to-Refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content pullingIcon="arrow-down-outline" refreshingSpinner="circles">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <div class="vac-container animate-fade-in">
+    <!-- Search Bar -->
+    <ion-searchbar
+      mode="ios"
+      animated="true"
+      placeholder="Buscar por crotal o nombre..."
+      (ionInput)="handleSearch($event)"
+      class="vac-filter-bar"
+      style="padding: 0; box-shadow: none; border: none; background: transparent;">
+    </ion-searchbar>
+
+    <!-- GRÁFICO DE PESO -->
+    <div class="bi-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
+      <ion-card-header>
+        <div class="bi-card-head">
+          <div class="card-title-stack">
+            <span>ANÁLISIS DE RENDIMIENTO</span>
+            <strong>Crecimiento (Peso en Kilos)</strong>
+          </div>
+          <div class="bi-mini-stat bg-primary-soft">
+            <ion-icon name="trending-up-outline"></ion-icon>
+            <span>Hato Saludable</span>
+          </div>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="chart-container-large" style="height: 300px;">
+           <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
+        </div>
+      </ion-card-content>
+    </div>
+
+    <!-- SKELETON LOADER -->
+    <ion-grid class="ion-no-padding" *ngIf="isLoading()">
+      <ion-row>
+        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
+          <div class="tag-body-luxe">
+            <div class="card-header-flex">
+              <ion-avatar class="vac-avatar">
+                <ion-skeleton-text animated style="width: 100%; height: 100%;"></ion-skeleton-text>
+              </ion-avatar>
+              <div class="card-title-stack" style="width: 50%;">
+                <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
+              </div>
+              <div class="flex-1"></div>
+              <ion-skeleton-text animated style="width: 50px; height: 25px; border-radius: 8px;"></ion-skeleton-text>
+            </div>
+
+            <div class="card-data-grid">
+              <div class="card-data-item">
+                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+              </div>
+              <div class="card-data-item">
+                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+              </div>
+            </div>
+            
+            <div class="card-footer-actions">
+              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 80px; height: 35px; border-radius: 8px;"></ion-skeleton-text>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- ANIMAL LIST -->
+    <ion-grid class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
+      <ion-row>
+        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+          <div class="tag-body-luxe">
+            <div class="card-header-flex">
+              <ion-avatar class="vac-avatar">
+                <div *ngIf="b.foto_url" class="avatar-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
+                <div *ngIf="!b.foto_url" class="avatar-placeholder">
+                  <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+                </div>
+              </ion-avatar>
+              <div class="card-title-stack">
+                <strong>{{ b.nombre }}</strong>
+                <span>{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</span>
+              </div>
+              <div class="flex-1"></div>
+              <ion-badge *ngIf="b.estado_productivo === 'Alta'" color="success" mode="ios">
+                Activo
+              </ion-badge>
+              <ion-badge *ngIf="b.estado_productivo !== 'Alta'" color="warning" mode="ios">
+                {{ b.estado_productivo }}
+              </ion-badge>
+            </div>
+
+            <div class="card-data-grid">
+              <div class="card-data-item">
+                <span class="label">Sexo / Aptitud</span>
+                <span class="value">{{ b.sexo }} • {{ b.aptitud }}</span>
+              </div>
+              <div class="card-data-item">
+                <span class="label">Edad Actual</span>
+                <span class="value">{{ ganadoService.getEdadDesc(b) }}</span>
+              </div>
+            </div>
+
+            <div class="card-footer-actions">
+              <ion-button fill="clear" color="medium" (click)="openEditModal(b)">
+                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" (click)="confirmDelete(b.id)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button fill="solid" color="primary" class="ion-no-margin">
+                Ver Ficha
+              </ion-button>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Estado Vacío -->
+    <div *ngIf="filteredBovinos().length === 0 && !isLoading()" class="vac-empty-state">
+      <div class="empty-icon-ring">
+        <ion-icon name="layers-outline"></ion-icon>
+      </div>
+      <h2>No hay animales registrados</h2>
+      <p>Comienza registrando tu primer animal en el sistema.</p>
+      <ion-button fill="solid" (click)="openAddModal()" color="primary" style="--border-radius: 12px;">
+        <ion-icon name="add-circle" slot="start"></ion-icon> Añadir Ejemplar
+      </ion-button>
+    </div>
+
+  </div>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="openAddModal()" color="primary">
+      <ion-icon name="add-circle"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- MODAL WIZARD -->
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()" class="vac-modal">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar color="primary">
+          <ion-title>{{ editingItem ? 'Actualizar Ficha' : 'Nuevo Registro' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeModal()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <!-- Stepper Visual -->
+      <div class="vac-wizard-stepper">
+        <div class="wizard-step" [ngClass]="{'step-active': currentStep >= 1}">
+          <div class="step-circle">1</div>
+          <span>Identidad</span>
+        </div>
+        <div class="wizard-line"></div>
+        <div class="wizard-step" [ngClass]="{'step-active': currentStep >= 2}">
+          <div class="step-circle">2</div>
+          <span>Biología</span>
+        </div>
+        <div class="wizard-line"></div>
+        <div class="wizard-step" [ngClass]="{'step-active': currentStep >= 3}">
+          <div class="step-circle">3</div>
+          <span>Finca</span>
+        </div>
+      </div>
+      
+      <ion-content class="ion-padding vac-modal-content">
+        <form [formGroup]="bovinoForm">
+          
+          <!-- Paso 1: Identidad -->
+          <div *ngIf="currentStep === 1" class="animate-slide-up">
+            <div class="form-intro">
+               <h3>Identificación Oficial</h3>
+               <p>Introduce los datos de trazabilidad obligatorios.</p>
+            </div>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Nombre del Ejemplar *</ion-label>
+              <ion-input formControlName="nombre" placeholder="Ej: Bonita"></ion-input>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">DIB / Crotal *</ion-label>
+              <ion-input formControlName="crotal" placeholder="ES012345678901"></ion-input>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Fotografía del Ejemplar</ion-label>
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" class="py-sm" />
+              <ion-note *ngIf="isUploadingFile">Subiendo imagen...</ion-note>
+            </ion-item>
+          </div>
+
+          <!-- Paso 2: Biología -->
+          <div *ngIf="currentStep === 2" class="animate-slide-up">
+            <div class="form-intro">
+               <h3>Rasgos Biológicos</h3>
+               <p>Información genética y cronológica del ejemplar.</p>
+            </div>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Sexo *</ion-label>
+              <ion-select formControlName="sexo" interface="popover">
+                <ion-select-option value="Hembra">Hembra</ion-select-option>
+                <ion-select-option value="Macho">Macho</ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Raza Prima *</ion-label>
+              <ion-select formControlName="raza" interface="popover">
+                <ion-select-option *ngFor="let raza of ganadoService.constants.RAZAS_BOVINAS" [value]="raza">
+                  {{ raza }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item class="vac-input" *ngIf="bovinoForm.get('raza')?.value !== 'Cruce / Mestizo' && bovinoForm.get('raza')?.value !== 'Otro'">
+              <ion-label position="stacked">Porcentaje de Pureza (%)</ion-label>
+              <ion-input type="number" formControlName="porcentaje_pureza" placeholder="Ej: 100"></ion-input>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Aptitud Principal *</ion-label>
+              <ion-select formControlName="aptitud" interface="popover">
+                <ion-select-option *ngFor="let apt of ganadoService.constants.APTITUDES_BOVINAS" [value]="apt">
+                  {{ apt }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Fecha de Nacimiento *</ion-label>
+              <ion-input type="date" formControlName="fecha_nacimiento"></ion-input>
+            </ion-item>
+          </div>
+
+          <!-- Paso 3: Ubicación -->
+          <div *ngIf="currentStep === 3" class="animate-slide-up">
+            <div class="form-intro">
+               <h3>Asignación de Lote</h3>
+               <p>Ubica al animal en su recinto correspondiente.</p>
+            </div>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Seleccionar Lote *</ion-label>
+              <ion-select formControlName="lote_id" placeholder="Cargar Lotes..." interface="popover">
+                <ion-select-option *ngFor="let lote of lotes()" [value]="lote.id">
+                  {{ lote.nombre }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Estado Productivo</ion-label>
+              <ion-select formControlName="estado_productivo" interface="popover">
+                <ion-select-option *ngFor="let st of ganadoService.constants.ESTADOS_PRODUCTIVOS" [value]="st.value">
+                  {{ st.label }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            
+            <!-- Estado Reproductivo Solo Hembras -->
+            <ion-item class="vac-input" *ngIf="bovinoForm.get('sexo')?.value === 'Hembra'">
+              <ion-label position="stacked">Estado Reproductivo</ion-label>
+              <ion-select formControlName="estado_reproductivo" interface="popover">
+                <ion-select-option *ngFor="let sr of ganadoService.constants.ESTADOS_REPRODUCTIVOS" [value]="sr.value">
+                  {{ sr.label }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+          
+          <!-- Navegación Wizard -->
+          <div class="vac-modal-footer">
+            <ion-row>
+              <ion-col size="6">
+                <ion-button *ngIf="currentStep > 1" expand="block" fill="clear" (click)="currentStep = currentStep - 1" class="color-earth">
+                  Anterior
+                </ion-button>
+              </ion-col>
+              <ion-col size="6">
+                <ion-button *ngIf="currentStep < 3" expand="block" fill="solid" (click)="currentStep = currentStep + 1" class="btn-vac-save" [disabled]="!isStepValid(currentStep)">
+                  Siguiente
+                </ion-button>
+                <ion-button *ngIf="currentStep === 3" expand="block" fill="solid" (click)="saveData()" class="btn-vac-save" [disabled]="bovinoForm.invalid">
+                  Guardar
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

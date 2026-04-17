@@ -4,12 +4,6 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { 
-  LucideAngularModule, LayoutDashboard, ClipboardList, Map, 
-  HeartPulse, Syringe, Scale, ChevronLeft, ChevronRight, Leaf, 
-  Wheat, PawPrint, Activity, Heart, TrendingUp, AlertCircle, Calendar,
-  LogOut, Wallet, ArrowDownCircle, ArrowUpCircle, Baby, ShieldAlert
-} from 'lucide-angular';
 import { provideServiceWorker } from '@angular/service-worker';
 
 /**
@@ -28,14 +22,10 @@ export const appConfig: ApplicationConfig = {
     // Proveedor para ng2-charts
     provideCharts(withDefaultRegisterables()),
     // Proveedor Global para el Sistema Ultra-Profesional de Iconos Lucide
-    importProvidersFrom(LucideAngularModule.pick({ 
-      LayoutDashboard, ClipboardList, Map, HeartPulse, Syringe, Scale, 
-      ChevronLeft, ChevronRight, Leaf, Wheat, PawPrint, Activity, Heart, 
-      TrendingUp, AlertCircle, Calendar, LogOut, Wallet, ArrowDownCircle, 
-      ArrowUpCircle, Baby, ShieldAlert
-    })), provideServiceWorker('ngsw-worker.js', {
+     provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
           })
   ],
 };
+

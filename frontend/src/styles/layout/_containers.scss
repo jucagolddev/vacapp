@@ -1,18 +1,18 @@
 @use "../abstracts/variables";
 
 /* 2. CONTENEDORES Y GRILLAS */
-.luxe-container {
+.vac-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 1.5rem 60px;
 }
 
-.luxe-welcome-section {
+.vac-welcome-section {
   margin-bottom: 2.5rem;
   padding-top: 1rem;
 }
 
-.luxe-edition-badge { 
+.vac-edition-badge { 
   background: var(--ion-color-secondary); color: variables.$white; padding: 4px 12px; border-radius: variables.$border-radius-full; 
   font-size: 9px; font-weight: 800; letter-spacing: 1.2px;
 }

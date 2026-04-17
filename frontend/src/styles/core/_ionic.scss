@@ -74,7 +74,7 @@ ion-menu {
 }
 
 // Standardized Toolbar for modern luxe theme
-.luxe-toolbar {
+.vac-toolbar {
   --background: #{variables.$primary-color};
   --color: #{variables.$white};
   height: variables.$header-height;
@@ -83,7 +83,7 @@ ion-menu {
   align-items: center;
 }
 
-.luxe-title {
+.vac-title {
   font-family: variables.$font-family-base;
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -91,7 +91,7 @@ ion-menu {
 }
 
 /* SHARED LUXE UTILITIES */
-.luxe-bg-forest { 
+.vac-bg-forest { 
   --background: #fefae0; 
   background: #fefae0;
 }
@@ -103,13 +103,13 @@ ion-menu {
   gap: 8px; 
 }
 
-.luxe-container {
+.vac-container {
   padding: 1rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
-.luxe-header-content {
+.vac-header-content {
   display: flex;
   align-items: center;
   gap: 16px;

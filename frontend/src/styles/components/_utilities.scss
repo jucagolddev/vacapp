@@ -15,7 +15,7 @@
   color: var(--ion-color-primary); font-size: 18px; 
 }
 
-.luxe-details-panel { 
+.vac-details-panel { 
   background: rgba(variables.$white, 0.5); border-radius: 20px; padding: 15px; 
   margin-bottom: 15px; border: 1px solid rgba(variables.$black, 0.01); 
 }
@@ -25,7 +25,7 @@
 .detail-notes-luxe { margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(variables.$black, 0.1); }
 .notes-txt-luxe { font-size: 0.85rem; color: variables.$gray-600; font-weight: 600; font-style: italic; margin-top: 4px; }
 
-.luxe-card-footer { 
+.vac-card-footer { 
   display: flex; justify-content: space-between; align-items: center; 
   border-top: 1px solid variables.$gray-100; padding-top: 10px; margin-top: 5px; 
 }
@@ -38,7 +38,7 @@
   &.enfermedad { background: rgba(variables.$danger-color, 0.1); color: variables.$danger-color; }
 }
 
-.luxe-wizard-stepper { 
+.vac-wizard-stepper { 
   display: flex; justify-content: space-between; align-items: center; 
   padding: 15px 30px; background: variables.$white; border-bottom: 1px solid variables.$gray-100; 
 }
@@ -165,7 +165,7 @@
 }
 
 /* 16. IMAGES & CONTAINERS */
-.luxe-img-container {
+.vac-img-container {
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;

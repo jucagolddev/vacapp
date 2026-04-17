@@ -10,9 +10,10 @@ import { SupabaseService } from '../../core/services/supabase.service';
 import { GanadoService } from '../../core/services/ganado.service';
 import { Lote } from '../../core/models/vacapp.models';
 import { addIcons } from 'ionicons';
+import { PdfService } from '../../core/services/pdf.service';
 import { 
   businessOutline, gridOutline, addCircle, closeOutline, saveOutline, locationOutline, 
-  statsChartOutline, createOutline, trashOutline, leafOutline, waterOutline, arrowForwardOutline, filterOutline, layersOutline
+  statsChartOutline, createOutline, trashOutline, leafOutline, waterOutline, arrowForwardOutline, filterOutline, layersOutline, documentTextOutline
 } from 'ionicons/icons';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
@@ -38,6 +39,9 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ion-buttons>
         <ion-title>Potreros y Recintos</ion-title>
         <ion-buttons slot="end">
+          <ion-button (click)="exportarPDF()" color="primary">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </ion-button>
           <ion-button fill="clear" class="color-forest">
             <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
@@ -46,9 +50,9 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="luxe-container animate-fade-in">
+      <div class="vac-container animate-fade-in">
         
-        <div class="luxe-text-stack mb-8">
+        <div class="vac-text-stack mb-8">
           <h1 class="page-h1-rustic">Gestión de Potreros</h1>
           <p class="page-p-rustic">Organiza y monitorea la carga animal por recinto</p>
         </div>
@@ -65,27 +69,27 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                       {{ lote.ubicacion || 'Sector General' }}
                     </p>
                   </div>
-                  <div class="luxe-icon-circle bg-forest-light">
+                  <div class="vac-icon-circle bg-forest-light">
                     <ion-icon name="layers-outline" class="color-forest"></ion-icon>
                   </div>
                 </div>
 
                 <div class="mt-6 flex items-center justify-between">
-                  <div class="luxe-info-item">
-                    <span class="luxe-label-mini">Animales</span>
-                    <span class="luxe-value-sm">{{ getAnimalCount(lote.id) }} <small>Cabezas</small></span>
+                  <div class="vac-info-item">
+                    <span class="vac-label-mini">Animales</span>
+                    <span class="vac-value-sm">{{ getAnimalCount(lote.id) }} <small>Cabezas</small></span>
                   </div>
-                  <div class="luxe-info-item text-right">
-                    <span class="luxe-label-mini">Carga Total</span>
-                    <span class="luxe-value-sm color-forest">{{ getUgbForLote(lote.id) }} <small>UGB</small></span>
+                  <div class="vac-info-item text-right">
+                    <span class="vac-label-mini">Carga Total</span>
+                    <span class="vac-value-sm color-forest">{{ getUgbForLote(lote.id) }} <small>UGB</small></span>
                   </div>
                 </div>
 
-                <div class="luxe-card-footer mt-6 pt-4 border-t flex justify-end gap-2">
-                   <button class="luxe-btn-icon bg-light" (click)="openEditModal(lote)">
+                <div class="vac-card-footer mt-6 pt-4 border-t flex justify-end gap-2">
+                   <button class="vac-btn-icon bg-light" (click)="openEditModal(lote)">
                       <ion-icon name="create-outline"></ion-icon>
                    </button>
-                   <button class="luxe-btn-icon bg-light color-danger" (click)="confirmDelete(lote.id)">
+                   <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(lote.id)">
                       <ion-icon name="trash-outline"></ion-icon>
                    </button>
                 </div>
@@ -94,13 +98,13 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           </ion-row>
         </ion-grid>
 
-        <div *ngIf="lotes.length === 0" class="luxe-empty-state">
+        <div *ngIf="lotes.length === 0" class="vac-empty-state">
           <div class="empty-icon-ring">
             <ion-icon name="layers-outline"></ion-icon>
           </div>
           <h2>Sin lotes configurados</h2>
           <p>Crea recintos o potreros para empezar a organizar tu ganado.</p>
-          <ion-button fill="solid" (click)="openAddModal()" class="btn-luxe-primary mt-4">
+          <ion-button fill="solid" (click)="openAddModal()" class="btn-vac-primary mt-4">
             <ion-icon name="add" slot="start"></ion-icon> Crear Nuevo Lote
           </ion-button>
         </div>
@@ -114,7 +118,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
       </ion-fab>
 
       <!-- MODAL DE LOTE -->
-      <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()" class="luxe-modal">
+      <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()" class="vac-modal">
         <ng-template>
           <ion-header class="ion-no-border">
             <ion-toolbar>
@@ -127,7 +131,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             </ion-toolbar>
           </ion-header>
           
-          <ion-content class="ion-padding luxe-modal-content">
+          <ion-content class="ion-padding vac-modal-content">
             <div class="form-intro mb-6">
                <div class="icon-ring-luxe bg-wheat mb-3">
                   <ion-icon name="layers-outline" class="color-earth text-3xl"></ion-icon>
@@ -136,24 +140,24 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                <p>Define las características del potrero o recinto.</p>
             </div>
 
-            <form [formGroup]="loteForm" class="luxe-form-stack">
-              <div class="luxe-input-group">
-                <label class="luxe-label">Nombre del Lote *</label>
-                <input type="text" formControlName="nombre" placeholder="Ej: Potrero El Roble" class="luxe-input-field">
+            <form [formGroup]="loteForm" class="vac-form-stack">
+              <div class="vac-input-group">
+                <label class="vac-label">Nombre del Lote *</label>
+                <input type="text" formControlName="nombre" placeholder="Ej: Potrero El Roble" class="vac-input-field">
               </div>
 
-              <div class="luxe-input-group">
-                <label class="luxe-label">Ubicación / Coordenadas</label>
-                <input type="text" formControlName="ubicacion" placeholder="Ej: Zona Norte - Sector A" class="luxe-input-field">
+              <div class="vac-input-group">
+                <label class="vac-label">Ubicación / Coordenadas</label>
+                <input type="text" formControlName="ubicacion" placeholder="Ej: Zona Norte - Sector A" class="vac-input-field">
               </div>
 
-              <div class="luxe-input-group">
-                <label class="luxe-label">Capacidad Estimada (Cabezas)</label>
-                <input type="number" formControlName="capacidad" placeholder="0" class="luxe-input-field">
+              <div class="vac-input-group">
+                <label class="vac-label">Capacidad Estimada (Cabezas)</label>
+                <input type="number" formControlName="capacidad" placeholder="0" class="vac-input-field">
               </div>
               
               <div class="mt-8 pt-6 border-t border-gray-100">
-                <ion-button (click)="saveData()" [disabled]="loteForm.invalid" class="btn-luxe-save" expand="block">
+                <ion-button (click)="saveData()" [disabled]="loteForm.invalid" class="btn-vac-save" expand="block">
                   <ion-icon name="save-outline" slot="start"></ion-icon> 
                   Guardar Configuración
                 </ion-button>
@@ -171,6 +175,7 @@ export class LotesComponent implements OnInit {
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
+  private pdfService = inject(PdfService);
   
   lotes: Lote[] = [];
   isModalOpen = false;
@@ -178,7 +183,7 @@ export class LotesComponent implements OnInit {
   loteForm: FormGroup;
 
   constructor() {
-    addIcons({ businessOutline, gridOutline, addCircle, closeOutline, saveOutline, locationOutline, statsChartOutline, createOutline, trashOutline, leafOutline, waterOutline, arrowForwardOutline, filterOutline, layersOutline });
+    addIcons({ businessOutline, gridOutline, addCircle, closeOutline, saveOutline, locationOutline, statsChartOutline, createOutline, trashOutline, leafOutline, waterOutline, arrowForwardOutline, filterOutline, layersOutline, documentTextOutline });
     this.loteForm = this.fb.group({
       nombre: ['', Validators.required],
       ubicacion: [''],
@@ -193,6 +198,23 @@ export class LotesComponent implements OnInit {
   async loadData() {
     const { data } = await this.supa.getAll<Lote>('lotes');
     this.lotes = data || [];
+  }
+
+  async exportarPDF() {
+    const headers = [['Código/Nombre', 'Capacidad', 'Ubicación', 'Bovinos']];
+    const body = this.lotes.map(l => [
+      l.nombre || 'S/N',
+      l.capacidad || '0',
+      l.ubicacion || '-',
+      (this.ganadoService.bovinos().filter(b => b.lote_id === l.id).length) + ' Cabezas'
+    ]);
+
+    await this.pdfService.generateTablePDF(
+      'Inventario de Potreros y Recintos - Vacapp',
+      headers,
+      body,
+      'inventario_lotes_vacapp'
+    );
   }
 
   getAnimalCount(loteId: string): number {

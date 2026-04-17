@@ -30,7 +30,7 @@ import { AuthService } from '../../services/auth.service';
       <ion-split-pane contentId="main-content" [when]="'md'" [class.collapsed]="isCollapsed">
         
         <!-- Sidebar "The Forest Craft" -->
-        <ion-menu contentId="main-content" type="overlay" class="rustic-sidebar">
+        <ion-menu contentId="main-content" type="overlay" class="vac-sidebar">
           <ion-header class="ion-no-border">
             <ion-toolbar>
               <div class="sidebar-header-luxe" *ngIf="!isCollapsed">
@@ -109,7 +109,7 @@ export class MainLayoutComponent {
 
   public appPages = [
     { title: 'Cuadro de Mando', url: '/dashboard', icon: 'pie-chart-outline' },
-    { title: 'Registro Ganadero', url: '/ganado', icon: 'paw-outline' },
+    { title: 'Registro Ganadero', url: '/manejo', icon: 'paw-outline' },
     { title: 'Recintos & Potreros', url: '/lotes', icon: 'layers-outline' },
     { title: 'Reproducción', url: '/reproduccion', icon: 'heart-half-outline' },
     { title: 'Sanidad Animal', url: '/sanidad', icon: 'medkit-outline' },

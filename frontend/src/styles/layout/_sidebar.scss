@@ -13,18 +13,18 @@ ion-split-pane.collapsed {
   --side-min-width: 80px;
 }
 
-.rustic-sidebar {
+.vac-sidebar {
   --background: linear-gradient(180deg, #{variables.$primary-color} 0%, #{variables.$dark-color} 100%) !important;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   transition: variables.$transition-base;
 }
 
-.rustic-sidebar::part(container) {
+.vac-sidebar::part(container) {
   background: transparent;
   box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2);
 }
 
-.rustic-sidebar ion-content {
+.vac-sidebar ion-content {
   --background: transparent;
   --padding-bottom: 20px;
 }

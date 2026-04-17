@@ -32,14 +32,14 @@
 
     /* Dashboard: Estilos estructurales mínimos (Heredados de _luxe.scss) */
     .welcome-header-main { display: flex; align-items: center; gap: 15px; }
-    .luxe-chart-mock { height: 200px; display: flex; align-items: flex-end; gap: 20px; padding: 20px 0; border-bottom: 2px solid var(--ion-color-light); }
+    .vac-chart-mock { height: 200px; display: flex; align-items: flex-end; gap: 20px; padding: 20px 0; border-bottom: 2px solid var(--ion-color-light); }
     .chart-row-luxe { flex: 1; display: flex; align-items: flex-end; height: 100%; }
     
-    .luxe-alert-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.1); padding: 15px; border-radius: 20px; }
+    .vac-alert-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.1); padding: 15px; border-radius: 20px; }
     .alert-text strong { display: block; font-size: 0.95rem; }
     .alert-text p { font-size: 0.8rem; margin: 2px 0 0; opacity: 0.8; }
     
-    .luxe-progress-section { margin-top: 30px; }
+    .vac-progress-section { margin-top: 30px; }
     .progress-info { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
   
 
@@ -81,8 +81,8 @@
     .gain-val-luxe { display: flex; align-items: center; gap: 5px; font-size: 1.2rem; font-weight: 900; }
     .tag-pesaje-luxe { display: flex; align-items: center; gap: 6px; color: var(--ion-color-secondary); font-weight: 800; font-size: 0.85rem; }
     
-    .luxe-loading-state { text-align: center; padding: 40px; color: var(--ion-color-primary); }
-    .luxe-loading-state p { margin-top: 15px; font-weight: 600; font-size: 1.1rem; }
+    .vac-loading-state { text-align: center; padding: 40px; color: var(--ion-color-primary); }
+    .vac-loading-state p { margin-top: 15px; font-weight: 600; font-size: 1.1rem; }
   
 
 

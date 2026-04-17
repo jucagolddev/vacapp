@@ -11,7 +11,7 @@
 }
 
 // Barra de Filtros Rústica
-.rustic-filter-bar {
+.vac-filter-bar {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   border-radius: 16px;
@@ -82,7 +82,7 @@
 }
 
 // Segmento Rustic (Botones grandes y fáciles de tocar)
-.rustic-segment {
+.vac-segment {
   margin: variables.$spacing-md 0;
   --background: #{variables.$gray-100};
   border-radius: 12px;
@@ -138,7 +138,7 @@
     font-weight: 500;
   }
 
-  .rustic-badge {
+  .vac-badge {
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 0.85rem;
@@ -147,14 +147,14 @@
 }
 
 // Estilo de los botones laterales (Slide)
-.vibrante-item {
+.vac-item {
   border-radius: 16px;
   overflow: hidden;
   margin-bottom: 12px;
 }
 
 // MODAL RUSTIC (Wizard Paso a Paso)
-.rustic-modal {
+.vac-modal {
   --border-radius: 24px;
   --box-shadow: 0 28px 48px rgba($black, 0.4);
 
@@ -223,7 +223,7 @@
 }
 
 // Campos de entrada Rustic (Más grandes)
-.rustic-input {
+.vac-input {
   --background: #{variables.$gray-100};
   --border-radius: 12px;
   margin-bottom: variables.$spacing-md;
@@ -272,7 +272,7 @@
 }
 
 // Tarjeta de Lote (Rustic) - Diseño Diferenciado
-.rustic-lote-card {
+.vac-lote-card {
   --background: #{variables.$white};
   border-radius: 16px;
   margin-bottom: variables.$spacing-md;
@@ -338,7 +338,7 @@
 }
 
 // Estilos de Input mejorados para legibilidad extrema
-.rustic-input {
+.vac-input {
   ion-label {
     font-size: 0.9rem !important;
     text-transform: uppercase;

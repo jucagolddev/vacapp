@@ -149,7 +149,7 @@
 }
 
 /* BUSCADOR RÚSTICO */
-.rustic-search-wrapper {
+.vac-search-wrapper {
   position: relative;
   background: var(--ion-card-background);
   border-radius: 14px;
@@ -159,13 +159,13 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
   border: 1px solid rgba(0,0,0,0.05);
 
-  .rustic-search-icon {
+  .vac-search-icon {
     font-size: 1.3rem;
     color: #bc6c25;
     margin-right: 0.75rem;
   }
 
-  .rustic-search-input-field {
+  .vac-search-input-field {
     width: 100%;
     border: none;
     padding: 1.15rem 0;

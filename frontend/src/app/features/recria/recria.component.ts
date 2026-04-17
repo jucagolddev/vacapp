@@ -12,10 +12,11 @@ import {
   ToastController 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
+import { PdfService } from '../../core/services/pdf.service';
 import { 
   speedometerOutline, trendingDownOutline, personOutline, searchOutline, maleOutline, 
   femaleOutline, chevronForwardOutline, trashOutline, addCircle, closeOutline, scaleOutline, 
-  barChartOutline, fitnessOutline, saveOutline, createOutline, trendingUpOutline, calendarOutline, leafOutline, pawOutline, filterOutline 
+  barChartOutline, fitnessOutline, saveOutline, createOutline, trendingUpOutline, calendarOutline, leafOutline, pawOutline, filterOutline, documentTextOutline 
 } from 'ionicons/icons';
 
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -48,6 +49,9 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
         </ion-buttons>
         <ion-title>Recría & Rendimiento</ion-title>
         <ion-buttons slot="end">
+          <ion-button (click)="exportarPDF()" color="primary">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </ion-button>
           <ion-button fill="clear" class="color-forest">
             <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
@@ -56,32 +60,32 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="luxe-container animate-fade-in">
+      <div class="vac-container animate-fade-in">
         
         <!-- Cabecera de Selección -->
         <div *ngIf="selectedBovino" class="flex items-center justify-between mb-8 animate-fade-in">
-          <div class="luxe-text-stack">
+          <div class="vac-text-stack">
             <h1 class="page-h1-rustic">{{ selectedBovino.nombre }}</h1>
             <p class="page-p-rustic">Seguimiento de maduración y conversión</p>
           </div>
-          <ion-button fill="outline" (click)="selectedBovino = null" color="dark" class="btn-luxe-outline">
+          <ion-button fill="outline" (click)="selectedBovino = null" color="dark" class="btn-vac-outline">
              <ion-icon name="close" slot="start"></ion-icon> Cambiar
           </ion-button>
         </div>
 
         <!-- LISTADO DE ANIMALES PARA SELECCIÓN -->
         <div *ngIf="!selectedBovino" class="animate-fade-in">
-           <div class="luxe-text-stack mb-6">
+           <div class="vac-text-stack mb-6">
              <h1 class="page-h1-rustic">Seleccionar Animal</h1>
              <p class="page-p-rustic">Busca el ejemplar para registrar su pesaje</p>
            </div>
 
-           <div class="rustic-search-wrapper mb-8">
-              <ion-icon name="search" class="rustic-search-icon"></ion-icon>
+           <div class="vac-search-wrapper mb-8">
+              <ion-icon name="search" class="vac-search-icon"></ion-icon>
               <input 
                 type="text" 
                 placeholder="Buscar por crotal o nombre..." 
-                class="rustic-search-input-field"
+                class="vac-search-input-field"
                 [(ngModel)]="searchTerm">
            </div>
 
@@ -90,24 +94,24 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
              <ion-row>
                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
                  <div class="tag-body-luxe mb-4" (click)="selectBovino(b)" style="cursor: pointer;">
-                   <div class="luxe-item-header">
-                     <div class="luxe-avatar-wrapper">
-                       <div *ngIf="b.foto_url" class="luxe-avatar" [style.background-image]="'url(' + b.foto_url + ')'"></div>
-                       <div *ngIf="!b.foto_url" class="luxe-avatar-placeholder">
+                   <div class="vac-item-header">
+                     <div class="vac-avatar-wrapper">
+                       <div *ngIf="b.foto_url" class="vac-avatar" [style.background-image]="'url(' + b.foto_url + ')'"></div>
+                       <div *ngIf="!b.foto_url" class="vac-avatar-placeholder">
                          <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
                        </div>
                      </div>
-                     <div class="luxe-title-stack">
+                     <div class="vac-title-stack">
                        <h3>{{ b.nombre }}</h3>
                        <p>{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</p>
                      </div>
-                     <div class="luxe-badge-status-simple">
+                     <div class="vac-badge-status-simple">
                         <ion-icon name="chevron-forward-outline"></ion-icon>
                      </div>
                    </div>
-                   <div class="luxe-item-footer mt-3 pt-3 border-t">
-                     <span class="luxe-tag-mini">{{ ganadoService.calculateCategoria(b) }}</span>
-                     <span class="luxe-info-label ml-auto">Consultar Ficha</span>
+                   <div class="vac-item-footer mt-3 pt-3 border-t">
+                     <span class="vac-tag-mini">{{ ganadoService.calculateCategoria(b) }}</span>
+                     <span class="vac-info-label ml-auto">Consultar Ficha</span>
                    </div>
                  </div>
                </ion-col>
@@ -155,7 +159,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                     <h3 class="card-title-luxe">Curva de Crecimiento</h3>
                     <p class="card-subtitle-luxe">Evolución del peso en el tiempo</p>
                  </div>
-                 <div class="luxe-icon-circle bg-wheat">
+                 <div class="vac-icon-circle bg-wheat">
                     <ion-icon name="bar-chart-outline" class="color-earth"></ion-icon>
                  </div>
               </div>
@@ -166,28 +170,28 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 
            <!-- HISTORIAL -->
            <div class="flex items-center justify-between mb-6">
-             <h2 class="luxe-section-title ion-no-margin">Historial de Pesadas</h2>
-             <span class="luxe-badge-count">{{ pesajesFiltrados.length }} Registros</span>
+             <h2 class="vac-section-title ion-no-margin">Historial de Pesadas</h2>
+             <span class="vac-badge-count">{{ pesajesFiltrados.length }} Registros</span>
            </div>
            
            <ion-grid class="ion-no-padding">
              <ion-row>
                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajesFiltrados">
                  <div class="tag-body-luxe mb-4">
-                   <div class="luxe-item-header">
-                     <div class="luxe-icon-avatar bg-light">
+                   <div class="vac-item-header">
+                     <div class="vac-icon-avatar bg-light">
                         <ion-icon name="calendar-outline" class="color-medium"></ion-icon>
                      </div>
-                     <div class="luxe-title-stack">
+                     <div class="vac-title-stack">
                        <h3 class="text-lg font-bold">{{ p.peso_kg }} KG</h3>
                        <p>{{ p.tipo_pesaje }}</p>
                      </div>
-                     <button class="luxe-btn-icon color-danger ml-auto" (click)="deletePesaje(p.id)">
+                     <button class="vac-btn-icon color-danger ml-auto" (click)="deletePesaje(p.id)">
                         <ion-icon name="trash-outline"></ion-icon>
                      </button>
                    </div>
-                   <div class="luxe-item-footer mt-3 pt-3 border-t">
-                     <span class="luxe-date-label">
+                   <div class="vac-item-footer mt-3 pt-3 border-t">
+                     <span class="vac-date-label">
                        <ion-icon name="time-outline" class="mr-1"></ion-icon>
                        {{ p.fecha_pesaje | date:'dd MMM yyyy' }}
                      </span>
@@ -198,7 +202,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
              </ion-row>
            </ion-grid>
 
-           <div *ngIf="pesajesFiltrados.length === 0" class="luxe-empty-state">
+           <div *ngIf="pesajesFiltrados.length === 0" class="vac-empty-state">
              <div class="empty-icon-ring">
                <ion-icon name="scale-outline"></ion-icon>
              </div>
@@ -214,7 +218,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
          <!-- MODAL DE PESAJE -->
-      <ion-modal [isOpen]="isModalOpen" (didDismiss)="setOpen(false)" class="luxe-modal">
+      <ion-modal [isOpen]="isModalOpen" (didDismiss)="setOpen(false)" class="vac-modal">
         <ng-template>
           <ion-header class="ion-no-border">
             <ion-toolbar>
@@ -227,7 +231,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
             </ion-toolbar>
           </ion-header>
 
-          <ion-content class="ion-padding luxe-modal-content">
+          <ion-content class="ion-padding vac-modal-content">
             <div class="form-intro mb-6">
                <div class="icon-ring-luxe bg-wheat mb-3">
                   <ion-icon name="scale-outline" class="color-earth text-3xl"></ion-icon>
@@ -236,28 +240,28 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                <p>Registra el peso actual detectado en báscula.</p>
             </div>
 
-            <form [formGroup]="pesajeForm" (ngSubmit)="onSubmit()" class="luxe-form-stack">
-              <div class="luxe-input-group">
-                <label class="luxe-label">Animal</label>
-                <div class="luxe-readonly-input">
+            <form [formGroup]="pesajeForm" (ngSubmit)="onSubmit()" class="vac-form-stack">
+              <div class="vac-input-group">
+                <label class="vac-label">Animal</label>
+                <div class="vac-readonly-input">
                    {{ selectedBovino?.nombre }} ({{ selectedBovino?.crotal }})
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
-                <div class="luxe-input-group">
-                  <label class="luxe-label">Fecha del Pesaje</label>
-                  <input type="date" formControlName="fecha_pesaje" class="luxe-input-field">
+                <div class="vac-input-group">
+                  <label class="vac-label">Fecha del Pesaje</label>
+                  <input type="date" formControlName="fecha_pesaje" class="vac-input-field">
                 </div>
-                <div class="luxe-input-group">
-                  <label class="luxe-label">KG *</label>
-                  <input type="number" formControlName="peso_kg" placeholder="0.00" class="luxe-input-field">
+                <div class="vac-input-group">
+                  <label class="vac-label">KG *</label>
+                  <input type="number" formControlName="peso_kg" placeholder="0.00" class="vac-input-field">
                 </div>
               </div>
 
-              <div class="luxe-input-group">
-                 <label class="luxe-label">Tipo de Control</label>
-                 <select formControlName="tipo_pesaje" class="luxe-select-field">
+              <div class="vac-input-group">
+                 <label class="vac-label">Tipo de Control</label>
+                 <select formControlName="tipo_pesaje" class="vac-select-field">
                    <option *ngFor="let t of ganadoService.constants.TIPOS_PESAJE" [value]="t">
                      {{ t }}
                    </option>
@@ -265,7 +269,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
               </div>
 
               <div class="mt-8 pt-6 border-t border-gray-100">
-                <ion-button type="submit" expand="block" [disabled]="pesajeForm.invalid" class="btn-luxe-save">
+                <ion-button type="submit" expand="block" [disabled]="pesajeForm.invalid" class="btn-vac-save">
                   <ion-icon name="save-outline" slot="start"></ion-icon>
                   Guardar Pesaje
                 </ion-button>
@@ -285,6 +289,7 @@ export class RecriaComponent implements OnInit {
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
+  private pdfService = inject(PdfService);
 
   selectedBovino: Bovino | null = null;
   searchTerm: string = '';
@@ -310,7 +315,7 @@ export class RecriaComponent implements OnInit {
     addIcons({ 
       fitnessOutline, scaleOutline, addCircle, closeOutline, saveOutline, createOutline, trashOutline, 
       trendingUpOutline, trendingDownOutline, calendarOutline, barChartOutline, 
-      leafOutline, pawOutline, speedometerOutline, personOutline, searchOutline, maleOutline, femaleOutline, chevronForwardOutline, filterOutline 
+      leafOutline, pawOutline, speedometerOutline, personOutline, searchOutline, maleOutline, femaleOutline, chevronForwardOutline, filterOutline, documentTextOutline 
     });
     this.pesajeForm = this.fb.group({
       bovino_id: ['', Validators.required],
@@ -323,6 +328,53 @@ export class RecriaComponent implements OnInit {
 
   async ngOnInit() {
     // No necesitamos cargar nada aquí ya que GanadoService ya tiene los bovinos
+  }
+
+  async exportarPDF() {
+    this.showToast('Generando Reporte de Rendimiento...', 'primary');
+    
+    if (this.selectedBovino) {
+      // REPORTE INDIVIDUAL
+      const headers = [['Fecha', 'Peso', 'Tipo Control', 'Notas']];
+      const body = this.pesajesFiltrados.map(p => [
+        p.fecha_pesaje ? new Date(p.fecha_pesaje).toLocaleDateString() : 'N/A',
+        (p.peso_kg || 0) + ' KG',
+        p.tipo_pesaje || '-',
+        p.notes || '-'
+      ]);
+
+      await this.pdfService.generateTablePDF(
+        `Historia de Pesaje: ${this.selectedBovino.nombre}`,
+        headers,
+        body,
+        `rendimiento_${this.selectedBovino.crotal}`,
+        {
+          didDrawPage: (data: any) => {
+            // Aquí podríamos agregar una cabecera personalizada si fuera necesario
+          }
+        }
+      );
+    } else {
+      // REPORTE GENERAL DE HATO (RESUMEN DE RECRÍA)
+      const headers = [['Crotal', 'Nombre', 'Último Peso', 'Ganancia Reciente']];
+      const body = this.ganadoService.bovinosAlta().map(b => {
+        const hist = this.pesajeService.records().filter(p => p.bovino_id === b.id)
+          .sort((x, y) => new Date(y.fecha_pesaje).getTime() - new Date(x.fecha_pesaje).getTime());
+        return [
+          b.crotal || '-',
+          b.nombre || '-',
+          hist[0]?.peso_kg ? hist[0].peso_kg + ' KG' : 'N/R',
+          (hist[0]?.peso_kg && hist[1]?.peso_kg) ? (hist[0].peso_kg - hist[1].peso_kg).toFixed(1) + ' KG' : '-'
+        ];
+      });
+
+      await this.pdfService.generateTablePDF(
+        'Censo de Rendimiento y Pesaje - Vacapp',
+        headers,
+        body,
+        'censo_rendimiento_vacapp'
+      );
+    }
   }
 
   filteredBovinos() {

@@ -1,7 +1,7 @@
 @use "../abstracts/variables";
 
 /* 10. ELEMENTOS DE FORMULARIO LUXE */
-.luxe-input {
+.vac-input {
   --background: #{variables.$white};
   --border-radius: 16px;
   margin-bottom: 1.5rem;
@@ -43,7 +43,7 @@
   }
 }
 
-.luxe-item-group {
+.vac-item-group {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
@@ -53,7 +53,7 @@
     }
 }
 
-.btn-luxe-save {
+.btn-vac-save {
   --background: var(--ion-color-primary);
   --color: var(--ion-color-tertiary);
   --border-radius: 14px;
@@ -75,7 +75,7 @@
 
 
 /* 11. Buscador */
-.rustic-search-wrapper { 
+.vac-search-wrapper { 
   margin: 10px 12px 25px; 
   background: variables.$white; 
   border-radius: 20px; 
@@ -88,25 +88,25 @@
   overflow: hidden;
 }
 
-.rustic-search-wrapper:focus-within {
+.vac-search-wrapper:focus-within {
   box-shadow: variables.$shadow-focus;
   border-color: var(--ion-color-tertiary);
   transform: translateY(-2px);
 }
 
-.rustic-search-icon {
+.vac-search-icon {
   color: variables.$gray-600;
   font-size: 20px;
   margin-right: 12px;
   transition: transform 0.4s ease, color 0.4s ease;
 }
 
-.rustic-search-wrapper:focus-within .rustic-search-icon {
+.vac-search-wrapper:focus-within .vac-search-icon {
   transform: scale(1.1) rotate(5deg);
   color: var(--ion-color-tertiary);
 }
 
-.rustic-search-input-field {
+.vac-search-input-field {
   flex: 1;
   border: none;
   outline: none;
@@ -118,7 +118,7 @@
   transition: all 0.3s ease;
 }
 
-.rustic-search-input-field::placeholder {
+.vac-search-input-field::placeholder {
   color: variables.$gray-600;
   font-weight: 500;
 }
