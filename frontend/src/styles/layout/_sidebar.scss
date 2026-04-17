@@ -29,7 +29,7 @@ ion-split-pane.collapsed {
   --padding-bottom: 20px;
 }
 
-.sidebar-header-luxe {
+.vac-sidebar-header {
   height: 100px;
   display: flex;
   align-items: center;
@@ -79,11 +79,11 @@ ion-split-pane.collapsed {
   opacity: 0.8;
 }
 
-.nav-container-luxe {
+.vac-nav-container {
   padding: 20px 10px;
 }
 
-.nav-item-luxe {
+.vac-nav-item {
   --background: transparent;
   --background-focused: rgba(255, 255, 255, 0.05);
   --background-hover: rgba(255, 255, 255, 0.08);
@@ -110,7 +110,7 @@ ion-split-pane.collapsed {
       box-shadow: 0 4px 12px rgba(variables.$tertiary-color, 0.3);
     }
     
-    .label-luxe {
+  .vac-label {
       font-weight: 800;
       letter-spacing: 0.5px;
     }
@@ -146,7 +146,7 @@ ion-split-pane.collapsed {
   }
 }
 
-.label-luxe {
+.vac-label {
   font-size: 14px;
   font-weight: 600;
   transition: variables.$transition-fast;

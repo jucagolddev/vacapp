@@ -61,7 +61,7 @@
     <ion-grid class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="tag-body-luxe">
+          <div class="vac-tag-body">
             <div class="card-header-flex">
               <div class="card-icon-box" style="background-color: var(--ion-color-light);">
                 <ion-skeleton-text animated style="width: 24px; height: 24px; border-radius: 50%;"></ion-skeleton-text>
@@ -107,7 +107,7 @@
     <ion-grid class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredGestaciones()">
-          <div class="tag-body-luxe">
+          <div class="vac-tag-body">
             <div class="card-header-flex">
               <div class="card-icon-box bg-danger-soft">
                 <ion-icon name="pulse-outline" color="danger"></ion-icon>
@@ -146,7 +146,7 @@
     <ion-grid class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredReproducciones()">
-          <div class="tag-body-luxe">
+          <div class="vac-tag-body">
             <div class="card-header-flex">
               <div class="card-icon-box bg-primary-soft">
                 <ion-icon name="female-outline" color="primary"></ion-icon>

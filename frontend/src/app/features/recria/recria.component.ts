@@ -42,7 +42,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonSelect, IonSelectOption, IonLabel, IonCardContent
   ],
   template: `
-    <ion-header class="ion-no-border header-luxe">
+    <ion-header class="ion-no-border vac-header">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-menu-button class="color-forest"></ion-menu-button>
@@ -93,7 +93,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <ion-grid class="ion-no-padding">
              <ion-row>
                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-                 <div class="tag-body-luxe mb-4" (click)="selectBovino(b)" style="cursor: pointer;">
+                 <div class="vac-tag-body mb-4" (click)="selectBovino(b)" style="cursor: pointer;">
                    <div class="vac-item-header">
                      <div class="vac-avatar-wrapper">
                        <div *ngIf="b.foto_url" class="vac-avatar" [style.background-image]="'url(' + b.foto_url + ')'"></div>
@@ -126,7 +126,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <ion-grid class="ion-no-padding mb-8">
               <ion-row>
                  <ion-col size="12" size-md="6">
-                    <div class="metric-card-luxe">
+                    <div class="vac-metric-card">
                        <div class="metric-icon-box bg-wheat">
                           <ion-icon name="scale-outline" class="color-earth"></ion-icon>
                        </div>
@@ -137,7 +137,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                     </div>
                  </ion-col>
                  <ion-col size="12" size-md="6">
-                    <div class="metric-card-luxe">
+                    <div class="vac-metric-card">
                        <div class="metric-icon-box bg-forest-light">
                           <ion-icon name="trending-up-outline" class="color-forest"></ion-icon>
                        </div>
@@ -156,8 +156,8 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <div class="bi-main-card mb-8">
               <div class="card-header-flex">
                  <div class="card-title-stack">
-                    <h3 class="card-title-luxe">Curva de Crecimiento</h3>
-                    <p class="card-subtitle-luxe">Evolución del peso en el tiempo</p>
+                    <h3 class="vac-card-title">Curva de Crecimiento</h3>
+                    <p class="vac-card-subtitle">Evolución del peso en el tiempo</p>
                  </div>
                  <div class="vac-icon-circle bg-wheat">
                     <ion-icon name="bar-chart-outline" class="color-earth"></ion-icon>
@@ -177,7 +177,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <ion-grid class="ion-no-padding">
              <ion-row>
                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajesFiltrados">
-                 <div class="tag-body-luxe mb-4">
+                 <div class="vac-tag-body mb-4">
                    <div class="vac-item-header">
                      <div class="vac-icon-avatar bg-light">
                         <ion-icon name="calendar-outline" class="color-medium"></ion-icon>
@@ -195,7 +195,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                        <ion-icon name="time-outline" class="mr-1"></ion-icon>
                        {{ p.fecha_pesaje | date:'dd MMM yyyy' }}
                      </span>
-                     <ion-badge slot="end" class="badge-luxe bg-forest ml-auto">Completado</ion-badge>
+                     <ion-badge slot="end" class="vac-badge bg-forest ml-auto">Completado</ion-badge>
                    </div>
                  </div>
                </ion-col>
@@ -214,7 +214,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
-        <ion-fab-button (click)="setOpen(true)" class="fab-luxe">
+        <ion-fab-button (click)="setOpen(true)" class="vac-fab">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
          <!-- MODAL DE PESAJE -->
@@ -233,7 +233,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 
           <ion-content class="ion-padding vac-modal-content">
             <div class="form-intro mb-6">
-               <div class="icon-ring-luxe bg-wheat mb-3">
+               <div class="vac-icon-ring bg-wheat mb-3">
                   <ion-icon name="scale-outline" class="color-earth text-3xl"></ion-icon>
                </div>
                <h3>Entrada de Datos</h3>

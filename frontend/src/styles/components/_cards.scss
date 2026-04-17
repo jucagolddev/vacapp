@@ -213,11 +213,11 @@
 }
 
 /* Modifiers for Specific Modules */
-.pro-card-luxe { 
+.vac-pro-card { 
   @extend .vac-base-card;
   border-top: 4px solid variables.$tertiary-color;
 }
 
-.tag-body-luxe, .field-card-body-luxe, .health-card-body-luxe, .repro-card-body-luxe, .weight-card-body-luxe {
+.vac-tag-body, .vac-field-card-body, .vac-health-card-body, .vac-repro-card-body, .vac-weight-card-body {
   @extend .vac-base-card;
 }

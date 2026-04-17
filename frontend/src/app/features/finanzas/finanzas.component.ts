@@ -69,7 +69,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of finanzasService.records().slice(0, 20)">
-              <div class="tag-body-luxe">
+              <div class="vac-tag-body">
                 <div class="card-header-flex">
                   <div class="card-icon-box" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
                     <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'" [color]="r.tipo === 'Ingreso' ? 'light' : 'warning'"></ion-icon>

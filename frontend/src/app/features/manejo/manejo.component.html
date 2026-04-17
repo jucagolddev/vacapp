@@ -59,7 +59,7 @@
     <ion-grid class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="tag-body-luxe">
+          <div class="vac-tag-body">
             <div class="card-header-flex">
               <ion-avatar class="vac-avatar">
                 <ion-skeleton-text animated style="width: 100%; height: 100%;"></ion-skeleton-text>
@@ -97,7 +97,7 @@
     <ion-grid class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-          <div class="tag-body-luxe">
+          <div class="vac-tag-body">
             <div class="card-header-flex">
               <ion-avatar class="vac-avatar">
                 <div *ngIf="b.foto_url" class="avatar-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>

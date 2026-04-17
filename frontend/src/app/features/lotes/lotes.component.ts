@@ -32,7 +32,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonAvatar
   ],
   template: `
-    <ion-header class="ion-no-border header-luxe">
+    <ion-header class="ion-no-border vac-header">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-menu-button class="color-forest"></ion-menu-button>
@@ -63,8 +63,8 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
               <div class="bi-main-card mb-6 animate-fade-in">
                 <div class="card-header-flex">
                   <div class="card-title-stack">
-                    <h3 class="card-title-luxe">{{ lote.nombre }}</h3>
-                    <p class="card-subtitle-luxe">
+                    <h3 class="vac-card-title">{{ lote.nombre }}</h3>
+                    <p class="vac-card-subtitle">
                       <ion-icon name="location-outline" class="mr-1"></ion-icon>
                       {{ lote.ubicacion || 'Sector General' }}
                     </p>
@@ -112,7 +112,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
-        <ion-fab-button (click)="openAddModal()" class="fab-luxe">
+        <ion-fab-button (click)="openAddModal()" class="vac-fab">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -133,7 +133,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           
           <ion-content class="ion-padding vac-modal-content">
             <div class="form-intro mb-6">
-               <div class="icon-ring-luxe bg-wheat mb-3">
+               <div class="vac-icon-ring bg-wheat mb-3">
                   <ion-icon name="layers-outline" class="color-earth text-3xl"></ion-icon>
                </div>
                <h3>Configuración de Espacio</h3>
