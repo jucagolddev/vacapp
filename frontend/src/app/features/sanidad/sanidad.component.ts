@@ -16,6 +16,7 @@ import {
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
+import { GanadoService } from '../../core/services/ganado.service';
 
 /**
  * Componente para el Módulo de Sanidad Animal - Versión Rústica.
@@ -163,7 +164,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
               <ion-item class="luxe-input">
                 <ion-label position="stacked">Identificar Ejemplar *</ion-label>
                 <ion-select formControlName="bovino_id" placeholder="Seleccionar animal" interface="popover">
-                  <ion-select-option *ngFor="let b of bovinos" [value]="b.id">
+                  <ion-select-option *ngFor="let b of ganadoService.bovinosAlta()" [value]="b.id">
                     {{ b.nombre }} ({{ b.crotal }})
                   </ion-select-option>
                 </ion-select>
@@ -177,10 +178,9 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                 <ion-item class="luxe-input half">
                   <ion-label position="stacked">Tipo de Evento</ion-label>
                   <ion-select formControlName="tipo" interface="popover">
-                    <ion-select-option value="Vacunación">Vacunación</ion-select-option>
-                    <ion-select-option value="Desparasitación">Desparasitación</ion-select-option>
-                    <ion-select-option value="Saneamiento">Saneamiento</ion-select-option>
-                    <ion-select-option value="Enfermedad">Enfermedad</ion-select-option>
+                    <ion-select-option *ngFor="let tipo of ganadoService.constants.TIPOS_EVENTO_SANIDAD" [value]="tipo">
+                      {{ tipo }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
               </div>
@@ -230,13 +230,13 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 })
 export class SanidadComponent implements OnInit {
   private supa = inject(SupabaseService);
+  public ganadoService = inject(GanadoService);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   
   sanidadRecords: Sanidad[] = [];
   filteredSanidad: Sanidad[] = [];
-  bovinos: Bovino[] = [];
   
   isModalOpen = false;
   editingItem: Sanidad | null = null;
@@ -268,11 +268,8 @@ export class SanidadComponent implements OnInit {
   async loadData() {
     try {
       const { data: records } = await this.supa.getSanidad();
-      const { data: bovs } = await this.supa.getAll<Bovino>('bovinos');
-      
       this.sanidadRecords = records || [];
       this.filteredSanidad = [...this.sanidadRecords];
-      this.bovinos = (bovs || []).filter(b => b.estado_productivo === 'Alta');
     } catch (e) {
       console.error('Error cargando datos sanitarios:', e);
     }

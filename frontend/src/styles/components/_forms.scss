@@ -16,8 +16,8 @@
 
   &.item-has-focus {
     --background: #{variables.$white};
-    border-color: var(--ion-color-secondary);
-    box-shadow: 0 6px 20px rgba(variables.$secondary-color, 0.15);
+    border-color: var(--ion-color-tertiary);
+    box-shadow: variables.$shadow-focus;
   }
 
   ion-label {
@@ -35,7 +35,7 @@
   }
   
   ion-select::part(icon) {
-    color: var(--ion-color-secondary);
+    color: var(--ion-color-tertiary);
     opacity: 1;
     width: 24px;
     height: 24px;
@@ -55,11 +55,22 @@
 
 .btn-luxe-save {
   --background: var(--ion-color-primary);
-  --color: #{variables.$white};
+  --color: var(--ion-color-tertiary);
   --border-radius: 14px;
   height: 52px;
   font-weight: 800;
   box-shadow: 0 8px 20px rgba(variables.$primary-color, 0.2);
+  transition: variables.$transition-base;
+  
+  &:hover {
+    --background: var(--ion-color-primary-shade);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(variables.$primary-color, 0.3);
+  }
+
+  ion-icon {
+    color: var(--ion-color-tertiary);
+  }
 }
 
 
@@ -78,13 +89,13 @@
 }
 
 .rustic-search-wrapper:focus-within {
-  box-shadow: 0 15px 40px rgba(variables.$secondary-color, 0.15);
-  border-color: var(--ion-color-secondary);
+  box-shadow: variables.$shadow-focus;
+  border-color: var(--ion-color-tertiary);
   transform: translateY(-2px);
 }
 
 .rustic-search-icon {
-  color: var(--ion-color-secondary);
+  color: variables.$gray-600;
   font-size: 20px;
   margin-right: 12px;
   transition: transform 0.4s ease, color 0.4s ease;
@@ -92,7 +103,7 @@
 
 .rustic-search-wrapper:focus-within .rustic-search-icon {
   transform: scale(1.1) rotate(5deg);
-  color: var(--ion-color-primary);
+  color: var(--ion-color-tertiary);
 }
 
 .rustic-search-input-field {
@@ -136,7 +147,7 @@ ion-popover.select-popover {
   }
 
   ion-radio {
-    --color-checked: var(--ion-color-secondary);
+    --color-checked: var(--ion-color-tertiary);
   }
 }
 

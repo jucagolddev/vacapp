@@ -1,0 +1,188 @@
+/* --- Módulo de Recría y Control de Pesaje --- */
+
+.animal-selection-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border-color: var(--ion-color-primary);
+  }
+
+  .card-header-flex {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .card-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    
+    &.bg-primary { background: var(--ion-color-primary); }
+    &.bg-secondary { background: var(--ion-color-secondary); }
+  }
+
+  .card-title-stack {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    strong {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    span {
+      font-size: 0.85rem;
+      color: #666;
+      font-weight: 500;
+    }
+  }
+}
+
+/* MÉTRICAS DE RENDIMIENTO */
+.metric-card-luxe {
+  padding: 1.5rem;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  border: 1px solid rgba(0,0,0,0.02);
+
+  .label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    font-weight: 600;
+  }
+
+  .value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    color: #1b4332;
+
+    small {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #999;
+    }
+  }
+}
+
+/* HISTORIAL DE PESADA (Versión Row) */
+.weight-card-row {
+  background: white;
+  margin-bottom: 0.75rem;
+  border-radius: 14px;
+  padding: 1rem;
+  border-left: 4px solid var(--ion-color-primary);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  
+  .card-content-flex {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .date-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 55px;
+    padding-right: 1.25rem;
+    border-right: 1px solid #f0f0f0;
+
+    strong {
+      font-size: 1.4rem;
+      line-height: 1;
+      color: #1a1a1a;
+    }
+
+    span {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #888;
+      font-weight: 700;
+    }
+  }
+
+  .data-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .weight {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .type {
+      font-size: 0.85rem;
+      color: #bc6c25;
+      font-weight: 600;
+      opacity: 0.8;
+    }
+  }
+}
+
+/* BUSCADOR RÚSTICO */
+.rustic-search-wrapper {
+  position: relative;
+  background: white;
+  border-radius: 14px;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.05);
+
+  .rustic-search-icon {
+    font-size: 1.3rem;
+    color: #bc6c25;
+    margin-right: 0.75rem;
+  }
+
+  .rustic-search-input-field {
+    width: 100%;
+    border: none;
+    padding: 1.15rem 0;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: #333;
+    outline: none;
+    background: transparent;
+
+    &::placeholder {
+      color: #bbb;
+    }
+  }
+}
+
+.chart-container-large {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}

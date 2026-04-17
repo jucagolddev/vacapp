@@ -2,6 +2,7 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { FincaService } from './finca.service';
 import { Bovino } from '../models/vacapp.models';
+import * as VacaConst from '../constants/vaca.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,19 @@ import { Bovino } from '../models/vacapp.models';
 export class GanadoService {
   private supabase = inject(SupabaseService);
   private fincaService = inject(FincaService);
+
+  // Exponer constantes para la UI
+  // Exponer constantes para la UI
+  readonly constants = {
+    RAZAS_BOVINAS: VacaConst.RAZAS_BOVINAS,
+    APTITUDES_BOVINAS: VacaConst.APTITUDES_BOVINAS,
+    ESTADOS_PRODUCTIVOS: VacaConst.ESTADOS_PRODUCTIVOS,
+    ESTADOS_REPRODUCTIVOS: VacaConst.ESTADOS_REPRODUCTIVOS,
+    TIPOS_EVENTO_SANIDAD: VacaConst.TIPOS_EVENTO_SANIDAD,
+    TIPOS_PESAJE: VacaConst.TIPOS_PESAJE,
+    METODOS_REPRODUCCION: VacaConst.METODOS_REPRODUCCION,
+    ESTADOS_GESTACION: VacaConst.ESTADOS_GESTACION
+  };
 
   // Estado interno
   private bovinosSignal = signal<Bovino[]>([]);
@@ -24,6 +38,11 @@ export class GanadoService {
   readonly totalBovinos = computed(() => this.bovinosSignal().length);
   readonly totalHembras = computed(() => this.bovinosSignal().filter(b => b.sexo === 'Hembra').length);
   readonly totalMachos = computed(() => this.bovinosSignal().filter(b => b.sexo === 'Macho').length);
+
+  // Listas filtradas reactivas
+  readonly bovinosAlta = computed(() => this.bovinosSignal().filter(b => b.estado_productivo === 'Alta'));
+  readonly hembrasActivas = computed(() => this.bovinosSignal().filter(b => b.sexo === 'Hembra' && b.estado_productivo === 'Alta'));
+  readonly machosActivos = computed(() => this.bovinosSignal().filter(b => b.sexo === 'Macho' && b.estado_productivo === 'Alta'));
 
   // Distribución por Aptitud
   readonly distAptitud = computed(() => {

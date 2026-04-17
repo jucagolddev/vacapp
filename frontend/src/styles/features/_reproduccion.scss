@@ -141,3 +141,33 @@
   --background: #{variables.$primary-color};
   --box-shadow: 0 8px 20px rgba($primary-color, 0.3);
 }
+
+/* Feature Specific Styles moved from component */
+
+.item-card-pro { 
+  --background: transparent;
+  --padding-start: 12px; 
+  --inner-padding-end: 16px; 
+}
+
+.history-avatar-bi { 
+  width: 48px; 
+  height: 48px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  border-radius: 14px; 
+  font-size: 1.6rem; 
+  color: #582f0e; 
+}
+
+.bg-earth-soft { background: rgba(88, 47, 14, 0.1); }
+
+.card-footer-actions-bi { 
+  border-top: 1px solid rgba(0,0,0,0.05); 
+  padding-top: 10px; 
+  display: flex; 
+  gap: 8px; 
+}
+
+.action-buttons-mini { display: flex; gap: 2px; }

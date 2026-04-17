@@ -58,7 +58,7 @@ import { add, close, save, pencil, trash } from 'ionicons/icons';
             <lucide-icon name="trending-up" class="text-forest/30" size="32"></lucide-icon>
           </div>
           <div class="chart-container-large">
-             <canvas baseChart [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
+             <canvas baseChart class="chart-canvas-finance" [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
           </div>
         </div>
 

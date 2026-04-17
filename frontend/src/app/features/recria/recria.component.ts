@@ -1,22 +1,25 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { 
-  IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
-  IonLabel, IonIcon, IonGrid, 
-  IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
-  IonModal, IonButton, IonInput, IonSelect, IonSelectOption, 
-  IonSpinner
-} from '@ionic/angular/standalone';
-import { SupabaseService } from '../../core/services/supabase.service';
-import { Pesaje, Bovino } from '../../core/models/vacapp.models';
+  IonicModule, 
+  AlertController, 
+  ToastController 
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { 
-  fitness, scale, add, close, save, pencil, trash, 
-  trendingUp, calendar, barChart, leaf, paw, speedometer,
-  trendingDown
+  speedometer, trendingDown, person, search, male, 
+  female, chevronForward, trash, add, close, scale, 
+  barChart, fitness, save, pencil, trendingUp, calendar, leaf, paw 
 } from 'ionicons/icons';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AlertController, ToastController } from '@ionic/angular/standalone';
+
+import { SupabaseService } from '../../core/services/supabase.service';
+import { GanadoService } from '../../core/services/ganado.service';
+import { PesajeService } from '../../core/services/pesaje.service';
+import { Bovino } from '../../core/models/vacapp.models';
+
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
  * Componente para el Módulo de Recría y Control de Pesaje - Versión Rústica.
@@ -25,14 +28,7 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
 @Component({
   selector: 'app-recria',
   standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule,
-    IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
-    IonLabel, IonIcon, IonGrid, 
-    IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
-    IonModal, IonButton, IonInput, IonSelect, IonSelectOption, 
-    IonSpinner
-  ],
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, BaseChartDirective],
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar color="primary" class="luxe-toolbar">
@@ -52,69 +48,120 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
             <ion-icon name="speedometer"></ion-icon>
           </div>
           <div class="luxe-text-stack">
-            <h1 class="page-h1-rustic">Control de Pesaje</h1>
-            <p class="page-p-rustic">Monitoreo de crecimiento y ganancia de masa.</p>
+            <h1 class="page-h1-rustic">{{ selectedBovino ? selectedBovino.nombre : 'Control de Pesaje' }}</h1>
+            <p class="page-p-rustic">
+              {{ selectedBovino ? 'Evolución de peso: ' + selectedBovino.crotal : 'Selecciona un animal para gestionar su rendimiento.' }}
+            </p>
           </div>
-        </div>
-
-        <div *ngIf="loading" class="luxe-loading-state">
-          <ion-spinner name="crescent" color="primary"></ion-spinner>
-          <p>Sincronizando con báscula...</p>
-        </div>
-
-        <!-- Listado de Pesajes -->
-        <ion-grid class="ion-no-padding" *ngIf="!loading && pesajes.length > 0">
-          <ion-row>
-            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajes">
-              <div class="weight-card-body-luxe animate-slide-up">
-                <div class="card-header-flex">
-                  <div class="card-icon-box bg-tertiary">
-                     <ion-icon name="speedometer"></ion-icon>
-                  </div>
-                  <div class="card-title-stack">
-                    <strong>{{ p.bovino?.nombre || 'Ejemplar S/N' }}</strong>
-                    <span>{{ p.bovino?.crotal || 'S/N' }} - {{ p.fecha_pesaje | date:'dd MMM yyyy' }}</span>
-                  </div>
-                </div>
-
-                <div class="card-data-grid">
-                  <div class="card-data-item">
-                    <span class="label">Masa Actual</span>
-                    <span class="value highlight">{{ p.peso_kg }} <small>KG</small></span>
-                  </div>
-                  <div class="card-data-item" *ngIf="p.gain !== null">
-                     <span class="label">Balance</span>
-                     <span class="value" [ngClass]="p.gain >= 0 ? 'color-forest' : 'color-danger'">
-                        <ion-icon [name]="p.gain >= 0 ? 'trending-up' : 'trending-down'"></ion-icon>
-                        {{ p.gain > 0 ? '+' : '' }}{{ p.gain | number:'1.1-2' }} kg
-                     </span>
-                  </div>
-                </div>
-
-                <div class="card-footer-actions">
-                  <ion-button fill="clear" disabled color="dark" class="opacity-80 text-xs">
-                    <ion-icon name="bar-chart" slot="start"></ion-icon> {{ p.tipo_pesaje }}
-                  </ion-button>
-                  <ion-button fill="clear" (click)="deletePesaje(p.id)" color="danger">
-                    <ion-icon name="trash" slot="start"></ion-icon> Borrar
-                  </ion-button>
-                </div>
-              </div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-
-        <!-- Estado Vacío -->
-        <div *ngIf="!loading && pesajes.length === 0" class="luxe-empty-state">
-          <div class="empty-icon-ring">
-            <ion-icon name="scale"></ion-icon>
-          </div>
-          <h2>Báscula Lista</h2>
-          <p>No se han registrado pesajes aún.</p>
-          <ion-button fill="solid" (click)="setOpen(true)" class="btn-luxe-save">
-            <ion-icon name="add" slot="start"></ion-icon> Registrar Pesaje
+          <ion-button *ngIf="selectedBovino" fill="clear" (click)="selectedBovino = null" color="dark" slot="end" class="mt-4">
+             <ion-icon name="close" slot="start"></ion-icon> Cambiar Animal
           </ion-button>
         </div>
+
+        <!-- LISTADO DE ANIMALES PARA SELECCIÓN -->
+        <div *ngIf="!selectedBovino" class="animate-fade-in">
+           <div class="rustic-search-wrapper mb-6">
+              <ion-icon name="search" class="rustic-search-icon"></ion-icon>
+              <input 
+                type="text" 
+                placeholder="Buscar por crotal o nombre..." 
+                class="rustic-search-input-field"
+                [(ngModel)]="searchTerm">
+           </div>
+
+           <ion-grid class="ion-no-padding">
+              <ion-row>
+                 <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+                    <ion-card class="pro-card-luxe animate-slide-up cursor-pointer" (click)="selectBovino(b)" tabindex="0" (keydown.enter)="selectBovino(b)">
+                       <ion-card-header>
+                          <div class="card-header-flex">
+                             <div *ngIf="b.foto_url" class="card-icon-box bg-earth card-icon-box-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
+                             <div *ngIf="!b.foto_url" class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
+                                <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
+                             </div>
+                             <div class="card-title-stack">
+                                <strong>{{ b.nombre }}</strong>
+                                <span>Crotal: {{ b.crotal }}</span>
+                             </div>
+                             <ion-icon name="chevron-forward" class="opacity-30" slot="end" style="margin-left:auto;"></ion-icon>
+                          </div>
+                       </ion-card-header>
+                       <ion-card-content>
+                          <div class="card-data-grid">
+                            <div class="card-data-item">
+                              <span class="label">Categoría</span>
+                              <span class="value">{{ ganadoService.calculateCategoria(b) }}</span>
+                            </div>
+                            <div class="card-data-item">
+                              <span class="label">Raza</span>
+                              <span class="value">{{ b.raza || 'Mestizo' }}</span>
+                            </div>
+                          </div>
+                       </ion-card-content>
+                    </ion-card>
+                 </ion-col>
+              </ion-row>
+           </ion-grid>
+        </div>
+
+        <!-- VISTA DETALLE DEL ANIMAL SELECCIONADO -->
+        <div *ngIf="selectedBovino" class="animate-fade-in">
+           
+           <!-- MÉTRICAS CLAVE -->
+           <ion-grid class="ion-no-padding mb-8">
+              <ion-row>
+                 <ion-col size="12" size-md="6">
+                    <div class="metric-card-luxe bg-white">
+                       <span class="label">Último Peso</span>
+                       <span class="value">{{ getUltimoPeso() }} <small>KG</small></span>
+                    </div>
+                 </ion-col>
+                 <ion-col size="12" size-md="6">
+                    <div class="metric-card-luxe bg-white">
+                       <span class="label">GMD (Ganancia Diaria)</span>
+                       <span class="value" [ngClass]="getGMD() >= 0 ? 'color-forest' : 'color-danger'">
+                          {{ getGMD() > 0 ? '+' : '' }}{{ getGMD() | number:'1.2-2' }} <small>kg/día</small>
+                       </span>
+                    </div>
+                 </ion-col>
+              </ion-row>
+           </ion-grid>
+
+           <!-- GRÁFICO INDIVIDUAL -->
+           <div class="analytics-card-large mb-8">
+              <div class="card-header-flex">
+                 <h3 class="card-title-luxe">Curva de Crecimiento Individual</h3>
+              </div>
+              <div class="chart-container-large">
+                 <canvas baseChart [data]="chartDataIndividual" [options]="chartOptions" [type]="'line'"></canvas>
+              </div>
+           </div>
+
+           <!-- HISTORIAL -->
+           <h2 class="luxe-section-title">Historial de Pesadas</h2>
+           <div class="history-panel-bi">
+              <div *ngFor="let p of pesajesFiltrados" class="weight-card-row animate-slide-up">
+                 <div class="card-content-flex">
+                    <div class="date-box">
+                       <strong>{{ p.fecha_pesaje | date:'dd' }}</strong>
+                       <span>{{ p.fecha_pesaje | date:'MMM' }}</span>
+                    </div>
+                    <div class="data-box">
+                       <span class="weight">{{ p.peso_kg }} KG</span>
+                       <span class="type">{{ p.tipo_pesaje }}</span>
+                    </div>
+                    <ion-button fill="clear" color="danger" (click)="deletePesaje(p.id)" class="ml-auto">
+                       <ion-icon name="trash" slot="icon-only"></ion-icon>
+                    </ion-button>
+                 </div>
+              </div>
+           </div>
+
+           <div *ngIf="pesajesFiltrados.length === 0" class="luxe-empty-state">
+              <p>No hay pesajes registrados para este animal.</p>
+           </div>
+        </div>
+
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
@@ -146,12 +193,8 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
 
             <form [formGroup]="pesajeForm" (ngSubmit)="onSubmit()">
               <ion-item class="luxe-input">
-                <ion-label position="stacked">Seleccionar Animal *</ion-label>
-                <ion-select formControlName="bovino_id" placeholder="Ejemplar a pesar" interface="popover">
-                  <ion-select-option *ngFor="let b of bovinos" [value]="b.id">
-                    {{ b.crotal }} - {{ b.nombre }}
-                  </ion-select-option>
-                </ion-select>
+                <ion-label position="stacked">Animal Seleccionado</ion-label>
+                <ion-input [value]="selectedBovino?.nombre + ' (' + selectedBovino?.crotal + ')'" [readonly]="true"></ion-input>
               </ion-item>
 
               <div class="luxe-item-group">
@@ -168,10 +211,9 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
               <ion-item class="luxe-input">
                  <ion-label position="stacked">Tipo Control</ion-label>
                  <ion-select formControlName="tipo_pesaje" interface="popover">
-                   <ion-select-option value="Nacimiento">Nacimiento</ion-select-option>
-                   <ion-select-option value="Destete">Destete</ion-select-option>
-                   <ion-select-option value="Recría">Recría</ion-select-option>
-                   <ion-select-option value="Finalización">Finalización</ion-select-option>
+                   <ion-select-option *ngFor="let t of ganadoService.constants.TIPOS_PESAJE" [value]="t">
+                     {{ t }}
+                   </ion-select-option>
                  </ion-select>
               </ion-item>
 
@@ -189,46 +231,104 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
   `
 })
 export class RecriaComponent implements OnInit {
-  private supabase = inject(SupabaseService);
+  private supa = inject(SupabaseService);
+  public ganadoService = inject(GanadoService);
+  private pesajeService = inject(PesajeService);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
 
-  pesajes: any[] = [];
-  bovinos: Bovino[] = [];
-  loading = true;
+  selectedBovino: Bovino | null = null;
+  searchTerm: string = '';
+  
+  pesajesFiltrados: any[] = [];
+  loading = false;
   isModalOpen = false;
   pesajeForm: FormGroup;
 
+  // Datos para el gráfico individual
+  chartDataIndividual: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
+  chartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, title: { display: true, text: 'KG' } },
+      x: { grid: { display: false } }
+    }
+  };
+
   constructor() {
-    addIcons({ fitness, scale, add, close, save, pencil, trash, trendingUp, trendingDown, calendar, barChart, leaf, paw, speedometer });
+    addIcons({ 
+      fitness, scale, add, close, save, pencil, trash, 
+      trendingUp, trendingDown, calendar, barChart, 
+      leaf, paw, speedometer, person, search, male, female, chevronForward 
+    });
     this.pesajeForm = this.fb.group({
       bovino_id: ['', Validators.required],
+      peso_kg: ['', [Validators.required, Validators.min(1)]],
       fecha_pesaje: [new Date().toISOString().split('T')[0], Validators.required],
-      peso_kg: ['', [Validators.required, Validators.min(0.1)]],
-      tipo_pesaje: ['Recría', Validators.required]
+      tipo_pesaje: ['Recría', Validators.required],
+      notas: ['']
     });
   }
 
   async ngOnInit() {
-    await this.loadData();
+    // No necesitamos cargar nada aquí ya que GanadoService ya tiene los bovinos
   }
 
-  async loadData() {
-    this.loading = true;
-    try {
-      const [pesajesRes, bovinosRes] = await Promise.all([
-        this.supabase.getPesajes(),
-        this.supabase.getAll<Bovino>('bovinos')
-      ]);
+  filteredBovinos() {
+    const term = this.searchTerm.toLowerCase();
+    return this.ganadoService.bovinosAlta().filter(b => 
+      b.nombre?.toLowerCase().includes(term) || 
+      b.crotal?.toLowerCase().includes(term)
+    );
+  }
 
-      this.bovinos = (bovinosRes.data || []).filter(b => b.estado_productivo === 'Alta');
-      this.pesajes = this.processPesajes(pesajesRes.data || []);
-    } catch (error) {
-      this.showToast('Error de sincronización', 'danger');
-    } finally {
-      this.loading = false;
-    }
+  selectBovino(b: Bovino) {
+    this.selectedBovino = b;
+    this.updateIndividualHistory();
+  }
+
+  updateIndividualHistory() {
+    if (!this.selectedBovino) return;
+    
+    // Filtrar pesajes para este animal
+    const hist = this.pesajeService.records().filter(p => p.bovino_id === this.selectedBovino?.id)
+      .sort((a, b) => new Date(b.fecha_pesaje).getTime() - new Date(a.fecha_pesaje).getTime());
+    
+    this.pesajesFiltrados = hist;
+
+    // Actualizar Gráfico
+    const plotData = [...hist].sort((a, b) => new Date(a.fecha_pesaje).getTime() - new Date(b.fecha_pesaje).getTime());
+    this.chartDataIndividual = {
+      labels: plotData.map(p => new Date(p.fecha_pesaje).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })),
+      datasets: [{
+        label: 'Peso (KG)',
+        data: plotData.map(p => p.peso_kg),
+        borderColor: '#bc6c25',
+        backgroundColor: 'rgba(188, 108, 37, 0.1)',
+        fill: true,
+        tension: 0.4
+      }]
+    };
+  }
+
+  getUltimoPeso(): string {
+    return this.pesajesFiltrados[0]?.peso_kg || '0';
+  }
+
+  getGMD(): number {
+    if (this.pesajesFiltrados.length < 2) return 0;
+    const last = this.pesajesFiltrados[0];
+    const prev = this.pesajesFiltrados[1];
+    
+    const d1 = new Date(last.fecha_pesaje);
+    const d2 = new Date(prev.fecha_pesaje);
+    const diffDays = (d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24);
+    
+    if (diffDays <= 0) return 0;
+    return (last.peso_kg - prev.peso_kg) / diffDays;
   }
 
   processPesajes(data: any[]) {
@@ -251,12 +351,11 @@ export class RecriaComponent implements OnInit {
 
   setOpen(isOpen: boolean) {
     this.isModalOpen = isOpen;
-    if (!isOpen) {
-      this.pesajeForm.reset({
+    if (isOpen && this.selectedBovino) {
+      this.pesajeForm.patchValue({
+        bovino_id: this.selectedBovino.id,
         fecha_pesaje: new Date().toISOString().split('T')[0],
-        tipo_pesaje: 'Recría',
-        bovino_id: '',
-        peso_kg: ''
+        tipo_pesaje: 'Recría'
       });
     }
   }
@@ -266,25 +365,15 @@ export class RecriaComponent implements OnInit {
 
     try {
       const pesajeData = this.pesajeForm.value;
-      const res = await this.supabase.createPesaje(pesajeData);
+      const { error } = await this.supa.createPesaje(pesajeData);
       
-      if (res.error) {
-        this.showToast('Error al guardar: ' + res.error, 'danger');
+      if (error) {
+        this.showToast('Error al guardar: ' + error, 'danger');
       } else {
-        // Lógica de reasignación automática de lote (Hardcoded por peso)
-        const reasignacion = await this.supabase.updateBovinoLote(
-          pesajeData.bovino_id, 
-          pesajeData.peso_kg
-        );
-
-        if (reasignacion.data?.changed) {
-          this.showToast(`¡Animal reasignado a ${reasignacion.data.nombre}!`, 'tertiary');
-        } else {
-          this.showToast('Peso registrado correctamente');
-        }
-
+        this.showToast('Peso registrado correctamente');
         this.setOpen(false);
-        await this.loadData();
+        await this.pesajeService.loadPesajes();
+        this.updateIndividualHistory();
       }
     } catch (e) {
       this.showToast('Error técnico al procesar el pesaje', 'danger');
@@ -293,20 +382,21 @@ export class RecriaComponent implements OnInit {
 
   async deletePesaje(id: string) {
     const alert = await this.alertCtrl.create({
-      header: 'Eliminar Registro',
-      message: '¿Confirma el borrado?',
+      header: 'Confirmar eliminación',
+      message: '¿Estás seguro de que deseas borrar este pesaje?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        { 
-          text: 'Eliminar', 
+        {
+          text: 'Eliminar',
           role: 'destructive',
           handler: async () => {
-            const res = await this.supabase.deletePesaje(id);
-            if (res.error) {
-              this.showToast('Error al eliminar: ' + res.error, 'danger');
+            const { error } = await this.supa.delete('pesajes_individuales', id);
+            if (error) {
+              this.showToast('Error al eliminar', 'danger');
             } else {
-              this.showToast('Registro eliminado', 'warning');
-              await this.loadData();
+              this.showToast('Pesaje eliminado');
+              await this.pesajeService.loadPesajes();
+              this.updateIndividualHistory();
             }
           }
         }

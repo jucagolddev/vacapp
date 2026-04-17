@@ -50,13 +50,15 @@ ion-menu ion-item {
 
 // Estado SELECCIONADO del ítem
 ion-menu ion-item.selected {
-  // Fondo suave con el color primario
-  --background: rgba(#{45, 90, 39}, 0.1); 
-  --color: #{variables.$primary-color};
-  font-weight: 600;
+  // Fondo suave con el color tertiary (Wheat)
+  --background: rgba(var(--ion-color-tertiary-rgb), 0.15); 
+  --color: #{variables.$tertiary-color};
+  font-weight: 800;
+  border-right: 4px solid variables.$tertiary-color;
+  border-radius: variables.$border-radius-sm 0 0 variables.$border-radius-sm;
 
   ion-icon {
-    color: variables.$primary-color; // Icono en verde al estar seleccionado
+    color: variables.$tertiary-color; // Icono en trigo al estar seleccionado
   }
 }
 

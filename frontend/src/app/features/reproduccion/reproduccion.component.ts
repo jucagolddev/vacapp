@@ -19,6 +19,8 @@ import {
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 import { ReproduccionService } from '../../core/services/reproduccion.service';
+import { GanadoService } from '../../core/services/ganado.service';
+import { METODOS_REPRODUCCION, ESTADOS_GESTACION } from '../../core/constants/vaca.constants';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
@@ -190,7 +192,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
               <ion-item class="luxe-input">
                 <ion-label position="stacked">Identificar Hembra *</ion-label>
                 <ion-select formControlName="bovino_id" placeholder="Seleccionar hembra" interface="popover">
-                  <ion-select-option *ngFor="let b of vacas" [value]="b.id">
+                  <ion-select-option *ngFor="let b of ganadoService.hembrasActivas()" [value]="b.id">
                     {{ b.nombre }} ({{ b.crotal }})
                   </ion-select-option>
                 </ion-select>
@@ -210,18 +212,18 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
               <ion-item class="luxe-input">
                 <ion-label position="stacked">Metodología</ion-label>
                 <ion-select formControlName="tipo_cubricion" interface="popover">
-                  <ion-select-option value="Monta Natural">Monta Natural</ion-select-option>
-                  <ion-select-option value="Inseminación Artificial">Inseminación Artificial</ion-select-option>
+                  <ion-select-option *ngFor="let m of METODOS" [value]="m">
+                    {{ m }}
+                  </ion-select-option>
                 </ion-select>
               </ion-item>
 
               <ion-item class="luxe-input">
                 <ion-label position="stacked">Estado Gestación</ion-label>
                 <ion-select formControlName="estado_gestacion" interface="popover">
-                  <ion-select-option value="Pendiente">Pendiente</ion-select-option>
-                  <ion-select-option value="Confirmada">Confirmada</ion-select-option>
-                  <ion-select-option value="Parido">Parido</ion-select-option>
-                  <ion-select-option value="Fallida">Fallida</ion-select-option>
+                  <ion-select-option *ngFor="let eg of ESTADOS" [value]="eg">
+                    {{ eg }}
+                  </ion-select-option>
                 </ion-select>
               </ion-item>
               
@@ -235,45 +237,15 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
         </ng-template>
       </ion-modal>
     </ion-content>
-  `,
-  styles: [`
-    .luxe-bg-forest { --background: #fefae0; }
-    .pro-card-luxe { 
-      border-radius: 20px; 
-      border-left: 5px solid var(--ion-color-primary); 
-      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-      margin: 12px 8px;
-    }
-    .pro-card-row {
-      border-radius: 16px;
-      border-left: 5px solid var(--ion-color-primary);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-      margin-bottom: 12px;
-      overflow: hidden;
-    }
-    .item-card-pro { 
-      --background: transparent;
-      --padding-start: 12px; 
-      --inner-padding-end: 16px; 
-    }
-    .history-avatar-bi { 
-      width: 48px; 
-      height: 48px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      border-radius: 14px; 
-      font-size: 1.6rem; 
-      color: #582f0e; 
-    }
-    .bg-earth-soft { background: rgba(88, 47, 14, 0.1); }
-    .card-footer-actions-bi { border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px; display: flex; gap: 8px; }
-    .action-buttons-mini { display: flex; gap: 2px; }
-  `]
+  `
 })
 export class ReproduccionComponent implements OnInit {
   private supa = inject(SupabaseService);
+  public ganadoService = inject(GanadoService);
   private reproService = inject(ReproduccionService);
+
+  public readonly METODOS = METODOS_REPRODUCCION;
+  public readonly ESTADOS = ESTADOS_GESTACION;
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
@@ -301,7 +273,6 @@ export class ReproduccionComponent implements OnInit {
   
   reproducciones: Reproduccion[] = [];
   gestacionesActivas: Reproduccion[] = [];
-  vacas: Bovino[] = [];
   
   isModalOpen = false;
   editingItem: Reproduccion | null = null;
@@ -331,10 +302,7 @@ export class ReproduccionComponent implements OnInit {
   async loadData() {
     try {
       const { data: repros } = await this.supa.getReproduccion();
-      const { data: females } = await this.supa.getFemales();
-      
       this.reproducciones = repros || [];
-      this.vacas = females || [];
       this.gestacionesActivas = this.reproducciones.filter(r => r.estado_gestacion === 'Confirmada');
     } catch (e) {
       console.error('Error cargando datos reproductivos:', e);

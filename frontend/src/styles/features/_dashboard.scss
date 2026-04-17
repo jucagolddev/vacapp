@@ -1,329 +1,125 @@
-@use '../abstracts/variables';
+// _dashboard.scss
+// Dashboard Features - Luxe-Forest Theme
 
-// ==========================================================================
-// Dashboard Elite AgriTech 2.0 (Glassmorphism & Rústico-Luxe)
-// ==========================================================================
+@use '../abstracts/variables' as v;
+@use '../abstracts/mixins' as m;
 
-.luxe-bg-forest {
-    --background: #{variables.$light-color}; 
-    background: #{variables.$light-color};
+// .luxe-toolbar moved to core/_ionic.scss for global standardization
+
+.bi-title {
+  font-family: v.$font-family-base;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: v.$black;
+  margin-bottom: 0px;
+  letter-spacing: -0.5px;
 }
 
-// ------------------------------------
-// Page Headers (Títulos de vista principales)
-// ------------------------------------
-.luxe-header-content {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    padding-top: 1.5rem; // Espacio superior extra para alejarlo del header de app
-
-    .luxe-text-stack {
-        display: flex;
-        flex-direction: column;
-
-        .page-h1-rustic {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: variables.$dark-color;
-            margin: 0 0 6px 0;
-            letter-spacing: -0.5px;
-            line-height: 1.1;
-        }
-        
-        .page-p-rustic {
-            font-size: 1.1rem;
-            color: variables.$gray-600;
-            margin: 0;
-            font-weight: 500;
-        }
-    }
-
-    .luxe-icon-box {
-        width: 64px;
-        height: 64px;
-        min-width: 64px; // Previene colapso flex
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 16px rgba(variables.$black, 0.15); // Sombra más prominente
-        
-        // Tamaños consistentes para Lucide/Ionic
-        lucide-icon, ion-icon {
-            font-size: 32px !important;
-            width: 32px !important;
-            height: 32px !important;
-        }
-
-        &.bg-forest { 
-            background: variables.$primary-color; 
-            color: variables.$white; 
-            lucide-icon, ion-icon { color: variables.$white !important; }
-        }
-        &.bg-earth { 
-            background: variables.$tertiary-color; 
-            // Para "earth" usamos color oscuro contraste alto natural
-            color: variables.$secondary-color; 
-            lucide-icon, ion-icon { color: variables.$secondary-color !important; }
-        }
-        &.bg-secondary { 
-            background: variables.$secondary-color; 
-            color: variables.$white; 
-            lucide-icon, ion-icon { color: variables.$white !important; }
-        }
-    }
+.bi-subtitle {
+  font-family: v.$font-family-base;
+  font-size: 1.1rem;
+  color: v.$medium-color;
+  margin-top: 4px;
 }
 
-.dashboard-header-glass {
-    padding: 2.5rem 1.5rem;
-    background: #{variables.$white};
-    border-radius: 0 0 2rem 2rem;
-    border-bottom: 2px solid rgba(variables.$primary-color, 0.1);
-    box-shadow: 0 6px 15px rgba(variables.$black, 0.05);
-    margin-bottom: 2rem;
-
-    .header-flex {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap; // Responsive
-        gap: 1rem;
-        transition: transform 0.3s ease;
-    }
-    
-    &:hover {
-        box-shadow: 0 10px 30px rgba(variables.$black, 0.08);
-    }
-
-    .status-chips {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .time-filter-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-        background: #{variables.$white};
-        border: 2px solid variables.$primary-color;
-        border-radius: 20px;
-        padding: 4px 12px;
-        box-shadow: 0 4px 10px rgba(variables.$black, 0.05);
-
-        .luxe-time-select {
-            background: transparent;
-            color: variables.$primary-color;
-            border: none;
-            outline: none;
-            appearance: none;
-            padding: 8px 30px 8px 12px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            
-            option { background: variables.$white; color: variables.$dark-color; }
-        }
-
-        .select-icon {
-            position: absolute;
-            right: 12px;
-            pointer-events: none;
-            color: variables.$primary-color;
-            font-weight: bold;
-        }
-    }
-
-    .glass-badge {
-        background: variables.$warning-color;
-        color: variables.$white;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 600;
-        box-shadow: 0 4px 8px rgba(variables.$black, 0.1);
-    }
+.bi-kpi-card {
+  border-radius: 16px;
+  margin: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
 }
 
-.online-dot {
-    width: 10px;
-    height: 10px;
-    background: #52b788;
+.kpi-mini-icon {
+  font-size: 2rem;
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: v.$gray-600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.kpi-value {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: v.$black;
+}
+
+.bi-main-card {
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  margin: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.bi-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.bi-mini-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: v.$primary-color;
+}
+
+.bg-primary-soft {
+  background: rgba(27, 67, 50, 0.1);
+}
+
+.chart-container-donut {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.chart-skeleton {
+  height: 100%;
+  width: 100%;
+  min-height: 250px;
+}
+
+.online-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: v.$success-color;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 6px 14px;
+  border-radius: 20px;
+
+  &.offline {
+    color: v.$danger-color;
+    .dot {
+      background: v.$danger-color;
+    }
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: v.$success-color;
     border-radius: 50%;
-    box-shadow: 0 0 10px #52b788;
-    &.offline {
-        background: #ef4444;
-        box-shadow: 0 0 10px #ef4444;
-    }
-}
-
-// KPI Cards V2
-.kpi-card-v2 {
-    background: #{variables.$white};
-    border: 1px solid rgba(variables.$primary-color, 0.1);
-    border-radius: 24px;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(variables.$black, 0.04);
-
-    &:hover {
-        background: rgba(variables.$primary-color, 0.02);
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(variables.$black, 0.08);
-    }
-
-    .kpi-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        box-shadow: 0 8px 16px rgba(variables.$black,0.2);
-        
-        &.bg-forest { background: variables.$primary-color; }
-        &.bg-earth { background: variables.$tertiary-color; color: variables.$dark-color; }
-        &.bg-danger { background: variables.$danger-color; }
-        &.bg-secondary { background: variables.$secondary-color; }
-    }
-
-    .kpi-data {
-        .kpi-label {
-            display: block;
-            font-size: 0.95rem;
-            color: variables.$gray-600;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-        .kpi-value {
-            font-size: 2.2rem;
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 6px;
-            color: variables.$dark-color;
-        }
-        .kpi-sub {
-            font-size: 0.85rem;
-            color: variables.$primary-color;
-            font-weight: 500;
-        }
-    }
-
-    &.alert-glow {
-        box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
-        animation: pulse-border 2s infinite;
-    }
-}
-
-@keyframes pulse-border {
-    0% { border-color: rgba(239, 68, 68, 0.2); }
-    50% { border-color: rgba(239, 68, 68, 0.5); }
-    100% { border-color: rgba(239, 68, 68, 0.2); }
-}
-
-// Action Center (Alertas)
-.section-title-luxe {
-    color: variables.$dark-color;
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    padding-left: 0.5rem;
-}
-
-.luxe-alert-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.2rem 1.5rem;
-    border-radius: 16px;
-    margin-bottom: 1rem;
-    border: 2px solid transparent;
-    box-shadow: 0 4px 10px rgba(variables.$black, 0.05);
-    background: variables.$white;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    &:hover {
-        transform: scale(1.01) translateY(-2px);
-        box-shadow: 0 10px 25px rgba(variables.$black, 0.08);
-    }
-
-    &.bg-red-glass { border-color: rgba(variables.$danger-color, 0.3); border-left: 8px solid variables.$danger-color; }
-    &.bg-gold-glass { border-color: rgba(variables.$warning-color, 0.3); border-left: 8px solid variables.$warning-color; }
-
-    .alert-info {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        strong { color: variables.$dark-color; display: block; font-size: 1.25rem !important; margin-bottom: 4px; }
-        span { font-size: 1.05rem !important; color: variables.$gray-600; }
-    }
-}
-
-// Analíticas Modulares: Grid principal y Grid ampliado (360)
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.dashboard-grid-large {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    
-    @media (min-width: 992px) {
-        // En pantallas grandes, dos gráficas arriba y una estirada, o dos y dos.
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-.analytics-card-large {
-    background: variables.$white;
-    border: 1px solid rgba(variables.$primary-color, 0.1);
-    border-radius: 24px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(variables.$black, 0.05);
-    transition: transform 0.3s ease;
-
-    &:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(variables.$black, 0.08); }
-
-    .card-header-flex {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 1.5rem;
-    }
-
-    .card-title-luxe {
-        color: variables.$dark-color;
-        font-size: 1.5rem;
-        font-weight: 800;
-        margin: 0;
-    }
-
-    .card-subtitle-luxe {
-        color: variables.$gray-600;
-        font-size: 1rem;
-        font-weight: 500;
-        margin: 4px 0 0 0;
-    }
-
-    .chart-container-large {
-        height: 350px;
-        width: 100%;
-    }
-}
-
-.luxe-progress {
-    --background: rgba(255,255,255,0.1);
-    --progress-background: #52b788;
-    height: 4px;
+  }
 }

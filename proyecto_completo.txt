@@ -105,10 +105,12 @@ ARCHIVO: .\README.md
 ## 🚀 Cómo empezar
 
 ### Requisitos previos
+
 - [Node.js](https://nodejs.org/) (versión 18 o superior)
 - [Angular CLI](https://angular.dev/tools/cli) (`npm install -g @angular/cli`)
 
 ### Instalación
+
 1. Clona el repositorio:
    ```bash
    git clone https://github.com/TU_USUARIO/vacapp.git
@@ -120,9 +122,9 @@ ARCHIVO: .\README.md
    ```
 3. Inicia el servidor de desarrollo:
    ```bash
-   npm run start
+   npm run starthttp://localhost:4200
    ```
-4. Abre [http://localhost:4200](http://localhost:4200) en tu navegador.
+4. Abre [](http://localhost:4200) en tu navegador.
 
 ---
 
@@ -140,10 +142,12 @@ Consulta la [Estructura del Proyecto](documentation/tree.md) para más detalles 
 ---
 
 ## 📄 Licencia
+
 Este proyecto es de uso libre para fines educativos y de gestión ganadera personal.
 
 ---
-*Desarrollado para el sector ganadero.*
+
+_Desarrollado para el sector ganadero._
 Riverside, CA. 2026.
 
 
@@ -638,6 +642,205 @@ ARCHIVO: .\backend\supabase\.temp\cli-latest
 ==================================================
 
 v2.84.2
+
+==================================================
+ARCHIVO: .\backend\supabase\migrations\00_initial_schema.sql
+==================================================
+
+-- 00_initial_schema.sql
+-- Vacapp ERP: Healthcare & Farm Management System
+
+-- Enable common extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- 1. Empresas
+CREATE TABLE empresas (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nombre TEXT NOT NULL,
+    nif TEXT,
+    telefono TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 2. User Profiles (Auth Link)
+CREATE TABLE user_profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT NOT NULL,
+    rol TEXT NOT NULL CHECK (rol IN ('Propietario', 'Veterinario', 'Trabajador')),
+    empresa_id UUID REFERENCES empresas(id) ON DELETE SET NULL,
+    display_name TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 3. Fincas
+CREATE TABLE fincas (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    empresa_id UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+    nombre TEXT NOT NULL,
+    ubicacion TEXT,
+    codigo_explotacion TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 4. Lotes
+CREATE TABLE lotes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    finca_id UUID NOT NULL REFERENCES fincas(id) ON DELETE CASCADE,
+    nombre TEXT NOT NULL,
+    descripcion TEXT,
+    ubicacion TEXT,
+    capacidad INTEGER,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 5. Bovinos
+CREATE TABLE bovinos (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    crotal TEXT UNIQUE NOT NULL,
+    finca_id UUID NOT NULL REFERENCES fincas(id) ON DELETE CASCADE,
+    nombre TEXT,
+    fecha_nacimiento DATE NOT NULL,
+    sexo TEXT NOT NULL CHECK (sexo IN ('Macho', 'Hembra')),
+    
+    -- ERP Attributes
+    raza TEXT,
+    porcentaje_pureza NUMERIC(5,2) DEFAULT 100.00,
+    aptitud TEXT CHECK (aptitud IN ('Carne', 'Leche', 'Doble Propósito', 'Trabajo/Lidia')),
+    estado_productivo TEXT NOT NULL CHECK (estado_productivo IN ('Alta', 'Baja Venta', 'Baja Muerte', 'Baja Descarte')) DEFAULT 'Alta',
+    estado_reproductivo TEXT CHECK (estado_reproductivo IN ('Vacía', 'Gestante', 'Lactante', 'Seca')) DEFAULT 'Vacía',
+    
+    lote_id UUID REFERENCES lotes(id) ON DELETE SET NULL,
+    foto_url TEXT,
+    
+    -- Genealogía
+    padre_id UUID REFERENCES bovinos(id) ON DELETE SET NULL,
+    madre_id UUID REFERENCES bovinos(id) ON DELETE SET NULL,
+    coeficiente_consanguinidad NUMERIC(5,4),
+    
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 6. Sementales (Externos o Propios)
+CREATE TABLE sementales (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nombre TEXT NOT NULL,
+    raza TEXT,
+    procedencia TEXT,
+    finca_id UUID NOT NULL REFERENCES fincas(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 7. Reproducción
+CREATE TABLE reproduccion (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    bovino_id UUID NOT NULL REFERENCES bovinos(id) ON DELETE CASCADE,
+    semental_id UUID REFERENCES sementales(id) ON DELETE SET NULL,
+    fecha_celo DATE,
+    fecha_cubricion DATE,
+    tipo_cubricion TEXT CHECK (tipo_cubricion IN ('Monta Natural', 'Inseminación Artificial')),
+    fecha_parto_prevista DATE,
+    estado_gestacion TEXT NOT NULL CHECK (estado_gestacion IN ('Pendiente', 'Confirmada', 'Parido', 'Fallida')) DEFAULT 'Pendiente',
+    observaciones_parto TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 8. Sanidad
+CREATE TABLE sanidad (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    bovino_id UUID NOT NULL REFERENCES bovinos(id) ON DELETE CASCADE,
+    fecha DATE NOT NULL,
+    tipo TEXT NOT NULL CHECK (tipo IN ('Vacunación', 'Desparasitación', 'Tratamiento', 'Cirugía', 'Test/Diagnóstico')),
+    producto TEXT NOT NULL,
+    lote_medicamento TEXT,
+    dias_retiro_carne INTEGER,
+    dias_retiro_leche INTEGER,
+    observaciones TEXT,
+    costo_aplicacion NUMERIC(10,2),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 9. Pesajes (Recría/Control)
+CREATE TABLE recria_pesajes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    bovino_id UUID NOT NULL REFERENCES bovinos(id) ON DELETE CASCADE,
+    fecha_pesaje DATE NOT NULL,
+    peso_kg NUMERIC(6,2) NOT NULL,
+    tipo_pesaje TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 10. Finanzas
+CREATE TABLE finanzas (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tipo TEXT NOT NULL CHECK (tipo IN ('Ingreso', 'Gasto')),
+    categoria TEXT NOT NULL, -- Venta, Alimentación, Veterinaria, Adquisición, Otros
+    monto NUMERIC(12,2) NOT NULL,
+    fecha DATE NOT NULL,
+    descripcion TEXT,
+    bovino_id UUID REFERENCES bovinos(id) ON DELETE SET NULL,
+    finca_id UUID REFERENCES fincas(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 11. Tareas
+CREATE TABLE tareas (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    finca_id UUID NOT NULL REFERENCES fincas(id) ON DELETE CASCADE,
+    bovino_id UUID REFERENCES bovinos(id) ON DELETE SET NULL,
+    titulo TEXT NOT NULL,
+    fecha_vencimiento DATE NOT NULL,
+    estado TEXT NOT NULL CHECK (estado IN ('Pendiente', 'Completada', 'Omitida')) DEFAULT 'Pendiente',
+    tipo_tarea TEXT,
+    creada_por_sistema BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Trigger function for updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Apply triggers
+CREATE TRIGGER update_empresas_updated_at BEFORE UPDATE ON empresas FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_user_profiles_updated_at BEFORE UPDATE ON user_profiles FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_fincas_updated_at BEFORE UPDATE ON fincas FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_lotes_updated_at BEFORE UPDATE ON lotes FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_bovinos_updated_at BEFORE UPDATE ON bovinos FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_sementales_updated_at BEFORE UPDATE ON sementales FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_reproduccion_updated_at BEFORE UPDATE ON reproduccion FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_sanidad_updated_at BEFORE UPDATE ON sanidad FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_recria_pesajes_updated_at BEFORE UPDATE ON recria_pesajes FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_finanzas_updated_at BEFORE UPDATE ON finanzas FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_tareas_updated_at BEFORE UPDATE ON tareas FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+-- Row Level Security (RLS) - Basic Enable
+ALTER TABLE empresas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fincas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lotes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bovinos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sementales ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reproduccion ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sanidad ENABLE ROW LEVEL SECURITY;
+ALTER TABLE recria_pesajes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE finanzas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tareas ENABLE ROW LEVEL SECURITY;
+
 
 ==================================================
 ARCHIVO: .\database\01_init_schema.sql
@@ -2235,6 +2438,85 @@ ARCHIVO: .\frontend\src\app\core\.gitkeep
 
 
 ==================================================
+ARCHIVO: .\frontend\src\app\core\constants\vaca.constants.ts
+==================================================
+
+/**
+ * CONSTANTES GLOBALES - MANEJO DE BOVINOS (VACAPP)
+ * Centralización de opciones para formularios y etiquetas.
+ */
+
+export const RAZAS_BOVINAS = [
+  'Angus',
+  'Brahman',
+  'Charolais',
+  'Cruce / Mestizo',
+  'Hereford',
+  'Holstein',
+  'Limousin',
+  'Nelore',
+  'Pardo Suizo',
+  'Simmental',
+  'Otro'
+];
+
+export const APTITUDES_BOVINAS = [
+  'Carne',
+  'Leche',
+  'Doble Propósito',
+  'Trabajo / Lidia',
+  'Semental',
+  'Cría'
+];
+
+export const ESTADOS_PRODUCTIVOS = [
+  { value: 'Alta', label: 'Alta Confirmada (Finca)', color: 'success' },
+  { value: 'Baja Venta', label: 'Baja por Venta', color: 'primary' },
+  { value: 'Baja Muerte', label: 'Baja por Naturaleza/Muerte', color: 'danger' },
+  { value: 'Baja Descarte', label: 'Baja por Descarte Sanitario', color: 'warning' }
+];
+
+export const ESTADOS_REPRODUCTIVOS = [
+  { value: 'Vacía', label: 'Vacía / Abierta', color: 'medium' },
+  { value: 'Gestante', label: 'Gestante Conf.', color: 'success' },
+  { value: 'Lactante', label: 'Lactante (Parida)', color: 'primary' },
+  { value: 'Seca', label: 'Seca', color: 'warning' }
+];
+
+export const TIPOS_EVENTO_SANIDAD = [
+  'Vacunación',
+  'Desparasitación',
+  'Saneamiento',
+  'Herida / Traumatismo',
+  'Enfermedad Metabólica',
+  'Infección',
+  'Control Rutinario'
+];
+
+export const TIPOS_PESAJE = [
+  'Nacimiento',
+  'Destete',
+  'Recría',
+  'Finalización',
+  'Peso Mensual',
+  'Báscula Automática'
+];
+
+export const METODOS_REPRODUCCION = [
+  'Monta Natural',
+  'Inseminación Artificial',
+  'Transferencia de Embriones'
+];
+
+export const ESTADOS_GESTACION = [
+  'Pendiente',
+  'Confirmada',
+  'Parido',
+  'Fallida'
+];
+
+
+==================================================
 ARCHIVO: .\frontend\src\app\core\guards\auth.guard.ts
 ==================================================
 
@@ -2913,6 +3195,7 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { FincaService } from './finca.service';
 import { Bovino } from '../models/vacapp.models';
+import * as VacaConst from '../constants/vaca.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -2920,6 +3203,19 @@ import { Bovino } from '../models/vacapp.models';
 export class GanadoService {
   private supabase = inject(SupabaseService);
   private fincaService = inject(FincaService);
+
+  // Exponer constantes para la UI
+  // Exponer constantes para la UI
+  readonly constants = {
+    RAZAS_BOVINAS: VacaConst.RAZAS_BOVINAS,
+    APTITUDES_BOVINAS: VacaConst.APTITUDES_BOVINAS,
+    ESTADOS_PRODUCTIVOS: VacaConst.ESTADOS_PRODUCTIVOS,
+    ESTADOS_REPRODUCTIVOS: VacaConst.ESTADOS_REPRODUCTIVOS,
+    TIPOS_EVENTO_SANIDAD: VacaConst.TIPOS_EVENTO_SANIDAD,
+    TIPOS_PESAJE: VacaConst.TIPOS_PESAJE,
+    METODOS_REPRODUCCION: VacaConst.METODOS_REPRODUCCION,
+    ESTADOS_GESTACION: VacaConst.ESTADOS_GESTACION
+  };
 
   // Estado interno
   private bovinosSignal = signal<Bovino[]>([]);
@@ -2935,6 +3231,11 @@ export class GanadoService {
   readonly totalBovinos = computed(() => this.bovinosSignal().length);
   readonly totalHembras = computed(() => this.bovinosSignal().filter(b => b.sexo === 'Hembra').length);
   readonly totalMachos = computed(() => this.bovinosSignal().filter(b => b.sexo === 'Macho').length);
+
+  // Listas filtradas reactivas
+  readonly bovinosAlta = computed(() => this.bovinosSignal().filter(b => b.estado_productivo === 'Alta'));
+  readonly hembrasActivas = computed(() => this.bovinosSignal().filter(b => b.sexo === 'Hembra' && b.estado_productivo === 'Alta'));
+  readonly machosActivos = computed(() => this.bovinosSignal().filter(b => b.sexo === 'Macho' && b.estado_productivo === 'Alta'));
 
   // Distribución por Aptitud
   readonly distAptitud = computed(() => {
@@ -2952,6 +3253,16 @@ export class GanadoService {
     this.bovinosSignal().forEach(b => {
       const cat = this.calculateCategoria(b);
       map[cat] = (map[cat] || 0) + 1;
+    });
+    return map;
+  });
+
+  // Distribución por Lotes
+  readonly distLotes = computed(() => {
+    const map: Record<string, number> = {};
+    this.bovinosSignal().forEach(b => {
+      const loteName = b.lote?.nombre || 'Sin Lote';
+      map[loteName] = (map[loteName] || 0) + 1;
     });
     return map;
   });
@@ -3457,6 +3768,35 @@ export class PesajeService {
     };
   }
 
+  // Obtiene la evolución media mensual de peso de todo el hato
+  getEvolucionMensualHerd() {
+    const records = this.pesajesSignal();
+    if (records.length === 0) return { labels: [], datasets: [] };
+
+    const map = new Map<string, { suma: number, count: number }>();
+
+    records.forEach(r => {
+      const date = new Date(r.fecha_pesaje);
+      const key = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+      
+      if (!map.has(key)) map.set(key, { suma: 0, count: 0 });
+      const stats = map.get(key)!;
+      stats.suma += r.peso_kg;
+      stats.count += 1;
+    });
+
+    const sortedLabels = Array.from(map.keys()).sort();
+    const data = sortedLabels.map(k => {
+      const stats = map.get(k)!;
+      return Math.round(stats.suma / stats.count);
+    });
+
+    return {
+      labels: sortedLabels,
+      data: data
+    };
+  }
+
   private generateMockPesajes(): Pesaje[] {
     const mocks: Pesaje[] = [];
     const today = new Date();
@@ -3823,13 +4163,15 @@ export class SupabaseService {
 
   constructor() {
     // Inicialización del cliente Supabase
-    if (environment.supabaseUrl && environment.supabaseKey) {
+    if (environment.supabaseUrl && environment.supabaseKey && !environment.useMockData) {
       this.supabase = createClient(
         environment.supabaseUrl,
         environment.supabaseKey
       );
     } else {
-      console.warn('Credenciales de Supabase no encontradas. Ejecutando en MODO MOCK (Local Storage).');
+      const mode = environment.useMockData ? 'MODO MOCK (Forzado)' : 'MODO MOCK (Por falta de credenciales)';
+      console.warn(`Ejecutando en ${mode}. Almacenamiento local activo.`);
+      this.seedTestData();
     }
   }
 
@@ -3844,50 +4186,15 @@ export class SupabaseService {
    * Obtiene todos los registros de una tabla, con soporte para simulación Mock.
    */
   async getAll<T>(table: string) {
-    if (!this.supabase) {
+    if (!this.supabase || environment.useMockData) {
       const stored = localStorage.getItem(`mock_${table}`);
-      if (stored) {
-        let data = JSON.parse(stored) as T[];
-        // Enriquecemos los datos mock para que coincidan con los JOINS de Supabase real
-        data = await this.enrichMockData(table, data);
-        return { data, error: null };
-      }
-
-      const mockInitial: any = {
-        empresas: [
-          { id: 'emp-1', nombre: 'Ganadería Premium SL', nif: 'B12345678', created_at: new Date().toISOString() }
-        ],
-        fincas: [
-          { id: 'finca-1', empresa_id: 'emp-1', nombre: 'Finca Principal', ubicacion: 'Valle Central', created_at: new Date().toISOString() }
-        ],
-        bovinos: [
-          { id: '1', crotal: 'ES0123456789', nombre: 'Vaca Lola', raza: 'Limousin', sexo: 'Hembra', estado: 'Activo', fecha_nacimiento: '2023-01-01', finca_id: 'finca-1', created_at: new Date().toISOString() },
-          { id: '2', crotal: 'ES9876543210', nombre: 'Toro Gitano', raza: 'Charolais', sexo: 'Macho', estado: 'Activo', fecha_nacimiento: '2022-05-15', finca_id: 'finca-1', created_at: new Date().toISOString() },
-          { id: '3', crotal: 'ES4455667788', nombre: 'Ternera Linda', raza: 'Limousin Cross', sexo: 'Hembra', estado: 'Activo', fecha_nacimiento: '2024-02-10', finca_id: 'finca-1', created_at: new Date().toISOString() }
-        ],
-        lotes: [
-          { id: '1', finca_id: 'finca-1', nombre: 'Prado Alto', ubicacion: 'Zona Norte', created_at: new Date().toISOString() },
-          { id: '2', finca_id: 'finca-1', nombre: 'Recría Hembras', ubicacion: 'Cercado Central', created_at: new Date().toISOString() }
-        ],
-        reproduccion: [
-          { id: '1', bovino_id: '1', fecha_cubricion: '2026-01-15', tipo_cubricion: 'Monta Natural', fecha_parto_prevista: '2026-10-25', estado_gestacion: 'Confirmada' }
-        ],
-        sanidad: [
-          { id: '1', bovino_id: '1', fecha: '2026-03-20', tipo: 'Vacunación', producto: 'Bovilis Blue Tongue', observaciones: 'Anual obligatoria' }
-        ],
-        recria_pesajes: [
-          { id: '1', bovino_id: '1', fecha_pesaje: '2024-03-01', peso_kg: 45.0, tipo_pesaje: 'Nacimiento' },
-          { id: '2', bovino_id: '1', fecha_pesaje: '2024-04-10', peso_kg: 62.5, tipo_pesaje: 'Recría' }
-        ]
-      };
-      
-      const data = mockInitial[table] || [];
-      localStorage.setItem(`mock_${table}`, JSON.stringify(data));
-      const enriched = await this.enrichMockData(table, data);
-      return { data: enriched as T[], error: null };
+      let data = stored ? (JSON.parse(stored) as T[]) : [];
+      // Enriquecemos los datos mock para que coincidan con los JOINS de Supabase real
+      data = await this.enrichMockData(table, data);
+      return { data, error: null };
     }
     
-    // Consulta real a Supabase con ordenamiento por fecha de creación (Paginado para rendimiento)
+    // Consulta real a Supabase
     const { data, error } = await this.supabase
       .from(table)
       .select('*')
@@ -3924,7 +4231,7 @@ export class SupabaseService {
       ...payload 
     };
 
-    if (!this.supabase) {
+    if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
       const updated = [newRecord, ...data];
       localStorage.setItem(`mock_${table}`, JSON.stringify(updated));
@@ -3953,7 +4260,7 @@ export class SupabaseService {
    * Actualiza un registro existente mediante su ID.
    */
   async update<T>(table: string, id: string, payload: Partial<T>) {
-    if (!this.supabase) {
+    if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
       const index = data.findIndex((item: any) => item.id === id);
       if (index !== -1) {
@@ -3978,7 +4285,7 @@ export class SupabaseService {
    * Elimina un registro físicamente.
    */
   async delete(table: string, id: string) {
-    if (!this.supabase) {
+    if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
       const updated = data.filter((item: any) => item.id !== id);
       localStorage.setItem(`mock_${table}`, JSON.stringify(updated));
@@ -4077,6 +4384,166 @@ export class SupabaseService {
 
   async deletePesaje(id: string) {
     return this.delete('recria_pesajes', id);
+  }
+
+  /**
+   * Actualiza el lote de un bovino basándose en su peso (Lógica Determinista).
+   */
+  async updateBovinoLote(bovinoId: string, peso: number) {
+    let nuevoLoteId = '';
+    let nombreLote = '';
+
+    if (peso < 150) {
+      nuevoLoteId = 'UUID_LOTE_RECRIA_INICIAL';
+      nombreLote = 'Recría Inicial';
+    } else if (peso >= 150 && peso <= 300) {
+      nuevoLoteId = 'UUID_LOTE_DESARROLLO';
+      nombreLote = 'Desarrollo';
+    } else {
+      nuevoLoteId = 'UUID_LOTE_FINALIZACION';
+      nombreLote = 'Finalización';
+    }
+
+    try {
+      if (!this.supabase) {
+        // Mock Update
+        const { data: bovinos } = await this.getRawMock('bovinos');
+        const index = bovinos.findIndex((b: any) => b.id === bovinoId);
+        if (index !== -1) {
+          const oldLoteId = bovinos[index].lote_id;
+          bovinos[index].lote_id = nuevoLoteId;
+          localStorage.setItem('mock_bovinos', JSON.stringify(bovinos));
+          return { data: { id: nuevoLoteId, nombre: nombreLote, changed: oldLoteId !== nuevoLoteId }, error: null };
+        }
+        return { data: null, error: 'Animal no encontrado' };
+      }
+
+      // Supabase Update
+      const { data: currentBovino } = await this.supabase
+        .from('bovinos')
+        .select('lote_id')
+        .eq('id', bovinoId)
+        .single();
+
+      const { error } = await this.supabase
+        .from('bovinos')
+        .update({ lote_id: nuevoLoteId })
+        .eq('id', bovinoId);
+
+      if (error) throw error;
+
+      return { 
+        data: { 
+          id: nuevoLoteId, 
+          nombre: nombreLote, 
+          changed: currentBovino?.lote_id !== nuevoLoteId 
+        }, 
+        error: null 
+      };
+    } catch (e: any) {
+      console.error('Error en updateBovinoLote:', e);
+      return { data: null, error: e.message || 'Error técnico al actualizar lote' };
+    }
+  }
+
+  /**
+   * Genera un set de datos masivo y realista para demostración.
+   */
+  private seedTestData() {
+    if (localStorage.getItem('vacapp_seeded') === 'true') return;
+
+    const mockData: any = {
+      empresas: [
+        { id: 'emp-1', nombre: 'Ganadería Luxe Forest SL', nif: 'B12345678', created_at: new Date().toISOString() }
+      ],
+      fincas: [
+        { id: 'finca-1', empresa_id: 'emp-1', nombre: 'Hacienda Los Alcornocales', ubicacion: 'Sierra Gaditana', created_at: new Date().toISOString() },
+        { id: 'finca-2', empresa_id: 'emp-1', nombre: 'Dehesa El Robledo', ubicacion: 'Valle Norte', created_at: new Date().toISOString() }
+      ],
+      lotes: [
+        { id: 'lote-1', finca_id: 'finca-1', nombre: 'Prado de Engorde', ubicacion: 'Zona Sur', capacidad: 50 },
+        { id: 'lote-2', finca_id: 'finca-1', nombre: 'Recría Hembras', ubicacion: 'Cercado Norte', capacidad: 30 },
+        { id: 'lote-3', finca_id: 'finca-2', nombre: 'Maternidad', ubicacion: 'Corrales Centrales', capacidad: 20 },
+        { id: 'lote-4', finca_id: 'finca-2', nombre: 'Sementales', ubicacion: 'Paddock A', capacidad: 5 }
+      ],
+      bovinos: [],
+      recria_pesajes: [],
+      finanzas: [],
+      sanidad: [],
+      reproduccion: [],
+      tareas: []
+    };
+
+    // Generar 20 Bovinos
+    const razas = ['Limousin', 'Charolais', 'Angus', 'Retinta'];
+    for (let i = 1; i <= 20; i++) {
+        const id = `bov-${i}`;
+        const sexo = i % 2 === 0 ? 'Hembra' : 'Macho';
+        const raza = razas[Math.floor(Math.random() * razas.length)];
+        const lote_id = i <= 5 ? 'lote-1' : (i <= 10 ? 'lote-2' : (i <= 15 ? 'lote-3' : 'lote-4'));
+        const finca_id = i <= 10 ? 'finca-1' : 'finca-2';
+        
+        mockData.bovinos.push({
+            id,
+            crotal: `ES0${i}98765432${i}`,
+            nombre: `${sexo === 'Hembra' ? 'Vaca' : 'Toro'} ${i}`,
+            raza,
+            sexo,
+            finca_id,
+            lote_id,
+            estado_productivo: 'Alta',
+            estado_reproductivo: sexo === 'Hembra' ? 'Vacía' : null,
+            fecha_nacimiento: new Date(2022, Math.floor(Math.random() * 12), 1).toISOString(),
+            created_at: new Date().toISOString()
+        });
+
+        // Generar historial de pesajes para cada bovino (6 pesajes por animal)
+        let pesoBase = 45; // Nacimiento
+        for (let j = 0; j < 6; j++) {
+            const fecha = new Date();
+            fecha.setMonth(fecha.getMonth() - (6 - j));
+            pesoBase += 25 + Math.random() * 10;
+            mockData.recria_pesajes.push({
+                id: `pes-${id}-${j}`,
+                bovino_id: id,
+                fecha_pesaje: fecha.toISOString().split('T')[0],
+                peso_kg: Math.round(pesoBase),
+                tipo_pesaje: j === 0 ? 'Nacimiento' : 'Control'
+            });
+        }
+    }
+
+    // Generar Finanzas (12 meses)
+    for (let i = 0; i < 12; i++) {
+        const fecha = new Date();
+        fecha.setMonth(fecha.getMonth() - i);
+        const label = `${fecha.toLocaleString('default', { month: 'short' })} ${fecha.getFullYear()}`;
+        
+        mockData.finanzas.push({
+            id: `fin-i-${i}`,
+            tipo: 'Ingreso',
+            categoria: 'Venta',
+            monto: 5000 + Math.random() * 2000,
+            fecha: fecha.toISOString().split('T')[0],
+            descripcion: `Venta mensual ${label}`
+        });
+        mockData.finanzas.push({
+            id: `fin-g-${i}`,
+            tipo: 'Gasto',
+            categoria: 'Alimentación',
+            monto: 2500 + Math.random() * 1000,
+            fecha: fecha.toISOString().split('T')[0],
+            descripcion: `Gasto pienso ${label}`
+        });
+    }
+
+    // Guardar todo en LocalStorage
+    Object.keys(mockData).forEach(table => {
+        localStorage.setItem(`mock_${table}`, JSON.stringify(mockData[table]));
+    });
+
+    localStorage.setItem('vacapp_seeded', 'true');
+    console.log('✅ Base de datos simulada poblada correctamente con éxito.');
   }
 }
 
@@ -4185,140 +4652,398 @@ export class LoginComponent {
 ARCHIVO: .\frontend\src\app\features\dashboard\dashboard.component.ts
 ==================================================
 
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit, effect, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, 
-  IonButtons, IonMenuButton, IonBadge, IonProgressBar
+  IonButtons, IonMenuButton, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
+  IonIcon, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { GanadoService } from '../../core/services/ganado.service';
 import { FincaService } from '../../core/services/finca.service';
 import { ReproduccionService } from '../../core/services/reproduccion.service';
 import { SanidadService } from '../../core/services/sanidad.service';
+import { PesajeService } from '../../core/services/pesaje.service';
+import { FinanzasService } from '../../core/services/finanzas.service';
 import { OfflineSyncService } from '../../core/services/offline-sync.service';
 import { 
-  LucideAngularModule, PawPrint, Activity, Heart, ShieldAlert, Baby, ChevronDown
-} from 'lucide-angular';
+  Chart, registerables
+} from 'chart.js';
+import { addIcons } from 'ionicons';
+import { 
+  paw, heart, calendar, statsChart, alertCircle, 
+  trendingUp, trendingDown, wallet, scale, pieChart 
+} from 'ionicons/icons';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule, IonContent, IonHeader, IonToolbar, IonTitle, 
-    IonButtons, IonMenuButton, IonBadge, IonProgressBar,
-    LucideAngularModule
+    IonButtons, IonMenuButton, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
+    IonIcon, IonSkeletonText
   ],
   template: `
     <ion-header class="ion-no-border">
-      <ion-toolbar color="primary">
+      <ion-toolbar color="primary" class="luxe-toolbar">
         <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
+          <ion-menu-button class="text-white"></ion-menu-button>
         </ion-buttons>
-        <ion-title>Centro de Mando</ion-title>
+        <ion-title class="luxe-title">Centro de Inteligencia</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="luxe-bg-forest">
       <div class="luxe-container animate-fade-in pb-12">
         
-        <!-- Header de Bienvenida -->
-        <div class="dashboard-header-glass">
-          <div class="header-flex">
+        <!-- Header con Identidad -->
+        <div class="dashboard-header-bi mt-4">
+          <div class="header-flex-bi">
             <div>
-              <h1 class="text-3xl font-bold tracking-tight mb-1 color-dark">Resumen de mi Finca</h1>
-              <p class="flex items-center gap-2 color-medium text-lg">
-                <lucide-icon name="paw-print" size="18"></lucide-icon>
-                Viendo la finca: <strong>{{ finca()?.nombre }}</strong>
+              <h1 class="bi-title">Resumen Ejecutivo</h1>
+              <p class="bi-subtitle">
+                <ion-icon name="paw" class="icon-mr-sm"></ion-icon>
+                Finca actual: <strong>{{ finca()?.nombre || 'Cargando...' }}</strong>
               </p>
             </div>
-            <div class="status-chips">
-              <ion-badge *ngIf="!isOnline()" color="warning" class="glass-badge">
-                <lucide-icon name="alert-circle" size="14" class="icon-inline-baseline icon-mr-sm"></lucide-icon> Sin Internet (Modo Offline)
-              </ion-badge>
-              <div class="online-dot" [class.offline]="!isOnline()"></div>
-            </div>
-          </div>
-        </div>
-
-        <ion-progress-bar *ngIf="cargando()" type="indeterminate" class="luxe-progress"></ion-progress-bar>
-
-        <!-- KPI Grid Primario: Botones grandes y claros -->
-        <div class="dashboard-grid mt-6">
-          <div class="kpi-card-v2 animate-slide-up delay-100">
-            <div class="kpi-icon bg-forest"><lucide-icon name="paw-print" size="32"></lucide-icon></div>
-            <div class="kpi-data">
-              <span class="kpi-label">Vacas Totales</span>
-              <div class="kpi-value">{{ ganadoService.totalBovinos() }}</div>
-              <div class="kpi-sub">Animales registrados</div>
-            </div>
-          </div>
-
-          <div class="kpi-card-v2 animate-slide-up delay-200">
-            <div class="kpi-icon bg-earth"><lucide-icon name="heart" size="32"></lucide-icon></div>
-            <div class="kpi-data">
-              <span class="kpi-label">Días Abiertos</span>
-              <div class="kpi-value">{{ reproService.promedioDiasAbiertos() }}</div>
-              <div class="kpi-sub">Media de fertilidad</div>
-            </div>
-          </div>
-
-          <div class="kpi-card-v2 animate-slide-up delay-300" [class.alert-glow]="sanidadService.retirosActivos().length > 0">
-            <div class="kpi-icon" [ngClass]="sanidadService.retirosActivos().length > 0 ? 'bg-danger' : 'bg-secondary'">
-              <lucide-icon name="activity" size="32"></lucide-icon>
-            </div>
-            <div class="kpi-data">
-              <span class="kpi-label">Avisos Médicos</span>
-              <div class="kpi-value" [class.text-danger]="sanidadService.retirosActivos().length > 0">{{ sanidadService.retirosActivos().length }}</div>
-              <div class="kpi-sub font-bold">Ver alertas abajo</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Feed de Alertas Críticas: EL CABALLO DE BATALLA DE LA UX PARA EL GANADERO -->
-        <div class="action-center mt-12 animate-slide-up delay-400" *ngIf="sanidadService.retirosActivos().length > 0 || reproService.partosInminentes().length > 0">
-           <h2 class="section-title-luxe text-3xl uppercase color-danger"><lucide-icon name="alert-circle" size="28" class="icon-inline icon-mr"></lucide-icon> Avisos Urgentes de Hoy</h2>
-           
-           <div class="luxe-alert-row bg-red-glass border-left-danger" *ngFor="let a of sanidadService.retirosActivos()">
-              <lucide-icon name="shield-alert" class="text-danger" size="48"></lucide-icon>
-              <div class="alert-info">
-                <strong class="text-xl color-danger">PROHIBIDO ORDEÑAR/VENDER: {{ a.bovino?.nombre || 'Animal' }} ({{ a.bovino?.crotal }})</strong>
-                <span class="text-lg color-dark">Todavía está bajo los efectos de: <strong>{{ a.producto }}</strong>.</span>
+            <div class="bi-status">
+              <div class="online-indicator" [class.offline]="!isOnline()">
+                <span>{{ isOnline() ? 'Sincronizado' : 'Modo Offline' }}</span>
+                <div class="dot shadow-pulse"></div>
               </div>
-           </div>
-
-           <div class="luxe-alert-row bg-gold-glass border-left-tertiary" *ngFor="let p of reproService.partosInminentes()">
-              <lucide-icon name="baby" class="text-earth" size="48"></lucide-icon>
-              <div class="alert-info">
-                <strong class="text-xl color-secondary">PARTO PRÓXIMO: {{ p.bovino?.nombre || 'Vaca' }}</strong>
-                <span class="text-lg color-dark">Prepárate para el parto el día <strong>{{ p.fecha_parto_prevista | date:'dd de MMMM' }}</strong>.</span>
-              </div>
-           </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Mensaje de Bienvenida Rústico -->
-        <div *ngIf="sanidadService.retirosActivos().length === 0 && reproService.partosInminentes().length === 0" class="luxe-empty-state mt-lg">
-            <lucide-icon name="paw-print" size="64" class="color-muted opacity-80"></lucide-icon>
-            <h2 class="text-2xl color-muted">Todo está en orden hoy.</h2>
-            <p>No tienes alertas médicas ni partos previstos para esta semana.</p>
-        </div>
+        <!-- KPI GRID PRINCIPAL -->
+        <ion-grid class="ion-no-padding mt-4">
+          <ion-row>
+            <ion-col size="6" size-md="3">
+              <ion-card class="bi-kpi-card glass animate-slide-up">
+                <div class="kpi-mini-icon color-primary"><ion-icon name="paw"></ion-icon></div>
+                <div class="kpi-content">
+                  <span class="kpi-label">Hato Total</span>
+                  <h2 class="kpi-value" *ngIf="!cargando()">{{ totalBovinos() }}</h2>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi-value"></ion-skeleton-text>
+                </div>
+              </ion-card>
+            </ion-col>
+            <ion-col size="6" size-md="3">
+              <ion-card class="bi-kpi-card glass animate-slide-up delay-100">
+                <div class="kpi-mini-icon color-danger"><ion-icon name="heart"></ion-icon></div>
+                <div class="kpi-content">
+                  <span class="kpi-label">Gestantes</span>
+                  <h2 class="kpi-value" *ngIf="!cargando()">{{ gestacionesActivas().length }}</h2>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi-value"></ion-skeleton-text>
+                </div>
+              </ion-card>
+            </ion-col>
+            <ion-col size="6" size-md="3">
+              <ion-card class="bi-kpi-card glass animate-slide-up delay-200">
+                <div class="kpi-mini-icon color-tertiary"><ion-icon name="wallet"></ion-icon></div>
+                <div class="kpi-content">
+                  <span class="kpi-label">Margen Bruto</span>
+                  <h2 class="kpi-value" *ngIf="!cargando()">{{ saldoMensual() | number:'1.0-0' }}€</h2>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi-value"></ion-skeleton-text>
+                </div>
+              </ion-card>
+            </ion-col>
+            <ion-col size="6" size-md="3">
+              <ion-card class="bi-kpi-card glass animate-slide-up delay-300">
+                <div class="kpi-mini-icon color-secondary"><ion-icon name="scale"></ion-icon></div>
+                <div class="kpi-content">
+                  <span class="kpi-label">Peso Medio</span>
+                  <h2 class="kpi-value" *ngIf="!cargando()">{{ pesoMedio() }} kg</h2>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi-value"></ion-skeleton-text>
+                </div>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <!-- DASHBOARD DE GRÁFICOS -->
+        <ion-grid class="ion-no-padding mt-4">
+          <ion-row>
+            <!-- ÁREA CHART: EVOLUCIÓN PESO -->
+            <ion-col size="12" size-lg="8">
+              <ion-card class="bi-main-card animate-slide-up delay-400">
+                <ion-card-header>
+                  <div class="bi-card-head">
+                    <div>
+                      <ion-card-subtitle class="font-bold uppercase tracking-widest opacity-80">Evolución Ponderada</ion-card-subtitle>
+                      <ion-card-title class="text-2xl font-bold color-dark">Control de Masa Total</ion-card-title>
+                    </div>
+                    <div class="bi-mini-stat bg-primary-soft">
+                      <ion-icon name="trending-up"></ion-icon>
+                      <span>+8.2% este mes</span>
+                    </div>
+                  </div>
+                </ion-card-header>
+                <ion-card-content class="relative">
+                  <div *ngIf="cargando()" class="chart-skeleton">
+                    <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
+                  </div>
+                  <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <!-- DONUT CHART: DISTRIBUCIÓN -->
+            <ion-col size="12" size-lg="4">
+              <ion-card class="bi-main-card animate-slide-up delay-500">
+                <ion-card-header>
+                  <ion-card-subtitle class="font-bold uppercase tracking-widest opacity-80">Distribución</ion-card-subtitle>
+                  <ion-card-title class="text-2xl font-bold color-dark">Población por Lote</ion-card-title>
+                </ion-card-header>
+                <ion-card-content class="chart-container-donut">
+                  <div *ngIf="cargando()" class="chart-skeleton flex justify-center items-center">
+                    <ion-skeleton-text animated class="skeleton-chart-donut"></ion-skeleton-text>
+                  </div>
+                  <canvas #lotesChart [hidden]="cargando()"></canvas>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <!-- BAR CHART: FINANZAS -->
+            <ion-col size="12">
+              <ion-card class="bi-main-card animate-slide-up delay-600">
+                <ion-card-header>
+                  <ion-card-subtitle class="font-bold uppercase tracking-widest opacity-80">Gestión Económica</ion-card-subtitle>
+                  <ion-card-title class="text-2xl font-bold color-dark">Balance Mensual Comparativo</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <div *ngIf="cargando()" class="chart-skeleton">
+                    <ion-skeleton-text animated class="skeleton-chart-finance"></ion-skeleton-text>
+                  </div>
+                  <canvas #financeChart class="chart-canvas-finance" [hidden]="cargando()"></canvas>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
 
       </div>
     </ion-content>
-  `
+  `,
+  styles: []
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   fincaService = inject(FincaService);
   ganadoService = inject(GanadoService);
   reproService = inject(ReproduccionService);
   sanidadService = inject(SanidadService);
+  pesajeService = inject(PesajeService);
+  finanzasService = inject(FinanzasService);
   offlineSync = inject(OfflineSyncService);
   
   finca = this.fincaService.currentFinca;
   isOnline = this.offlineSync.isOnline;
   
-  cargando = computed(() => this.ganadoService.isLoading() || this.sanidadService.isLoading());
+  totalBovinos = this.ganadoService.totalBovinos;
+  gestacionesActivas = this.reproService.gestacionesActivas;
+  
+  cargando = computed(() => 
+    this.ganadoService.isLoading() || 
+    this.pesajeService.isLoading() || 
+    this.finanzasService.isLoading()
+  );
 
-  constructor() {}
+  saldoMensual = computed(() => {
+    const fin = this.finanzasService.getDatosFinancierosPorPeriodo('Mensual');
+    if (fin.length === 0) return 3450; // Mock si no hay datos para el KPI
+    const last = fin[fin.length - 1];
+    return last.ingresos - last.gastos;
+  });
+
+  pesoMedio = computed(() => {
+    const weights = this.pesajeService.records();
+    if (weights.length === 0) return 425;
+    const sum = weights.reduce((acc, p) => acc + p.peso_kg, 0);
+    return Math.round(sum / weights.length);
+  });
+
+  @ViewChild('weightChart') weightCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('lotesChart') lotesCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('financeChart') financeCanvas!: ElementRef<HTMLCanvasElement>;
+
+  private charts: any[] = [];
+
+  constructor() {
+    addIcons({ 
+      paw, heart, calendar, statsChart, alertCircle, 
+      trendingUp, trendingDown, wallet, scale, pieChart 
+    });
+
+    // Configuración Global de Chart.js
+    Chart.defaults.font.family = "'Outfit', sans-serif";
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+    Chart.defaults.plugins.tooltip.titleColor = '#1b4332';
+    Chart.defaults.plugins.tooltip.bodyColor = '#2b2d42';
+    Chart.defaults.plugins.tooltip.borderColor = 'rgba(0,0,0,0.05)';
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 12;
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.padding = 20;
+
+    // Reactividad a datos
+    effect(() => {
+      if (!this.cargando()) {
+        setTimeout(() => this.updateCharts(), 300);
+      }
+    });
+  }
+
+  ngOnInit() {}
+
+  ngAfterViewInit() {
+    this.initCharts();
+  }
+
+  ngOnDestroy() {
+    this.charts.forEach(c => c.destroy());
+  }
+
+  private initCharts() {
+    this.initWeightChart();
+    this.initLotesChart();
+    this.initFinanceChart();
+  }
+
+  private updateCharts() {
+    this.charts.forEach(c => c.destroy());
+    this.charts = [];
+    this.initCharts();
+  }
+
+  private initWeightChart() {
+    const ctx = this.weightCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const stats = this.pesajeService.getEvolucionMensualHerd();
+    
+    // Degradado "Apple style"
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(71, 103, 89, 0.4)');
+    gradient.addColorStop(1, 'rgba(71, 103, 89, 0)');
+
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: stats.labels as any,
+        datasets: [{
+          label: 'Peso Medio (kg)',
+          data: stats.data,
+          borderColor: 'rgba(71, 103, 89, 1)',
+          borderWidth: 4,
+          tension: 0.4,
+          fill: true,
+          backgroundColor: gradient,
+          pointBackgroundColor: 'rgba(71, 103, 89, 1)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { weight: 600 } } },
+          y: { 
+            grid: { display: false }, 
+            beginAtZero: false,
+            ticks: { font: { weight: 600 } }
+          }
+        }
+      }
+    });
+    this.charts.push(chart);
+  }
+
+  private initLotesChart() {
+    const ctx = this.lotesCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const dataMap = this.ganadoService.distLotes();
+    const labels = Object.keys(dataMap);
+    const data = Object.values(dataMap);
+
+    const chart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels as any,
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            'rgba(71, 103, 89, 1)', 
+            'rgba(212, 163, 115, 1)', 
+            '#e9edc9', 
+            '#bc6c25', 
+            '#8d99ae'
+          ],
+          borderWidth: 4,
+          borderColor: '#fff',
+          hoverOffset: 15
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: '75%',
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+    this.charts.push(chart);
+  }
+
+  private initFinanceChart() {
+    const ctx = this.financeCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const finData = this.finanzasService.getDatosFinancierosPorPeriodo('Mensual');
+    const labels = finData.map(d => d.label);
+    const ingresos = finData.map(d => d.ingresos);
+    const gastos = finData.map(d => d.gastos);
+
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels as any,
+        datasets: [
+          {
+            label: 'Ingresos (€)',
+            data: ingresos,
+            backgroundColor: 'rgba(71, 103, 89, 0.9)',
+            borderRadius: 6,
+            stack: 'Stack 0',
+          },
+          {
+            label: 'Gastos (€)',
+            data: gastos,
+            backgroundColor: 'rgba(188, 71, 73, 0.9)',
+            borderRadius: 6,
+            stack: 'Stack 0',
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: 'rgba(0,0,0,0.03)' }, beginAtZero: true }
+        }
+      }
+    });
+    this.charts.push(chart);
+  }
 }
 
 
@@ -4386,7 +5111,7 @@ import { add, close, save, pencil, trash } from 'ionicons/icons';
             <lucide-icon name="trending-up" class="text-forest/30" size="32"></lucide-icon>
           </div>
           <div class="chart-container-large">
-             <canvas baseChart [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
+             <canvas baseChart class="chart-canvas-finance" [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
           </div>
         </div>
 
@@ -4645,7 +5370,8 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
   IonLabel, IonIcon, IonNote, IonGrid, 
   IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
-  IonModal, IonButton, IonInput, IonSelect, IonSelectOption
+  IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
+  IonCard, IonCardHeader, IonCardContent, IonBadge
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Bovino, Lote } from '../../core/models/vacapp.models';
@@ -4653,7 +5379,8 @@ import { addIcons } from 'ionicons';
 import { 
   paw, list, add, close, save, person, 
   male, female, calendar, barChart, leaf,
-  pencil, trash, arrowForward, chevronForward, megaphone
+  pencil, trash, arrowForward, chevronForward, megaphone,
+  logoBuffer
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
@@ -4679,10 +5406,11 @@ import { computed, signal } from '@angular/core';
     IonLabel, IonIcon, IonNote, IonGrid, 
     IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
     IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
+    IonCard, IonCardHeader, IonCardContent, IonBadge,
     BaseChartDirective
   ],
   template: `
-    <ion-header class="ion-no-border">
+    <ion-header class="ion-no-border" [translucent]="true">
       <ion-toolbar color="primary" class="luxe-toolbar">
         <ion-buttons slot="start">
           <ion-menu-button class="text-white"></ion-menu-button>
@@ -4705,7 +5433,7 @@ import { computed, signal } from '@angular/core';
           </div>
         </div>
 
-        <!-- GRÁFICO DE PESO (Relocado) -->
+        <!-- GRÁFICO DE PESO -->
         <div class="analytics-card-large animate-slide-up mb-8" *ngIf="bovinos().length > 0">
           <div class="card-header-flex">
             <div>
@@ -4718,50 +5446,60 @@ import { computed, signal } from '@angular/core';
           </div>
         </div>
 
-        <ion-grid class="ion-no-padding">
+        <ion-grid class="ion-no-padding" *ngIf="bovinos().length > 0">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of bovinos()">
-              <div class="tag-body-luxe animate-slide-up">
-                <div class="card-header-flex">
-                  <div *ngIf="b.foto_url" class="card-icon-box bg-earth card-icon-box-img" [style.background-image]="'url(' + b.foto_url + ')'">
+              <ion-card class="pro-card-luxe animate-slide-up">
+                <ion-card-header>
+                  <div class="card-header-flex">
+                    <div *ngIf="b.foto_url" class="card-icon-box bg-earth card-icon-box-img" [style.background-image]="'url(' + b.foto_url + ')'">
+                    </div>
+                    <div *ngIf="!b.foto_url" class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
+                      <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
+                    </div>
+                    <div class="card-title-stack">
+                      <strong>{{ b.nombre }}</strong>
+                      <span>ID CROTAL: {{ b.crotal }}</span>
+                    </div>
+                    
+                    <ion-badge *ngIf="b.estado_reproductivo" 
+                      [color]="b.estado_reproductivo === 'Gestante' ? 'success' : (b.estado_reproductivo === 'Seca' ? 'medium' : 'primary')" 
+                      mode="ios" slot="end" class="badge-card-top">
+                      {{ b.estado_reproductivo }}
+                    </ion-badge>
                   </div>
-                  <div *ngIf="!b.foto_url" class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
-                    <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
-                  </div>
-                  <div class="card-title-stack">
-                    <strong>{{ b.nombre }}</strong>
-                    <span>ID CROTAL: {{ b.crotal }}</span>
-                  </div>
-                </div>
+                </ion-card-header>
 
-                <div class="card-data-grid">
-                  <div class="card-data-item">
-                    <span class="label">Categoría</span>
-                    <span class="value">{{ ganadoService.calculateCategoria(b) }}</span>
+                <ion-card-content>
+                  <div class="card-data-grid">
+                    <div class="card-data-item">
+                      <span class="label">Categoría</span>
+                      <span class="value">{{ ganadoService.calculateCategoria(b) }}</span>
+                    </div>
+                    <div class="card-data-item">
+                      <span class="label">Raza</span>
+                      <span class="value">{{ b.raza || 'Mestizo' }}</span>
+                    </div>
+                    <div class="card-data-item">
+                      <span class="label">Aptitud</span>
+                      <span class="value">{{ b.aptitud || 'No def.' }}</span>
+                    </div>
+                    <div class="card-data-item">
+                      <span class="label">Edad</span>
+                      <span class="value highlight font-heavy">{{ ganadoService.getEdadDesc(b) }}</span>
+                    </div>
                   </div>
-                  <div class="card-data-item">
-                    <span class="label">Raza</span>
-                    <span class="value">{{ b.raza || 'Mestizo' }} {{ b.porcentaje_pureza ? '(' + b.porcentaje_pureza + '%)' : '' }}</span>
-                  </div>
-                  <div class="card-data-item">
-                    <span class="label">Aptitud</span>
-                    <span class="value">{{ b.aptitud || 'No def.' }}</span>
-                  </div>
-                  <div class="card-data-item">
-                    <span class="label">Edad</span>
-                    <span class="value highlight text-lg font-heavy">{{ ganadoService.getEdadDesc(b) }}</span>
-                  </div>
-                </div>
 
-                <div class="card-footer-actions">
-                  <ion-button fill="clear" (click)="openEditModal(b)" color="dark">
-                    <ion-icon name="pencil" slot="start"></ion-icon> Editar
-                  </ion-button>
-                  <ion-button fill="clear" (click)="confirmDelete(b.id)" color="danger">
-                    <ion-icon name="trash" slot="start"></ion-icon> Borrar
-                  </ion-button>
-                </div>
-              </div>
+                  <div class="card-footer-actions-bi mt-4">
+                    <ion-button fill="clear" (click)="openEditModal(b)" color="dark" size="small">
+                      <ion-icon name="pencil" slot="start"></ion-icon> Editar
+                    </ion-button>
+                    <ion-button fill="clear" (click)="confirmDelete(b.id)" color="danger" size="small">
+                      <ion-icon name="trash" slot="start"></ion-icon> Borrar
+                    </ion-button>
+                  </div>
+                </ion-card-content>
+              </ion-card>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -4769,9 +5507,9 @@ import { computed, signal } from '@angular/core';
         <!-- Estado Vacío -->
         <div *ngIf="bovinos().length === 0" class="luxe-empty-state">
           <div class="empty-icon-ring">
-            <ion-icon name="paw"></ion-icon>
+            <ion-icon name="logo-buffer"></ion-icon>
           </div>
-          <h2>Sin ejemplares</h2>
+          <h2>No hay animales registrados</h2>
           <p>Comienza registrando tu primer animal en el sistema.</p>
           <ion-button fill="solid" (click)="openAddModal()" class="btn-luxe-save">
             <ion-icon name="add" slot="start"></ion-icon> Añadir Ejemplar
@@ -4858,15 +5596,9 @@ import { computed, signal } from '@angular/core';
                 <ion-item class="luxe-input">
                   <ion-label position="stacked">Raza Prima *</ion-label>
                   <ion-select formControlName="raza" interface="popover">
-                    <ion-select-option value="Cruce / Mestizo">Cruce / Mestizo</ion-select-option>
-                    <ion-select-option value="Angus">Angus</ion-select-option>
-                    <ion-select-option value="Brahman">Brahman</ion-select-option>
-                    <ion-select-option value="Charolais">Charolais</ion-select-option>
-                    <ion-select-option value="Hereford">Hereford</ion-select-option>
-                    <ion-select-option value="Holstein">Holstein</ion-select-option>
-                    <ion-select-option value="Limousin">Limousin</ion-select-option>
-                    <ion-select-option value="Pardo Suizo">Pardo Suizo</ion-select-option>
-                    <ion-select-option value="Otro">Otro (Especificar)</ion-select-option>
+                    <ion-select-option *ngFor="let raza of ganadoService.constants.RAZAS_BOVINAS" [value]="raza">
+                      {{ raza }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
                 <ion-item class="luxe-input" *ngIf="bovinoForm.get('raza')?.value !== 'Cruce / Mestizo' && bovinoForm.get('raza')?.value !== 'Otro'">
@@ -4876,10 +5608,9 @@ import { computed, signal } from '@angular/core';
                 <ion-item class="luxe-input">
                   <ion-label position="stacked">Aptitud Principal *</ion-label>
                   <ion-select formControlName="aptitud" interface="popover">
-                    <ion-select-option value="Carne">Producción de Carne</ion-select-option>
-                    <ion-select-option value="Leche">Producción Lechera</ion-select-option>
-                    <ion-select-option value="Doble Propósito">Doble Propósito</ion-select-option>
-                    <ion-select-option value="Trabajo/Lidia">Trabajo / Lidia</ion-select-option>
+                    <ion-select-option *ngFor="let apt of ganadoService.constants.APTITUDES_BOVINAS" [value]="apt">
+                      {{ apt }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
                 <ion-item class="luxe-input">
@@ -4905,10 +5636,9 @@ import { computed, signal } from '@angular/core';
                 <ion-item class="luxe-input">
                   <ion-label position="stacked">Estado Productivo</ion-label>
                   <ion-select formControlName="estado_productivo" interface="popover">
-                    <ion-select-option value="Alta">Alta Confirmada (Finca)</ion-select-option>
-                    <ion-select-option value="Baja Venta">Baja por Venta</ion-select-option>
-                    <ion-select-option value="Baja Muerte">Baja por Naturaleza/Muerte</ion-select-option>
-                    <ion-select-option value="Baja Descarte">Baja por Descarte Sanitario</ion-select-option>
+                    <ion-select-option *ngFor="let st of ganadoService.constants.ESTADOS_PRODUCTIVOS" [value]="st.value">
+                      {{ st.label }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
                 
@@ -4916,10 +5646,9 @@ import { computed, signal } from '@angular/core';
                 <ion-item class="luxe-input" *ngIf="bovinoForm.get('sexo')?.value === 'Hembra'">
                   <ion-label position="stacked">Estado Reproductivo</ion-label>
                   <ion-select formControlName="estado_reproductivo" interface="popover">
-                    <ion-select-option value="Vacía">Vacía / Abierta</ion-select-option>
-                    <ion-select-option value="Gestante">Gestante Conf.</ion-select-option>
-                    <ion-select-option value="Lactante">Lactante (Parida)</ion-select-option>
-                    <ion-select-option value="Seca">Seca</ion-select-option>
+                    <ion-select-option *ngFor="let sr of ganadoService.constants.ESTADOS_REPRODUCTIVOS" [value]="sr.value">
+                      {{ sr.label }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
               </div>
@@ -4947,7 +5676,8 @@ import { computed, signal } from '@angular/core';
         </ng-template>
       </ion-modal>
     </ion-content>
-  `
+  `,
+  styles: []
 })
 export class GanadoComponent implements OnInit {
   public ganadoService = inject(GanadoService);
@@ -4989,7 +5719,7 @@ export class GanadoComponent implements OnInit {
   bovinoForm: FormGroup;
 
   constructor() {
-    addIcons({ paw, list, add, close, save, person, male, female, calendar, barChart, leaf, pencil, trash, arrowForward, chevronForward, megaphone });
+    addIcons({ paw, list, add, close, save, person, male, female, calendar, barChart, leaf, pencil, trash, arrowForward, chevronForward, megaphone, logoBuffer });
     this.bovinoForm = this.fb.group({
       nombre: ['', Validators.required],
       crotal: ['', Validators.required],
@@ -5410,23 +6140,26 @@ ARCHIVO: .\frontend\src\app\features\recria\recria.component.ts
 
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { 
-  IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
-  IonLabel, IonIcon, IonGrid, 
-  IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
-  IonModal, IonButton, IonInput, IonSelect, IonSelectOption, 
-  IonSpinner
-} from '@ionic/angular/standalone';
-import { SupabaseService } from '../../core/services/supabase.service';
-import { Pesaje, Bovino } from '../../core/models/vacapp.models';
+  IonicModule, 
+  AlertController, 
+  ToastController 
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { 
-  fitness, scale, add, close, save, pencil, trash, 
-  trendingUp, calendar, barChart, leaf, paw, speedometer,
-  trendingDown
+  speedometer, trendingDown, person, search, male, 
+  female, chevronForward, trash, add, close, scale, 
+  barChart, fitness, save, pencil, trendingUp, calendar, leaf, paw 
 } from 'ionicons/icons';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AlertController, ToastController } from '@ionic/angular/standalone';
+
+import { SupabaseService } from '../../core/services/supabase.service';
+import { GanadoService } from '../../core/services/ganado.service';
+import { PesajeService } from '../../core/services/pesaje.service';
+import { Bovino } from '../../core/models/vacapp.models';
+
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
  * Componente para el Módulo de Recría y Control de Pesaje - Versión Rústica.
@@ -5435,14 +6168,7 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
 @Component({
   selector: 'app-recria',
   standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule,
-    IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
-    IonLabel, IonIcon, IonGrid, 
-    IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
-    IonModal, IonButton, IonInput, IonSelect, IonSelectOption, 
-    IonSpinner
-  ],
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, BaseChartDirective],
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar color="primary" class="luxe-toolbar">
@@ -5462,69 +6188,120 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
             <ion-icon name="speedometer"></ion-icon>
           </div>
           <div class="luxe-text-stack">
-            <h1 class="page-h1-rustic">Control de Pesaje</h1>
-            <p class="page-p-rustic">Monitoreo de crecimiento y ganancia de masa.</p>
+            <h1 class="page-h1-rustic">{{ selectedBovino ? selectedBovino.nombre : 'Control de Pesaje' }}</h1>
+            <p class="page-p-rustic">
+              {{ selectedBovino ? 'Evolución de peso: ' + selectedBovino.crotal : 'Selecciona un animal para gestionar su rendimiento.' }}
+            </p>
           </div>
-        </div>
-
-        <div *ngIf="loading" class="luxe-loading-state">
-          <ion-spinner name="crescent" color="primary"></ion-spinner>
-          <p>Sincronizando con báscula...</p>
-        </div>
-
-        <!-- Listado de Pesajes -->
-        <ion-grid class="ion-no-padding" *ngIf="!loading && pesajes.length > 0">
-          <ion-row>
-            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajes">
-              <div class="weight-card-body-luxe animate-slide-up">
-                <div class="card-header-flex">
-                  <div class="card-icon-box bg-tertiary">
-                     <ion-icon name="speedometer"></ion-icon>
-                  </div>
-                  <div class="card-title-stack">
-                    <strong>{{ p.bovino?.nombre || 'Ejemplar S/N' }}</strong>
-                    <span>{{ p.bovino?.crotal || 'S/N' }} - {{ p.fecha_pesaje | date:'dd MMM yyyy' }}</span>
-                  </div>
-                </div>
-
-                <div class="card-data-grid">
-                  <div class="card-data-item">
-                    <span class="label">Masa Actual</span>
-                    <span class="value highlight">{{ p.peso_kg }} <small>KG</small></span>
-                  </div>
-                  <div class="card-data-item" *ngIf="p.gain !== null">
-                     <span class="label">Balance</span>
-                     <span class="value" [ngClass]="p.gain >= 0 ? 'color-forest' : 'color-danger'">
-                        <ion-icon [name]="p.gain >= 0 ? 'trending-up' : 'trending-down'"></ion-icon>
-                        {{ p.gain > 0 ? '+' : '' }}{{ p.gain | number:'1.1-2' }} kg
-                     </span>
-                  </div>
-                </div>
-
-                <div class="card-footer-actions">
-                  <ion-button fill="clear" disabled color="dark" class="opacity-80 text-xs">
-                    <ion-icon name="bar-chart" slot="start"></ion-icon> {{ p.tipo_pesaje }}
-                  </ion-button>
-                  <ion-button fill="clear" (click)="deletePesaje(p.id)" color="danger">
-                    <ion-icon name="trash" slot="start"></ion-icon> Borrar
-                  </ion-button>
-                </div>
-              </div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-
-        <!-- Estado Vacío -->
-        <div *ngIf="!loading && pesajes.length === 0" class="luxe-empty-state">
-          <div class="empty-icon-ring">
-            <ion-icon name="scale"></ion-icon>
-          </div>
-          <h2>Báscula Lista</h2>
-          <p>No se han registrado pesajes aún.</p>
-          <ion-button fill="solid" (click)="setOpen(true)" class="btn-luxe-save">
-            <ion-icon name="add" slot="start"></ion-icon> Registrar Pesaje
+          <ion-button *ngIf="selectedBovino" fill="clear" (click)="selectedBovino = null" color="dark" slot="end" class="mt-4">
+             <ion-icon name="close" slot="start"></ion-icon> Cambiar Animal
           </ion-button>
         </div>
+
+        <!-- LISTADO DE ANIMALES PARA SELECCIÓN -->
+        <div *ngIf="!selectedBovino" class="animate-fade-in">
+           <div class="rustic-search-wrapper mb-6">
+              <ion-icon name="search" class="rustic-search-icon"></ion-icon>
+              <input 
+                type="text" 
+                placeholder="Buscar por crotal o nombre..." 
+                class="rustic-search-input-field"
+                [(ngModel)]="searchTerm">
+           </div>
+
+           <ion-grid class="ion-no-padding">
+              <ion-row>
+                 <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+                    <ion-card class="pro-card-luxe animate-slide-up cursor-pointer" (click)="selectBovino(b)" tabindex="0" (keydown.enter)="selectBovino(b)">
+                       <ion-card-header>
+                          <div class="card-header-flex">
+                             <div *ngIf="b.foto_url" class="card-icon-box bg-earth card-icon-box-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
+                             <div *ngIf="!b.foto_url" class="card-icon-box" [ngClass]="b.sexo === 'Macho' ? 'bg-secondary' : 'bg-primary'">
+                                <ion-icon [name]="b.sexo === 'Macho' ? 'male' : 'female'"></ion-icon>
+                             </div>
+                             <div class="card-title-stack">
+                                <strong>{{ b.nombre }}</strong>
+                                <span>Crotal: {{ b.crotal }}</span>
+                             </div>
+                             <ion-icon name="chevron-forward" class="opacity-30" slot="end" style="margin-left:auto;"></ion-icon>
+                          </div>
+                       </ion-card-header>
+                       <ion-card-content>
+                          <div class="card-data-grid">
+                            <div class="card-data-item">
+                              <span class="label">Categoría</span>
+                              <span class="value">{{ ganadoService.calculateCategoria(b) }}</span>
+                            </div>
+                            <div class="card-data-item">
+                              <span class="label">Raza</span>
+                              <span class="value">{{ b.raza || 'Mestizo' }}</span>
+                            </div>
+                          </div>
+                       </ion-card-content>
+                    </ion-card>
+                 </ion-col>
+              </ion-row>
+           </ion-grid>
+        </div>
+
+        <!-- VISTA DETALLE DEL ANIMAL SELECCIONADO -->
+        <div *ngIf="selectedBovino" class="animate-fade-in">
+           
+           <!-- MÉTRICAS CLAVE -->
+           <ion-grid class="ion-no-padding mb-8">
+              <ion-row>
+                 <ion-col size="12" size-md="6">
+                    <div class="metric-card-luxe bg-white">
+                       <span class="label">Último Peso</span>
+                       <span class="value">{{ getUltimoPeso() }} <small>KG</small></span>
+                    </div>
+                 </ion-col>
+                 <ion-col size="12" size-md="6">
+                    <div class="metric-card-luxe bg-white">
+                       <span class="label">GMD (Ganancia Diaria)</span>
+                       <span class="value" [ngClass]="getGMD() >= 0 ? 'color-forest' : 'color-danger'">
+                          {{ getGMD() > 0 ? '+' : '' }}{{ getGMD() | number:'1.2-2' }} <small>kg/día</small>
+                       </span>
+                    </div>
+                 </ion-col>
+              </ion-row>
+           </ion-grid>
+
+           <!-- GRÁFICO INDIVIDUAL -->
+           <div class="analytics-card-large mb-8">
+              <div class="card-header-flex">
+                 <h3 class="card-title-luxe">Curva de Crecimiento Individual</h3>
+              </div>
+              <div class="chart-container-large">
+                 <canvas baseChart [data]="chartDataIndividual" [options]="chartOptions" [type]="'line'"></canvas>
+              </div>
+           </div>
+
+           <!-- HISTORIAL -->
+           <h2 class="luxe-section-title">Historial de Pesadas</h2>
+           <div class="history-panel-bi">
+              <div *ngFor="let p of pesajesFiltrados" class="weight-card-row animate-slide-up">
+                 <div class="card-content-flex">
+                    <div class="date-box">
+                       <strong>{{ p.fecha_pesaje | date:'dd' }}</strong>
+                       <span>{{ p.fecha_pesaje | date:'MMM' }}</span>
+                    </div>
+                    <div class="data-box">
+                       <span class="weight">{{ p.peso_kg }} KG</span>
+                       <span class="type">{{ p.tipo_pesaje }}</span>
+                    </div>
+                    <ion-button fill="clear" color="danger" (click)="deletePesaje(p.id)" class="ml-auto">
+                       <ion-icon name="trash" slot="icon-only"></ion-icon>
+                    </ion-button>
+                 </div>
+              </div>
+           </div>
+
+           <div *ngIf="pesajesFiltrados.length === 0" class="luxe-empty-state">
+              <p>No hay pesajes registrados para este animal.</p>
+           </div>
+        </div>
+
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
@@ -5556,12 +6333,8 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
 
             <form [formGroup]="pesajeForm" (ngSubmit)="onSubmit()">
               <ion-item class="luxe-input">
-                <ion-label position="stacked">Seleccionar Animal *</ion-label>
-                <ion-select formControlName="bovino_id" placeholder="Ejemplar a pesar" interface="popover">
-                  <ion-select-option *ngFor="let b of bovinos" [value]="b.id">
-                    {{ b.crotal }} - {{ b.nombre }}
-                  </ion-select-option>
-                </ion-select>
+                <ion-label position="stacked">Animal Seleccionado</ion-label>
+                <ion-input [value]="selectedBovino?.nombre + ' (' + selectedBovino?.crotal + ')'" [readonly]="true"></ion-input>
               </ion-item>
 
               <div class="luxe-item-group">
@@ -5578,10 +6351,9 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
               <ion-item class="luxe-input">
                  <ion-label position="stacked">Tipo Control</ion-label>
                  <ion-select formControlName="tipo_pesaje" interface="popover">
-                   <ion-select-option value="Nacimiento">Nacimiento</ion-select-option>
-                   <ion-select-option value="Destete">Destete</ion-select-option>
-                   <ion-select-option value="Recría">Recría</ion-select-option>
-                   <ion-select-option value="Finalización">Finalización</ion-select-option>
+                   <ion-select-option *ngFor="let t of ganadoService.constants.TIPOS_PESAJE" [value]="t">
+                     {{ t }}
+                   </ion-select-option>
                  </ion-select>
               </ion-item>
 
@@ -5599,46 +6371,104 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
   `
 })
 export class RecriaComponent implements OnInit {
-  private supabase = inject(SupabaseService);
+  private supa = inject(SupabaseService);
+  public ganadoService = inject(GanadoService);
+  private pesajeService = inject(PesajeService);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
 
-  pesajes: any[] = [];
-  bovinos: Bovino[] = [];
-  loading = true;
+  selectedBovino: Bovino | null = null;
+  searchTerm: string = '';
+  
+  pesajesFiltrados: any[] = [];
+  loading = false;
   isModalOpen = false;
   pesajeForm: FormGroup;
 
+  // Datos para el gráfico individual
+  chartDataIndividual: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
+  chartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, title: { display: true, text: 'KG' } },
+      x: { grid: { display: false } }
+    }
+  };
+
   constructor() {
-    addIcons({ fitness, scale, add, close, save, pencil, trash, trendingUp, trendingDown, calendar, barChart, leaf, paw, speedometer });
+    addIcons({ 
+      fitness, scale, add, close, save, pencil, trash, 
+      trendingUp, trendingDown, calendar, barChart, 
+      leaf, paw, speedometer, person, search, male, female, chevronForward 
+    });
     this.pesajeForm = this.fb.group({
       bovino_id: ['', Validators.required],
+      peso_kg: ['', [Validators.required, Validators.min(1)]],
       fecha_pesaje: [new Date().toISOString().split('T')[0], Validators.required],
-      peso_kg: ['', [Validators.required, Validators.min(0.1)]],
-      tipo_pesaje: ['Recría', Validators.required]
+      tipo_pesaje: ['Recría', Validators.required],
+      notas: ['']
     });
   }
 
   async ngOnInit() {
-    await this.loadData();
+    // No necesitamos cargar nada aquí ya que GanadoService ya tiene los bovinos
   }
 
-  async loadData() {
-    this.loading = true;
-    try {
-      const [pesajesRes, bovinosRes] = await Promise.all([
-        this.supabase.getPesajes(),
-        this.supabase.getAll<Bovino>('bovinos')
-      ]);
+  filteredBovinos() {
+    const term = this.searchTerm.toLowerCase();
+    return this.ganadoService.bovinosAlta().filter(b => 
+      b.nombre?.toLowerCase().includes(term) || 
+      b.crotal?.toLowerCase().includes(term)
+    );
+  }
 
-      this.bovinos = (bovinosRes.data || []).filter(b => b.estado_productivo === 'Alta');
-      this.pesajes = this.processPesajes(pesajesRes.data || []);
-    } catch (error) {
-      this.showToast('Error de sincronización', 'danger');
-    } finally {
-      this.loading = false;
-    }
+  selectBovino(b: Bovino) {
+    this.selectedBovino = b;
+    this.updateIndividualHistory();
+  }
+
+  updateIndividualHistory() {
+    if (!this.selectedBovino) return;
+    
+    // Filtrar pesajes para este animal
+    const hist = this.pesajeService.records().filter(p => p.bovino_id === this.selectedBovino?.id)
+      .sort((a, b) => new Date(b.fecha_pesaje).getTime() - new Date(a.fecha_pesaje).getTime());
+    
+    this.pesajesFiltrados = hist;
+
+    // Actualizar Gráfico
+    const plotData = [...hist].sort((a, b) => new Date(a.fecha_pesaje).getTime() - new Date(b.fecha_pesaje).getTime());
+    this.chartDataIndividual = {
+      labels: plotData.map(p => new Date(p.fecha_pesaje).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })),
+      datasets: [{
+        label: 'Peso (KG)',
+        data: plotData.map(p => p.peso_kg),
+        borderColor: '#bc6c25',
+        backgroundColor: 'rgba(188, 108, 37, 0.1)',
+        fill: true,
+        tension: 0.4
+      }]
+    };
+  }
+
+  getUltimoPeso(): string {
+    return this.pesajesFiltrados[0]?.peso_kg || '0';
+  }
+
+  getGMD(): number {
+    if (this.pesajesFiltrados.length < 2) return 0;
+    const last = this.pesajesFiltrados[0];
+    const prev = this.pesajesFiltrados[1];
+    
+    const d1 = new Date(last.fecha_pesaje);
+    const d2 = new Date(prev.fecha_pesaje);
+    const diffDays = (d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24);
+    
+    if (diffDays <= 0) return 0;
+    return (last.peso_kg - prev.peso_kg) / diffDays;
   }
 
   processPesajes(data: any[]) {
@@ -5661,12 +6491,11 @@ export class RecriaComponent implements OnInit {
 
   setOpen(isOpen: boolean) {
     this.isModalOpen = isOpen;
-    if (!isOpen) {
-      this.pesajeForm.reset({
+    if (isOpen && this.selectedBovino) {
+      this.pesajeForm.patchValue({
+        bovino_id: this.selectedBovino.id,
         fecha_pesaje: new Date().toISOString().split('T')[0],
-        tipo_pesaje: 'Recría',
-        bovino_id: '',
-        peso_kg: ''
+        tipo_pesaje: 'Recría'
       });
     }
   }
@@ -5675,35 +6504,39 @@ export class RecriaComponent implements OnInit {
     if (this.pesajeForm.invalid) return;
 
     try {
-      const res = await this.supabase.createPesaje(this.pesajeForm.value);
-      if (res.error) {
-        this.showToast('Error al guardar: ' + res.error, 'danger');
+      const pesajeData = this.pesajeForm.value;
+      const { error } = await this.supa.createPesaje(pesajeData);
+      
+      if (error) {
+        this.showToast('Error al guardar: ' + error, 'danger');
       } else {
-        this.showToast('Registro completado');
+        this.showToast('Peso registrado correctamente');
         this.setOpen(false);
-        await this.loadData();
+        await this.pesajeService.loadPesajes();
+        this.updateIndividualHistory();
       }
     } catch (e) {
-      this.showToast('Error técnico', 'danger');
+      this.showToast('Error técnico al procesar el pesaje', 'danger');
     }
   }
 
   async deletePesaje(id: string) {
     const alert = await this.alertCtrl.create({
-      header: 'Eliminar Registro',
-      message: '¿Confirma el borrado?',
+      header: 'Confirmar eliminación',
+      message: '¿Estás seguro de que deseas borrar este pesaje?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        { 
-          text: 'Eliminar', 
+        {
+          text: 'Eliminar',
           role: 'destructive',
           handler: async () => {
-            const res = await this.supabase.deletePesaje(id);
-            if (res.error) {
-              this.showToast('Error al eliminar: ' + res.error, 'danger');
+            const { error } = await this.supa.delete('pesajes_individuales', id);
+            if (error) {
+              this.showToast('Error al eliminar', 'danger');
             } else {
-              this.showToast('Registro eliminado', 'warning');
-              await this.loadData();
+              this.showToast('Pesaje eliminado');
+              await this.pesajeService.loadPesajes();
+              this.updateIndividualHistory();
             }
           }
         }
@@ -5737,7 +6570,7 @@ import {
   IonLabel, IonBadge, IonIcon,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
   IonButton, IonInput, IonSelect, IonSelectOption,
-  IonGrid, IonRow, IonCol
+  IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardContent
 } from '@ionic/angular/standalone';
 import { BaseChartDirective } from 'ng2-charts';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -5750,6 +6583,8 @@ import {
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 import { ReproduccionService } from '../../core/services/reproduccion.service';
+import { GanadoService } from '../../core/services/ganado.service';
+import { METODOS_REPRODUCCION, ESTADOS_GESTACION } from '../../core/constants/vaca.constants';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
@@ -5763,10 +6598,11 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonItem, IonLabel, IonBadge, IonIcon,
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal, IonButton,
-    IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol, BaseChartDirective
+    IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol, IonCard, 
+    IonCardHeader, IonCardContent, BaseChartDirective
   ],
   template: `
-    <ion-header class="ion-no-border">
+    <ion-header class="ion-no-border" [translucent]="true">
       <ion-toolbar color="primary" class="luxe-toolbar">
         <ion-buttons slot="start">
           <ion-menu-button class="text-white"></ion-menu-button>
@@ -5789,12 +6625,12 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
           </div>
         </div>
 
-        <!-- GRÁFICO DE FERTILIDAD (Relocado) -->
+        <!-- GRÁFICO DE FERTILIDAD -->
         <div class="analytics-card-large animate-slide-up mb-8">
           <div class="card-header-flex">
             <div>
               <h3 class="card-title-luxe"><ion-icon name="heart" class="icon-inline-baseline icon-mr color-danger"></ion-icon> Preñeces con éxito</h3>
-              <p class="card-subtitle-luxe">Compara cuántas vacas quedaron preñadas vs las que fallaron.</p>
+              <p class="card-subtitle-luxe">Análisis de efectividad en ciclos reproductivos.</p>
             </div>
           </div>
           <div class="chart-container-large">
@@ -5803,64 +6639,88 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
         </div>
 
         <h2 class="luxe-section-title">Próximos Partos</h2>
-        <ion-grid class="ion-no-padding">
+        
+        <!-- Estado Vacío -->
+        <div *ngIf="gestacionesActivas.length === 0" class="luxe-empty-state">
+          <div class="empty-icon-ring">
+            <ion-icon name="logo-buffer"></ion-icon>
+          </div>
+          <h2>No hay animales registrados</h2>
+          <p>La lista de gestaciones confirmadas está vacía.</p>
+        </div>
+
+        <ion-grid class="ion-no-padding" *ngIf="gestacionesActivas.length > 0">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of gestacionesActivas">
-              <div class="repro-card-body-luxe animate-slide-up">
-                <div class="card-header-flex">
-                  <div class="card-icon-box bg-danger">
-                    <ion-icon name="pulse"></ion-icon>
+              <ion-card class="pro-card-luxe animate-slide-up">
+                <ion-card-header>
+                  <div class="card-header-flex">
+                    <div class="card-icon-box bg-danger">
+                      <ion-icon name="pulse"></ion-icon>
+                    </div>
+                    <div class="card-title-stack">
+                      <strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong>
+                      <span>Parto: {{ getDaysToCalving(r) }} d restantes</span>
+                    </div>
+                    <ion-badge color="success" slot="end" mode="ios">Gestante</ion-badge>
                   </div>
-                  <div class="card-title-stack">
-                    <strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong>
-                    <span>ID: {{ r.bovino?.crotal }} - Parto: {{ getDaysToCalving(r) }} d</span>
-                  </div>
-                </div>
+                </ion-card-header>
 
-                <div class="card-data-grid">
-                  <div class="card-data-item">
-                    <span class="label">Parto Previsto</span>
-                    <span class="value highlight">{{ r.fecha_parto_prevista | date:'dd/MM/yyyy' }}</span>
+                <ion-card-content>
+                  <div class="card-data-grid">
+                    <div class="card-data-item">
+                      <span class="label">Parto Previsto</span>
+                      <span class="value highlight">{{ r.fecha_parto_prevista | date:'dd MMM yyyy' }}</span>
+                    </div>
+                    <div class="card-data-item">
+                      <span class="label">Método</span>
+                      <span class="value">{{ r.tipo_cubricion }}</span>
+                    </div>
                   </div>
-                  <div class="card-data-item">
-                    <span class="label">Método</span>
-                    <span class="value">{{ r.tipo_cubricion }}</span>
-                  </div>
-                </div>
 
-                <div class="card-footer-actions">
-                  <ion-button fill="clear" (click)="openEditModal(r)" color="dark">
-                    <ion-icon name="pencil" slot="start"></ion-icon> Gestionar
-                  </ion-button>
-                  <ion-button fill="clear" (click)="confirmDelete(r)" color="danger">
-                    <ion-icon name="trash" slot="start"></ion-icon> Borrar
-                  </ion-button>
-                </div>
-              </div>
+                  <div class="card-footer-actions-bi mt-4">
+                    <ion-button fill="clear" (click)="openEditModal(r)" color="dark" size="small">
+                      <ion-icon name="pencil" slot="start"></ion-icon> Editar
+                    </ion-button>
+                    <ion-button fill="clear" (click)="confirmDelete(r)" color="danger" size="small">
+                      <ion-icon name="trash" slot="start"></ion-icon> Borrar
+                    </ion-button>
+                  </div>
+                </ion-card-content>
+              </ion-card>
             </ion-col>
           </ion-row>
         </ion-grid>
 
-        <h2 class="luxe-section-title">Historial Reproductivo</h2>
-        <div class="history-panel-luxe">
-           <div class="history-row-luxe" *ngFor="let r of reproducciones">
-              <div class="history-avatar-luxe">
-                <ion-icon name="female"></ion-icon>
-              </div>
-              <div class="history-data-luxe">
-                <h4>{{ r.bovino?.nombre }} <small>({{ r.bovino?.crotal }})</small></h4>
-                <p>{{ r.tipo_cubricion }} - {{ r.fecha_cubricion | date:'dd/MM/yyyy' }}</p>
-              </div>
-              <div class="history-actions-luxe">
-                <ion-badge [color]="getStatusColor(r.estado_gestacion)" mode="ios">
-                  {{ r.estado_gestacion }}
-                </ion-badge>
-                <div class="btn-group-history">
-                   <ion-button fill="clear" (click)="openEditModal(r)"><ion-icon name="pencil"></ion-icon></ion-button>
-                   <ion-button fill="clear" (click)="confirmDelete(r)"><ion-icon name="trash" color="danger"></ion-icon></ion-button>
+        <h2 class="luxe-section-title mt-8">Historial Reproductivo</h2>
+        
+        <!-- Historial en Tarjetas Pro -->
+        <div class="history-panel-bi" *ngIf="reproducciones.length > 0">
+           <ion-card class="pro-card-row animate-slide-up" *ngFor="let r of reproducciones">
+              <ion-item lines="none" class="item-card-pro">
+                <div class="history-avatar-bi bg-earth-soft" slot="start">
+                  <ion-icon name="female"></ion-icon>
                 </div>
-              </div>
-           </div>
+                <ion-label>
+                  <h3 class="font-bold">{{ r.bovino?.nombre }} <small class="opacity-60">({{ r.bovino?.crotal }})</small></h3>
+                  <p>{{ r.tipo_cubricion }} • {{ r.fecha_cubricion | date:'dd/MM/yyyy' }}</p>
+                </ion-label>
+                <div slot="end" class="flex flex-col items-end gap-2">
+                  <ion-badge [color]="getStatusColor(r.estado_gestacion)" mode="ios">
+                    {{ r.estado_gestacion }}
+                  </ion-badge>
+                  <div class="action-buttons-mini">
+                    <ion-button fill="clear" (click)="openEditModal(r)" size="small"><ion-icon name="pencil" slot="icon-only"></ion-icon></ion-button>
+                    <ion-button fill="clear" (click)="confirmDelete(r)" size="small" color="danger"><ion-icon name="trash" slot="icon-only"></ion-icon></ion-button>
+                  </div>
+                </div>
+              </ion-item>
+           </ion-card>
+        </div>
+
+        <div *ngIf="reproducciones.length === 0" class="luxe-empty-state">
+           <ion-icon name="logo-buffer" class="text-6xl opacity-20"></ion-icon>
+           <p>No hay historial registrado.</p>
         </div>
 
       </div>
@@ -5896,7 +6756,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
               <ion-item class="luxe-input">
                 <ion-label position="stacked">Identificar Hembra *</ion-label>
                 <ion-select formControlName="bovino_id" placeholder="Seleccionar hembra" interface="popover">
-                  <ion-select-option *ngFor="let b of vacas" [value]="b.id">
+                  <ion-select-option *ngFor="let b of ganadoService.hembrasActivas()" [value]="b.id">
                     {{ b.nombre }} ({{ b.crotal }})
                   </ion-select-option>
                 </ion-select>
@@ -5916,18 +6776,18 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
               <ion-item class="luxe-input">
                 <ion-label position="stacked">Metodología</ion-label>
                 <ion-select formControlName="tipo_cubricion" interface="popover">
-                  <ion-select-option value="Monta Natural">Monta Natural</ion-select-option>
-                  <ion-select-option value="Inseminación Artificial">Inseminación Artificial</ion-select-option>
+                  <ion-select-option *ngFor="let m of METODOS" [value]="m">
+                    {{ m }}
+                  </ion-select-option>
                 </ion-select>
               </ion-item>
 
               <ion-item class="luxe-input">
                 <ion-label position="stacked">Estado Gestación</ion-label>
                 <ion-select formControlName="estado_gestacion" interface="popover">
-                  <ion-select-option value="Pendiente">Pendiente</ion-select-option>
-                  <ion-select-option value="Confirmada">Confirmada</ion-select-option>
-                  <ion-select-option value="Parido">Parido</ion-select-option>
-                  <ion-select-option value="Fallida">Fallida</ion-select-option>
+                  <ion-select-option *ngFor="let eg of ESTADOS" [value]="eg">
+                    {{ eg }}
+                  </ion-select-option>
                 </ion-select>
               </ion-item>
               
@@ -5945,7 +6805,11 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 })
 export class ReproduccionComponent implements OnInit {
   private supa = inject(SupabaseService);
+  public ganadoService = inject(GanadoService);
   private reproService = inject(ReproduccionService);
+
+  public readonly METODOS = METODOS_REPRODUCCION;
+  public readonly ESTADOS = ESTADOS_GESTACION;
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
@@ -5973,7 +6837,6 @@ export class ReproduccionComponent implements OnInit {
   
   reproducciones: Reproduccion[] = [];
   gestacionesActivas: Reproduccion[] = [];
-  vacas: Bovino[] = [];
   
   isModalOpen = false;
   editingItem: Reproduccion | null = null;
@@ -6003,10 +6866,7 @@ export class ReproduccionComponent implements OnInit {
   async loadData() {
     try {
       const { data: repros } = await this.supa.getReproduccion();
-      const { data: females } = await this.supa.getFemales();
-      
       this.reproducciones = repros || [];
-      this.vacas = females || [];
       this.gestacionesActivas = this.reproducciones.filter(r => r.estado_gestacion === 'Confirmada');
     } catch (e) {
       console.error('Error cargando datos reproductivos:', e);
@@ -6137,6 +6997,7 @@ import {
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
+import { GanadoService } from '../../core/services/ganado.service';
 
 /**
  * Componente para el Módulo de Sanidad Animal - Versión Rústica.
@@ -6284,7 +7145,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
               <ion-item class="luxe-input">
                 <ion-label position="stacked">Identificar Ejemplar *</ion-label>
                 <ion-select formControlName="bovino_id" placeholder="Seleccionar animal" interface="popover">
-                  <ion-select-option *ngFor="let b of bovinos" [value]="b.id">
+                  <ion-select-option *ngFor="let b of ganadoService.bovinosAlta()" [value]="b.id">
                     {{ b.nombre }} ({{ b.crotal }})
                   </ion-select-option>
                 </ion-select>
@@ -6298,10 +7159,9 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                 <ion-item class="luxe-input half">
                   <ion-label position="stacked">Tipo de Evento</ion-label>
                   <ion-select formControlName="tipo" interface="popover">
-                    <ion-select-option value="Vacunación">Vacunación</ion-select-option>
-                    <ion-select-option value="Desparasitación">Desparasitación</ion-select-option>
-                    <ion-select-option value="Saneamiento">Saneamiento</ion-select-option>
-                    <ion-select-option value="Enfermedad">Enfermedad</ion-select-option>
+                    <ion-select-option *ngFor="let tipo of ganadoService.constants.TIPOS_EVENTO_SANIDAD" [value]="tipo">
+                      {{ tipo }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
               </div>
@@ -6351,13 +7211,13 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 })
 export class SanidadComponent implements OnInit {
   private supa = inject(SupabaseService);
+  public ganadoService = inject(GanadoService);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   
   sanidadRecords: Sanidad[] = [];
   filteredSanidad: Sanidad[] = [];
-  bovinos: Bovino[] = [];
   
   isModalOpen = false;
   editingItem: Sanidad | null = null;
@@ -6389,11 +7249,8 @@ export class SanidadComponent implements OnInit {
   async loadData() {
     try {
       const { data: records } = await this.supa.getSanidad();
-      const { data: bovs } = await this.supa.getAll<Bovino>('bovinos');
-      
       this.sanidadRecords = records || [];
       this.filteredSanidad = [...this.sanidadRecords];
-      this.bovinos = (bovs || []).filter(b => b.estado_productivo === 'Alta');
     } catch (e) {
       console.error('Error cargando datos sanitarios:', e);
     }
@@ -6541,7 +7398,8 @@ ARCHIVO: .\frontend\src\environments\environment.ts
 export const environment = {
   production: false,
   supabaseUrl: '',
-  supabaseKey: ''
+  supabaseKey: '',
+  useMockData: true
 };
 
 
@@ -6575,9 +7433,11 @@ ARCHIVO: .\frontend\src\styles\main.scss
 
 // 4. Características (Módulos de negocio)
 @use 'features/dashboard';
+@use 'features/ganado';
 @use 'features/manejo';
 @use 'features/reproduccion';
 @use 'features/sanidad';
+@use 'features/recria';
 
 // 5. Utility classes (Optional)
 // .u-mb-4 { margin-bottom: 1rem; }
@@ -6648,6 +7508,20 @@ $breakpoints: (
   }
 }
 
+// Animations base
+@mixin animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .5;
+    }
+  }
+}
+
 
 ==================================================
 ARCHIVO: .\frontend\src\styles\abstracts\_variables.scss
@@ -6656,7 +7530,7 @@ ARCHIVO: .\frontend\src\styles\abstracts\_variables.scss
 // Colores - Paleta Rústica y Natural Vibrante
 $primary-color: #1b4332;   // Verde Bosque Profundo
 $secondary-color: #582f0e; // Marrón Tierra Oscuro
-$tertiary-color: #d4a373;  // Arena/Canela Suave (Harmonious accent)
+$tertiary-color: #d4a373;  // Color Trigo/Arena (Súper acento principal para íconos y selecciones)
 $success-color: #40916c;   // Verde Éxito Natural y Suave
 $warning-color: #dda15e;   // Naranja Cosecha Muteado
 $danger-color: #bc4749;    // Rojo Ladrillo/Arcilla
@@ -6678,26 +7552,39 @@ $font-size-lg: 1.1rem;
 $font-size-sm: 0.75rem;
 $line-height-base: 1.4;
 
+// Z-indexes
+$z-index-base: 10;
+$z-index-overlay: 100;
+$z-index-modal: 1000;
+
+// Layout
+$header-height: 70px;
+
 // Spacing
-$spacing-xs: 0.15rem;
-$spacing-sm: 0.35rem;
-$spacing-md: 0.75rem;
-$spacing-lg: 1.25rem;
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
 $spacing-xl: 2rem;
 
-// Borders & Radius (Muted, more rustic)
-$border-radius-sm: 4px;
-$border-radius-md: 8px;
-$border-radius-lg: 12px;
+// Borders & Radius (Premium)
+$border-radius-sm: 6px;
+$border-radius-md: 12px;
+$border-radius-lg: 16px;
 $border-radius-full: 9999px;
 
-// Shadows (Subtle, realistic, not rustic/exaggerated)
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md: 0 2px 4px -1px rgba(0, 0, 0, 0.08);
-$shadow-lg: 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+// Focus & Accesibilidad (Ring design)
+$focus-ring-width: 3px;
+$focus-ring-color: rgba($tertiary-color, 0.6); // Wheat color para los bordes de selección
+
+// Shadows (Premium, deep but soft)
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.03);
+$shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
+$shadow-focus: 0 0 0 $focus-ring-width $focus-ring-color;
 
 // Transitions
-$transition-base: all 0.2s ease-in-out;
+$transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
 
 ==================================================
@@ -6968,7 +7855,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   padding: 1rem;
   box-shadow: variables.$shadow-sm;
   border: 1px solid variables.$gray-200;
-  border-left: 6px solid var(--ion-color-secondary);
+  border-left: 6px solid var(--ion-color-tertiary); /* Wheat left border */
   margin: 8px;
   position: relative;
   transition: all 0.3s ease;
@@ -6999,10 +7886,26 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   color: variables.$white;
   flex-shrink: 0;
   
-  &.bg-primary { background: var(--ion-color-primary); }
-  &.bg-secondary { background: var(--ion-color-secondary); }
-  &.bg-tertiary { background: var(--ion-color-tertiary); color: variables.$secondary-color; ion-icon, lucide-icon { color: variables.$secondary-color !important; } }
-  &.bg-danger { background: var(--ion-color-danger); }
+  &.bg-primary { 
+    background: var(--ion-color-primary); 
+    color: var(--ion-color-tertiary); 
+    ion-icon { color: var(--ion-color-tertiary) !important; }
+  }
+  &.bg-secondary { 
+    background: var(--ion-color-secondary); 
+    color: var(--ion-color-tertiary); 
+    ion-icon { color: var(--ion-color-tertiary) !important; }
+  }
+  &.bg-tertiary { 
+    background: rgba(var(--ion-color-tertiary-rgb), 0.2); 
+    color: var(--ion-color-tertiary); 
+    ion-icon { color: var(--ion-color-tertiary) !important; } 
+  }
+  &.bg-danger { 
+    background: var(--ion-color-danger); 
+    color: var(--ion-color-tertiary); 
+    ion-icon { color: var(--ion-color-tertiary) !important; }
+  }
 }
 
 .card-title-stack {
@@ -7080,8 +7983,10 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   gap: 12px;
   cursor: pointer;
 
-  &:hover {
-    border-color: rgba(variables.$secondary-color, 0.2);
+  &:hover, &:focus-visible {
+    border-color: rgba(var(--ion-color-tertiary-rgb), 0.5);
+    outline: none;
+    box-shadow: variables.$shadow-focus;
   }
 }
 
@@ -7112,6 +8017,24 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 }
 
 .luxe-panel-dark h3 { color: variables.$white; }
+
+/* PRO CARD LUXE */
+.pro-card-luxe { 
+  border-radius: 20px; 
+  border-left: 5px solid var(--ion-color-primary); 
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  margin: 12px 8px;
+  background: variables.$white;
+}
+
+.pro-card-row {
+  border-radius: 16px;
+  border-left: 5px solid var(--ion-color-primary);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  margin-bottom: 12px;
+  overflow: hidden;
+  background: variables.$white;
+}
 
 
 ==================================================
@@ -7253,8 +8176,8 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
 
   &.item-has-focus {
     --background: #{variables.$white};
-    border-color: var(--ion-color-secondary);
-    box-shadow: 0 6px 20px rgba(variables.$secondary-color, 0.15);
+    border-color: var(--ion-color-tertiary);
+    box-shadow: variables.$shadow-focus;
   }
 
   ion-label {
@@ -7272,7 +8195,7 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
   }
   
   ion-select::part(icon) {
-    color: var(--ion-color-secondary);
+    color: var(--ion-color-tertiary);
     opacity: 1;
     width: 24px;
     height: 24px;
@@ -7292,11 +8215,22 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
 
 .btn-luxe-save {
   --background: var(--ion-color-primary);
-  --color: #{variables.$white};
+  --color: var(--ion-color-tertiary);
   --border-radius: 14px;
   height: 52px;
   font-weight: 800;
   box-shadow: 0 8px 20px rgba(variables.$primary-color, 0.2);
+  transition: variables.$transition-base;
+  
+  &:hover {
+    --background: var(--ion-color-primary-shade);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(variables.$primary-color, 0.3);
+  }
+
+  ion-icon {
+    color: var(--ion-color-tertiary);
+  }
 }
 
 
@@ -7315,13 +8249,13 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
 }
 
 .rustic-search-wrapper:focus-within {
-  box-shadow: 0 15px 40px rgba(variables.$secondary-color, 0.15);
-  border-color: var(--ion-color-secondary);
+  box-shadow: variables.$shadow-focus;
+  border-color: var(--ion-color-tertiary);
   transform: translateY(-2px);
 }
 
 .rustic-search-icon {
-  color: var(--ion-color-secondary);
+  color: variables.$gray-600;
   font-size: 20px;
   margin-right: 12px;
   transition: transform 0.4s ease, color 0.4s ease;
@@ -7329,7 +8263,7 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
 
 .rustic-search-wrapper:focus-within .rustic-search-icon {
   transform: scale(1.1) rotate(5deg);
-  color: var(--ion-color-primary);
+  color: var(--ion-color-tertiary);
 }
 
 .rustic-search-input-field {
@@ -7373,7 +8307,7 @@ ion-popover.select-popover {
   }
 
   ion-radio {
-    --color-checked: var(--ion-color-secondary);
+    --color-checked: var(--ion-color-tertiary);
   }
 }
 
@@ -7594,6 +8528,34 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
   padding: 20px;
 }
 
+/* 16. IMAGES & CONTAINERS */
+.luxe-img-container {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 16px;
+  background: variables.$gray-100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+
+  &.avatar {
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+  }
+}
+
 
 ==================================================
 ARCHIVO: .\frontend\src\styles\core\_ionic.scss
@@ -7606,19 +8568,22 @@ ARCHIVO: .\frontend\src\styles\core\_ionic.scss
   --ion-color-primary-rgb: 45, 90, 39;
   --ion-color-primary-contrast: #{variables.$white};
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: darken($primary-color, 10%);
-  --ion-color-primary-tint: lighten($primary-color, 10%);
+  --ion-color-primary-shade: darken(variables.$primary-color, 10%);
+  --ion-color-primary-tint: lighten(variables.$primary-color, 10%);
 
   --ion-color-secondary: #{variables.$secondary-color};
   --ion-color-secondary-rgb: 124, 92, 78;
   --ion-color-secondary-contrast: #{variables.$white};
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: darken($secondary-color, 10%);
-  --ion-color-secondary-tint: lighten($secondary-color, 10%);
+  --ion-color-secondary-shade: darken(variables.$secondary-color, 10%);
+  --ion-color-secondary-tint: lighten(variables.$secondary-color, 10%);
 
   --ion-color-tertiary: #{variables.$tertiary-color};
-  --ion-color-tertiary-rgb: 141, 182, 0;
+  --ion-color-tertiary-rgb: 212, 163, 115;
   --ion-color-tertiary-contrast: #{variables.$white};
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: darken(variables.$tertiary-color, 10%);
+  --ion-color-tertiary-tint: lighten(variables.$tertiary-color, 10%);
   
   --ion-color-success: #{variables.$success-color};
   --ion-color-warning: #{variables.$warning-color};
@@ -7632,6 +8597,86 @@ ARCHIVO: .\frontend\src\styles\core\_ionic.scss
 // Side menu customization
 ion-menu {
   --ion-background-color: #{variables.$white};
+}
+
+// Global utility classes to replace inline styles
+
+.skeleton-kpi-value {
+  width: 60%;
+  height: 24px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.skeleton-chart-main {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
+}
+
+.skeleton-chart-donut {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+}
+
+.skeleton-chart-finance {
+  width: 100%;
+  height: 250px;
+  border-radius: 8px;
+}
+
+.chart-canvas-main {
+  width: 100%;
+  height: 300px;
+}
+
+.chart-canvas-finance {
+  width: 100%;
+  height: 250px;
+}
+
+// Standardized Toolbar for modern luxe theme
+.luxe-toolbar {
+  --background: #{variables.$primary-color};
+  --color: #{variables.$white};
+  height: variables.$header-height;
+  --min-height: #{variables.$header-height};
+  display: flex;
+  align-items: center;
+}
+
+.luxe-title {
+  font-family: variables.$font-family-base;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  font-size: 1.2rem;
+}
+
+/* SHARED LUXE UTILITIES */
+.luxe-bg-forest { 
+  --background: #fefae0; 
+  background: #fefae0;
+}
+
+.card-footer-actions-bi { 
+  border-top: 1px solid rgba(0,0,0,0.05); 
+  padding-top: 10px; 
+  display: flex; 
+  gap: 8px; 
+}
+
+.luxe-container {
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.luxe-header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 2rem;
 }
 
 
@@ -7691,13 +8736,15 @@ ion-menu ion-item {
 
 // Estado SELECCIONADO del ítem
 ion-menu ion-item.selected {
-  // Fondo suave con el color primario
-  --background: rgba(#{45, 90, 39}, 0.1); 
-  --color: #{variables.$primary-color};
-  font-weight: 600;
+  // Fondo suave con el color tertiary (Wheat)
+  --background: rgba(var(--ion-color-tertiary-rgb), 0.15); 
+  --color: #{variables.$tertiary-color};
+  font-weight: 800;
+  border-right: 4px solid variables.$tertiary-color;
+  border-radius: variables.$border-radius-sm 0 0 variables.$border-radius-sm;
 
   ion-icon {
-    color: variables.$primary-color; // Icono en verde al estar seleccionado
+    color: variables.$tertiary-color; // Icono en trigo al estar seleccionado
   }
 }
 
@@ -7742,334 +8789,219 @@ ion-toolbar {
 ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
 ==================================================
 
-@use '../abstracts/variables';
+// _dashboard.scss
+// Dashboard Features - Luxe-Forest Theme
 
-// ==========================================================================
-// Dashboard Elite AgriTech 2.0 (Glassmorphism & Rústico-Luxe)
-// ==========================================================================
+@use '../abstracts/variables' as v;
+@use '../abstracts/mixins' as m;
+
+// .luxe-toolbar moved to core/_ionic.scss for global standardization
+
+.bi-title {
+  font-family: v.$font-family-base;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: v.$black;
+  margin-bottom: 0px;
+  letter-spacing: -0.5px;
+}
+
+.bi-subtitle {
+  font-family: v.$font-family-base;
+  font-size: 1.1rem;
+  color: v.$medium-color;
+  margin-top: 4px;
+}
+
+.bi-kpi-card {
+  border-radius: 16px;
+  margin: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+.kpi-mini-icon {
+  font-size: 2rem;
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: v.$gray-600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.kpi-value {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: v.$black;
+}
+
+.bi-main-card {
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  margin: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.bi-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.bi-mini-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: v.$primary-color;
+}
+
+.bg-primary-soft {
+  background: rgba(27, 67, 50, 0.1);
+}
+
+.chart-container-donut {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.chart-skeleton {
+  height: 100%;
+  width: 100%;
+  min-height: 250px;
+}
+
+.online-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: v.$success-color;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 6px 14px;
+  border-radius: 20px;
+
+  &.offline {
+    color: v.$danger-color;
+    .dot {
+      background: v.$danger-color;
+    }
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: v.$success-color;
+    border-radius: 50%;
+  }
+}
+
+
+==================================================
+ARCHIVO: .\frontend\src\styles\features\_ganado.scss
+==================================================
+
+// _ganado.scss
+// Ganado Features - Luxe-Forest Theme
+
+@use '../abstracts/variables' as v;
+@use '../abstracts/mixins' as m;
 
 .luxe-bg-forest {
-    --background: #{variables.$light-color}; 
-    background: #{variables.$light-color};
+  --background: v.$light-color;
 }
 
-// ------------------------------------
-// Page Headers (Títulos de vista principales)
-// ------------------------------------
-.luxe-header-content {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    padding-top: 1.5rem; // Espacio superior extra para alejarlo del header de app
+.pro-card-luxe {
+  border-radius: 20px;
+  border-left: 5px solid v.$primary-color;
+  box-shadow: v.$shadow-sm;
+  margin: 12px 8px;
+  background: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-    .luxe-text-stack {
-        display: flex;
-        flex-direction: column;
-
-        .page-h1-rustic {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: variables.$dark-color;
-            margin: 0 0 6px 0;
-            letter-spacing: -0.5px;
-            line-height: 1.1;
-        }
-        
-        .page-p-rustic {
-            font-size: 1.1rem;
-            color: variables.$gray-600;
-            margin: 0;
-            font-weight: 500;
-        }
-    }
-
-    .luxe-icon-box {
-        width: 64px;
-        height: 64px;
-        min-width: 64px; // Previene colapso flex
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 16px rgba(variables.$black, 0.15); // Sombra más prominente
-        
-        // Tamaños consistentes para Lucide/Ionic
-        lucide-icon, ion-icon {
-            font-size: 32px !important;
-            width: 32px !important;
-            height: 32px !important;
-        }
-
-        &.bg-forest { 
-            background: variables.$primary-color; 
-            color: variables.$white; 
-            lucide-icon, ion-icon { color: variables.$white !important; }
-        }
-        &.bg-earth { 
-            background: variables.$tertiary-color; 
-            // Para "earth" usamos color oscuro contraste alto natural
-            color: variables.$secondary-color; 
-            lucide-icon, ion-icon { color: variables.$secondary-color !important; }
-        }
-        &.bg-secondary { 
-            background: variables.$secondary-color; 
-            color: variables.$white; 
-            lucide-icon, ion-icon { color: variables.$white !important; }
-        }
-    }
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: v.$shadow-md;
+  }
 }
 
-.dashboard-header-glass {
-    padding: 2.5rem 1.5rem;
-    background: #{variables.$white};
-    border-radius: 0 0 2rem 2rem;
-    border-bottom: 2px solid rgba(variables.$primary-color, 0.1);
-    box-shadow: 0 6px 15px rgba(variables.$black, 0.05);
-    margin-bottom: 2rem;
-
-    .header-flex {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap; // Responsive
-        gap: 1rem;
-        transition: transform 0.3s ease;
-    }
-    
-    &:hover {
-        box-shadow: 0 10px 30px rgba(variables.$black, 0.08);
-    }
-
-    .status-chips {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .time-filter-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-        background: #{variables.$white};
-        border: 2px solid variables.$primary-color;
-        border-radius: 20px;
-        padding: 4px 12px;
-        box-shadow: 0 4px 10px rgba(variables.$black, 0.05);
-
-        .luxe-time-select {
-            background: transparent;
-            color: variables.$primary-color;
-            border: none;
-            outline: none;
-            appearance: none;
-            padding: 8px 30px 8px 12px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            
-            option { background: variables.$white; color: variables.$dark-color; }
-        }
-
-        .select-icon {
-            position: absolute;
-            right: 12px;
-            pointer-events: none;
-            color: variables.$primary-color;
-            font-weight: bold;
-        }
-    }
-
-    .glass-badge {
-        background: variables.$warning-color;
-        color: variables.$white;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 600;
-        box-shadow: 0 4px 8px rgba(variables.$black, 0.1);
-    }
+.badge-card-top {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 12px;
 }
 
-.online-dot {
-    width: 10px;
-    height: 10px;
-    background: #52b788;
+.card-footer-actions-bi {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 10px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+// Animal image handling
+.card-icon-box-img {
+  background-size: cover;
+  background-position: center;
+  border-radius: 14px;
+}
+
+// Empty state improvements
+.luxe-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+
+  .empty-icon-ring {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    box-shadow: 0 0 10px #52b788;
-    &.offline {
-        background: #ef4444;
-        box-shadow: 0 0 10px #ef4444;
-    }
-}
-
-// KPI Cards V2
-.kpi-card-v2 {
-    background: #{variables.$white};
-    border: 1px solid rgba(variables.$primary-color, 0.1);
-    border-radius: 24px;
-    padding: 1.5rem;
+    background: rgba(v.$primary-color, 0.1);
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(variables.$black, 0.04);
+    justify-content: center;
+    font-size: 3rem;
+    color: v.$primary-color;
+    margin-bottom: 24px;
+    @include m.animate-pulse;
+  }
 
-    &:hover {
-        background: rgba(variables.$primary-color, 0.02);
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(variables.$black, 0.08);
-    }
+  h2 {
+    font-family: v.$font-family-base;
+    color: v.$black;
+    font-weight: 700;
+  }
 
-    .kpi-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        box-shadow: 0 8px 16px rgba(variables.$black,0.2);
-        
-        &.bg-forest { background: variables.$primary-color; }
-        &.bg-earth { background: variables.$tertiary-color; color: variables.$dark-color; }
-        &.bg-danger { background: variables.$danger-color; }
-        &.bg-secondary { background: variables.$secondary-color; }
-    }
-
-    .kpi-data {
-        .kpi-label {
-            display: block;
-            font-size: 0.95rem;
-            color: variables.$gray-600;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-        .kpi-value {
-            font-size: 2.2rem;
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 6px;
-            color: variables.$dark-color;
-        }
-        .kpi-sub {
-            font-size: 0.85rem;
-            color: variables.$primary-color;
-            font-weight: 500;
-        }
-    }
-
-    &.alert-glow {
-        box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
-        animation: pulse-border 2s infinite;
-    }
-}
-
-@keyframes pulse-border {
-    0% { border-color: rgba(239, 68, 68, 0.2); }
-    50% { border-color: rgba(239, 68, 68, 0.5); }
-    100% { border-color: rgba(239, 68, 68, 0.2); }
-}
-
-// Action Center (Alertas)
-.section-title-luxe {
-    color: variables.$dark-color;
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    padding-left: 0.5rem;
-}
-
-.luxe-alert-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.2rem 1.5rem;
-    border-radius: 16px;
-    margin-bottom: 1rem;
-    border: 2px solid transparent;
-    box-shadow: 0 4px 10px rgba(variables.$black, 0.05);
-    background: variables.$white;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    &:hover {
-        transform: scale(1.01) translateY(-2px);
-        box-shadow: 0 10px 25px rgba(variables.$black, 0.08);
-    }
-
-    &.bg-red-glass { border-color: rgba(variables.$danger-color, 0.3); border-left: 8px solid variables.$danger-color; }
-    &.bg-gold-glass { border-color: rgba(variables.$warning-color, 0.3); border-left: 8px solid variables.$warning-color; }
-
-    .alert-info {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        strong { color: variables.$dark-color; display: block; font-size: 1.25rem !important; margin-bottom: 4px; }
-        span { font-size: 1.05rem !important; color: variables.$gray-600; }
-    }
-}
-
-// Analíticas Modulares: Grid principal y Grid ampliado (360)
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.dashboard-grid-large {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    
-    @media (min-width: 992px) {
-        // En pantallas grandes, dos gráficas arriba y una estirada, o dos y dos.
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-.analytics-card-large {
-    background: variables.$white;
-    border: 1px solid rgba(variables.$primary-color, 0.1);
-    border-radius: 24px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(variables.$black, 0.05);
-    transition: transform 0.3s ease;
-
-    &:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(variables.$black, 0.08); }
-
-    .card-header-flex {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 1.5rem;
-    }
-
-    .card-title-luxe {
-        color: variables.$dark-color;
-        font-size: 1.5rem;
-        font-weight: 800;
-        margin: 0;
-    }
-
-    .card-subtitle-luxe {
-        color: variables.$gray-600;
-        font-size: 1rem;
-        font-weight: 500;
-        margin: 4px 0 0 0;
-    }
-
-    .chart-container-large {
-        height: 350px;
-        width: 100%;
-    }
-}
-
-.luxe-progress {
-    --background: rgba(255,255,255,0.1);
-    --progress-background: #52b788;
-    height: 4px;
+  p {
+    color: v.$gray-600;
+    max-width: 300px;
+    margin-bottom: 30px;
+  }
 }
 
 
@@ -8438,6 +9370,200 @@ ARCHIVO: .\frontend\src\styles\features\_manejo.scss
 
 
 ==================================================
+ARCHIVO: .\frontend\src\styles\features\_recria.scss
+==================================================
+
+/* --- Módulo de Recría y Control de Pesaje --- */
+
+.animal-selection-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border-color: var(--ion-color-primary);
+  }
+
+  .card-header-flex {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .card-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    
+    &.bg-primary { background: var(--ion-color-primary); }
+    &.bg-secondary { background: var(--ion-color-secondary); }
+  }
+
+  .card-title-stack {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    strong {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    span {
+      font-size: 0.85rem;
+      color: #666;
+      font-weight: 500;
+    }
+  }
+}
+
+/* MÉTRICAS DE RENDIMIENTO */
+.metric-card-luxe {
+  padding: 1.5rem;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  border: 1px solid rgba(0,0,0,0.02);
+
+  .label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    font-weight: 600;
+  }
+
+  .value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    color: #1b4332;
+
+    small {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #999;
+    }
+  }
+}
+
+/* HISTORIAL DE PESADA (Versión Row) */
+.weight-card-row {
+  background: white;
+  margin-bottom: 0.75rem;
+  border-radius: 14px;
+  padding: 1rem;
+  border-left: 4px solid var(--ion-color-primary);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  
+  .card-content-flex {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .date-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 55px;
+    padding-right: 1.25rem;
+    border-right: 1px solid #f0f0f0;
+
+    strong {
+      font-size: 1.4rem;
+      line-height: 1;
+      color: #1a1a1a;
+    }
+
+    span {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #888;
+      font-weight: 700;
+    }
+  }
+
+  .data-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .weight {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .type {
+      font-size: 0.85rem;
+      color: #bc6c25;
+      font-weight: 600;
+      opacity: 0.8;
+    }
+  }
+}
+
+/* BUSCADOR RÚSTICO */
+.rustic-search-wrapper {
+  position: relative;
+  background: white;
+  border-radius: 14px;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.05);
+
+  .rustic-search-icon {
+    font-size: 1.3rem;
+    color: #bc6c25;
+    margin-right: 0.75rem;
+  }
+
+  .rustic-search-input-field {
+    width: 100%;
+    border: none;
+    padding: 1.15rem 0;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: #333;
+    outline: none;
+    background: transparent;
+
+    &::placeholder {
+      color: #bbb;
+    }
+  }
+}
+
+.chart-container-large {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+
+==================================================
 ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
 ==================================================
 
@@ -8584,6 +9710,36 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
   --background: #{variables.$primary-color};
   --box-shadow: 0 8px 20px rgba($primary-color, 0.3);
 }
+
+/* Feature Specific Styles moved from component */
+
+.item-card-pro { 
+  --background: transparent;
+  --padding-start: 12px; 
+  --inner-padding-end: 16px; 
+}
+
+.history-avatar-bi { 
+  width: 48px; 
+  height: 48px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  border-radius: 14px; 
+  font-size: 1.6rem; 
+  color: #582f0e; 
+}
+
+.bg-earth-soft { background: rgba(88, 47, 14, 0.1); }
+
+.card-footer-actions-bi { 
+  border-top: 1px solid rgba(0,0,0,0.05); 
+  padding-top: 10px; 
+  display: flex; 
+  gap: 8px; 
+}
+
+.action-buttons-mini { display: flex; gap: 2px; }
 
 
 ==================================================
@@ -8846,19 +10002,21 @@ ion-split-pane.collapsed {
 }
 
 .sidebar-header-luxe {
-  height: 100px;
+  height: variables.$header-height;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  background: linear-gradient(135deg, rgba(variables.$black, 0.25), transparent);
-  border-bottom: 1px solid rgba(variables.$secondary-color, 0.2);
+  padding: 0 1.5rem;
+  background: variables.$primary-color;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .brand-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
 .logo-circle {
@@ -8871,6 +10029,7 @@ ion-split-pane.collapsed {
   justify-content: center;
   font-size: 24px;
   box-shadow: 0 8px 16px rgba(variables.$black, 0.3);
+  flex-shrink: 0;
 }
 
 .main-brand {
@@ -8880,6 +10039,9 @@ ion-split-pane.collapsed {
   letter-spacing: 1.5px;
   line-height: 1;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sub-brand {
@@ -8898,6 +10060,7 @@ ion-split-pane.collapsed {
   height: 36px;
   width: 36px;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 .toggle-btn-luxe:hover {
   background: rgba(variables.$white, 0.2);
@@ -8942,52 +10105,52 @@ ion-split-pane.collapsed {
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
   color: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
 }
 
-.nav-item-luxe.selected {
+.nav-item-luxe.active-link {
   --color: #{variables.$white} !important;
 }
 
-.nav-item-luxe.selected::part(native) {
+.nav-item-luxe.active-link::part(native) {
   background: #{variables.$secondary-color} !important;
   box-shadow: 0 4px 15px rgba(variables.$black, 0.2);
 }
 
-.nav-item-luxe.selected .label-luxe {
+.nav-item-luxe.active-link .label-luxe {
   color: #{variables.$white} !important;
   text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-.nav-item-luxe.selected .icon-frame {
+.nav-item-luxe.active-link .icon-frame {
   background: rgba(255, 255, 255, 0.15);
   color: #{variables.$white};
 }
 
 
-/* Fixes aplicados a Sidebar */
-.nav-item-luxe .icon-frame {
-  flex-shrink: 0;
-  min-width: 36px;
+/* Overrides & Fixes */
+.nav-item-luxe.active-link lucide-icon, 
+.nav-item-luxe.active-link .icon-frame, 
+.nav-item-luxe.active-link .label-luxe {
+  color: var(--ion-color-tertiary) !important;
 }
-.nav-item-luxe.selected lucide-icon, .nav-item-luxe.selected .icon-frame, .nav-item-luxe.selected .label-luxe {
-  color: #ffffff !important;
+
+.nav-item-luxe.active-link {
+  background: rgba(var(--ion-color-tertiary-rgb), 0.15) !important;
+  color: var(--ion-color-tertiary) !important;
 }
-.nav-item-luxe.selected {
-  background: var(--ion-color-secondary) !important;
-  color: #ffffff !important;
-}
+
 .rustic-sidebar.collapsed {
   --width: 90px !important;
   min-width: 90px !important;
 }
-/* Fix outline removing for ionic items */
+
 .nav-item-luxe::part(native) {
   border: none;
   outline: none;
   border-radius: 14px;
   background: transparent;
 }
-
 
 
 ==================================================

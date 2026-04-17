@@ -24,9 +24,11 @@
 
 // 4. Características (Módulos de negocio)
 @use 'features/dashboard';
+@use 'features/ganado';
 @use 'features/manejo';
 @use 'features/reproduccion';
 @use 'features/sanidad';
+@use 'features/recria';
 
 // 5. Utility classes (Optional)
 // .u-mb-4 { margin-bottom: 1rem; }

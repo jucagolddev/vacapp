@@ -5,19 +5,22 @@
   --ion-color-primary-rgb: 45, 90, 39;
   --ion-color-primary-contrast: #{variables.$white};
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: darken($primary-color, 10%);
-  --ion-color-primary-tint: lighten($primary-color, 10%);
+  --ion-color-primary-shade: darken(variables.$primary-color, 10%);
+  --ion-color-primary-tint: lighten(variables.$primary-color, 10%);
 
   --ion-color-secondary: #{variables.$secondary-color};
   --ion-color-secondary-rgb: 124, 92, 78;
   --ion-color-secondary-contrast: #{variables.$white};
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: darken($secondary-color, 10%);
-  --ion-color-secondary-tint: lighten($secondary-color, 10%);
+  --ion-color-secondary-shade: darken(variables.$secondary-color, 10%);
+  --ion-color-secondary-tint: lighten(variables.$secondary-color, 10%);
 
   --ion-color-tertiary: #{variables.$tertiary-color};
-  --ion-color-tertiary-rgb: 141, 182, 0;
+  --ion-color-tertiary-rgb: 212, 163, 115;
   --ion-color-tertiary-contrast: #{variables.$white};
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: darken(variables.$tertiary-color, 10%);
+  --ion-color-tertiary-tint: lighten(variables.$tertiary-color, 10%);
   
   --ion-color-success: #{variables.$success-color};
   --ion-color-warning: #{variables.$warning-color};
@@ -31,4 +34,84 @@
 // Side menu customization
 ion-menu {
   --ion-background-color: #{variables.$white};
+}
+
+// Global utility classes to replace inline styles
+
+.skeleton-kpi-value {
+  width: 60%;
+  height: 24px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.skeleton-chart-main {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
+}
+
+.skeleton-chart-donut {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+}
+
+.skeleton-chart-finance {
+  width: 100%;
+  height: 250px;
+  border-radius: 8px;
+}
+
+.chart-canvas-main {
+  width: 100%;
+  height: 300px;
+}
+
+.chart-canvas-finance {
+  width: 100%;
+  height: 250px;
+}
+
+// Standardized Toolbar for modern luxe theme
+.luxe-toolbar {
+  --background: #{variables.$primary-color};
+  --color: #{variables.$white};
+  height: variables.$header-height;
+  --min-height: #{variables.$header-height};
+  display: flex;
+  align-items: center;
+}
+
+.luxe-title {
+  font-family: variables.$font-family-base;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  font-size: 1.2rem;
+}
+
+/* SHARED LUXE UTILITIES */
+.luxe-bg-forest { 
+  --background: #fefae0; 
+  background: #fefae0;
+}
+
+.card-footer-actions-bi { 
+  border-top: 1px solid rgba(0,0,0,0.05); 
+  padding-top: 10px; 
+  display: flex; 
+  gap: 8px; 
+}
+
+.luxe-container {
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.luxe-header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 2rem;
 }

@@ -230,15 +230,9 @@ import { computed, signal } from '@angular/core';
                 <ion-item class="luxe-input">
                   <ion-label position="stacked">Raza Prima *</ion-label>
                   <ion-select formControlName="raza" interface="popover">
-                    <ion-select-option value="Cruce / Mestizo">Cruce / Mestizo</ion-select-option>
-                    <ion-select-option value="Angus">Angus</ion-select-option>
-                    <ion-select-option value="Brahman">Brahman</ion-select-option>
-                    <ion-select-option value="Charolais">Charolais</ion-select-option>
-                    <ion-select-option value="Hereford">Hereford</ion-select-option>
-                    <ion-select-option value="Holstein">Holstein</ion-select-option>
-                    <ion-select-option value="Limousin">Limousin</ion-select-option>
-                    <ion-select-option value="Pardo Suizo">Pardo Suizo</ion-select-option>
-                    <ion-select-option value="Otro">Otro (Especificar)</ion-select-option>
+                    <ion-select-option *ngFor="let raza of ganadoService.constants.RAZAS_BOVINAS" [value]="raza">
+                      {{ raza }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
                 <ion-item class="luxe-input" *ngIf="bovinoForm.get('raza')?.value !== 'Cruce / Mestizo' && bovinoForm.get('raza')?.value !== 'Otro'">
@@ -248,10 +242,9 @@ import { computed, signal } from '@angular/core';
                 <ion-item class="luxe-input">
                   <ion-label position="stacked">Aptitud Principal *</ion-label>
                   <ion-select formControlName="aptitud" interface="popover">
-                    <ion-select-option value="Carne">Producción de Carne</ion-select-option>
-                    <ion-select-option value="Leche">Producción Lechera</ion-select-option>
-                    <ion-select-option value="Doble Propósito">Doble Propósito</ion-select-option>
-                    <ion-select-option value="Trabajo/Lidia">Trabajo / Lidia</ion-select-option>
+                    <ion-select-option *ngFor="let apt of ganadoService.constants.APTITUDES_BOVINAS" [value]="apt">
+                      {{ apt }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
                 <ion-item class="luxe-input">
@@ -277,10 +270,9 @@ import { computed, signal } from '@angular/core';
                 <ion-item class="luxe-input">
                   <ion-label position="stacked">Estado Productivo</ion-label>
                   <ion-select formControlName="estado_productivo" interface="popover">
-                    <ion-select-option value="Alta">Alta Confirmada (Finca)</ion-select-option>
-                    <ion-select-option value="Baja Venta">Baja por Venta</ion-select-option>
-                    <ion-select-option value="Baja Muerte">Baja por Naturaleza/Muerte</ion-select-option>
-                    <ion-select-option value="Baja Descarte">Baja por Descarte Sanitario</ion-select-option>
+                    <ion-select-option *ngFor="let st of ganadoService.constants.ESTADOS_PRODUCTIVOS" [value]="st.value">
+                      {{ st.label }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
                 
@@ -288,10 +280,9 @@ import { computed, signal } from '@angular/core';
                 <ion-item class="luxe-input" *ngIf="bovinoForm.get('sexo')?.value === 'Hembra'">
                   <ion-label position="stacked">Estado Reproductivo</ion-label>
                   <ion-select formControlName="estado_reproductivo" interface="popover">
-                    <ion-select-option value="Vacía">Vacía / Abierta</ion-select-option>
-                    <ion-select-option value="Gestante">Gestante Conf.</ion-select-option>
-                    <ion-select-option value="Lactante">Lactante (Parida)</ion-select-option>
-                    <ion-select-option value="Seca">Seca</ion-select-option>
+                    <ion-select-option *ngFor="let sr of ganadoService.constants.ESTADOS_REPRODUCTIVOS" [value]="sr.value">
+                      {{ sr.label }}
+                    </ion-select-option>
                   </ion-select>
                 </ion-item>
               </div>
@@ -320,28 +311,7 @@ import { computed, signal } from '@angular/core';
       </ion-modal>
     </ion-content>
   `,
-  styles: [`
-    .luxe-bg-forest { --background: #fefae0; }
-    .pro-card-luxe { 
-      border-radius: 20px; 
-      border-left: 5px solid var(--ion-color-primary); 
-      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-      margin: 12px 8px;
-    }
-    .badge-card-top {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      font-size: 0.75rem;
-      padding: 4px 10px;
-    }
-    .card-footer-actions-bi { 
-      border-top: 1px solid rgba(0,0,0,0.05); 
-      padding-top: 10px; 
-      display: flex; 
-      gap: 8px; 
-    }
-  `]
+  styles: []
 })
 export class GanadoComponent implements OnInit {
   public ganadoService = inject(GanadoService);

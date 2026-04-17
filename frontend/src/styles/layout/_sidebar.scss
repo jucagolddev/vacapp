@@ -36,19 +36,21 @@ ion-split-pane.collapsed {
 }
 
 .sidebar-header-luxe {
-  height: 100px;
+  height: variables.$header-height;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  background: linear-gradient(135deg, rgba(variables.$black, 0.25), transparent);
-  border-bottom: 1px solid rgba(variables.$secondary-color, 0.2);
+  padding: 0 1.5rem;
+  background: variables.$primary-color;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .brand-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
 .logo-circle {
@@ -61,6 +63,7 @@ ion-split-pane.collapsed {
   justify-content: center;
   font-size: 24px;
   box-shadow: 0 8px 16px rgba(variables.$black, 0.3);
+  flex-shrink: 0;
 }
 
 .main-brand {
@@ -70,6 +73,9 @@ ion-split-pane.collapsed {
   letter-spacing: 1.5px;
   line-height: 1;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sub-brand {
@@ -88,6 +94,7 @@ ion-split-pane.collapsed {
   height: 36px;
   width: 36px;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 .toggle-btn-luxe:hover {
   background: rgba(variables.$white, 0.2);
@@ -132,49 +139,49 @@ ion-split-pane.collapsed {
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
   color: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
 }
 
-.nav-item-luxe.selected {
+.nav-item-luxe.active-link {
   --color: #{variables.$white} !important;
 }
 
-.nav-item-luxe.selected::part(native) {
+.nav-item-luxe.active-link::part(native) {
   background: #{variables.$secondary-color} !important;
   box-shadow: 0 4px 15px rgba(variables.$black, 0.2);
 }
 
-.nav-item-luxe.selected .label-luxe {
+.nav-item-luxe.active-link .label-luxe {
   color: #{variables.$white} !important;
   text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-.nav-item-luxe.selected .icon-frame {
+.nav-item-luxe.active-link .icon-frame {
   background: rgba(255, 255, 255, 0.15);
   color: #{variables.$white};
 }
 
 
-/* Fixes aplicados a Sidebar */
-.nav-item-luxe .icon-frame {
-  flex-shrink: 0;
-  min-width: 36px;
+/* Overrides & Fixes */
+.nav-item-luxe.active-link lucide-icon, 
+.nav-item-luxe.active-link .icon-frame, 
+.nav-item-luxe.active-link .label-luxe {
+  color: var(--ion-color-tertiary) !important;
 }
-.nav-item-luxe.selected lucide-icon, .nav-item-luxe.selected .icon-frame, .nav-item-luxe.selected .label-luxe {
-  color: #ffffff !important;
+
+.nav-item-luxe.active-link {
+  background: rgba(var(--ion-color-tertiary-rgb), 0.15) !important;
+  color: var(--ion-color-tertiary) !important;
 }
-.nav-item-luxe.selected {
-  background: var(--ion-color-secondary) !important;
-  color: #ffffff !important;
-}
+
 .rustic-sidebar.collapsed {
   --width: 90px !important;
   min-width: 90px !important;
 }
-/* Fix outline removing for ionic items */
+
 .nav-item-luxe::part(native) {
   border: none;
   outline: none;
   border-radius: 14px;
   background: transparent;
 }
-

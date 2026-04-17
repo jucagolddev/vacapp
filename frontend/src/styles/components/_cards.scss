@@ -7,7 +7,7 @@
   padding: 1rem;
   box-shadow: variables.$shadow-sm;
   border: 1px solid variables.$gray-200;
-  border-left: 6px solid var(--ion-color-secondary);
+  border-left: 6px solid var(--ion-color-tertiary); /* Wheat left border */
   margin: 8px;
   position: relative;
   transition: all 0.3s ease;
@@ -38,10 +38,26 @@
   color: variables.$white;
   flex-shrink: 0;
   
-  &.bg-primary { background: var(--ion-color-primary); }
-  &.bg-secondary { background: var(--ion-color-secondary); }
-  &.bg-tertiary { background: var(--ion-color-tertiary); color: variables.$secondary-color; ion-icon, lucide-icon { color: variables.$secondary-color !important; } }
-  &.bg-danger { background: var(--ion-color-danger); }
+  &.bg-primary { 
+    background: var(--ion-color-primary); 
+    color: var(--ion-color-tertiary); 
+    ion-icon { color: var(--ion-color-tertiary) !important; }
+  }
+  &.bg-secondary { 
+    background: var(--ion-color-secondary); 
+    color: var(--ion-color-tertiary); 
+    ion-icon { color: var(--ion-color-tertiary) !important; }
+  }
+  &.bg-tertiary { 
+    background: rgba(var(--ion-color-tertiary-rgb), 0.2); 
+    color: var(--ion-color-tertiary); 
+    ion-icon { color: var(--ion-color-tertiary) !important; } 
+  }
+  &.bg-danger { 
+    background: var(--ion-color-danger); 
+    color: var(--ion-color-tertiary); 
+    ion-icon { color: var(--ion-color-tertiary) !important; }
+  }
 }
 
 .card-title-stack {
@@ -119,8 +135,10 @@
   gap: 12px;
   cursor: pointer;
 
-  &:hover {
-    border-color: rgba(variables.$secondary-color, 0.2);
+  &:hover, &:focus-visible {
+    border-color: rgba(var(--ion-color-tertiary-rgb), 0.5);
+    outline: none;
+    box-shadow: variables.$shadow-focus;
   }
 }
 
@@ -151,3 +169,21 @@
 }
 
 .luxe-panel-dark h3 { color: variables.$white; }
+
+/* PRO CARD LUXE */
+.pro-card-luxe { 
+  border-radius: 20px; 
+  border-left: 5px solid var(--ion-color-primary); 
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  margin: 12px 8px;
+  background: variables.$white;
+}
+
+.pro-card-row {
+  border-radius: 16px;
+  border-left: 5px solid var(--ion-color-primary);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  margin-bottom: 12px;
+  overflow: hidden;
+  background: variables.$white;
+}

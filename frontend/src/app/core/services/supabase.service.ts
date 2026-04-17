@@ -15,13 +15,15 @@ export class SupabaseService {
 
   constructor() {
     // Inicialización del cliente Supabase
-    if (environment.supabaseUrl && environment.supabaseKey) {
+    if (environment.supabaseUrl && environment.supabaseKey && !environment.useMockData) {
       this.supabase = createClient(
         environment.supabaseUrl,
         environment.supabaseKey
       );
     } else {
-      console.warn('Credenciales de Supabase no encontradas. Ejecutando en MODO MOCK (Local Storage).');
+      const mode = environment.useMockData ? 'MODO MOCK (Forzado)' : 'MODO MOCK (Por falta de credenciales)';
+      console.warn(`Ejecutando en ${mode}. Almacenamiento local activo.`);
+      this.seedTestData();
     }
   }
 
@@ -36,50 +38,15 @@ export class SupabaseService {
    * Obtiene todos los registros de una tabla, con soporte para simulación Mock.
    */
   async getAll<T>(table: string) {
-    if (!this.supabase) {
+    if (!this.supabase || environment.useMockData) {
       const stored = localStorage.getItem(`mock_${table}`);
-      if (stored) {
-        let data = JSON.parse(stored) as T[];
-        // Enriquecemos los datos mock para que coincidan con los JOINS de Supabase real
-        data = await this.enrichMockData(table, data);
-        return { data, error: null };
-      }
-
-      const mockInitial: any = {
-        empresas: [
-          { id: 'emp-1', nombre: 'Ganadería Premium SL', nif: 'B12345678', created_at: new Date().toISOString() }
-        ],
-        fincas: [
-          { id: 'finca-1', empresa_id: 'emp-1', nombre: 'Finca Principal', ubicacion: 'Valle Central', created_at: new Date().toISOString() }
-        ],
-        bovinos: [
-          { id: '1', crotal: 'ES0123456789', nombre: 'Vaca Lola', raza: 'Limousin', sexo: 'Hembra', estado: 'Activo', fecha_nacimiento: '2023-01-01', finca_id: 'finca-1', created_at: new Date().toISOString() },
-          { id: '2', crotal: 'ES9876543210', nombre: 'Toro Gitano', raza: 'Charolais', sexo: 'Macho', estado: 'Activo', fecha_nacimiento: '2022-05-15', finca_id: 'finca-1', created_at: new Date().toISOString() },
-          { id: '3', crotal: 'ES4455667788', nombre: 'Ternera Linda', raza: 'Limousin Cross', sexo: 'Hembra', estado: 'Activo', fecha_nacimiento: '2024-02-10', finca_id: 'finca-1', created_at: new Date().toISOString() }
-        ],
-        lotes: [
-          { id: '1', finca_id: 'finca-1', nombre: 'Prado Alto', ubicacion: 'Zona Norte', created_at: new Date().toISOString() },
-          { id: '2', finca_id: 'finca-1', nombre: 'Recría Hembras', ubicacion: 'Cercado Central', created_at: new Date().toISOString() }
-        ],
-        reproduccion: [
-          { id: '1', bovino_id: '1', fecha_cubricion: '2026-01-15', tipo_cubricion: 'Monta Natural', fecha_parto_prevista: '2026-10-25', estado_gestacion: 'Confirmada' }
-        ],
-        sanidad: [
-          { id: '1', bovino_id: '1', fecha: '2026-03-20', tipo: 'Vacunación', producto: 'Bovilis Blue Tongue', observaciones: 'Anual obligatoria' }
-        ],
-        recria_pesajes: [
-          { id: '1', bovino_id: '1', fecha_pesaje: '2024-03-01', peso_kg: 45.0, tipo_pesaje: 'Nacimiento' },
-          { id: '2', bovino_id: '1', fecha_pesaje: '2024-04-10', peso_kg: 62.5, tipo_pesaje: 'Recría' }
-        ]
-      };
-      
-      const data = mockInitial[table] || [];
-      localStorage.setItem(`mock_${table}`, JSON.stringify(data));
-      const enriched = await this.enrichMockData(table, data);
-      return { data: enriched as T[], error: null };
+      let data = stored ? (JSON.parse(stored) as T[]) : [];
+      // Enriquecemos los datos mock para que coincidan con los JOINS de Supabase real
+      data = await this.enrichMockData(table, data);
+      return { data, error: null };
     }
     
-    // Consulta real a Supabase con ordenamiento por fecha de creación (Paginado para rendimiento)
+    // Consulta real a Supabase
     const { data, error } = await this.supabase
       .from(table)
       .select('*')
@@ -116,7 +83,7 @@ export class SupabaseService {
       ...payload 
     };
 
-    if (!this.supabase) {
+    if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
       const updated = [newRecord, ...data];
       localStorage.setItem(`mock_${table}`, JSON.stringify(updated));
@@ -145,7 +112,7 @@ export class SupabaseService {
    * Actualiza un registro existente mediante su ID.
    */
   async update<T>(table: string, id: string, payload: Partial<T>) {
-    if (!this.supabase) {
+    if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
       const index = data.findIndex((item: any) => item.id === id);
       if (index !== -1) {
@@ -170,7 +137,7 @@ export class SupabaseService {
    * Elimina un registro físicamente.
    */
   async delete(table: string, id: string) {
-    if (!this.supabase) {
+    if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
       const updated = data.filter((item: any) => item.id !== id);
       localStorage.setItem(`mock_${table}`, JSON.stringify(updated));
@@ -329,5 +296,105 @@ export class SupabaseService {
       console.error('Error en updateBovinoLote:', e);
       return { data: null, error: e.message || 'Error técnico al actualizar lote' };
     }
+  }
+
+  /**
+   * Genera un set de datos masivo y realista para demostración.
+   */
+  private seedTestData() {
+    if (localStorage.getItem('vacapp_seeded') === 'true') return;
+
+    const mockData: any = {
+      empresas: [
+        { id: 'emp-1', nombre: 'Ganadería Luxe Forest SL', nif: 'B12345678', created_at: new Date().toISOString() }
+      ],
+      fincas: [
+        { id: 'finca-1', empresa_id: 'emp-1', nombre: 'Hacienda Los Alcornocales', ubicacion: 'Sierra Gaditana', created_at: new Date().toISOString() },
+        { id: 'finca-2', empresa_id: 'emp-1', nombre: 'Dehesa El Robledo', ubicacion: 'Valle Norte', created_at: new Date().toISOString() }
+      ],
+      lotes: [
+        { id: 'lote-1', finca_id: 'finca-1', nombre: 'Prado de Engorde', ubicacion: 'Zona Sur', capacidad: 50 },
+        { id: 'lote-2', finca_id: 'finca-1', nombre: 'Recría Hembras', ubicacion: 'Cercado Norte', capacidad: 30 },
+        { id: 'lote-3', finca_id: 'finca-2', nombre: 'Maternidad', ubicacion: 'Corrales Centrales', capacidad: 20 },
+        { id: 'lote-4', finca_id: 'finca-2', nombre: 'Sementales', ubicacion: 'Paddock A', capacidad: 5 }
+      ],
+      bovinos: [],
+      recria_pesajes: [],
+      finanzas: [],
+      sanidad: [],
+      reproduccion: [],
+      tareas: []
+    };
+
+    // Generar 20 Bovinos
+    const razas = ['Limousin', 'Charolais', 'Angus', 'Retinta'];
+    for (let i = 1; i <= 20; i++) {
+        const id = `bov-${i}`;
+        const sexo = i % 2 === 0 ? 'Hembra' : 'Macho';
+        const raza = razas[Math.floor(Math.random() * razas.length)];
+        const lote_id = i <= 5 ? 'lote-1' : (i <= 10 ? 'lote-2' : (i <= 15 ? 'lote-3' : 'lote-4'));
+        const finca_id = i <= 10 ? 'finca-1' : 'finca-2';
+        
+        mockData.bovinos.push({
+            id,
+            crotal: `ES0${i}98765432${i}`,
+            nombre: `${sexo === 'Hembra' ? 'Vaca' : 'Toro'} ${i}`,
+            raza,
+            sexo,
+            finca_id,
+            lote_id,
+            estado_productivo: 'Alta',
+            estado_reproductivo: sexo === 'Hembra' ? 'Vacía' : null,
+            fecha_nacimiento: new Date(2022, Math.floor(Math.random() * 12), 1).toISOString(),
+            created_at: new Date().toISOString()
+        });
+
+        // Generar historial de pesajes para cada bovino (6 pesajes por animal)
+        let pesoBase = 45; // Nacimiento
+        for (let j = 0; j < 6; j++) {
+            const fecha = new Date();
+            fecha.setMonth(fecha.getMonth() - (6 - j));
+            pesoBase += 25 + Math.random() * 10;
+            mockData.recria_pesajes.push({
+                id: `pes-${id}-${j}`,
+                bovino_id: id,
+                fecha_pesaje: fecha.toISOString().split('T')[0],
+                peso_kg: Math.round(pesoBase),
+                tipo_pesaje: j === 0 ? 'Nacimiento' : 'Control'
+            });
+        }
+    }
+
+    // Generar Finanzas (12 meses)
+    for (let i = 0; i < 12; i++) {
+        const fecha = new Date();
+        fecha.setMonth(fecha.getMonth() - i);
+        const label = `${fecha.toLocaleString('default', { month: 'short' })} ${fecha.getFullYear()}`;
+        
+        mockData.finanzas.push({
+            id: `fin-i-${i}`,
+            tipo: 'Ingreso',
+            categoria: 'Venta',
+            monto: 5000 + Math.random() * 2000,
+            fecha: fecha.toISOString().split('T')[0],
+            descripcion: `Venta mensual ${label}`
+        });
+        mockData.finanzas.push({
+            id: `fin-g-${i}`,
+            tipo: 'Gasto',
+            categoria: 'Alimentación',
+            monto: 2500 + Math.random() * 1000,
+            fecha: fecha.toISOString().split('T')[0],
+            descripcion: `Gasto pienso ${label}`
+        });
+    }
+
+    // Guardar todo en LocalStorage
+    Object.keys(mockData).forEach(table => {
+        localStorage.setItem(`mock_${table}`, JSON.stringify(mockData[table]));
+    });
+
+    localStorage.setItem('vacapp_seeded', 'true');
+    console.log('✅ Base de datos simulada poblada correctamente con éxito.');
   }
 }

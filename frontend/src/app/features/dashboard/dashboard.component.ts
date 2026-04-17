@@ -72,7 +72,7 @@ Chart.register(...registerables);
                 <div class="kpi-content">
                   <span class="kpi-label">Hato Total</span>
                   <h2 class="kpi-value" *ngIf="!cargando()">{{ totalBovinos() }}</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 24px; border-radius: 4px; margin-top: 4px;"></ion-skeleton-text>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi-value"></ion-skeleton-text>
                 </div>
               </ion-card>
             </ion-col>
@@ -82,7 +82,7 @@ Chart.register(...registerables);
                 <div class="kpi-content">
                   <span class="kpi-label">Gestantes</span>
                   <h2 class="kpi-value" *ngIf="!cargando()">{{ gestacionesActivas().length }}</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 24px; border-radius: 4px; margin-top: 4px;"></ion-skeleton-text>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi-value"></ion-skeleton-text>
                 </div>
               </ion-card>
             </ion-col>
@@ -92,7 +92,7 @@ Chart.register(...registerables);
                 <div class="kpi-content">
                   <span class="kpi-label">Margen Bruto</span>
                   <h2 class="kpi-value" *ngIf="!cargando()">{{ saldoMensual() | number:'1.0-0' }}€</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 24px; border-radius: 4px; margin-top: 4px;"></ion-skeleton-text>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi-value"></ion-skeleton-text>
                 </div>
               </ion-card>
             </ion-col>
@@ -102,7 +102,7 @@ Chart.register(...registerables);
                 <div class="kpi-content">
                   <span class="kpi-label">Peso Medio</span>
                   <h2 class="kpi-value" *ngIf="!cargando()">{{ pesoMedio() }} kg</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 24px; border-radius: 4px; margin-top: 4px;"></ion-skeleton-text>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi-value"></ion-skeleton-text>
                 </div>
               </ion-card>
             </ion-col>
@@ -129,9 +129,9 @@ Chart.register(...registerables);
                 </ion-card-header>
                 <ion-card-content class="relative">
                   <div *ngIf="cargando()" class="chart-skeleton">
-                    <ion-skeleton-text animated style="width: 100%; height: 300px; border-radius: 8px;"></ion-skeleton-text>
+                    <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
                   </div>
-                  <canvas #weightChart style="width: 100%; height: 300px;" [hidden]="cargando()"></canvas>
+                  <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
                 </ion-card-content>
               </ion-card>
             </ion-col>
@@ -145,7 +145,7 @@ Chart.register(...registerables);
                 </ion-card-header>
                 <ion-card-content class="chart-container-donut">
                   <div *ngIf="cargando()" class="chart-skeleton flex justify-center items-center">
-                    <ion-skeleton-text animated style="width: 200px; height: 200px; border-radius: 50%;"></ion-skeleton-text>
+                    <ion-skeleton-text animated class="skeleton-chart-donut"></ion-skeleton-text>
                   </div>
                   <canvas #lotesChart [hidden]="cargando()"></canvas>
                 </ion-card-content>
@@ -161,9 +161,9 @@ Chart.register(...registerables);
                 </ion-card-header>
                 <ion-card-content>
                   <div *ngIf="cargando()" class="chart-skeleton">
-                    <ion-skeleton-text animated style="width: 100%; height: 250px; border-radius: 8px;"></ion-skeleton-text>
+                    <ion-skeleton-text animated class="skeleton-chart-finance"></ion-skeleton-text>
                   </div>
-                  <canvas #financeChart style="width: 100%; height: 250px;" [hidden]="cargando()"></canvas>
+                  <canvas #financeChart class="chart-canvas-finance" [hidden]="cargando()"></canvas>
                 </ion-card-content>
               </ion-card>
             </ion-col>
@@ -173,29 +173,7 @@ Chart.register(...registerables);
       </div>
     </ion-content>
   `,
-  styles: [`
-    .luxe-toolbar { --background: #1b4332; }
-    .bi-title { font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 800; color: #2b3a32; margin-bottom: 0px; letter-spacing: -0.5px; }
-    .bi-subtitle { font-family: 'Outfit', sans-serif; font-size: 1.1rem; color: #476759; margin-top: 4px; }
-    
-    .bi-kpi-card { border-radius: 16px; margin: 6px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 16px rgba(0,0,0,0.06); padding: 16px; display: flex; align-items: center; gap: 12px; }
-    .kpi-mini-icon { font-size: 2rem; }
-    .kpi-label { font-size: 0.85rem; font-weight: 700; color: #8d99ae; text-transform: uppercase; letter-spacing: 1px; }
-    .kpi-value { margin: 0; font-size: 1.6rem; font-weight: 800; color: #2b2d42; }
-
-    .bi-main-card { border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.4); margin: 8px; overflow: hidden; }
-    .bi-card-head { display: flex; justify-content: space-between; align-items: flex-start; }
-    .bi-mini-stat { display: flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 30px; font-size: 0.8rem; font-weight: 700; color: #1b4332; }
-    .bg-primary-soft { background: rgba(27, 67, 50, 0.1); }
-    
-    .chart-container-donut { height: 300px; display: flex; align-items: center; justify-content: center; position: relative; }
-    .chart-skeleton { height: 100%; width: 100%; min-height: 250px; }
-    
-    .online-indicator { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; color: #40916c; background: rgba(255,255,255,0.5); padding: 6px 14px; border-radius: 20px; }
-    .dot { width: 8px; height: 8px; background: #2dd55b; border-radius: 50%; }
-    .offline { color: #bc4749; }
-    .offline .dot { background: #bc4749; }
-  `]
+  styles: []
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   fincaService = inject(FincaService);
