@@ -1,4 +1,5 @@
 @use '../abstracts/variables';
+@use '../components/cards';
 
 // Estilos para el módulo de Reproducción (Neutral & Simple)
 /**
@@ -27,40 +28,7 @@
 }
 
 .vac-repro-card {
-  --background: var(--ion-card-background);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
-  border: 1px solid rgba(variables.$primary-color, 0.1);
-  margin: 0;
-  transition: transform 0.3s ease;
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  ion-card-header {
-    padding-bottom: 8px;
-  }
-
-  ion-card-subtitle {
-    color: variables.$primary-color;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  ion-card-title {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: variables.$dark-color;
-  }
-
-  .vac-status-badge {
-    margin-top: 10px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 700;
-  }
+  @extend .uniform-card;
 }
 
 // Animación de Latido Suave para indicar vida/gestación

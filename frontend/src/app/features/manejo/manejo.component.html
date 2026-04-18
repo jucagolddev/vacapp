@@ -35,7 +35,7 @@
 
     <!-- GRÁFICO DE PESO -->
     <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
-      <ion-card-header>
+      <div class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>ANÁLISIS DE RENDIMIENTO</span>
@@ -46,12 +46,12 @@
             <span>Hato Saludable</span>
           </div>
         </div>
-      </ion-card-header>
-      <ion-card-content>
+      </div>
+      <div class="vac-card-content">
         <div class="vac-chart-container">
            <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
         </div>
-      </ion-card-content>
+      </div>
     </div>
 
     <!-- SKELETON LOADER -->
@@ -59,11 +59,11 @@
     <ion-grid class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <ion-card class="uniform-card">
+          <div class="uniform-card">
             <ion-item lines="none" class="vac-card-header ion-margin-bottom">
-              <ion-avatar class="vac-avatar ion-margin-end" slot="start">
+              <div class="vac-avatar ion-margin-end" slot="start">
                 <ion-skeleton-text animated class="skeleton-avatar-lg"></ion-skeleton-text>
-              </ion-avatar>
+              </div>
               <ion-label class="vac-card-title-group vac-flex-1">
                 <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
                 <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
@@ -71,7 +71,7 @@
               <ion-skeleton-text animated class="skeleton-badge" slot="end"></ion-skeleton-text>
             </ion-item>
 
-            <ion-card-content>
+            <div class="vac-card-content">
               <div class="ion-margin-vertical">
                 <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
                 <ion-skeleton-text animated class="skeleton-value-sm"></ion-skeleton-text>
@@ -82,8 +82,8 @@
                 <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
                 <ion-skeleton-text animated class="skeleton-btn-wide"></ion-skeleton-text>
               </div>
-            </ion-card-content>
-          </ion-card>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -92,31 +92,29 @@
     <ion-grid class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-          <ion-card class="uniform-card">
+          <div class="uniform-card clickable-card" (click)="goToDetail(b.id)">
             <ion-item lines="none" class="vac-card-header">
-              <div class="vac-avatar-wrapper ion-margin-end" slot="start">
-                <div class="vac-avatar">
-                   <div *ngIf="b.foto_url" class="avatar-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
-                   <div *ngIf="!b.foto_url" class="avatar-placeholder">
-                     <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
-                   </div>
-                </div>
+              <div class="ion-margin-end" slot="start">
+                 <img *ngIf="b.foto_url" [src]="b.foto_url" class="avatar-list" [alt]="b.nombre">
+                 <div *ngIf="!b.foto_url" class="avatar-list flex items-center justify-center bg-light-soft color-primary">
+                    <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+                 </div>
               </div>
               <ion-label class="vac-card-title-group ion-text-wrap">
                 <h2 class="ion-text-wrap"><strong>{{ b.nombre }}</strong></h2>
                 <h3 class="ion-text-wrap">{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</h3>
               </ion-label>
               <div slot="end">
-                <ion-badge *ngIf="b.estado_productivo === 'Alta'" color="success" mode="ios">
+                <ion-badge *ngIf="b.estado_productivo === 'Alta'" color="success" class="status-badge" mode="ios">
                   Activo
                 </ion-badge>
-                <ion-badge *ngIf="b.estado_productivo !== 'Alta'" color="warning" mode="ios">
+                <ion-badge *ngIf="b.estado_productivo !== 'Alta'" color="warning" class="status-badge" mode="ios">
                   {{ b.estado_productivo }}
                 </ion-badge>
               </div>
             </ion-item>
 
-            <ion-card-content>
+            <div class="vac-card-content">
               <div class="vac-card-grid ion-margin-vertical">
                 <div class="vac-card-info">
                   <span class="label">Sexo / Aptitud</span>
@@ -135,12 +133,12 @@
                 <ion-button fill="clear" color="danger" (click)="confirmDelete(b.id)" aria-label="Eliminar">
                   <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                 </ion-button>
-                <ion-button fill="solid" color="primary" class="ion-no-margin ml-auto btn-vac-sm">
+                <ion-button fill="solid" color="primary" class="ion-no-margin ml-auto btn-vac-sm" (click)="goToDetail(b.id); $event.stopPropagation()">
                   Ver Ficha
                 </ion-button>
               </div>
-            </ion-card-content>
-          </ion-card>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
     </ion-grid>

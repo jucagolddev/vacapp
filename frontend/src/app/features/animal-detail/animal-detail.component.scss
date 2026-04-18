@@ -1,0 +1,144 @@
+@use "../../../styles/abstracts/variables";
+@use "../../../styles/components/cards";
+
+/**
+ * Animal Intelligence Detail Hub
+ * Rustic-Luxe Optimized
+ */
+
+.animal-profile-header {
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
+  margin: 0 8px;
+  padding: 30px 20px;
+  border-radius: 24px;
+  color: white;
+  box-shadow: 0 15px 35px rgba(27, 67, 50, 0.2);
+}
+
+.animal-avatar-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.animal-avatar {
+  width: 80px;
+  height: 80px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  overflow: hidden;
+
+  .img-full {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.crotal-id {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin: 0;
+}
+
+.animal-name {
+  margin: 4px 0 8px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* SEGMENT UTILS */
+.bg-success-soft { background: rgba(var(--ion-color-success-rgb), 0.1); }
+.bg-secondary-soft { background: rgba(var(--ion-color-secondary-rgb), 0.1); }
+.bg-danger-soft { background: rgba(var(--ion-color-danger-rgb), 0.1); }
+
+.vac-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* TIMELINE STYLES - Centered in Design System */
+.timeline-container {
+  padding: 10px 20px;
+  position: relative;
+}
+
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  left: 31px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(0,0,0,0.05);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 25px;
+  padding-left: 50px;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 17px;
+  top: 15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.timeline-content {
+  margin: 0 !important;
+  padding: 15px !important;
+  @extend .rustic-card;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.70rem;
+  font-weight: 800;
+}
+
+.event-title {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--ion-color-primary);
+}
+
+.event-desc {
+  margin: 5px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+.vac-kpi-value-sm {
+   font-size: 1.2rem;
+   font-weight: 800;
+   margin: 0;
+   color: #1b4332;
+}

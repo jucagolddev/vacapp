@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
   IonLabel, IonIcon, IonNote, IonGrid, 
@@ -58,6 +59,7 @@ export class ManejoComponent implements OnInit {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
+  private router = inject(Router);
   
   bovinos = this.ganadoService.bovinos;
   lotesArr: Lote[] = []; // Opcional, dependiendo de si quieres rellenarlo aquí.
@@ -135,6 +137,12 @@ export class ManejoComponent implements OnInit {
 
   handleSearch(event: any) {
     this.searchTerm.set(event.detail.value || '');
+  }
+
+  goToDetail(id: string) {
+    if (id) {
+      this.router.navigate(['/animal-detail', id]);
+    }
   }
 
   async handleRefresh(event: any) {

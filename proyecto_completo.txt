@@ -3,6 +3,11 @@
 ARCHIVO: .\bundle_project.py
 ==================================================
 
+# MODO DE USO MANUAL EN TERMINAL:
+# 1. Abre la terminal o PowerShell
+# 2. Asegúrate de estar en la carpeta raíz (c:\xampp\htdocs\vacapp)
+# 3. Ejecuta el comando: python bundle_project.py
+
 import os
 
 # Configuración
@@ -1407,6 +1412,11 @@ ARCHIVO: .\frontend\angular.json
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*.svg",
+                "input": "node_modules/ionicons/dist/ionicons/svg",
+                "output": "svg"
               }
             ],
             "styles": [
@@ -2346,7 +2356,6 @@ export class AppComponent {
 }
 
 
-
 ==================================================
 ARCHIVO: .\frontend\src\app\app.config.ts
 ==================================================
@@ -2464,6 +2473,12 @@ export const routes: Routes = [
         path: 'finanzas',
         title: 'Vacapp | Contabilidad',
         loadComponent: () => import('./features/finanzas/finanzas.component').then(m => m.FinanzasComponent)
+      },
+      // VISTA DE DETALLE ÚNICA (Intelligence Hub)
+      {
+        path: 'animal-detail/:id',
+        title: 'Vacapp | Detalle de Inteligencia',
+        loadComponent: () => import('./features/animal-detail/animal-detail.component').then(m => m.AnimalDetailComponent)
       }
     ]
   },
@@ -2626,7 +2641,7 @@ import { AuthService } from '../../services/auth.service';
               <div class="vac-sidebar-header" *ngIf="!isCollapsed">
                 <div class="brand-wrapper">
                   <div class="logo-circle">
-                    <ion-icon name="leaf-outline" style="color: white;"></ion-icon>
+                    <ion-icon name="leaf-outline" class="color-white"></ion-icon>
                   </div>
                   <div class="brand-text">
                     <span class="main-brand">VACAPP</span>
@@ -4340,14 +4355,27 @@ export class SupabaseService {
 
   constructor() {
     // Inicialización del cliente Supabase
-    if (environment.supabaseUrl && environment.supabaseKey && !environment.useMockData) {
-      this.supabase = createClient(
-        environment.supabaseUrl,
-        environment.supabaseKey
-      );
+    const hasCredentials = !!(environment.supabaseUrl && environment.supabaseKey);
+    const mockForced = !!environment.useMockData;
+
+    if (hasCredentials && !mockForced) {
+      try {
+        this.supabase = createClient(
+          environment.supabaseUrl, 
+          environment.supabaseKey
+        );
+        console.log('%c✅ Vacapp: Conexión establecida con Supabase.', 'color: #2d6a4f; font-weight: bold;');
+      } catch (error) {
+        console.error('❌ Vacapp: Error crítico al inicializar el cliente de Supabase:', error);
+      }
     } else {
-      const mode = environment.useMockData ? 'MODO MOCK (Forzado)' : 'MODO MOCK (Por falta de credenciales)';
-      console.warn(`Ejecutando en ${mode}. Almacenamiento local activo.`);
+      // Determinamos la razón del modo Mock
+      const reason = mockForced 
+        ? 'MODO MOCK (Forzado por configuración)' 
+        : 'MODO MOCK (Fallback: Faltan credenciales)';
+      
+      console.warn(`%c🚀 Vacapp: Ejecutando en ${reason}.`, 'color: #d4a373; font-weight: bold;');
+      console.info('Utilizando almacenamiento LocalStorage para persistencia temporal.');
       this.seedTestData();
     }
   }
@@ -4488,6 +4516,56 @@ export class SupabaseService {
         callback(payload);
       })
       .subscribe();
+  }
+
+  /** --- INTELIGENCIA DE DATOS (VISTA ÚNICA) --- **/
+
+  /**
+   * Obtiene toda la información relacionada de un animal en una sola carga.
+   * Ideal para la Vista de Detalle Única.
+   */
+  async getAnimalCompleteData(id: string) {
+    if (!this.supabase || environment.useMockData) {
+      // Mock Aggregation
+      const { data: bovinos } = await this.getAll<any>('bovinos');
+      const bovino = bovinos.find(b => b.id === id);
+      
+      const { data: sanidad } = await this.getAll<any>('sanidad');
+      const { data: repro } = await this.getAll<any>('reproduccion');
+      const { data: pesajes } = await this.getAll<any>('recria_pesajes');
+      const { data: finanzas } = await this.getAll<any>('finanzas');
+
+      return {
+        data: {
+          bovino,
+          sanidad: sanidad.filter((s: any) => s.bovino_id === id),
+          reproduccion: repro.filter((r: any) => r.bovino_id === id),
+          pesajes: pesajes.filter((p: any) => p.bovino_id === id),
+          finanzas: finanzas.filter((f: any) => f.bovino_id === id)
+        },
+        error: null
+      };
+    }
+
+    // Supabase Parallel Fetch
+    const [bovinoRes, sanidadRes, reproRes, pesajesRes, finanzasRes] = await Promise.all([
+      this.supabase.from('bovinos').select('*, lote:lote_id(*)').eq('id', id).single(),
+      this.supabase.from('sanidad').select('*').eq('bovino_id', id).order('fecha', { ascending: false }),
+      this.supabase.from('reproduccion').select('*, semental:semental_id(*)').eq('bovino_id', id).order('created_at', { ascending: false }),
+      this.supabase.from('recria_pesajes').select('*').eq('bovino_id', id).order('fecha_pesaje', { ascending: false }),
+      this.supabase.from('finanzas').select('*').eq('bovino_id', id).order('fecha', { ascending: false })
+    ]);
+
+    return {
+      data: {
+        bovino: bovinoRes.data,
+        sanidad: sanidadRes.data || [],
+        reproduccion: reproRes.data || [],
+        pesajes: pesajesRes.data || [],
+        finanzas: finanzasRes.data || []
+      },
+      error: bovinoRes.error
+    };
   }
 
   /** --- MÉTODOS DE ABSTRACCIÓN POR MÓDULO --- **/
@@ -4733,6 +4811,482 @@ ARCHIVO: .\frontend\src\app\features\.gitkeep
 
 
 ==================================================
+ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.scss
+==================================================
+
+@use "../../../styles/abstracts/variables";
+@use "../../../styles/components/cards";
+
+/**
+ * Animal Intelligence Detail Hub
+ * Rustic-Luxe Optimized
+ */
+
+.animal-profile-header {
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
+  margin: 0 8px;
+  padding: 30px 20px;
+  border-radius: 24px;
+  color: white;
+  box-shadow: 0 15px 35px rgba(27, 67, 50, 0.2);
+}
+
+.animal-avatar-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.animal-avatar {
+  width: 80px;
+  height: 80px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  overflow: hidden;
+
+  .img-full {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.crotal-id {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin: 0;
+}
+
+.animal-name {
+  margin: 4px 0 8px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* SEGMENT UTILS */
+.bg-success-soft { background: rgba(var(--ion-color-success-rgb), 0.1); }
+.bg-secondary-soft { background: rgba(var(--ion-color-secondary-rgb), 0.1); }
+.bg-danger-soft { background: rgba(var(--ion-color-danger-rgb), 0.1); }
+
+.vac-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* TIMELINE STYLES - Centered in Design System */
+.timeline-container {
+  padding: 10px 20px;
+  position: relative;
+}
+
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  left: 31px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(0,0,0,0.05);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 25px;
+  padding-left: 50px;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 17px;
+  top: 15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.timeline-content {
+  margin: 0 !important;
+  padding: 15px !important;
+  @extend .rustic-card;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.70rem;
+  font-weight: 800;
+}
+
+.event-title {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--ion-color-primary);
+}
+
+.event-desc {
+  margin: 5px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+.vac-kpi-value-sm {
+   font-size: 1.2rem;
+   font-weight: 800;
+   margin: 0;
+   color: #1b4332;
+}
+
+
+==================================================
+ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.ts
+==================================================
+
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { 
+  IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, 
+  IonBackButton, IonGrid, IonRow, IonCol, IonIcon, 
+  IonSegment, IonSegmentButton, IonLabel, IonBadge,
+  IonList, IonItem, IonSkeletonText, IonButton,
+  IonRefresher, IonRefresherContent
+} from '@ionic/angular/standalone';
+import { FormsModule } from '@angular/forms';
+import { SupabaseService } from '../../core/services/supabase.service';
+import { addIcons } from 'ionicons';
+import { 
+  paw, medical, scale, calendar, cash, 
+  chevronForwardOutline, fitnessOutline, 
+  timeOutline, alertCircleOutline, checkmarkCircleOutline,
+  flaskOutline, gitBranchOutline, medkitOutline
+} from 'ionicons/icons';
+
+interface TimelineEvent {
+  date: string;
+  title: string;
+  description: string;
+  icon: string;
+  type: 'health' | 'repro' | 'weight' | 'cost';
+  color: string;
+}
+
+@Component({
+  selector: 'app-animal-detail',
+  standalone: true,
+  imports: [
+    CommonModule, FormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
+    IonButtons, IonBackButton, IonGrid, IonRow, IonCol, IonIcon,
+    IonSegment, IonSegmentButton, IonLabel, IonBadge, IonList, 
+    IonItem, IonSkeletonText, IonButton, IonRefresher, IonRefresherContent
+  ],
+  template: `
+    <ion-header class="ion-no-border">
+      <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+          <ion-back-button defaultHref="/manejo"></ion-back-button>
+        </ion-buttons>
+        <ion-title>Inteligencia Animal</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding-vertical">
+      <div class="vac-container animate-fade-in" *ngIf="data()">
+        
+        <!-- CABECERA DE PERFIL (RUSTIC-LUXE) -->
+        <div class="animal-profile-header">
+           <div class="animal-avatar-container">
+              <div class="animal-avatar">
+                 <img *ngIf="data()?.bovino?.foto_url" [src]="data()?.bovino?.foto_url" class="img-full" alt="Perfil">
+                 <ion-icon *ngIf="!data()?.bovino?.foto_url" name="paw"></ion-icon>
+              </div>
+              <div class="animal-main-info">
+                 <h1 class="crotal-id">{{ data()?.bovino?.crotal }}</h1>
+                 <p class="animal-name">{{ data()?.bovino?.nombre || 'Res S/N' }} • {{ data()?.bovino?.raza }}</p>
+                 <ion-badge [color]="getStatusColor(data()?.bovino?.estado_reproductivo)" class="status-badge" mode="ios">
+                    {{ data()?.bovino?.estado_reproductivo || 'Activo' }}
+                 </ion-badge>
+              </div>
+           </div>
+        </div>
+
+        <!-- KPI SUMMARY GRID (4 Cards) -->
+        <ion-grid class="ion-no-padding mt-4">
+          <ion-row>
+            <ion-col size="6" size-md="3">
+              <div class="vac-kpi-card glass">
+                <div class="vac-kpi-mini-icon"><ion-icon name="fitness-outline" color="danger"></ion-icon></div>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Salud</span>
+                  <h2 class="vac-kpi-value-sm">{{ lastHealth() }}</h2>
+                </div>
+              </div>
+            </ion-col>
+            <ion-col size="6" size-md="3">
+              <div class="vac-kpi-card glass">
+                <div class="vac-kpi-mini-icon"><ion-icon name="scale" color="secondary"></ion-icon></div>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Peso Actual</span>
+                  <h2 class="vac-kpi-value-sm">{{ lastWeight() }} kg</h2>
+                </div>
+              </div>
+            </ion-col>
+            <ion-col size="6" size-md="3">
+              <div class="vac-kpi-card glass">
+                <div class="vac-kpi-mini-icon"><ion-icon name="calendar" color="tertiary"></ion-icon></div>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Últ. Parto</span>
+                  <h2 class="vac-kpi-value-sm">{{ lastParto() }}</h2>
+                </div>
+              </div>
+            </ion-col>
+            <ion-col size="6" size-md="3">
+              <div class="vac-kpi-card glass">
+                <div class="vac-kpi-mini-icon"><ion-icon name="cash" color="success"></ion-icon></div>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Gastos Tot.</span>
+                  <h2 class="vac-kpi-value-sm">{{ totalExpenses() | number:'1.2-2' }}€</h2>
+                </div>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <!-- NAVEGACIÓN INTERNA (ION-SEGMENT) -->
+        <div class="vac-segment-container mt-4 mb-3">
+          <ion-segment [value]="activeSegment()" (ionChange)="activeSegment.set($any($event).detail.value)" mode="ios">
+            <ion-segment-button value="history">
+              <ion-label>Historial</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="health">
+              <ion-label>Salud</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="repro">
+              <ion-label>Repro</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="expenses">
+              <ion-label>Gastos</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- CONTENIDO DINÁMICO POR PESTAÑA -->
+        <div [ngSwitch]="activeSegment()">
+           
+           <!-- PESTAÑA: HISTORIAL (TIMELINE VERTICAL) -->
+           <div *ngSwitchCase="'history'" class="animate-fade-in">
+              <div class="timeline-container">
+                 <div class="timeline-item" *ngFor="let event of timeline()">
+                    <div class="timeline-dot" [style.background-color]="event.color">
+                       <ion-icon [name]="event.icon"></ion-icon>
+                    </div>
+                    <div class="timeline-content vac-base-card">
+                       <div class="timeline-header">
+                          <span class="event-date">{{ event.date | date:'dd MMM yyyy' }}</span>
+                          <span class="event-type" [style.color]="event.color">{{ event.type | uppercase }}</span>
+                       </div>
+                       <h3 class="event-title">{{ event.title }}</h3>
+                       <p class="event-desc">{{ event.description }}</p>
+                    </div>
+                 </div>
+              </div>
+           </div>
+
+           <!-- PESTAÑA: SALUD -->
+           <div *ngSwitchCase="'health'" class="animate-fade-in">
+              <div class="rustic-card p-4 mb-4" *ngFor="let s of data()?.sanidad">
+                 <div class="vac-card-header-flex">
+                     <div class="vac-icon-circle bg-success-soft"><ion-icon name="medkit-outline" color="success"></ion-icon></div>
+                     <div class="vac-card-title-group ml-3">
+                        <strong class="block text-lg">{{ s.producto }}</strong>
+                        <span class="text-sm color-muted">{{ s.tipo }} • {{ s.fecha | date:'dd MMM yyyy' }}</span>
+                     </div>
+                 </div>
+                 <div class="mt-3">
+                    <p class="color-dark font-medium">{{ s.observaciones }}</p>
+                    <div class="mt-2" *ngIf="s.dias_retiro_carne > 0">
+                       <ion-badge color="warning" class="status-badge">Retiro: {{ s.dias_retiro_carne }} días</ion-badge>
+                    </div>
+                 </div>
+              </div>
+           </div>
+
+           <!-- PESTAÑA: REPRODUCCIÓN -->
+           <div *ngSwitchCase="'repro'" class="animate-fade-in">
+              <div class="rustic-card p-4 mb-4" *ngFor="let r of data()?.reproduccion">
+                 <div class="vac-card-header-flex">
+                     <div class="vac-icon-circle bg-secondary-soft"><ion-icon name="git-branch-outline" color="secondary"></ion-icon></div>
+                     <div class="vac-card-title-group ml-3">
+                        <strong class="block text-lg">{{ r.estado_gestacion }}</strong>
+                        <span class="text-sm color-muted">{{ r.tipo_cubricion || 'Evento Reproductivo' }}</span>
+                     </div>
+                 </div>
+              </div>
+           </div>
+
+           <!-- PESTAÑA: GASTOS -->
+           <div *ngSwitchCase="'expenses'" class="animate-fade-in">
+              <div class="rustic-card flex justify-between items-center p-4 mb-3" *ngFor="let f of data()?.finanzas">
+                 <div class="flex items-center gap-3">
+                    <div class="vac-icon-circle bg-danger-soft"><ion-icon name="cash-outline" color="danger"></ion-icon></div>
+                    <div>
+                        <strong class="block text-lg">{{ f.categoria }}</strong>
+                        <span class="text-sm color-muted font-medium">{{ f.fecha | date:'dd MMM yyyy' }}</span>
+                    </div>
+                 </div>
+                 <h2 class="text-xl color-danger font-heavy">-{{ f.monto | number:'1.2-2' }}€</h2>
+              </div>
+           </div>
+
+        </div>
+
+      </div>
+
+      <!-- SKELETON LOADING -->
+      <div class="ion-padding" *ngIf="!data()">
+         <ion-skeleton-text animated style="width: 100%; height: 200px; border-radius: 20px;"></ion-skeleton-text>
+         <ion-skeleton-text animated style="width: 60%; height: 30px; margin-top: 20px;"></ion-skeleton-text>
+         <div class="mt-4">
+            <ion-skeleton-text animated style="width: 100%; height: 60px; margin-bottom: 10px;" *ngFor="let s of [1,2,3]"></ion-skeleton-text>
+         </div>
+      </div>
+
+    </ion-content>
+  `,
+  styleUrls: ['./animal-detail.component.scss']
+})
+export class AnimalDetailComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private supabase = inject(SupabaseService);
+  
+  activeSegment = signal('history');
+  data = signal<any>(null);
+
+  constructor() {
+    addIcons({ 
+      paw, medical, scale, calendar, cash, 
+      chevronForwardOutline, fitnessOutline, 
+      timeOutline, alertCircleOutline, checkmarkCircleOutline,
+      flaskOutline, gitBranchOutline, medkitOutline
+    });
+  }
+
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadData(id);
+    }
+  }
+
+  async loadData(id: string) {
+    const res = await this.supabase.getAnimalCompleteData(id);
+    this.data.set(res.data);
+  }
+
+  getStatusColor(status?: string) {
+    switch (status) {
+      case 'Gestante': return 'tertiary';
+      case 'Lactante': return 'success';
+      case 'Seca': return 'medium';
+      default: return 'primary';
+    }
+  }
+
+  // KPIs
+  lastHealth = computed(() => {
+    const records = this.data()?.sanidad;
+    return records?.length > 0 ? records[0].tipo : 'N/A';
+  });
+
+  lastWeight = computed(() => {
+    const records = this.data()?.pesajes;
+    return records?.length > 0 ? records[0].peso_kg : '---';
+  });
+
+  lastParto = computed(() => {
+    const repro = this.data()?.reproduccion;
+    const parido = repro?.find((r: any) => r.estado_gestacion === 'Parido');
+    return parido ? new Date(parido.created_at).toLocaleDateString() : 'N/A';
+  });
+
+  totalExpenses = computed(() => {
+    const fin = this.data()?.finanzas || [];
+    const san = this.data()?.sanidad || [];
+    const fromFinances = fin.reduce((acc: number, f: any) => acc + (f.tipo === 'Gasto' ? f.monto : 0), 0);
+    const fromSanity = san.reduce((acc: number, s: any) => acc + (s.costo_aplicacion || 0), 0);
+    return fromFinances + fromSanity;
+  });
+
+  // TIMELINE LOGIC
+  timeline = computed(() => {
+    if (!this.data()) return [];
+    const events: TimelineEvent[] = [];
+
+    // Sanidad
+    this.data().sanidad?.forEach((s: any) => {
+      events.push({
+        date: s.fecha,
+        title: s.producto,
+        description: s.tipo + ': ' + (s.observaciones || 'Sin notas'),
+        icon: 'medkit-outline',
+        type: 'health',
+        color: '#2d6a4f'
+      });
+    });
+
+    // Pesajes
+    this.data().pesajes?.forEach((p: any) => {
+      events.push({
+        date: p.fecha_pesaje,
+        title: 'Control de Peso',
+        description: `Peso registrado: ${p.peso_kg} kg (${p.tipo_pesaje})`,
+        icon: 'scale',
+        type: 'weight',
+        color: '#d4a373'
+      });
+    });
+
+    // Reproducción
+    this.data().reproduccion?.forEach((r: any) => {
+      events.push({
+        date: r.created_at,
+        title: 'Evento Reproductivo',
+        description: `Estado: ${r.estado_gestacion} (${r.tipo_cubricion || 'N/A'})`,
+        icon: 'git-branch-outline',
+        type: 'repro',
+        color: '#582f0e'
+      });
+    });
+
+    // Ordenar por fecha descendente
+    return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  });
+}
+
+
+==================================================
 ARCHIVO: .\frontend\src\app\features\auth\login.component.ts
 ==================================================
 
@@ -4741,19 +5295,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { 
-  IonContent, IonCard, IonCardContent, IonInput, IonButton, IonSpinner, IonText
+  IonContent, IonInput, IonButton, IonSpinner, IonText
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonCard, IonCardContent, IonInput, IonButton, IonSpinner, IonText],
+  imports: [CommonModule, FormsModule, IonContent, IonInput, IonButton, IonSpinner, IonText],
   template: `
     <ion-content color="light">
       <div class="flex-center justify-center h-full">
-        <ion-card class="login-card">
-          <ion-card-content>
+        <div class="uniform-card" class="vac-login-card">
+          <div>
             <h2 class="font-bold text-lg mb-8 text-center color-primary">
               Bienvenido a Vacapp
             </h2>
@@ -4784,8 +5338,8 @@ import { AuthService } from '../../core/services/auth.service';
               <p class="text-center mt-sm">Hemos enviado un enlace mágico a tu correo.</p>
             </ion-text>
 
-          </ion-card-content>
-        </ion-card>
+          </div>
+        </div>
       </div>
     </ion-content>
   `
@@ -4833,7 +5387,7 @@ import { Component, computed, inject, signal, OnInit, effect, ElementRef, ViewCh
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonButton,
-  IonButtons, IonMenuButton, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
+  IonButtons, IonMenuButton, IonGrid, IonRow, IonCol,
   IonIcon, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { GanadoService } from '../../core/services/ganado.service';
@@ -4850,7 +5404,8 @@ import { PdfService } from '../../core/services/pdf.service';
 import { addIcons } from 'ionicons';
 import { 
   pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
-  trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline 
+  trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline,
+  paw 
 } from 'ionicons/icons';
 
 Chart.register(...registerables);
@@ -4860,7 +5415,7 @@ Chart.register(...registerables);
   standalone: true,
   imports: [
     CommonModule, IonContent, IonHeader, IonToolbar, IonTitle, 
-    IonButtons, IonMenuButton, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
+    IonButtons, IonMenuButton, IonGrid, IonRow, IonCol,
     IonIcon, IonSkeletonText, IonButton
   ],
   template: `
@@ -4904,50 +5459,50 @@ Chart.register(...registerables);
         <ion-grid class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass animate-slide-up">
-                <div class="vac-kpi-mini-icon" style="color: var(--ion-color-primary);">
-                  <ion-icon name="paw-outline"></ion-icon>
+              <div class="vac-kpi-card glass animate-slide-up m-0 shadow-none border-none">
+                <div class="vac-kpi-mini-icon">
+                  <ion-icon name="paw-outline" color="primary"></ion-icon>
                 </div>
                 <div class="vac-kpi-content">
                   <span class="vac-kpi-label">Hato Total</span>
                   <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ totalBovinos() }}</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass animate-slide-up delay-100">
-                <div class="vac-kpi-mini-icon" style="color: var(--ion-color-danger);">
-                  <ion-icon name="heart-outline"></ion-icon>
+              <div class="vac-kpi-card glass animate-slide-up delay-100 m-0 shadow-none border-none">
+                <div class="vac-kpi-mini-icon">
+                  <ion-icon name="heart-outline" color="danger"></ion-icon>
                 </div>
                 <div class="vac-kpi-content">
                   <span class="vac-kpi-label">Gestantes</span>
                   <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ gestacionesActivas().length }}</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass animate-slide-up delay-200">
-                <div class="vac-kpi-mini-icon" style="color: var(--ion-color-tertiary);">
-                  <ion-icon name="wallet-outline"></ion-icon>
+              <div class="vac-kpi-card glass animate-slide-up delay-200 m-0 shadow-none border-none">
+                <div class="vac-kpi-mini-icon">
+                  <ion-icon name="wallet-outline" color="tertiary"></ion-icon>
                 </div>
                 <div class="vac-kpi-content">
                   <span class="vac-kpi-label">Margen Bruto</span>
                   <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ saldoMensual() | number:'1.0-0' }}€</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass animate-slide-up delay-300">
-                <div class="vac-kpi-mini-icon" style="color: var(--ion-color-secondary);">
-                  <ion-icon name="scale-outline"></ion-icon>
+              <div class="vac-kpi-card glass animate-slide-up delay-300 m-0 shadow-none border-none">
+                <div class="vac-kpi-mini-icon">
+                  <ion-icon name="scale-outline" color="secondary"></ion-icon>
                 </div>
                 <div class="vac-kpi-content">
                   <span class="vac-kpi-label">Peso Medio</span>
                   <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ pesoMedio() }} kg</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
               </div>
             </ion-col>
@@ -4960,7 +5515,7 @@ Chart.register(...registerables);
             <!-- ÁREA CHART: EVOLUCIÓN PESO -->
             <ion-col size="12" size-lg="8">
               <div class="vac-main-card animate-slide-up delay-400">
-                <ion-card-header>
+                <div class="vac-card-header">
                   <div class="vac-card-header-flex">
                     <div class="vac-card-title-group">
                       <span>EVOLUCIÓN PONDERADA</span>
@@ -4971,49 +5526,49 @@ Chart.register(...registerables);
                       <span>+8.2% este mes</span>
                     </div>
                   </div>
-                </ion-card-header>
-                <ion-card-content class="relative">
+                </div>
+                <div class="vac-card-content relative">
                   <div *ngIf="cargando()" class="vac-chart-skeleton">
                     <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
                   </div>
                   <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
-                </ion-card-content>
+                </div>
               </div>
             </ion-col>
-
+ 
             <!-- DONUT CHART: DISTRIBUCIÓN -->
             <ion-col size="12" size-lg="4">
               <div class="vac-main-card animate-slide-up delay-500">
-                <ion-card-header>
+                <div class="vac-card-header">
                   <div class="vac-card-title-group">
                     <span>DISTRIBUCIÓN</span>
                     <strong>Población por Lote</strong>
                   </div>
-                </ion-card-header>
-                <ion-card-content class="vac-chart-container-donut">
+                </div>
+                <div class="vac-card-content vac-chart-container-donut">
                   <div *ngIf="cargando()" class="vac-chart-skeleton flex justify-center items-center">
-                    <ion-skeleton-text animated style="width: 200px; height: 200px; border-radius: 50%;"></ion-skeleton-text>
+                    <ion-skeleton-text animated class="skeleton-avatar-xl"></ion-skeleton-text>
                   </div>
                   <canvas #lotesChart [hidden]="cargando()"></canvas>
-                </ion-card-content>
+                </div>
               </div>
             </ion-col>
-
+ 
             <!-- BAR CHART: FINANZAS -->
             <ion-col size="12">
               <div class="vac-main-card animate-slide-up delay-600">
-                <ion-card-header>
+                <div class="vac-card-header">
                   <div class="vac-card-title-group">
                     <span>GESTIÓN ECONÓMICA</span>
                     <strong>Balance Mensual Comparativo</strong>
                   </div>
-                </ion-card-header>
-                <ion-card-content>
+                </div>
+                <div class="vac-card-content">
                   <div *ngIf="cargando()" class="chart-skeleton">
-                    <ion-skeleton-text animated style="width: 100%; height: 250px;"></ion-skeleton-text>
+                    <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
                   </div>
                   <canvas #financeChart class="chart-canvas-finance" [hidden]="cargando()"></canvas>
-                </ion-card-content>
+                </div>
               </div>
             </ion-col>
           </ion-row>
@@ -5069,7 +5624,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor() {
     addIcons({ 
       pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
-      trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline 
+      trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline,
+      paw
     });
 
     // Configuración Global de Chart.js
@@ -5184,10 +5740,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const stats = this.pesajeService.getEvolucionMensualHerd();
     
-    // Degradado Estándar Vacapp
-    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(27, 67, 50, 0.3)');
-    gradient.addColorStop(1, 'rgba(27, 67, 50, 0)');
+    // Degradado Espectacular
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(27, 67, 50, 0.6)');
+    gradient.addColorStop(0.5, 'rgba(27, 67, 50, 0.2)');
+    gradient.addColorStop(1, 'rgba(27, 67, 50, 0.0)');
 
     const chart = new Chart(ctx, {
       type: 'line',
@@ -5198,27 +5755,43 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           data: stats.data,
           borderColor: '#1b4332',
           borderWidth: 4,
-          tension: 0.4,
+          tension: 0.5, // Curvas más suaves
           fill: true,
           backgroundColor: gradient,
-          pointBackgroundColor: '#1b4332',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#1b4332',
+          pointBorderWidth: 3,
           pointRadius: 6,
-          pointHoverRadius: 8
+          pointHoverRadius: 10,
+          pointHoverBackgroundColor: '#d4a373',
+          pointHoverBorderColor: '#1b4332'
         }]
       },
       options: {
         responsive: true,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { weight: 600 }, color: '#582f0e' } },
-          y: { 
-            grid: { display: true, color: 'rgba(0,0,0,0.03)' }, 
-            beginAtZero: false,
-            ticks: { font: { weight: 600 }, color: '#582f0e' }
+        plugins: { 
+          legend: { display: false },
+          tooltip: {
+            usePointStyle: true,
+            boxPadding: 8
           }
-        }
+        },
+        scales: {
+          x: { 
+            grid: { display: false }, 
+            ticks: { font: { weight: 600, family: 'Outfit' }, color: '#582f0e', padding: 10 } 
+          },
+          y: { 
+            grid: { display: true, color: 'rgba(0,0,0,0.04)' }, 
+            border: { display: false },
+            beginAtZero: false,
+            ticks: { font: { weight: 600, family: 'Outfit' }, color: '#582f0e', padding: 10 }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
       }
     });
     this.charts.push(chart);
@@ -5245,16 +5818,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             '#a3b18a', // Sage
             '#dda15e'  // Harvest
           ],
-          borderWidth: 4,
-          borderColor: '#fff',
-          hoverOffset: 15
+          borderWidth: 3,
+          borderColor: '#ffffff',
+          hoverOffset: 25,
+          borderRadius: 6 // Bordes redondeados espectaculares
         }]
       },
       options: {
         responsive: true,
-        cutout: '75%',
+        cutout: '72%',
+        layout: { padding: 10 },
         plugins: {
-          legend: { position: 'bottom' }
+          legend: { 
+            position: 'bottom',
+            labels: { font: { family: 'Outfit', weight: 600, size: 13 }, color: '#1b4332', padding: 20 }
+          }
         }
       }
     });
@@ -5270,6 +5848,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const ingresos = finData.map(d => d.ingresos);
     const gastos = finData.map(d => d.gastos);
 
+    // Degradados Cilíndricos
+    const gradIngresos = ctx.createLinearGradient(0, 0, 0, 400);
+    gradIngresos.addColorStop(0, '#1b4332');
+    gradIngresos.addColorStop(1, '#40916c');
+
+    const gradGastos = ctx.createLinearGradient(0, 0, 0, 400);
+    gradGastos.addColorStop(0, '#bc4749');
+    gradGastos.addColorStop(1, '#e5989b');
+
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -5278,28 +5865,47 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           {
             label: 'Ingresos (€)',
             data: ingresos,
-            backgroundColor: '#1b4332',
-            borderRadius: 8,
-            stack: 'Stack 0',
+            backgroundColor: gradIngresos,
+            borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 4, bottomRight: 4 },
+            borderSkipped: false,
+            barPercentage: 0.7,
+            categoryPercentage: 0.8
           },
           {
             label: 'Gastos (€)',
             data: gastos,
-            backgroundColor: '#bc4749',
-            borderRadius: 8,
-            stack: 'Stack 0',
+            backgroundColor: gradGastos,
+            borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 4, bottomRight: 4 },
+            borderSkipped: false,
+            barPercentage: 0.7,
+            categoryPercentage: 0.8
           }
         ]
       },
       options: {
         responsive: true,
         plugins: {
-          legend: { position: 'top' }
+          legend: { 
+            position: 'top',
+            labels: { font: { family: 'Outfit', weight: 600 }, color: '#1b4332', padding: 20 }
+          }
         },
         scales: {
-          x: { grid: { display: false } },
-          y: { grid: { color: 'rgba(0,0,0,0.03)' }, beginAtZero: true }
-        }
+          x: { 
+            grid: { display: false },
+            ticks: { font: { family: 'Outfit', weight: 600 }, color: '#582f0e', padding: 10 }
+          },
+          y: { 
+            grid: { color: 'rgba(0,0,0,0.04)' }, 
+            border: { display: false },
+            beginAtZero: true,
+            ticks: { font: { family: 'Outfit', weight: 600 }, color: '#582f0e', padding: 10 }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
       }
     });
     this.charts.push(chart);
@@ -5313,11 +5919,12 @@ ARCHIVO: .\frontend\src\app\features\finanzas\finanzas.component.ts
 
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
   IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
-  IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCardSubtitle, IonAvatar
+  IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
@@ -5327,7 +5934,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { PdfService } from '../../core/services/pdf.service';
-import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline, documentTextOutline } from 'ionicons/icons';
+import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-finanzas',
@@ -5336,7 +5943,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle,
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
     IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
-    IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCardSubtitle, IonAvatar,
+    IonGrid, IonRow, IonCol,
     BaseChartDirective
   ],
   template: `
@@ -5360,21 +5967,19 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
 
         <!-- GRÁFICO DE ROI (Relocado) -->
         <div class="vac-main-card animate-slide-up mb-8">
-          <ion-card-header>
-            <div class="vac-card-header-flex">
-              <div class="vac-card-title-group">
-                <span>ESTADO DE CUENTAS</span>
-                <strong>Ingresos vs Gastos Mensuales</strong>
-              </div>
-              <div class="vac-mini-stat bg-primary-soft">
-                <ion-icon name="trending-up-outline"></ion-icon>
-                <span>ROI en Crecimiento</span>
-              </div>
+          <div class="vac-card-header-flex">
+            <div class="vac-card-title-group">
+              <span>ESTADO DE CUENTAS</span>
+              <strong>Ingresos vs Gastos Mensuales</strong>
             </div>
-          </ion-card-header>
-          <ion-card-content>
+            <div class="vac-mini-stat bg-primary-soft">
+              <ion-icon name="trending-up-outline"></ion-icon>
+              <span>ROI en Crecimiento</span>
+            </div>
+          </div>
+          <div class="p-4">
              <canvas baseChart class="chart-canvas-finance" [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
-          </ion-card-content>
+          </div>
         </div>
 
         <!-- Listado de Movimientos Recientes -->
@@ -5382,30 +5987,30 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of finanzasService.records().slice(0, 20)">
-              <div class="vac-tag-body">
-                <div class="vac-card-header">
-                  <div class="vac-icon-box" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
-                    <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'" [color]="r.tipo === 'Ingreso' ? 'light' : 'warning'"></ion-icon>
+              <div class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
+                <div class="vac-card-header-flex">
+                  <div class="vac-icon-circle" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
+                    <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-outline' : 'arrow-down-outline'" [class.color-light]="r.tipo === 'Ingreso'" [class.color-warning]="r.tipo !== 'Ingreso'"></ion-icon>
                   </div>
                   <div class="vac-card-title-group">
-                    <strong>{{ r.categoria }}</strong>
-                    <span>{{ r.fecha | date:'dd MMM yyyy' }}</span>
+                    <h3 class="vac-card-title">{{ r.categoria }}</h3>
+                    <p class="vac-card-subtitle">{{ r.fecha | date:'dd MMM yyyy' }}</p>
                   </div>
                   <div class="flex-1"></div>
                   <div class="ion-text-right">
-                    <h3 class="vac-kpi-value-small" [ngStyle]="{'color': r.tipo === 'Ingreso' ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'}">
+                    <div class="vac-kpi-value-small" [class.color-success]="r.tipo === 'Ingreso'" [class.color-danger]="r.tipo !== 'Ingreso'">
                       {{ r.tipo === 'Ingreso' ? '+' : '-' }}{{ r.monto | number:'1.0-0' }}€
-                    </h3>
+                    </div>
                   </div>
                 </div>
 
-                <div class="vac-card-footer mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
-                  <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
-                    <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
-                  <ion-button fill="clear" color="danger" (click)="confirmDelete(r)">
-                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
+                <div class="vac-card-footer mt-4 pt-2 border-t-light flex justify-end gap-2">
+                  <button class="vac-btn-icon bg-light" (click)="openEditModal(r)">
+                    <ion-icon name="create-outline"></ion-icon>
+                  </button>
+                  <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(r)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
                 </div>
               </div>
             </ion-col>
@@ -5444,11 +6049,11 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
 
           <ion-content class="ion-padding vac-modal-content">
             <div class="form-intro ion-text-center ion-padding-bottom">
-               <div class="empty-icon-ring" style="margin: 0 auto; margin-bottom: 16px;">
+               <div class="vac-icon-ring mb-4 mx-auto">
                   <ion-icon name="wallet-outline"></ion-icon>
                </div>
                <h3>Registro Contable</h3>
-               <p style="color: var(--ion-color-medium);">Anota cualquier venta, compra o gasto asociado a tu actividad ganadera.</p>
+               <p class="color-medium">Anota cualquier venta, compra o gasto asociado a tu actividad ganadera.</p>
             </div>
 
             <form [formGroup]="finanzasForm">
@@ -5498,6 +6103,7 @@ export class FinanzasComponent {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
+  private router = inject(Router);
   
   isModalOpen = false;
   editingItem: Finanzas | null = null;
@@ -5532,8 +6138,14 @@ export class FinanzasComponent {
     }
   };
 
+  goToDetail(id: string) {
+    if (id) {
+      this.router.navigate(['/animal-detail', id]);
+    }
+  }
+
   constructor() {
-    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline, documentTextOutline });
+    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline });
     this.finanzasForm = this.fb.group({
       tipo: ['Gasto', Validators.required],
       categoria: ['Alimentación y Pastos', Validators.required],
@@ -5695,7 +6307,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
   IonLabel, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput,
-  IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonAvatar
+  IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { GanadoService } from '../../core/services/ganado.service';
@@ -5720,7 +6332,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonItem, IonLabel, IonIcon, IonButtons, IonMenuButton, 
     IonFab, IonFabButton, IonModal, IonButton, IonInput, 
-    IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonAvatar
+    IonGrid, IonRow, IonCol
   ],
   template: `
     <ion-header class="ion-no-border vac-header">
@@ -5751,7 +6363,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let lote of lotes">
-              <div class="vac-main-card mb-6 animate-fade-in">
+              <div class="uniform-card">
                 <div class="vac-card-header-flex">
                   <div class="vac-card-title-group">
                     <h3 class="vac-card-title">{{ lote.nombre }}</h3>
@@ -5776,7 +6388,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                   </div>
                 </div>
 
-                <div class="vac-card-footer mt-6 pt-4" style="border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: flex-end; gap: 8px;">
+                <div class="vac-card-footer mt-6 pt-4 border-t-light flex justify-end gap-2">
                    <button class="vac-btn-icon bg-light" (click)="openEditModal(lote)">
                       <ion-icon name="create-outline"></ion-icon>
                    </button>
@@ -5831,21 +6443,21 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                <p class="vac-modal-subtitle">Define las características del potrero o recinto.</p>
             </div>
 
-            <form [formGroup]="loteForm" class="vac-form-stack">
-              <div class="vac-input-group">
-                <label class="vac-label">Nombre del Lote *</label>
-                <input type="text" formControlName="nombre" placeholder="Ej: Potrero El Roble" class="vac-input-field">
-              </div>
+            <form [formGroup]="loteForm">
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Nombre del Lote *</ion-label>
+                <ion-input type="text" formControlName="nombre" placeholder="Ej: Potrero El Roble"></ion-input>
+              </ion-item>
 
-              <div class="vac-input-group">
-                <label class="vac-label">Ubicación / Coordenadas</label>
-                <input type="text" formControlName="ubicacion" placeholder="Ej: Zona Norte - Sector A" class="vac-input-field">
-              </div>
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Ubicación / Coordenadas</ion-label>
+                <ion-input type="text" formControlName="ubicacion" placeholder="Ej: Zona Norte - Sector A"></ion-input>
+              </ion-item>
 
-              <div class="vac-input-group">
-                <label class="vac-label">Capacidad Estimada (Cabezas)</label>
-                <input type="number" formControlName="capacidad" placeholder="0" class="vac-input-field">
-              </div>
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Capacidad Estimada (Cabezas)</ion-label>
+                <ion-input type="number" formControlName="capacidad" placeholder="0"></ion-input>
+              </ion-item>
               
               <div class="mt-8 pt-6 border-t border-gray-100">
                 <ion-button (click)="saveData()" [disabled]="loteForm.invalid" class="btn-vac-save" expand="block">
@@ -6018,13 +6630,12 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
       animated="true"
       placeholder="Buscar por crotal o nombre..."
       (ionInput)="handleSearch($event)"
-      class="vac-filter-bar"
-      style="padding: 0; box-shadow: none; border: none; background: transparent;">
+      class="vac-filter-bar vac-transparent-searchbar">
     </ion-searchbar>
 
     <!-- GRÁFICO DE PESO -->
     <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
-      <ion-card-header>
+      <div class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>ANÁLISIS DE RENDIMIENTO</span>
@@ -6035,12 +6646,12 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
             <span>Hato Saludable</span>
           </div>
         </div>
-      </ion-card-header>
-      <ion-card-content>
+      </div>
+      <div class="vac-card-content">
         <div class="vac-chart-container">
            <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
         </div>
-      </ion-card-content>
+      </div>
     </div>
 
     <!-- SKELETON LOADER -->
@@ -6048,27 +6659,29 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     <ion-grid class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="vac-tag-body ion-padding">
-            <div class="vac-card-header-flex ion-margin-bottom">
-              <ion-avatar class="vac-avatar ion-margin-end">
-                <ion-skeleton-text animated style="width: 100%; height: 100%; border-radius: 12px;"></ion-skeleton-text>
-              </ion-avatar>
-              <div class="vac-card-title-group" style="flex: 1;">
-                <ion-skeleton-text animated style="width: 70%; height: 16px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+          <div class="uniform-card">
+            <ion-item lines="none" class="vac-card-header ion-margin-bottom">
+              <div class="vac-avatar ion-margin-end" slot="start">
+                <ion-skeleton-text animated class="skeleton-avatar-lg"></ion-skeleton-text>
               </div>
-              <ion-skeleton-text animated style="width: 50px; height: 24px; border-radius: 8px;"></ion-skeleton-text>
-            </div>
+              <ion-label class="vac-card-title-group vac-flex-1">
+                <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+              </ion-label>
+              <ion-skeleton-text animated class="skeleton-badge" slot="end"></ion-skeleton-text>
+            </ion-item>
 
-            <div class="ion-margin-vertical">
-              <ion-skeleton-text animated style="width: 60%; height: 12px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 45%; height: 14px;"></ion-skeleton-text>
-            </div>
-            
-            <div class="vac-card-footer mt-2 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05); display: flex; gap: 8px;">
-              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 80px; height: 32px; border-radius: 8px; margin-left: auto;"></ion-skeleton-text>
+            <div class="vac-card-content">
+              <div class="ion-margin-vertical">
+                <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-value-sm"></ion-skeleton-text>
+              </div>
+              
+              <div class="card-footer-flex mt-2 pt-2">
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-btn-wide"></ion-skeleton-text>
+              </div>
             </div>
           </div>
         </ion-col>
@@ -6079,50 +6692,51 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     <ion-grid class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-          <div class="vac-cow-card">
-            <div class="vac-card-header-flex">
-              <div class="vac-avatar-wrapper ion-margin-end">
-                <div class="vac-avatar">
-                   <div *ngIf="b.foto_url" class="avatar-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
-                   <div *ngIf="!b.foto_url" class="avatar-placeholder">
-                     <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
-                   </div>
+          <div class="uniform-card clickable-card" (click)="goToDetail(b.id)">
+            <ion-item lines="none" class="vac-card-header">
+              <div class="ion-margin-end" slot="start">
+                 <img *ngIf="b.foto_url" [src]="b.foto_url" class="avatar-list" [alt]="b.nombre">
+                 <div *ngIf="!b.foto_url" class="avatar-list flex items-center justify-center bg-light-soft color-primary">
+                    <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+                 </div>
+              </div>
+              <ion-label class="vac-card-title-group ion-text-wrap">
+                <h2 class="ion-text-wrap"><strong>{{ b.nombre }}</strong></h2>
+                <h3 class="ion-text-wrap">{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</h3>
+              </ion-label>
+              <div slot="end">
+                <ion-badge *ngIf="b.estado_productivo === 'Alta'" color="success" class="status-badge" mode="ios">
+                  Activo
+                </ion-badge>
+                <ion-badge *ngIf="b.estado_productivo !== 'Alta'" color="warning" class="status-badge" mode="ios">
+                  {{ b.estado_productivo }}
+                </ion-badge>
+              </div>
+            </ion-item>
+
+            <div class="vac-card-content">
+              <div class="vac-card-grid ion-margin-vertical">
+                <div class="vac-card-info">
+                  <span class="label">Sexo / Aptitud</span>
+                  <p class="value ion-text-wrap">{{ b.sexo }} • {{ b.aptitud }}</p>
+                </div>
+                <div class="vac-card-info">
+                  <span class="label">Edad Actual</span>
+                  <p class="value ion-text-wrap">{{ ganadoService.getEdadDesc(b) }}</p>
                 </div>
               </div>
-              <div class="vac-card-title-group">
-                <strong>{{ b.nombre }}</strong>
-                <span>{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</span>
-              </div>
-              <div class="flex-1"></div>
-              <ion-badge *ngIf="b.estado_productivo === 'Alta'" color="success" mode="ios">
-                Activo
-              </ion-badge>
-              <ion-badge *ngIf="b.estado_productivo !== 'Alta'" color="warning" mode="ios">
-                {{ b.estado_productivo }}
-              </ion-badge>
-            </div>
 
-            <div class="vac-card-grid ion-margin-vertical">
-              <div class="vac-card-info">
-                <span class="label">Sexo / Aptitud</span>
-                <span class="value">{{ b.sexo }} • {{ b.aptitud }}</span>
+              <div class="card-footer-flex mt-2 pt-2">
+                <ion-button fill="clear" color="medium" (click)="openEditModal(b)" aria-label="Editar">
+                  <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="confirmDelete(b.id)" aria-label="Eliminar">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="solid" color="primary" class="ion-no-margin ml-auto btn-vac-sm" (click)="goToDetail(b.id); $event.stopPropagation()">
+                  Ver Ficha
+                </ion-button>
               </div>
-              <div class="vac-card-info">
-                <span class="label">Edad Actual</span>
-                <span class="value">{{ ganadoService.getEdadDesc(b) }}</span>
-              </div>
-            </div>
-
-            <div class="vac-card-footer mt-2 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
-              <ion-button fill="clear" color="medium" (click)="openEditModal(b)">
-                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" color="danger" (click)="confirmDelete(b.id)">
-                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="solid" color="primary" class="ion-no-margin ml-auto btn-vac-sm">
-                Ver Ficha
-              </ion-button>
             </div>
           </div>
         </ion-col>
@@ -6136,7 +6750,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
       </div>
       <h2>No hay animales registrados</h2>
       <p>Comienza registrando tu primer animal en el sistema.</p>
-      <ion-button fill="solid" (click)="openAddModal()" color="primary" style="--border-radius: 12px;">
+      <ion-button fill="solid" (click)="openAddModal()" color="primary" class="btn-rounded-12">
         <ion-icon name="add-circle" slot="start"></ion-icon> Añadir Ejemplar
       </ion-button>
     </div>
@@ -6317,12 +6931,13 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.ts
 
 import { Component, inject, OnInit, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
   IonLabel, IonIcon, IonNote, IonGrid, 
   IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-  IonCard, IonBadge, IonCardContent, IonAvatar, IonCardHeader,
+  IonBadge,
   IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -6358,7 +6973,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonLabel, IonIcon, IonNote, IonGrid, 
     IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
     IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-    IonCard, IonBadge, IonCardContent, IonAvatar, IonCardHeader,
+    IonBadge,
     IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText,
     BaseChartDirective
   ],
@@ -6375,6 +6990,7 @@ export class ManejoComponent implements OnInit {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
+  private router = inject(Router);
   
   bovinos = this.ganadoService.bovinos;
   lotesArr: Lote[] = []; // Opcional, dependiendo de si quieres rellenarlo aquí.
@@ -6452,6 +7068,12 @@ export class ManejoComponent implements OnInit {
 
   handleSearch(event: any) {
     this.searchTerm.set(event.detail.value || '');
+  }
+
+  goToDetail(id: string) {
+    if (id) {
+      this.router.navigate(['/animal-detail', id]);
+    }
   }
 
   async handleRefresh(event: any) {
@@ -6609,12 +7231,13 @@ ARCHIVO: .\frontend\src\app\features\recria\recria.component.ts
 
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
-  IonIcon, IonButton, IonGrid, IonRow, IonCol, IonCard, IonItem, 
-  IonAvatar, IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
-  IonSelect, IonSelectOption, IonLabel, IonCardContent
+  IonIcon, IonButton, IonGrid, IonRow, IonCol, IonItem, 
+  IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
+  IonSelect, IonSelectOption, IonLabel
 } from '@ionic/angular/standalone';
 import { 
   AlertController, 
@@ -6646,9 +7269,9 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule, BaseChartDirective,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
-    IonIcon, IonButton, IonGrid, IonRow, IonCol, IonCard, IonItem, 
-    IonAvatar, IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
-    IonSelect, IonSelectOption, IonLabel, IonCardContent
+    IonIcon, IonButton, IonGrid, IonRow, IonCol, IonItem, 
+    IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
+    IonSelect, IonSelectOption, IonLabel
   ],
   template: `
     <ion-header class="ion-no-border vac-header">
@@ -6701,26 +7324,26 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <!-- LISTA ESTANDARIZADA -->
            <ion-grid class="ion-no-padding">
              <ion-row>
-               <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-                 <div class="vac-tag-body mb-4" (click)="selectBovino(b)" style="cursor: pointer;">
-                   <div class="vac-item-header">
-                     <div class="vac-avatar-wrapper">
-                       <div *ngIf="b.foto_url" class="vac-avatar" [style.background-image]="'url(' + b.foto_url + ')'"></div>
-                       <div *ngIf="!b.foto_url" class="vac-avatar-placeholder">
-                         <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
-                       </div>
-                     </div>
-                     <div class="vac-title-stack">
-                       <h3>{{ b.nombre }}</h3>
-                       <p>{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</p>
-                     </div>
-                     <div class="vac-badge-status-simple">
-                        <ion-icon name="chevron-forward-outline"></ion-icon>
-                     </div>
-                   </div>
-                   <div class="vac-item-footer mt-3 pt-3 border-t">
+                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+                  <div class="uniform-card clickable-card" (click)="selectBovino(b)">
+                   <div class="vac-card-header-flex">
+                      <div class="ion-margin-end">
+                         <img *ngIf="b.foto_url" [src]="b.foto_url" class="avatar-list" [alt]="b.nombre">
+                         <div *ngIf="!b.foto_url" class="avatar-list flex items-center justify-center bg-light-soft color-primary">
+                            <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+                         </div>
+                      </div>
+                      <div class="vac-card-title-group">
+                        <h2 class="ion-text-wrap"><strong>{{ b.nombre }}</strong></h2>
+                        <h3 class="ion-text-wrap">{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</h3>
+                      </div>
+                      <div class="vac-badge-status-simple">
+                         <ion-icon name="chevron-forward-outline"></ion-icon>
+                      </div>
+                    </div>
+                   <div class="vac-card-footer mt-6 pt-4 border-t-light flex items-center justify-between">
                      <span class="vac-tag-mini">{{ ganadoService.calculateCategoria(b) }}</span>
-                     <span class="vac-info-label ml-auto">Consultar Ficha</span>
+                     <span class="vac-info-label ml-auto" (click)="goToDetail(b.id); $event.stopPropagation()">Consultar Ficha</span>
                    </div>
                  </div>
                </ion-col>
@@ -6786,25 +7409,28 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <ion-grid class="ion-no-padding">
              <ion-row>
                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajesFiltrados">
-                 <div class="vac-tag-body mb-4">
-                   <div class="vac-item-header">
+                 <div class="uniform-card">
+                   <div class="vac-card-header-flex">
                      <div class="vac-icon-avatar bg-light">
                         <ion-icon name="calendar-outline" class="color-medium"></ion-icon>
                      </div>
-                     <div class="vac-title-stack">
-                       <h3 class="text-lg font-bold">{{ p.peso_kg }} KG</h3>
+                     <div class="vac-card-title-group">
+                       <h3 class="vac-card-title-lg">{{ p.peso_kg }} KG</h3>
                        <p>{{ p.tipo_pesaje }}</p>
                      </div>
                      <button class="vac-btn-icon color-danger ml-auto" (click)="deletePesaje(p.id)">
                         <ion-icon name="trash-outline"></ion-icon>
                      </button>
                    </div>
-                   <div class="vac-item-footer mt-3 pt-3 border-t">
+                   <div class="vac-card-footer mt-6 pt-4 border-t-light flex items-center justify-between">
                      <span class="vac-date-label">
                        <ion-icon name="time-outline" class="mr-1"></ion-icon>
                        {{ p.fecha_pesaje | date:'dd MMM yyyy' }}
                      </span>
-                     <ion-badge slot="end" class="vac-badge bg-forest ml-auto">Completado</ion-badge>
+                     <ion-badge color="success" class="status-badge ml-auto">
+                        <ion-icon name="checkmark-circle-outline" class="mr-1"></ion-icon>
+                        Completado
+                     </ion-badge>
                    </div>
                  </div>
                </ion-col>
@@ -6849,33 +7475,37 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                <p class="vac-modal-subtitle">Registra el peso actual detectado en báscula.</p>
             </div>
 
-            <form [formGroup]="pesajeForm" (ngSubmit)="onSubmit()" class="vac-form-stack">
-              <div class="vac-input-group">
-                <label class="vac-label">Animal</label>
-                <div class="vac-readonly-input">
+            <form [formGroup]="pesajeForm" (ngSubmit)="onSubmit()">
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Animal</ion-label>
+                <div class="vac-readonly-input mt-2">
                    {{ selectedBovino?.nombre }} ({{ selectedBovino?.crotal }})
                 </div>
-              </div>
+              </ion-item>
 
-              <div class="grid grid-cols-2 gap-4">
-                <div class="vac-input-group">
-                  <label class="vac-label">Fecha del Pesaje</label>
-                  <input type="date" formControlName="fecha_pesaje" class="vac-input-field">
-                </div>
-                <div class="vac-input-group">
-                  <label class="vac-label">KG *</label>
-                  <input type="number" formControlName="peso_kg" placeholder="0.00" class="vac-input-field">
-                </div>
-              </div>
+              <ion-row>
+                <ion-col size="6">
+                  <ion-item class="vac-input">
+                    <ion-label position="stacked">Fecha del Pesaje</ion-label>
+                    <ion-input type="date" formControlName="fecha_pesaje"></ion-input>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="6">
+                  <ion-item class="vac-input">
+                    <ion-label position="stacked">KG *</ion-label>
+                    <ion-input type="number" formControlName="peso_kg" placeholder="0.00"></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
 
-              <div class="vac-input-group">
-                 <label class="vac-label">Tipo de Control</label>
-                 <select formControlName="tipo_pesaje" class="vac-select-field">
-                   <option *ngFor="let t of ganadoService.constants.TIPOS_PESAJE" [value]="t">
-                     {{ t }}
-                   </option>
-                 </select>
-              </div>
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Tipo de Control</ion-label>
+                <ion-select formControlName="tipo_pesaje" interface="popover" placeholder="Seleccionar...">
+                  <ion-select-option *ngFor="let t of ganadoService.constants.TIPOS_PESAJE" [value]="t">
+                    {{ t }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
 
               <div class="mt-8 pt-6 border-t border-gray-100">
                 <ion-button type="submit" expand="block" [disabled]="pesajeForm.invalid" class="btn-vac-save">
@@ -6899,6 +7529,7 @@ export class RecriaComponent implements OnInit {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
+  private router = inject(Router);
 
   selectedBovino: Bovino | null = null;
   searchTerm: string = '';
@@ -6937,6 +7568,12 @@ export class RecriaComponent implements OnInit {
 
   async ngOnInit() {
     // No necesitamos cargar nada aquí ya que GanadoService ya tiene los bovinos
+  }
+
+  goToDetail(id: string) {
+    if (id) {
+      this.router.navigate(['/animal-detail', id]);
+    }
   }
 
   async exportarPDF() {
@@ -7099,7 +7736,7 @@ export class RecriaComponent implements OnInit {
           text: 'Eliminar',
           role: 'destructive',
           handler: async () => {
-            const { error } = await this.supa.delete('pesajes_individuales', id);
+            const { error } = await this.supa.delete('recria_pesajes', id);
             if (error) {
               this.showToast('Error al eliminar', 'danger');
             } else {
@@ -7163,13 +7800,12 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
       animated="true"
       placeholder="Buscar por ejemplar o método..."
       (ionInput)="onSearch($event)"
-      class="vac-filter-bar"
-      style="padding: 0; box-shadow: none; border: none; background: transparent;">
+      class="vac-filter-bar vac-transparent-searchbar">
     </ion-searchbar>
 
     <!-- GRÁFICO DE FERTILIDAD -->
     <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
-      <ion-card-header>
+      <div class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>EFICIENCIA REPRODUCTIVA</span>
@@ -7180,12 +7816,12 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
             <span>Tasa de éxito: 82%</span>
           </div>
         </div>
-      </ion-card-header>
-        <ion-card-content>
-          <div class="vac-chart-container" style="height: 300px;">
-            <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
-          </div>
-        </ion-card-content>
+      </div>
+      <div class="vac-card-content">
+        <div class="vac-chart-container chart-300px">
+          <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
+        </div>
+      </div>
     </div>
 
     <h2 class="vac-section-title" *ngIf="!isLoading()">Próximos Partos</h2>
@@ -7194,24 +7830,26 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <ion-grid class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="vac-tag-body ion-padding">
-            <div class="vac-card-header ion-margin-bottom">
-              <ion-skeleton-text animated style="width: 40px; height: 40px; border-radius: 12px;" class="ion-margin-end"></ion-skeleton-text>
-              <div class="vac-card-title-group" style="flex: 1;">
-                <ion-skeleton-text animated style="width: 70%; height: 16px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+          <div class="uniform-card">
+            <div class="vac-card-header ion-padding-bottom">
+              <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
+              <div class="vac-card-title-group vac-flex-1">
+                <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
               </div>
-              <ion-skeleton-text animated style="width: 50px; height: 24px; border-radius: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated class="skeleton-badge" slot="end"></ion-skeleton-text>
             </div>
 
-            <div class="ion-margin-vertical">
-              <ion-skeleton-text animated style="width: 60%; height: 12px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 45%; height: 14px;"></ion-skeleton-text>
-            </div>
+            <div class="vac-card-content">
+              <div class="ion-margin-vertical">
+                <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-value-sm"></ion-skeleton-text>
+              </div>
 
-            <div class="vac-card-footer ion-padding-top" style="border-top: 1px solid rgba(0,0,0,0.05); display: flex; gap: 8px;">
-              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
+              <div class="card-footer-flex ion-padding-top mt-4">
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+              </div>
             </div>
           </div>
         </ion-col>
@@ -7231,33 +7869,37 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <ion-grid class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredGestaciones()">
-          <div class="vac-tag-body">
+          <div class="uniform-card">
             <div class="vac-card-header">
-              <div class="vac-card-icon bg-danger-soft">
+              <div class="vac-card-icon bg-danger-soft" slot="start">
                 <ion-icon name="pulse-outline" color="danger"></ion-icon>
               </div>
-              <div class="vac-card-title-group">
-                <strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong>
-                <span>FPP: {{ r.fecha_parto_prevista | date:'dd MMM yyyy' }}</span>
+              <div class="vac-card-title-group ion-text-wrap">
+                <h2 class="ion-text-wrap"><strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong></h2>
+                <h3 class="ion-text-wrap">FPP: {{ r.fecha_parto_prevista | date:'dd MMM yyyy' }}</h3>
               </div>
-              <div class="flex-1"></div>
-              <ion-badge color="success" mode="ios">Gestante</ion-badge>
+              <ion-badge color="success" class="status-badge" mode="ios" slot="end">
+                <ion-icon name="heart-outline" class="mr-1"></ion-icon>
+                Gestante
+              </ion-badge>
             </div>
 
-            <div class="vac-card-grid">
-              <div class="vac-card-info">
-                <span class="label">Cuenta Atrás</span>
-                <span class="value">{{ getDaysToCalving(r) }} días para parto</span>
+            <div class="vac-card-content">
+              <div class="vac-card-grid">
+                <div class="vac-card-info">
+                  <span class="label">Cuenta Atrás</span>
+                  <p class="value ion-text-wrap">{{ getDaysToCalving(r) }} días para parto</p>
+                </div>
               </div>
-            </div>
 
-            <div class="vac-card-footer mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
-              <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
-                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" color="danger" (click)="confirmDelete(r)">
-                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-              </ion-button>
+              <div class="card-footer-flex mt-4 pt-2">
+                <ion-button fill="clear" color="medium" (click)="openEditModal(r)" aria-label="Editar">
+                  <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="confirmDelete(r)" aria-label="Eliminar">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
             </div>
           </div>
         </ion-col>
@@ -7270,37 +7912,38 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <ion-grid class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredReproducciones()">
-          <div class="vac-tag-body">
+          <div class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
             <div class="vac-card-header">
-              <div class="vac-card-icon bg-primary-soft">
+              <div class="vac-card-icon bg-primary-soft" slot="start">
                 <ion-icon name="female-outline" color="primary"></ion-icon>
               </div>
-              <div class="vac-card-title-group">
-                <strong>{{ r.bovino?.nombre }}</strong>
-                <span>{{ r.bovino?.crotal }}</span>
+              <div class="vac-card-title-group ion-text-wrap">
+                <h2 class="ion-text-wrap"><strong>{{ r.bovino?.nombre }}</strong></h2>
+                <h3 class="ion-text-wrap">{{ r.bovino?.crotal }}</h3>
               </div>
-              <div class="flex-1"></div>
-              <ion-badge [color]="getStatusColor(r.estado_gestacion)" mode="ios">{{ r.estado_gestacion }}</ion-badge>
+              <ion-badge [color]="getStatusColor(r.estado_gestacion)" class="status-badge" mode="ios" slot="end">{{ r.estado_gestacion }}</ion-badge>
             </div>
 
-            <div class="vac-card-grid">
-              <div class="vac-card-info">
-                <span class="label">Método / Fecha</span>
-                <span class="value">{{ r.tipo_cubricion }} • {{ r.fecha_cubricion | date:'dd/MM/yyyy' }}</span>
+            <div class="vac-card-content">
+              <div class="vac-card-grid">
+                <div class="vac-card-info">
+                  <span class="label">Método / Fecha</span>
+                  <p class="value ion-text-wrap">{{ r.tipo_cubricion }} • {{ r.fecha_cubricion | date:'dd/MM/yyyy' }}</p>
+                </div>
+                <div class="vac-card-info">
+                  <span class="label">FPP Estimada</span>
+                  <p class="value ion-text-wrap">{{ r.fecha_parto_prevista ? (r.fecha_parto_prevista | date:'dd MMM yyyy') : 'Pendiente' }}</p>
+                </div>
               </div>
-              <div class="vac-card-info">
-                <span class="label">FPP Estimada</span>
-                <span class="value">{{ r.fecha_parto_prevista ? (r.fecha_parto_prevista | date:'dd MMM yyyy') : 'Pendiente' }}</span>
-              </div>
-            </div>
 
-            <div class="vac-card-footer mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
-              <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
-                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" color="danger" (click)="confirmDelete(r)">
-                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-              </ion-button>
+              <div class="card-footer-flex mt-4 pt-2">
+                <ion-button fill="clear" color="medium" (click)="openEditModal(r)" aria-label="Editar">
+                  <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="confirmDelete(r)" aria-label="Eliminar">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
             </div>
           </div>
         </ion-col>
@@ -7403,6 +8046,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.ts
 ==================================================
 
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { 
@@ -7410,7 +8054,7 @@ import {
   IonLabel, IonBadge, IonIcon,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
   IonButton, IonInput, IonSelect, IonSelectOption,
-  IonGrid, IonRow, IonCol, IonCard, IonAvatar, IonCardContent, IonCardHeader,
+  IonGrid, IonRow, IonCol,
   IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { BaseChartDirective } from 'ng2-charts';
@@ -7440,8 +8084,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonItem, IonLabel, IonBadge, IonIcon,
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal, IonButton,
-    IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol, IonCard, 
-    IonAvatar, IonCardContent, IonCardHeader,
+    IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol,
     IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
     BaseChartDirective
   ],
@@ -7451,6 +8094,7 @@ export class ReproduccionComponent implements OnInit {
   private supa = inject(SupabaseService);
   public ganadoService = inject(GanadoService);
   private reproService = inject(ReproduccionService);
+  private router = inject(Router);
 
   public readonly METODOS = METODOS_REPRODUCCION;
   public readonly ESTADOS = ESTADOS_GESTACION;
@@ -7533,6 +8177,12 @@ export class ReproduccionComponent implements OnInit {
 
   handleRefresh(event: any) {
     this.loadData(event);
+  }
+
+  goToDetail(bovinoId: string) {
+    if (bovinoId) {
+      this.router.navigate(['/animal-detail', bovinoId]);
+    }
   }
 
   async exportarPDF() {
@@ -7721,33 +8371,23 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     </div>
 
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
-    <ion-grid class="ion-no-padding ion-margin-top" *ngIf="isLoading()">
+    <ion-grid class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="vac-tag-body ion-padding">
-            <div class="vac-card-header ion-margin-bottom">
-              <ion-skeleton-text animated style="width: 40px; height: 40px; border-radius: 12px;" class="ion-margin-end"></ion-skeleton-text>
-              <div class="vac-card-title-group" style="flex: 1;">
-                <ion-skeleton-text animated style="width: 70%; height: 16px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+          <div class="uniform-card">
+            <div class="vac-card-header ion-padding-bottom">
+              <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
+              <div class="vac-card-title-group vac-flex-1">
+                <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
               </div>
-              <ion-skeleton-text animated style="width: 50px; height: 24px; border-radius: 8px;"></ion-skeleton-text>
             </div>
-
-            <ion-row class="ion-margin-vertical">
-              <ion-col size="6">
-                <ion-skeleton-text animated style="width: 60%; height: 12px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 90%; height: 14px;"></ion-skeleton-text>
-              </ion-col>
-              <ion-col size="6">
-                <ion-skeleton-text animated style="width: 60%; height: 12px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 90%; height: 14px;"></ion-skeleton-text>
-              </ion-col>
-            </ion-row>
-
-            <div class="vac-card-footer ion-padding-top" style="border-top: 1px solid rgba(0,0,0,0.05); display: flex; gap: 8px;">
-              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
+            <div class="vac-card-content">
+              <ion-skeleton-text animated style="width: 100%; height: 60px;"></ion-skeleton-text>
+              <div class="card-footer-flex mt-2 pt-2">
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+              </div>
             </div>
           </div>
         </ion-col>
@@ -7755,42 +8395,47 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     </ion-grid>
 
     <!-- LISTA ESTANDARIZADA -->
-    <ion-grid class="ion-no-padding ion-margin-top" *ngIf="filteredSanidad().length > 0 && !isLoading()">
+    <ion-grid class="ion-no-padding" *ngIf="filteredSanidad().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of filteredSanidad()">
-          <div class="vac-tag-body">
+          <div class="uniform-card clickable-card" (click)="goToDetail(s.bovino_id)">
             <div class="vac-card-header">
-              <div class="vac-card-icon" [style.background-color]="'var(--ion-color-light)'">
-                <ion-icon [name]="getHealthIcon(s.tipo)" color="primary"></ion-icon>
-              </div>
-              <div class="vac-card-title-group">
-                <strong>{{ s.bovino?.nombre || 'Ejemplar' }}</strong>
-                <span>{{ s.bovino?.crotal || 'S/N' }}</span>
-              </div>
-              <div class="flex-1"></div>
-              <ion-badge [color]="getDiasRestantes(s) > 0 ? 'danger' : 'success'" mode="ios">
-                {{ getDiasRestantes(s) > 0 ? getDiasRestantes(s) + 'd' : 'Libre' }}
-              </ion-badge>
+               <div class="vac-card-icon" [ngClass]="getBadgeColor(s.tipo)" slot="start">
+                 <ion-icon [name]="getHealthIcon(s.tipo)" color="light"></ion-icon>
+               </div>
+               <div class="vac-card-title-group ion-text-wrap">
+                 <h2 class="ion-text-wrap"><strong>{{ s.bovino?.nombre || 'Res S/N' }}</strong></h2>
+                 <h3 class="ion-text-wrap">{{ s.tipo }} • {{ s.fecha | date:'dd MMM yyyy' }}</h3>
+               </div>
+               <ion-badge *ngIf="getDiasRestantes(s) > 0" color="warning" class="status-badge" mode="ios" slot="end">
+                 <ion-icon name="time-outline" class="mr-1"></ion-icon>
+                 {{ getDiasRestantes(s) }} d. Retiro
+               </ion-badge>
             </div>
 
-            <div class="vac-card-grid">
-              <div class="vac-card-info">
-                <span class="label">Tratamiento</span>
-                <span class="value">{{ s.tipo }}: {{ s.producto }}</span>
+            <div class="vac-card-content">
+              <div class="vac-card-info mb-3">
+                <span class="label">Producto Aplicado</span>
+                <p class="value">{{ s.producto }}</p>
               </div>
-              <div class="vac-card-info">
-                <span class="label">Fecha Aplicación</span>
-                <span class="value">{{ s.fecha | date:'dd MMM yyyy' }}</span>
+              
+              <div class="vac-card-info mb-3" *ngIf="s.observaciones">
+                <span class="label">Observaciones</span>
+                <p class="value-sm line-clamp-2">{{ s.observaciones }}</p>
               </div>
-            </div>
 
-            <div class="vac-card-footer mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
-              <ion-button fill="clear" color="medium" (click)="openEditModal(s)">
-                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" color="danger" (click)="confirmDelete(s)">
-                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-              </ion-button>
+              <div class="card-footer-flex mt-2 pt-2 border-top">
+                <ion-button fill="clear" color="medium" (click)="openEditModal(s)" aria-label="Editar">
+                  <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="confirmDelete(s)" aria-label="Eliminar">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <div class="ml-auto text-end" *ngIf="s.costo_aplicacion">
+                  <span class="label block">Costo</span>
+                  <strong class="text-primary">{{ s.costo_aplicacion | number:'1.2-2' }}€</strong>
+                </div>
+              </div>
             </div>
           </div>
         </ion-col>
@@ -7911,11 +8556,14 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.ts
 
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem,
   IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-  IonCard, IonAvatar, IonCardContent, IonGrid, IonRow, IonCol,
+  IonGrid, IonRow, IonCol,
   IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -7943,7 +8591,7 @@ import { GanadoService } from '../../core/services/ganado.service';
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonItem, IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, 
     IonFab, IonFabButton, IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-    IonCard, IonAvatar, IonCardContent, IonGrid, IonRow, IonCol,
+    IonGrid, IonRow, IonCol,
     IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
   ],
   templateUrl: './sanidad.component.html'
@@ -7955,6 +8603,7 @@ export class SanidadComponent implements OnInit {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
+  private router = inject(Router);
   
   sanidadRecords: Sanidad[] = [];
   filteredSanidad = signal<Sanidad[]>([]);
@@ -8008,24 +8657,41 @@ export class SanidadComponent implements OnInit {
     this.loadData(event);
   }
 
-  async exportarPDF() {
-    this.presentToast('Generando PDF...', 'primary');
+  goToDetail(bovinoId: string) {
+    if (bovinoId) {
+      this.router.navigate(['/animal-detail', bovinoId]);
+    }
+  }
+
+  exportarPDF() {
+    const doc = new jsPDF();
     
-    const headers = [['Fecha', 'Crotal', 'Tratamiento', 'Producto', 'Observaciones']];
-    const body = this.filteredSanidad().map(s => [
-      s.fecha ? new Date(s.fecha).toLocaleDateString() : 'N/A',
-      s.bovino?.crotal || 'S/N',
-      s.tipo || '-',
-      s.producto || '-',
-      s.observaciones || '-'
+    // Título del PDF
+    doc.setFontSize(18);
+    doc.text('Registro Oficial de Sanidad - Vacapp', 14, 22);
+    
+    doc.setFontSize(11);
+    doc.text(`Fecha de exportación: ${new Date().toLocaleDateString()}`, 14, 30);
+
+    // Mapeamos los datos
+    const data = this.filteredSanidad().map(item => [
+      item.fecha ? new Date(item.fecha).toLocaleDateString() : 'N/A',
+      item.bovino?.crotal || 'S/N',
+      item.tipo || '-',
+      item.producto || '-'
     ]);
 
-    await this.pdfService.generateTablePDF(
-      'Registro Oficial de Sanidad - Vacapp',
-      headers,
-      body,
-      'registro_sanidad_vacapp'
-    );
+    // Generar la tabla
+    autoTable(doc, {
+      startY: 35,
+      head: [['Fecha', 'Crotal', 'Tratamiento', 'Producto']],
+      body: data,
+      headStyles: { fillColor: [92, 131, 116] }, // Color primario de tu app en RGB
+      alternateRowStyles: { fillColor: [245, 245, 245] }
+    });
+
+    // Descargar el archivo
+    doc.save('registro_sanidad.pdf');
   }
 
   onSearch(event: any) {
@@ -8169,8 +8835,11 @@ ARCHIVO: .\frontend\src\environments\environment.development.ts
 
 export const environment = {
   production: false,
-  supabaseUrl: 'TU_SUPABASE_URL_AQUI',
-  supabaseKey: 'TU_SUPABASE_KEY_AQUI'
+  // CONFIGURACIÓN DE SUPABASE (DESARROLLO)
+  supabaseUrl: '', 
+  supabaseKey: '',
+  // MODO MOCK: Fallback activado por defecto si no hay credenciales
+  useMockData: false 
 };
 
 
@@ -8180,9 +8849,13 @@ ARCHIVO: .\frontend\src\environments\environment.ts
 
 export const environment = {
   production: false,
-  supabaseUrl: '',
+  // CONFIGURACIÓN DE SUPABASE
+  // Reemplaza estos valores con las credenciales de tu proyecto en https://app.supabase.com
+  supabaseUrl: '', 
   supabaseKey: '',
-  useMockData: true
+  // MODO MOCK: Si está en true, el sistema usará LocalStorage en lugar de Supabase.
+  // Si está en false y no hay credenciales, se activará el modo Mock automáticamente como fallback.
+  useMockData: false 
 };
 
 
@@ -8850,8 +9523,166 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   border-top: 4px solid variables.$tertiary-color;
 }
 
-.vac-tag-body, .vac-field-card-body, .vac-health-card-body, .vac-repro-card-body, .vac-weight-card-body {
+.vac-tag-body, .vac-field-card-body, .vac-health-card-body, .vac-repro-card-body, .vac-weight-card-body, .vac-cow-card {
   @extend .vac-base-card;
+}
+
+/* RUSTIC CARD - The definitive Vacapp standard */
+.rustic-card {
+  background: variables.$white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(88, 47, 14, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  margin: 12px 8px;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* UNIFORM CARD - Standard for lists and inventories */
+.uniform-card {
+  @extend .rustic-card;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  margin: 8px !important;
+
+  &.clickable-card {
+    cursor: pointer;
+    &:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+  }
+}
+
+.vac-login-card {
+  max-width: 400px;
+  width: 100%;
+  margin: auto !important;
+  @extend .rustic-card;
+}
+
+/* BASE CARD - Standard Vacapp Floating Card (Legacy mapping) */
+.vac-base-card {
+  @extend .rustic-card;
+  padding: 1.25rem;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, variables.$tertiary-color, transparent);
+    opacity: 0;
+    transition: variables.$transition-base;
+  }
+
+  &:hover {
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+/* SKELETON UTILITIES */
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+.skeleton-avatar-lg {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+.skeleton-avatar-xl {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+}
+.skeleton-title {
+  width: 70%;
+  height: 16px;
+}
+.skeleton-subtitle {
+  width: 40%;
+  height: 12px;
+}
+.skeleton-badge {
+  width: 50px;
+  height: 24px;
+  border-radius: 8px;
+}
+.skeleton-kpi {
+  width: 60%;
+  height: 30px;
+}
+.skeleton-label {
+  width: 60%;
+  height: 12px;
+}
+.skeleton-value {
+  width: 90%;
+  height: 14px;
+}
+.skeleton-value-sm {
+  width: 45%;
+  height: 14px;
+}
+.skeleton-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+.skeleton-btn-wide {
+  width: 80px;
+  height: 32px;
+  border-radius: 8px;
+  margin-left: auto;
+}
+.skeleton-chart-main {
+  width: 100%;
+  height: 250px;
+}
+.chart-skeleton {
+  width: 100%;
+  height: 250px;
+}
+
+/* CARD LAYOUT UTILITIES */
+.vac-flex-1 {
+  flex: 1;
+}
+.card-footer-flex {
+  border-top: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.bg-light-soft {
+  background-color: var(--ion-color-light);
+}
+
+/* OTHER UTILITIES */
+.vac-transparent-searchbar {
+  padding: 0;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+.btn-rounded-12 {
+  --border-radius: 12px;
+}
+.chart-300px {
+  height: 300px;
 }
 
 
@@ -9347,6 +10178,37 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
 }
 
 /* 16. IMAGES & CONTAINERS */
+/* STATUS BADGE - Unified Badge System */
+.status-badge {
+  padding: 6px 14px !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: 0.72rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* IMAGE & AVATAR SYSTEM */
+.avatar-list {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 14px !important;
+  object-fit: cover !important;
+  border: 2px solid rgba(variables.$tertiary-color, 0.2);
+  background: variables.$gray-100;
+}
+
+.img-header {
+  width: 100% !important;
+  height: 220px !important;
+  object-fit: cover !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
 .vac-img-container {
   width: 100%;
   aspect-ratio: 4 / 3;
@@ -9612,6 +10474,7 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
 
 @use '../abstracts/variables' as v;
 @use '../abstracts/mixins' as m;
+@use '../components/cards';
 
 // .vac-toolbar moved to core/_ionic.scss for global standardization
 
@@ -9632,10 +10495,7 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
 }
 
 .vac-kpi-card {
-  border-radius: 16px;
-  margin: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  @extend .rustic-card;
   padding: 16px;
   display: flex;
   align-items: center;
@@ -9664,12 +10524,9 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
 }
 
 .vac-main-card {
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  margin: 8px;
+  @extend .rustic-card;
+  margin: 12px;
   overflow: hidden;
-  background: var(--ion-card-background);
 
   .vac-card-header-flex {
     display: flex;
@@ -9770,38 +10627,9 @@ ARCHIVO: .\frontend\src\styles\features\_manejo.scss
   }
 }
 
-/* TARJETA DE EJEMPLAR (VAC-TAG-BODY) */
+/* TARJETA DE EJEMPLAR (UNIFIED) */
 .vac-cow-card {
-  @extend .vac-tag-body !optional;
-  
-  .vac-avatar-wrapper {
-    position: relative;
-    
-    .vac-avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      overflow: hidden;
-      
-      .avatar-img {
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-      }
-      
-      .avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--vac-bg-soft);
-        font-size: 1.5rem;
-        color: var(--ion-color-primary);
-      }
-    }
-  }
+  @extend .uniform-card;
 }
 
 /* WIZARD & MODAL */
@@ -9948,79 +10776,24 @@ ARCHIVO: .\frontend\src\styles\features\_manejo.scss
 ARCHIVO: .\frontend\src\styles\features\_recria.scss
 ==================================================
 
+@use '../abstracts/variables' as v;
+@use '../components/cards';
+
 /* --- Módulo de Recría y Control de Pesaje --- */
 
-.vac-animal-selector {
-  margin-bottom: 1.5rem;
-  
-  .vac-animal-card {
-    background: var(--vac-card-background);
-    border-radius: var(--vac-card-radius);
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-    border: 1px solid var(--vac-border-color);
-    box-shadow: var(--vac-shadow-sm);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--vac-shadow-md);
-      border-color: var(--ion-color-primary);
-    }
-  }
+// Animal Selection Cards
+.vac-animal-card {
+  @extend .uniform-card;
 }
 
-/* MÉTRICAS DE RENDIMIENTO */
+// Metric Cards Unificaton
 .vac-metric-card {
+  @extend .rustic-card;
   padding: 1.5rem;
-  border-radius: var(--vac-card-radius);
-  background: var(--vac-card-background);
-  box-shadow: var(--vac-shadow-sm);
   display: flex;
   align-items: center;
   gap: 1.25rem;
   height: 100%;
-  border: 1px solid var(--vac-border-color);
-  margin-bottom: 1rem;
-
-  .vac-metric-icon {
-    width: 54px;
-    height: 54px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    flex-shrink: 0;
-  }
-
-  .vac-metric-info {
-    display: flex;
-    flex-direction: column;
-    
-    .label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--vac-text-muted);
-      font-weight: 600;
-    }
-
-    .value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      font-family: var(--vac-font-title);
-      color: var(--vac-text-main);
-      line-height: 1.2;
-
-      small {
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: var(--vac-text-muted);
-      }
-    }
-  }
 }
 
 /* HISTORIAL DE PESADA */
@@ -10119,6 +10892,7 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
 ==================================================
 
 @use '../abstracts/variables';
+@use '../components/cards';
 
 // Estilos para el módulo de Reproducción (Neutral & Simple)
 /**
@@ -10147,40 +10921,7 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
 }
 
 .vac-repro-card {
-  --background: var(--ion-card-background);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
-  border: 1px solid rgba(variables.$primary-color, 0.1);
-  margin: 0;
-  transition: transform 0.3s ease;
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  ion-card-header {
-    padding-bottom: 8px;
-  }
-
-  ion-card-subtitle {
-    color: variables.$primary-color;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  ion-card-title {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: variables.$dark-color;
-  }
-
-  .vac-status-badge {
-    margin-top: 10px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 700;
-  }
+  @extend .uniform-card;
 }
 
 // Animación de Latido Suave para indicar vida/gestación
@@ -10295,6 +11036,7 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
 
 // Estilos para el Módulo de Sanidad (Calendario y Tratamientos)
 @use '../abstracts/variables';
+@use '../components/cards';
 
 /**
  * Estilos para el Historial Clínico y Sanitario
@@ -10322,82 +11064,9 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
   }
 }
 
-// Historial/Tabla de Datos (ion-grid)
-.vac-health-table {
-  background: var(--ion-card-background);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
-  overflow: hidden;
-  border: 1px solid rgba(variables.$primary-color, 0.08);
-  margin-bottom: 80px; // Espacio para el FAB
-
-  .vac-table-header {
-    background: rgba(variables.$primary-color, 0.04);
-    border-bottom: 1px solid rgba(variables.$primary-color, 0.1);
-    
-    ion-col {
-      font-weight: 700;
-      color: variables.$primary-color;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 16px 12px;
-    }
-  }
-
-  .vac-table-row {
-    border-bottom: 1px solid rgba(variables.$gray-200, 0.5);
-    transition: background 0.2s ease;
-    align-items: center;
-
-    &:hover {
-      background: rgba(variables.$primary-color, 0.02);
-    }
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    ion-col {
-      padding: 14px 12px;
-      font-size: 0.95rem;
-      color: var(--ion-text-color);
-      display: flex;
-      align-items: center;
-    }
-
-    .vac-date-cell {
-      font-weight: 600;
-      color: variables.$gray-600;
-    }
-
-    .vac-animal-cell {
-      flex-direction: column;
-      align-items: flex-start;
-      
-      .vac-animal-name {
-        font-weight: 700;
-        color: variables.$primary-color;
-      }
-      .vac-animal-id {
-        font-size: 0.8rem;
-        color: variables.$gray-600;
-      }
-    }
-
-    .vac-type-badge {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      
-      &.vacunacion { background: rgba(variables.$success-color, 0.1); color: variables.$success-color; }
-      &.desparasitacion { background: rgba(variables.$primary-color, 0.1); color: variables.$primary-color; }
-      &.saneamiento { background: rgba(variables.$warning-color, 0.1); color: variables.$warning-color; }
-      &.enfermedad { background: rgba(variables.$danger-color, 0.1); color: variables.$danger-color; }
-    }
-  }
+// Historial/Tabla de Datos (Simulated with Cards for better UX)
+.vac-health-list {
+  margin-bottom: 80px;
 }
 
 // Modal de Sanidad
@@ -10809,17 +11478,24 @@ body {
   background-color: var(--ion-background-color);
 }
 
+/* Base Component Standardization (Rustic-Luxe) */
 ion-card {
+  --border-radius: 16px !important;
   border-radius: 16px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04) !important;
   margin-inline: 16px;
   margin-block: 12px;
-  border: 1px solid rgba(0,0,0,0.02);
+  border: 1px solid rgba(88, 47, 14, 0.05); /* Soft Earth border */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
 ion-button {
   --border-radius: 12px;
   --box-shadow: none;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 ion-badge {
@@ -10827,8 +11503,9 @@ ion-badge {
   --padding-end: 12px;
   --padding-top: 6px;
   --padding-bottom: 6px;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 12px; /* Standardized radius */
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* Efectos Globales de Personalización (Vacapp Neutral) */

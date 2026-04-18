@@ -1,3 +1,8 @@
+# MODO DE USO MANUAL EN TERMINAL:
+# 1. Abre la terminal o PowerShell
+# 2. Asegúrate de estar en la carpeta raíz (c:\xampp\htdocs\vacapp)
+# 3. Ejecuta el comando: python bundle_project.py
+
 import os
 
 # Configuración

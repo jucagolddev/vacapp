@@ -1,5 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem,
   IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
@@ -44,6 +47,7 @@ export class SanidadComponent implements OnInit {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
+  private router = inject(Router);
   
   sanidadRecords: Sanidad[] = [];
   filteredSanidad = signal<Sanidad[]>([]);
@@ -97,24 +101,41 @@ export class SanidadComponent implements OnInit {
     this.loadData(event);
   }
 
-  async exportarPDF() {
-    this.presentToast('Generando PDF...', 'primary');
+  goToDetail(bovinoId: string) {
+    if (bovinoId) {
+      this.router.navigate(['/animal-detail', bovinoId]);
+    }
+  }
+
+  exportarPDF() {
+    const doc = new jsPDF();
     
-    const headers = [['Fecha', 'Crotal', 'Tratamiento', 'Producto', 'Observaciones']];
-    const body = this.filteredSanidad().map(s => [
-      s.fecha ? new Date(s.fecha).toLocaleDateString() : 'N/A',
-      s.bovino?.crotal || 'S/N',
-      s.tipo || '-',
-      s.producto || '-',
-      s.observaciones || '-'
+    // Título del PDF
+    doc.setFontSize(18);
+    doc.text('Registro Oficial de Sanidad - Vacapp', 14, 22);
+    
+    doc.setFontSize(11);
+    doc.text(`Fecha de exportación: ${new Date().toLocaleDateString()}`, 14, 30);
+
+    // Mapeamos los datos
+    const data = this.filteredSanidad().map(item => [
+      item.fecha ? new Date(item.fecha).toLocaleDateString() : 'N/A',
+      item.bovino?.crotal || 'S/N',
+      item.tipo || '-',
+      item.producto || '-'
     ]);
 
-    await this.pdfService.generateTablePDF(
-      'Registro Oficial de Sanidad - Vacapp',
-      headers,
-      body,
-      'registro_sanidad_vacapp'
-    );
+    // Generar la tabla
+    autoTable(doc, {
+      startY: 35,
+      head: [['Fecha', 'Crotal', 'Tratamiento', 'Producto']],
+      body: data,
+      headStyles: { fillColor: [92, 131, 116] }, // Color primario de tu app en RGB
+      alternateRowStyles: { fillColor: [245, 245, 245] }
+    });
+
+    // Descargar el archivo
+    doc.save('registro_sanidad.pdf');
   }
 
   onSearch(event: any) {

@@ -15,14 +15,27 @@ export class SupabaseService {
 
   constructor() {
     // Inicialización del cliente Supabase
-    if (environment.supabaseUrl && environment.supabaseKey && !environment.useMockData) {
-      this.supabase = createClient(
-        environment.supabaseUrl,
-        environment.supabaseKey
-      );
+    const hasCredentials = !!(environment.supabaseUrl && environment.supabaseKey);
+    const mockForced = !!environment.useMockData;
+
+    if (hasCredentials && !mockForced) {
+      try {
+        this.supabase = createClient(
+          environment.supabaseUrl, 
+          environment.supabaseKey
+        );
+        console.log('%c✅ Vacapp: Conexión establecida con Supabase.', 'color: #2d6a4f; font-weight: bold;');
+      } catch (error) {
+        console.error('❌ Vacapp: Error crítico al inicializar el cliente de Supabase:', error);
+      }
     } else {
-      const mode = environment.useMockData ? 'MODO MOCK (Forzado)' : 'MODO MOCK (Por falta de credenciales)';
-      console.warn(`Ejecutando en ${mode}. Almacenamiento local activo.`);
+      // Determinamos la razón del modo Mock
+      const reason = mockForced 
+        ? 'MODO MOCK (Forzado por configuración)' 
+        : 'MODO MOCK (Fallback: Faltan credenciales)';
+      
+      console.warn(`%c🚀 Vacapp: Ejecutando en ${reason}.`, 'color: #d4a373; font-weight: bold;');
+      console.info('Utilizando almacenamiento LocalStorage para persistencia temporal.');
       this.seedTestData();
     }
   }
@@ -163,6 +176,56 @@ export class SupabaseService {
         callback(payload);
       })
       .subscribe();
+  }
+
+  /** --- INTELIGENCIA DE DATOS (VISTA ÚNICA) --- **/
+
+  /**
+   * Obtiene toda la información relacionada de un animal en una sola carga.
+   * Ideal para la Vista de Detalle Única.
+   */
+  async getAnimalCompleteData(id: string) {
+    if (!this.supabase || environment.useMockData) {
+      // Mock Aggregation
+      const { data: bovinos } = await this.getAll<any>('bovinos');
+      const bovino = bovinos.find(b => b.id === id);
+      
+      const { data: sanidad } = await this.getAll<any>('sanidad');
+      const { data: repro } = await this.getAll<any>('reproduccion');
+      const { data: pesajes } = await this.getAll<any>('recria_pesajes');
+      const { data: finanzas } = await this.getAll<any>('finanzas');
+
+      return {
+        data: {
+          bovino,
+          sanidad: sanidad.filter((s: any) => s.bovino_id === id),
+          reproduccion: repro.filter((r: any) => r.bovino_id === id),
+          pesajes: pesajes.filter((p: any) => p.bovino_id === id),
+          finanzas: finanzas.filter((f: any) => f.bovino_id === id)
+        },
+        error: null
+      };
+    }
+
+    // Supabase Parallel Fetch
+    const [bovinoRes, sanidadRes, reproRes, pesajesRes, finanzasRes] = await Promise.all([
+      this.supabase.from('bovinos').select('*, lote:lote_id(*)').eq('id', id).single(),
+      this.supabase.from('sanidad').select('*').eq('bovino_id', id).order('fecha', { ascending: false }),
+      this.supabase.from('reproduccion').select('*, semental:semental_id(*)').eq('bovino_id', id).order('created_at', { ascending: false }),
+      this.supabase.from('recria_pesajes').select('*').eq('bovino_id', id).order('fecha_pesaje', { ascending: false }),
+      this.supabase.from('finanzas').select('*').eq('bovino_id', id).order('fecha', { ascending: false })
+    ]);
+
+    return {
+      data: {
+        bovino: bovinoRes.data,
+        sanidad: sanidadRes.data || [],
+        reproduccion: reproRes.data || [],
+        pesajes: pesajesRes.data || [],
+        finanzas: finanzasRes.data || []
+      },
+      error: bovinoRes.error
+    };
   }
 
   /** --- MÉTODOS DE ABSTRACCIÓN POR MÓDULO --- **/

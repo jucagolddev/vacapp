@@ -1,76 +1,21 @@
+@use '../abstracts/variables' as v;
+@use '../components/cards';
+
 /* --- Módulo de Recría y Control de Pesaje --- */
 
-.vac-animal-selector {
-  margin-bottom: 1.5rem;
-  
-  .vac-animal-card {
-    background: var(--vac-card-background);
-    border-radius: var(--vac-card-radius);
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-    border: 1px solid var(--vac-border-color);
-    box-shadow: var(--vac-shadow-sm);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--vac-shadow-md);
-      border-color: var(--ion-color-primary);
-    }
-  }
+// Animal Selection Cards
+.vac-animal-card {
+  @extend .uniform-card;
 }
 
-/* MÉTRICAS DE RENDIMIENTO */
+// Metric Cards Unificaton
 .vac-metric-card {
+  @extend .rustic-card;
   padding: 1.5rem;
-  border-radius: var(--vac-card-radius);
-  background: var(--vac-card-background);
-  box-shadow: var(--vac-shadow-sm);
   display: flex;
   align-items: center;
   gap: 1.25rem;
   height: 100%;
-  border: 1px solid var(--vac-border-color);
-  margin-bottom: 1rem;
-
-  .vac-metric-icon {
-    width: 54px;
-    height: 54px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    flex-shrink: 0;
-  }
-
-  .vac-metric-info {
-    display: flex;
-    flex-direction: column;
-    
-    .label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--vac-text-muted);
-      font-weight: 600;
-    }
-
-    .value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      font-family: var(--vac-font-title);
-      color: var(--vac-text-main);
-      line-height: 1.2;
-
-      small {
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: var(--vac-text-muted);
-      }
-    }
-  }
 }
 
 /* HISTORIAL DE PESADA */

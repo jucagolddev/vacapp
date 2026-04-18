@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
@@ -67,7 +68,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of finanzasService.records().slice(0, 20)">
-              <div class="uniform-card">
+              <div class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
                 <div class="vac-card-header-flex">
                   <div class="vac-icon-circle" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
                     <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-outline' : 'arrow-down-outline'" [class.color-light]="r.tipo === 'Ingreso'" [class.color-warning]="r.tipo !== 'Ingreso'"></ion-icon>
@@ -183,6 +184,7 @@ export class FinanzasComponent {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
+  private router = inject(Router);
   
   isModalOpen = false;
   editingItem: Finanzas | null = null;
@@ -216,6 +218,12 @@ export class FinanzasComponent {
       }
     }
   };
+
+  goToDetail(id: string) {
+    if (id) {
+      this.router.navigate(['/animal-detail', id]);
+    }
+  }
 
   constructor() {
     addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline });

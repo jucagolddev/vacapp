@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { 
@@ -46,6 +47,7 @@ export class ReproduccionComponent implements OnInit {
   private supa = inject(SupabaseService);
   public ganadoService = inject(GanadoService);
   private reproService = inject(ReproduccionService);
+  private router = inject(Router);
 
   public readonly METODOS = METODOS_REPRODUCCION;
   public readonly ESTADOS = ESTADOS_GESTACION;
@@ -128,6 +130,12 @@ export class ReproduccionComponent implements OnInit {
 
   handleRefresh(event: any) {
     this.loadData(event);
+  }
+
+  goToDetail(bovinoId: string) {
+    if (bovinoId) {
+      this.router.navigate(['/animal-detail', bovinoId]);
+    }
   }
 
   async exportarPDF() {

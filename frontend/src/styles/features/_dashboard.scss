@@ -3,6 +3,7 @@
 
 @use '../abstracts/variables' as v;
 @use '../abstracts/mixins' as m;
+@use '../components/cards';
 
 // .vac-toolbar moved to core/_ionic.scss for global standardization
 
@@ -23,10 +24,7 @@
 }
 
 .vac-kpi-card {
-  border-radius: 16px;
-  margin: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  @extend .rustic-card;
   padding: 16px;
   display: flex;
   align-items: center;
@@ -55,12 +53,9 @@
 }
 
 .vac-main-card {
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  margin: 8px;
+  @extend .rustic-card;
+  margin: 12px;
   overflow: hidden;
-  background: var(--ion-card-background);
 
   .vac-card-header-flex {
     display: flex;

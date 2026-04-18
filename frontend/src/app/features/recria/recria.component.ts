@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
@@ -92,26 +93,26 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <!-- LISTA ESTANDARIZADA -->
            <ion-grid class="ion-no-padding">
              <ion-row>
-               <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-                 <div class="uniform-card" (click)="selectBovino(b)">
+                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+                  <div class="uniform-card clickable-card" (click)="selectBovino(b)">
                    <div class="vac-card-header-flex">
-                     <div class="vac-avatar-wrapper">
-                       <div *ngIf="b.foto_url" class="vac-avatar" [style.background-image]="'url(' + b.foto_url + ')'"></div>
-                       <div *ngIf="!b.foto_url" class="vac-avatar-placeholder">
-                         <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
-                       </div>
-                     </div>
-                     <div class="vac-card-title-group">
-                       <h3>{{ b.nombre }}</h3>
-                       <p>{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</p>
-                     </div>
-                     <div class="vac-badge-status-simple">
-                        <ion-icon name="chevron-forward-outline"></ion-icon>
-                     </div>
-                   </div>
+                      <div class="ion-margin-end">
+                         <img *ngIf="b.foto_url" [src]="b.foto_url" class="avatar-list" [alt]="b.nombre">
+                         <div *ngIf="!b.foto_url" class="avatar-list flex items-center justify-center bg-light-soft color-primary">
+                            <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+                         </div>
+                      </div>
+                      <div class="vac-card-title-group">
+                        <h2 class="ion-text-wrap"><strong>{{ b.nombre }}</strong></h2>
+                        <h3 class="ion-text-wrap">{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</h3>
+                      </div>
+                      <div class="vac-badge-status-simple">
+                         <ion-icon name="chevron-forward-outline"></ion-icon>
+                      </div>
+                    </div>
                    <div class="vac-card-footer mt-6 pt-4 border-t-light flex items-center justify-between">
                      <span class="vac-tag-mini">{{ ganadoService.calculateCategoria(b) }}</span>
-                     <span class="vac-info-label ml-auto">Consultar Ficha</span>
+                     <span class="vac-info-label ml-auto" (click)="goToDetail(b.id); $event.stopPropagation()">Consultar Ficha</span>
                    </div>
                  </div>
                </ion-col>
@@ -195,7 +196,10 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                        <ion-icon name="time-outline" class="mr-1"></ion-icon>
                        {{ p.fecha_pesaje | date:'dd MMM yyyy' }}
                      </span>
-                     <ion-badge slot="end" class="vac-badge-success ml-auto">Completado</ion-badge>
+                     <ion-badge color="success" class="status-badge ml-auto">
+                        <ion-icon name="checkmark-circle-outline" class="mr-1"></ion-icon>
+                        Completado
+                     </ion-badge>
                    </div>
                  </div>
                </ion-col>
@@ -294,6 +298,7 @@ export class RecriaComponent implements OnInit {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
+  private router = inject(Router);
 
   selectedBovino: Bovino | null = null;
   searchTerm: string = '';
@@ -332,6 +337,12 @@ export class RecriaComponent implements OnInit {
 
   async ngOnInit() {
     // No necesitamos cargar nada aquí ya que GanadoService ya tiene los bovinos
+  }
+
+  goToDetail(id: string) {
+    if (id) {
+      this.router.navigate(['/animal-detail', id]);
+    }
   }
 
   async exportarPDF() {
@@ -494,7 +505,7 @@ export class RecriaComponent implements OnInit {
           text: 'Eliminar',
           role: 'destructive',
           handler: async () => {
-            const { error } = await this.supa.delete('pesajes_individuales', id);
+            const { error } = await this.supa.delete('recria_pesajes', id);
             if (error) {
               this.showToast('Error al eliminar', 'danger');
             } else {

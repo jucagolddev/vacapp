@@ -14,4 +14,3 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 export class AppComponent {
   // Este componente actúa como contenedor global y no requiere lógica compleja.
 }
-

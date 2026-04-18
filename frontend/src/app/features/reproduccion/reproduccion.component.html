@@ -35,7 +35,7 @@
 
     <!-- GRÁFICO DE FERTILIDAD -->
     <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
-      <ion-card-header>
+      <div class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>EFICIENCIA REPRODUCTIVA</span>
@@ -46,12 +46,12 @@
             <span>Tasa de éxito: 82%</span>
           </div>
         </div>
-      </ion-card-header>
-        <ion-card-content>
-          <div class="vac-chart-container chart-300px">
-            <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
-          </div>
-        </ion-card-content>
+      </div>
+      <div class="vac-card-content">
+        <div class="vac-chart-container chart-300px">
+          <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
+        </div>
+      </div>
     </div>
 
     <h2 class="vac-section-title" *ngIf="!isLoading()">Próximos Partos</h2>
@@ -60,17 +60,17 @@
     <ion-grid class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <ion-card class="uniform-card">
-            <ion-item lines="none" class="vac-card-header ion-margin-bottom">
+          <div class="uniform-card">
+            <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
-              <ion-label class="vac-card-title-group vac-flex-1">
+              <div class="vac-card-title-group vac-flex-1">
                 <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
                 <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
-              </ion-label>
+              </div>
               <ion-skeleton-text animated class="skeleton-badge" slot="end"></ion-skeleton-text>
-            </ion-item>
+            </div>
 
-            <ion-card-content>
+            <div class="vac-card-content">
               <div class="ion-margin-vertical">
                 <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
                 <ion-skeleton-text animated class="skeleton-value-sm"></ion-skeleton-text>
@@ -80,8 +80,8 @@
                 <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
                 <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
               </div>
-            </ion-card-content>
-          </ion-card>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -99,19 +99,22 @@
     <ion-grid class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredGestaciones()">
-          <ion-card class="uniform-card">
-            <ion-item lines="none" class="vac-card-header">
+          <div class="uniform-card">
+            <div class="vac-card-header">
               <div class="vac-card-icon bg-danger-soft" slot="start">
                 <ion-icon name="pulse-outline" color="danger"></ion-icon>
               </div>
-              <ion-label class="vac-card-title-group ion-text-wrap">
+              <div class="vac-card-title-group ion-text-wrap">
                 <h2 class="ion-text-wrap"><strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong></h2>
                 <h3 class="ion-text-wrap">FPP: {{ r.fecha_parto_prevista | date:'dd MMM yyyy' }}</h3>
-              </ion-label>
-              <ion-badge color="success" mode="ios" slot="end">Gestante</ion-badge>
-            </ion-item>
+              </div>
+              <ion-badge color="success" class="status-badge" mode="ios" slot="end">
+                <ion-icon name="heart-outline" class="mr-1"></ion-icon>
+                Gestante
+              </ion-badge>
+            </div>
 
-            <ion-card-content>
+            <div class="vac-card-content">
               <div class="vac-card-grid">
                 <div class="vac-card-info">
                   <span class="label">Cuenta Atrás</span>
@@ -127,8 +130,8 @@
                   <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                 </ion-button>
               </div>
-            </ion-card-content>
-          </ion-card>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -139,19 +142,19 @@
     <ion-grid class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredReproducciones()">
-          <ion-card class="uniform-card">
-            <ion-item lines="none" class="vac-card-header">
+          <div class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
+            <div class="vac-card-header">
               <div class="vac-card-icon bg-primary-soft" slot="start">
                 <ion-icon name="female-outline" color="primary"></ion-icon>
               </div>
-              <ion-label class="vac-card-title-group ion-text-wrap">
+              <div class="vac-card-title-group ion-text-wrap">
                 <h2 class="ion-text-wrap"><strong>{{ r.bovino?.nombre }}</strong></h2>
                 <h3 class="ion-text-wrap">{{ r.bovino?.crotal }}</h3>
-              </ion-label>
-              <ion-badge [color]="getStatusColor(r.estado_gestacion)" mode="ios" slot="end">{{ r.estado_gestacion }}</ion-badge>
-            </ion-item>
+              </div>
+              <ion-badge [color]="getStatusColor(r.estado_gestacion)" class="status-badge" mode="ios" slot="end">{{ r.estado_gestacion }}</ion-badge>
+            </div>
 
-            <ion-card-content>
+            <div class="vac-card-content">
               <div class="vac-card-grid">
                 <div class="vac-card-info">
                   <span class="label">Método / Fecha</span>
@@ -171,8 +174,8 @@
                   <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                 </ion-button>
               </div>
-            </ion-card-content>
-          </ion-card>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
     </ion-grid>

@@ -1,5 +1,6 @@
 // Estilos para el Módulo de Sanidad (Calendario y Tratamientos)
 @use '../abstracts/variables';
+@use '../components/cards';
 
 /**
  * Estilos para el Historial Clínico y Sanitario
@@ -27,82 +28,9 @@
   }
 }
 
-// Historial/Tabla de Datos (ion-grid)
-.vac-health-table {
-  background: var(--ion-card-background);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
-  overflow: hidden;
-  border: 1px solid rgba(variables.$primary-color, 0.08);
-  margin-bottom: 80px; // Espacio para el FAB
-
-  .vac-table-header {
-    background: rgba(variables.$primary-color, 0.04);
-    border-bottom: 1px solid rgba(variables.$primary-color, 0.1);
-    
-    ion-col {
-      font-weight: 700;
-      color: variables.$primary-color;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 16px 12px;
-    }
-  }
-
-  .vac-table-row {
-    border-bottom: 1px solid rgba(variables.$gray-200, 0.5);
-    transition: background 0.2s ease;
-    align-items: center;
-
-    &:hover {
-      background: rgba(variables.$primary-color, 0.02);
-    }
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    ion-col {
-      padding: 14px 12px;
-      font-size: 0.95rem;
-      color: var(--ion-text-color);
-      display: flex;
-      align-items: center;
-    }
-
-    .vac-date-cell {
-      font-weight: 600;
-      color: variables.$gray-600;
-    }
-
-    .vac-animal-cell {
-      flex-direction: column;
-      align-items: flex-start;
-      
-      .vac-animal-name {
-        font-weight: 700;
-        color: variables.$primary-color;
-      }
-      .vac-animal-id {
-        font-size: 0.8rem;
-        color: variables.$gray-600;
-      }
-    }
-
-    .vac-type-badge {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      
-      &.vacunacion { background: rgba(variables.$success-color, 0.1); color: variables.$success-color; }
-      &.desparasitacion { background: rgba(variables.$primary-color, 0.1); color: variables.$primary-color; }
-      &.saneamiento { background: rgba(variables.$warning-color, 0.1); color: variables.$warning-color; }
-      &.enfermedad { background: rgba(variables.$danger-color, 0.1); color: variables.$danger-color; }
-    }
-  }
+// Historial/Tabla de Datos (Simulated with Cards for better UX)
+.vac-health-list {
+  margin-bottom: 80px;
 }
 
 // Modal de Sanidad

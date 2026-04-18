@@ -19,7 +19,8 @@ import { PdfService } from '../../core/services/pdf.service';
 import { addIcons } from 'ionicons';
 import { 
   pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
-  trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline 
+  trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline,
+  paw 
 } from 'ionicons/icons';
 
 Chart.register(...registerables);
@@ -73,7 +74,7 @@ Chart.register(...registerables);
         <ion-grid class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
-              <ion-card class="vac-kpi-card glass animate-slide-up m-0 shadow-none border-none">
+              <div class="vac-kpi-card glass animate-slide-up m-0 shadow-none border-none">
                 <div class="vac-kpi-mini-icon">
                   <ion-icon name="paw-outline" color="primary"></ion-icon>
                 </div>
@@ -82,10 +83,10 @@ Chart.register(...registerables);
                   <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ totalBovinos() }}</h2>
                   <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
-              </ion-card>
+              </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <ion-card class="vac-kpi-card glass animate-slide-up delay-100 m-0 shadow-none border-none">
+              <div class="vac-kpi-card glass animate-slide-up delay-100 m-0 shadow-none border-none">
                 <div class="vac-kpi-mini-icon">
                   <ion-icon name="heart-outline" color="danger"></ion-icon>
                 </div>
@@ -94,10 +95,10 @@ Chart.register(...registerables);
                   <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ gestacionesActivas().length }}</h2>
                   <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
-              </ion-card>
+              </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <ion-card class="vac-kpi-card glass animate-slide-up delay-200 m-0 shadow-none border-none">
+              <div class="vac-kpi-card glass animate-slide-up delay-200 m-0 shadow-none border-none">
                 <div class="vac-kpi-mini-icon">
                   <ion-icon name="wallet-outline" color="tertiary"></ion-icon>
                 </div>
@@ -106,10 +107,10 @@ Chart.register(...registerables);
                   <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ saldoMensual() | number:'1.0-0' }}€</h2>
                   <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
-              </ion-card>
+              </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <ion-card class="vac-kpi-card glass animate-slide-up delay-300 m-0 shadow-none border-none">
+              <div class="vac-kpi-card glass animate-slide-up delay-300 m-0 shadow-none border-none">
                 <div class="vac-kpi-mini-icon">
                   <ion-icon name="scale-outline" color="secondary"></ion-icon>
                 </div>
@@ -118,7 +119,7 @@ Chart.register(...registerables);
                   <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ pesoMedio() }} kg</h2>
                   <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
-              </ion-card>
+              </div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -129,7 +130,7 @@ Chart.register(...registerables);
             <!-- ÁREA CHART: EVOLUCIÓN PESO -->
             <ion-col size="12" size-lg="8">
               <div class="vac-main-card animate-slide-up delay-400">
-                <ion-card-header>
+                <div class="vac-card-header">
                   <div class="vac-card-header-flex">
                     <div class="vac-card-title-group">
                       <span>EVOLUCIÓN PONDERADA</span>
@@ -140,49 +141,49 @@ Chart.register(...registerables);
                       <span>+8.2% este mes</span>
                     </div>
                   </div>
-                </ion-card-header>
-                <ion-card-content class="relative">
+                </div>
+                <div class="vac-card-content relative">
                   <div *ngIf="cargando()" class="vac-chart-skeleton">
                     <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
                   </div>
                   <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
-                </ion-card-content>
+                </div>
               </div>
             </ion-col>
-
+ 
             <!-- DONUT CHART: DISTRIBUCIÓN -->
             <ion-col size="12" size-lg="4">
               <div class="vac-main-card animate-slide-up delay-500">
-                <ion-card-header>
+                <div class="vac-card-header">
                   <div class="vac-card-title-group">
                     <span>DISTRIBUCIÓN</span>
                     <strong>Población por Lote</strong>
                   </div>
-                </ion-card-header>
-                <ion-card-content class="vac-chart-container-donut">
+                </div>
+                <div class="vac-card-content vac-chart-container-donut">
                   <div *ngIf="cargando()" class="vac-chart-skeleton flex justify-center items-center">
                     <ion-skeleton-text animated class="skeleton-avatar-xl"></ion-skeleton-text>
                   </div>
                   <canvas #lotesChart [hidden]="cargando()"></canvas>
-                </ion-card-content>
+                </div>
               </div>
             </ion-col>
-
+ 
             <!-- BAR CHART: FINANZAS -->
             <ion-col size="12">
               <div class="vac-main-card animate-slide-up delay-600">
-                <ion-card-header>
+                <div class="vac-card-header">
                   <div class="vac-card-title-group">
                     <span>GESTIÓN ECONÓMICA</span>
                     <strong>Balance Mensual Comparativo</strong>
                   </div>
-                </ion-card-header>
-                <ion-card-content>
+                </div>
+                <div class="vac-card-content">
                   <div *ngIf="cargando()" class="chart-skeleton">
                     <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
                   </div>
                   <canvas #financeChart class="chart-canvas-finance" [hidden]="cargando()"></canvas>
-                </ion-card-content>
+                </div>
               </div>
             </ion-col>
           </ion-row>
@@ -238,7 +239,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor() {
     addIcons({ 
       pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
-      trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline 
+      trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline,
+      paw
     });
 
     // Configuración Global de Chart.js
@@ -353,10 +355,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const stats = this.pesajeService.getEvolucionMensualHerd();
     
-    // Degradado Estándar Vacapp
-    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(27, 67, 50, 0.3)');
-    gradient.addColorStop(1, 'rgba(27, 67, 50, 0)');
+    // Degradado Espectacular
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(27, 67, 50, 0.6)');
+    gradient.addColorStop(0.5, 'rgba(27, 67, 50, 0.2)');
+    gradient.addColorStop(1, 'rgba(27, 67, 50, 0.0)');
 
     const chart = new Chart(ctx, {
       type: 'line',
@@ -367,27 +370,43 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           data: stats.data,
           borderColor: '#1b4332',
           borderWidth: 4,
-          tension: 0.4,
+          tension: 0.5, // Curvas más suaves
           fill: true,
           backgroundColor: gradient,
-          pointBackgroundColor: '#1b4332',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#1b4332',
+          pointBorderWidth: 3,
           pointRadius: 6,
-          pointHoverRadius: 8
+          pointHoverRadius: 10,
+          pointHoverBackgroundColor: '#d4a373',
+          pointHoverBorderColor: '#1b4332'
         }]
       },
       options: {
         responsive: true,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { weight: 600 }, color: '#582f0e' } },
-          y: { 
-            grid: { display: true, color: 'rgba(0,0,0,0.03)' }, 
-            beginAtZero: false,
-            ticks: { font: { weight: 600 }, color: '#582f0e' }
+        plugins: { 
+          legend: { display: false },
+          tooltip: {
+            usePointStyle: true,
+            boxPadding: 8
           }
-        }
+        },
+        scales: {
+          x: { 
+            grid: { display: false }, 
+            ticks: { font: { weight: 600, family: 'Outfit' }, color: '#582f0e', padding: 10 } 
+          },
+          y: { 
+            grid: { display: true, color: 'rgba(0,0,0,0.04)' }, 
+            border: { display: false },
+            beginAtZero: false,
+            ticks: { font: { weight: 600, family: 'Outfit' }, color: '#582f0e', padding: 10 }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
       }
     });
     this.charts.push(chart);
@@ -414,16 +433,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             '#a3b18a', // Sage
             '#dda15e'  // Harvest
           ],
-          borderWidth: 4,
-          borderColor: '#fff',
-          hoverOffset: 15
+          borderWidth: 3,
+          borderColor: '#ffffff',
+          hoverOffset: 25,
+          borderRadius: 6 // Bordes redondeados espectaculares
         }]
       },
       options: {
         responsive: true,
-        cutout: '75%',
+        cutout: '72%',
+        layout: { padding: 10 },
         plugins: {
-          legend: { position: 'bottom' }
+          legend: { 
+            position: 'bottom',
+            labels: { font: { family: 'Outfit', weight: 600, size: 13 }, color: '#1b4332', padding: 20 }
+          }
         }
       }
     });
@@ -439,6 +463,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const ingresos = finData.map(d => d.ingresos);
     const gastos = finData.map(d => d.gastos);
 
+    // Degradados Cilíndricos
+    const gradIngresos = ctx.createLinearGradient(0, 0, 0, 400);
+    gradIngresos.addColorStop(0, '#1b4332');
+    gradIngresos.addColorStop(1, '#40916c');
+
+    const gradGastos = ctx.createLinearGradient(0, 0, 0, 400);
+    gradGastos.addColorStop(0, '#bc4749');
+    gradGastos.addColorStop(1, '#e5989b');
+
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -447,28 +480,47 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           {
             label: 'Ingresos (€)',
             data: ingresos,
-            backgroundColor: '#1b4332',
-            borderRadius: 8,
-            stack: 'Stack 0',
+            backgroundColor: gradIngresos,
+            borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 4, bottomRight: 4 },
+            borderSkipped: false,
+            barPercentage: 0.7,
+            categoryPercentage: 0.8
           },
           {
             label: 'Gastos (€)',
             data: gastos,
-            backgroundColor: '#bc4749',
-            borderRadius: 8,
-            stack: 'Stack 0',
+            backgroundColor: gradGastos,
+            borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 4, bottomRight: 4 },
+            borderSkipped: false,
+            barPercentage: 0.7,
+            categoryPercentage: 0.8
           }
         ]
       },
       options: {
         responsive: true,
         plugins: {
-          legend: { position: 'top' }
+          legend: { 
+            position: 'top',
+            labels: { font: { family: 'Outfit', weight: 600 }, color: '#1b4332', padding: 20 }
+          }
         },
         scales: {
-          x: { grid: { display: false } },
-          y: { grid: { color: 'rgba(0,0,0,0.03)' }, beginAtZero: true }
-        }
+          x: { 
+            grid: { display: false },
+            ticks: { font: { family: 'Outfit', weight: 600 }, color: '#582f0e', padding: 10 }
+          },
+          y: { 
+            grid: { color: 'rgba(0,0,0,0.04)' }, 
+            border: { display: false },
+            beginAtZero: true,
+            ticks: { font: { family: 'Outfit', weight: 600 }, color: '#582f0e', padding: 10 }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
       }
     });
     this.charts.push(chart);

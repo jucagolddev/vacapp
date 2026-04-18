@@ -36,81 +36,73 @@
     </div>
 
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
-    <ion-grid class="ion-no-padding ion-margin-top" *ngIf="isLoading()">
+    <ion-grid class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <ion-card class="uniform-card">
-            <ion-item lines="none" class="vac-card-header ion-margin-bottom">
+          <div class="uniform-card">
+            <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
-              <ion-label class="vac-card-title-group vac-flex-1">
+              <div class="vac-card-title-group vac-flex-1">
                 <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
                 <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
-              </ion-label>
-              <ion-skeleton-text animated class="skeleton-badge" slot="end"></ion-skeleton-text>
-            </ion-item>
-
-            <ion-card-content>
-              <ion-row class="ion-margin-vertical">
-                <ion-col size="6">
-                  <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
-                  <ion-skeleton-text animated class="skeleton-value"></ion-skeleton-text>
-                </ion-col>
-                <ion-col size="6">
-                  <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
-                  <ion-skeleton-text animated class="skeleton-value"></ion-skeleton-text>
-                </ion-col>
-              </ion-row>
-
-              <div class="card-footer-flex ion-padding-top mt-4">
+              </div>
+            </div>
+            <div class="vac-card-content">
+              <ion-skeleton-text animated style="width: 100%; height: 60px;"></ion-skeleton-text>
+              <div class="card-footer-flex mt-2 pt-2">
                 <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
                 <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
               </div>
-            </ion-card-content>
-          </ion-card>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
     </ion-grid>
 
     <!-- LISTA ESTANDARIZADA -->
-    <ion-grid class="ion-no-padding ion-margin-top" *ngIf="filteredSanidad().length > 0 && !isLoading()">
+    <ion-grid class="ion-no-padding" *ngIf="filteredSanidad().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of filteredSanidad()">
-          <ion-card class="uniform-card">
-            <ion-item lines="none" class="vac-card-header">
-              <div class="vac-card-icon bg-light-soft" slot="start">
-                <ion-icon [name]="getHealthIcon(s.tipo)" color="primary"></ion-icon>
-              </div>
-              <ion-label class="vac-card-title-group ion-text-wrap">
-                <h2 class="ion-text-wrap"><strong>{{ s.bovino?.nombre || 'Ejemplar' }}</strong></h2>
-                <h3 class="ion-text-wrap">{{ s.bovino?.crotal || 'S/N' }}</h3>
-              </ion-label>
-              <ion-badge [color]="getDiasRestantes(s) > 0 ? 'danger' : 'success'" mode="ios" slot="end">
-                {{ getDiasRestantes(s) > 0 ? getDiasRestantes(s) + 'd' : 'Libre' }}
-              </ion-badge>
-            </ion-item>
+          <div class="uniform-card clickable-card" (click)="goToDetail(s.bovino_id)">
+            <div class="vac-card-header">
+               <div class="vac-card-icon" [ngClass]="getBadgeColor(s.tipo)" slot="start">
+                 <ion-icon [name]="getHealthIcon(s.tipo)" color="light"></ion-icon>
+               </div>
+               <div class="vac-card-title-group ion-text-wrap">
+                 <h2 class="ion-text-wrap"><strong>{{ s.bovino?.nombre || 'Res S/N' }}</strong></h2>
+                 <h3 class="ion-text-wrap">{{ s.tipo }} • {{ s.fecha | date:'dd MMM yyyy' }}</h3>
+               </div>
+               <ion-badge *ngIf="getDiasRestantes(s) > 0" color="warning" class="status-badge" mode="ios" slot="end">
+                 <ion-icon name="time-outline" class="mr-1"></ion-icon>
+                 {{ getDiasRestantes(s) }} d. Retiro
+               </ion-badge>
+            </div>
 
-            <ion-card-content>
-              <div class="vac-card-grid">
-                <div class="vac-card-info">
-                  <span class="label">Tratamiento</span>
-                  <p class="value ion-text-wrap">{{ s.tipo }}: {{ s.producto }}</p>
-                </div>
-                <div class="vac-card-info">
-                  <span class="label">Fecha Aplicación</span>
-                  <p class="value ion-text-wrap">{{ s.fecha | date:'dd MMM yyyy' }}</p>
-                </div>
+            <div class="vac-card-content">
+              <div class="vac-card-info mb-3">
+                <span class="label">Producto Aplicado</span>
+                <p class="value">{{ s.producto }}</p>
+              </div>
+              
+              <div class="vac-card-info mb-3" *ngIf="s.observaciones">
+                <span class="label">Observaciones</span>
+                <p class="value-sm line-clamp-2">{{ s.observaciones }}</p>
               </div>
 
-              <div class="card-footer-flex mt-4 pt-2">
-                <ion-button fill="clear" color="medium" (click)="openEditModal(s)" aria-label="Editar registro">
+              <div class="card-footer-flex mt-2 pt-2 border-top">
+                <ion-button fill="clear" color="medium" (click)="openEditModal(s)" aria-label="Editar">
                   <ion-icon name="create-outline" slot="icon-only"></ion-icon>
                 </ion-button>
-                <ion-button fill="clear" color="danger" (click)="confirmDelete(s)" aria-label="Eliminar registro">
+                <ion-button fill="clear" color="danger" (click)="confirmDelete(s)" aria-label="Eliminar">
                   <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                 </ion-button>
+                <div class="ml-auto text-end" *ngIf="s.costo_aplicacion">
+                  <span class="label block">Costo</span>
+                  <strong class="text-primary">{{ s.costo_aplicacion | number:'1.2-2' }}€</strong>
+                </div>
               </div>
-            </ion-card-content>
-          </ion-card>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
     </ion-grid>

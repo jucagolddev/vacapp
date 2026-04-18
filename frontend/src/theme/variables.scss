@@ -87,17 +87,24 @@ body {
   background-color: var(--ion-background-color);
 }
 
+/* Base Component Standardization (Rustic-Luxe) */
 ion-card {
+  --border-radius: 16px !important;
   border-radius: 16px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04) !important;
   margin-inline: 16px;
   margin-block: 12px;
-  border: 1px solid rgba(0,0,0,0.02);
+  border: 1px solid rgba(88, 47, 14, 0.05); /* Soft Earth border */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
 ion-button {
   --border-radius: 12px;
   --box-shadow: none;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 ion-badge {
@@ -105,8 +112,9 @@ ion-badge {
   --padding-end: 12px;
   --padding-top: 6px;
   --padding-bottom: 6px;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 12px; /* Standardized radius */
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* Efectos Globales de Personalización (Vacapp Neutral) */

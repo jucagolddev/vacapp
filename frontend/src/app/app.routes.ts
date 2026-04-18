@@ -65,6 +65,12 @@ export const routes: Routes = [
         path: 'finanzas',
         title: 'Vacapp | Contabilidad',
         loadComponent: () => import('./features/finanzas/finanzas.component').then(m => m.FinanzasComponent)
+      },
+      // VISTA DE DETALLE ÚNICA (Intelligence Hub)
+      {
+        path: 'animal-detail/:id',
+        title: 'Vacapp | Detalle de Inteligencia',
+        loadComponent: () => import('./features/animal-detail/animal-detail.component').then(m => m.AnimalDetailComponent)
       }
     ]
   },

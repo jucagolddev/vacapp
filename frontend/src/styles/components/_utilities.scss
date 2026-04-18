@@ -165,6 +165,37 @@
 }
 
 /* 16. IMAGES & CONTAINERS */
+/* STATUS BADGE - Unified Badge System */
+.status-badge {
+  padding: 6px 14px !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: 0.72rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* IMAGE & AVATAR SYSTEM */
+.avatar-list {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 14px !important;
+  object-fit: cover !important;
+  border: 2px solid rgba(variables.$tertiary-color, 0.2);
+  background: variables.$gray-100;
+}
+
+.img-header {
+  width: 100% !important;
+  height: 220px !important;
+  object-fit: cover !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
 .vac-img-container {
   width: 100%;
   aspect-ratio: 4 / 3;

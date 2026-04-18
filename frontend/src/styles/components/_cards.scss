@@ -222,9 +222,25 @@
   @extend .vac-base-card;
 }
 
-/* UNIFORM CARD (Requested by Lead Architect) */
+/* RUSTIC CARD - The definitive Vacapp standard */
+.rustic-card {
+  background: variables.$white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(88, 47, 14, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  margin: 12px 8px;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* UNIFORM CARD - Standard for lists and inventories */
 .uniform-card {
-  @extend .vac-base-card;
+  @extend .rustic-card;
   display: flex !important;
   flex-direction: column !important;
   height: 100% !important;
@@ -237,11 +253,37 @@
       opacity: 0.9;
     }
   }
+}
 
-  &.vac-login-card {
-    max-width: 400px;
-    width: 100%;
-    margin: auto !important;
+.vac-login-card {
+  max-width: 400px;
+  width: 100%;
+  margin: auto !important;
+  @extend .rustic-card;
+}
+
+/* BASE CARD - Standard Vacapp Floating Card (Legacy mapping) */
+.vac-base-card {
+  @extend .rustic-card;
+  padding: 1.25rem;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, variables.$tertiary-color, transparent);
+    opacity: 0;
+    transition: variables.$transition-base;
+  }
+
+  &:hover {
+    &::before {
+      opacity: 1;
+    }
   }
 }
 
