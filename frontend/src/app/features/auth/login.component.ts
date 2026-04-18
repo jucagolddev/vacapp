@@ -3,19 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { 
-  IonContent, IonCard, IonCardContent, IonInput, IonButton, IonSpinner, IonText
+  IonContent, IonInput, IonButton, IonSpinner, IonText
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonCard, IonCardContent, IonInput, IonButton, IonSpinner, IonText],
+  imports: [CommonModule, FormsModule, IonContent, IonInput, IonButton, IonSpinner, IonText],
   template: `
     <ion-content color="light">
       <div class="flex-center justify-center h-full">
-        <ion-card class="login-card">
-          <ion-card-content>
+        <div class="uniform-card" class="vac-login-card">
+          <div>
             <h2 class="font-bold text-lg mb-8 text-center color-primary">
               Bienvenido a Vacapp
             </h2>
@@ -46,8 +46,8 @@ import { AuthService } from '../../core/services/auth.service';
               <p class="text-center mt-sm">Hemos enviado un enlace mágico a tu correo.</p>
             </ion-text>
 
-          </ion-card-content>
-        </ion-card>
+          </div>
+        </div>
       </div>
     </ion-content>
   `

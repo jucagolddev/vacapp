@@ -5,7 +5,7 @@ import {
   IonLabel, IonIcon, IonNote, IonGrid, 
   IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-  IonCard, IonBadge, IonCardContent, IonAvatar, IonCardHeader,
+  IonBadge,
   IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -41,7 +41,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonLabel, IonIcon, IonNote, IonGrid, 
     IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
     IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-    IonCard, IonBadge, IonCardContent, IonAvatar, IonCardHeader,
+    IonBadge,
     IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText,
     BaseChartDirective
   ],

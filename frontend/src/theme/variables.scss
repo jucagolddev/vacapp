@@ -1,5 +1,5 @@
 :root {
-  /** 100% Sincronizado con _variables.scss - Tema Rústico y Armónico **/
+  /** 100% Sincronizado con _variables.scss - Vacapp Neutral Design System **/
   
   /* Verde Bosque Profundo ($primary-color) */
   --ion-color-primary: #1b4332;
@@ -37,7 +37,7 @@
   --ion-color-warning-rgb: 221, 161, 94;
   --ion-color-warning-contrast: #212529;
 
-  /** Fondos Orgánicos Rustic-Luxe **/
+  /** Fondos Orgánicos Vacapp System **/
   --ion-background-color: #fefae0; /* Beige/Cream ($light-color) */
   --ion-background-color-rgb: 254, 250, 224;
 
@@ -109,7 +109,7 @@ ion-badge {
   font-weight: 600;
 }
 
-/* Efectos Globales de Personalización (Rústicos, no exagerados) */
+/* Efectos Globales de Personalización (Vacapp Neutral) */
 .vac-card {
   --border-radius: 12px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);

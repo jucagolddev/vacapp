@@ -1,12 +1,12 @@
 // _dashboard.scss
-// Dashboard Features - Luxe-Forest Theme
+// Dashboard Features - Standard Vacapp Layout
 
 @use '../abstracts/variables' as v;
 @use '../abstracts/mixins' as m;
 
 // .vac-toolbar moved to core/_ionic.scss for global standardization
 
-.bi-title {
+.vac-page-title {
   font-family: v.$font-family-base;
   font-size: 2.2rem;
   font-weight: 800;
@@ -15,14 +15,14 @@
   letter-spacing: -0.5px;
 }
 
-.bi-subtitle {
+.vac-page-subtitle {
   font-family: v.$font-family-base;
   font-size: 1.1rem;
   color: v.$medium-color;
   margin-top: 4px;
 }
 
-.bi-kpi-card {
+.vac-kpi-card {
   border-radius: 16px;
   margin: 6px;
   border: 1px solid rgba(255, 255, 255, 0.4);
@@ -33,58 +33,47 @@
   gap: 12px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
+
+  .vac-kpi-mini-icon {
+    font-size: 2rem;
+  }
+
+  .vac-kpi-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: v.$gray-600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .vac-kpi-value {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: v.$black;
+  }
 }
 
-.kpi-mini-icon {
-  font-size: 2rem;
-}
-
-.kpi-label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: v.$gray-600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.kpi-value {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: v.$black;
-}
-
-.bi-main-card {
+.vac-main-card {
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.4);
   margin: 8px;
   overflow: hidden;
   background: var(--ion-card-background);
-}
 
-.bi-card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.bi-mini-stat {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 30px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: v.$primary-color;
+  .vac-card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
 }
 
 .bg-primary-soft {
   background: rgba(27, 67, 50, 0.1);
 }
 
-.chart-container-donut {
+.vac-chart-container-donut {
   height: 300px;
   display: flex;
   align-items: center;
@@ -92,13 +81,13 @@
   position: relative;
 }
 
-.chart-skeleton {
+.vac-chart-skeleton {
   height: 100%;
   width: 100%;
   min-height: 250px;
 }
 
-.online-indicator {
+.vac-online-indicator {
   display: flex;
   align-items: center;
   gap: 8px;

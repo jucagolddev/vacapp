@@ -4,7 +4,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
   IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
-  IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCardSubtitle, IonAvatar
+  IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
@@ -14,7 +14,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { PdfService } from '../../core/services/pdf.service';
-import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline, documentTextOutline } from 'ionicons/icons';
+import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-finanzas',
@@ -23,7 +23,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle,
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
     IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
-    IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCardSubtitle, IonAvatar,
+    IonGrid, IonRow, IonCol,
     BaseChartDirective
   ],
   template: `
@@ -46,22 +46,20 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         
 
         <!-- GRÁFICO DE ROI (Relocado) -->
-        <div class="bi-main-card animate-slide-up mb-8">
-          <ion-card-header>
-            <div class="bi-card-head">
-              <div class="card-title-stack">
-                <span>ESTADO DE CUENTAS</span>
-                <strong>Ingresos vs Gastos Mensuales</strong>
-              </div>
-              <div class="bi-mini-stat bg-primary-soft">
-                <ion-icon name="trending-up-outline"></ion-icon>
-                <span>ROI en Crecimiento</span>
-              </div>
+        <div class="vac-main-card animate-slide-up mb-8">
+          <div class="vac-card-header-flex">
+            <div class="vac-card-title-group">
+              <span>ESTADO DE CUENTAS</span>
+              <strong>Ingresos vs Gastos Mensuales</strong>
             </div>
-          </ion-card-header>
-          <ion-card-content>
+            <div class="vac-mini-stat bg-primary-soft">
+              <ion-icon name="trending-up-outline"></ion-icon>
+              <span>ROI en Crecimiento</span>
+            </div>
+          </div>
+          <div class="p-4">
              <canvas baseChart class="chart-canvas-finance" [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
-          </ion-card-content>
+          </div>
         </div>
 
         <!-- Listado de Movimientos Recientes -->
@@ -69,30 +67,30 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of finanzasService.records().slice(0, 20)">
-              <div class="vac-tag-body">
-                <div class="card-header-flex">
-                  <div class="card-icon-box" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
-                    <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'" [color]="r.tipo === 'Ingreso' ? 'light' : 'warning'"></ion-icon>
+              <div class="uniform-card">
+                <div class="vac-card-header-flex">
+                  <div class="vac-icon-circle" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
+                    <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-outline' : 'arrow-down-outline'" [class.color-light]="r.tipo === 'Ingreso'" [class.color-warning]="r.tipo !== 'Ingreso'"></ion-icon>
                   </div>
-                  <div class="card-title-stack">
-                    <strong>{{ r.categoria }}</strong>
-                    <span>{{ r.fecha | date:'dd MMM yyyy' }}</span>
+                  <div class="vac-card-title-group">
+                    <h3 class="vac-card-title">{{ r.categoria }}</h3>
+                    <p class="vac-card-subtitle">{{ r.fecha | date:'dd MMM yyyy' }}</p>
                   </div>
                   <div class="flex-1"></div>
                   <div class="ion-text-right">
-                    <h3 class="kpi-value-small" [ngStyle]="{'color': r.tipo === 'Ingreso' ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'}">
+                    <div class="vac-kpi-value-small" [class.color-success]="r.tipo === 'Ingreso'" [class.color-danger]="r.tipo !== 'Ingreso'">
                       {{ r.tipo === 'Ingreso' ? '+' : '-' }}{{ r.monto | number:'1.0-0' }}€
-                    </h3>
+                    </div>
                   </div>
                 </div>
 
-                <div class="card-footer-actions mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
-                  <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
-                    <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
-                  <ion-button fill="clear" color="danger" (click)="confirmDelete(r)">
-                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
+                <div class="vac-card-footer mt-4 pt-2 border-t-light flex justify-end gap-2">
+                  <button class="vac-btn-icon bg-light" (click)="openEditModal(r)">
+                    <ion-icon name="create-outline"></ion-icon>
+                  </button>
+                  <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(r)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
                 </div>
               </div>
             </ion-col>
@@ -131,11 +129,11 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
 
           <ion-content class="ion-padding vac-modal-content">
             <div class="form-intro ion-text-center ion-padding-bottom">
-               <div class="empty-icon-ring" style="margin: 0 auto; margin-bottom: 16px;">
+               <div class="vac-icon-ring mb-4 mx-auto">
                   <ion-icon name="wallet-outline"></ion-icon>
                </div>
                <h3>Registro Contable</h3>
-               <p style="color: var(--ion-color-medium);">Anota cualquier venta, compra o gasto asociado a tu actividad ganadera.</p>
+               <p class="color-medium">Anota cualquier venta, compra o gasto asociado a tu actividad ganadera.</p>
             </div>
 
             <form [formGroup]="finanzasForm">
@@ -220,7 +218,7 @@ export class FinanzasComponent {
   };
 
   constructor() {
-    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownCircleOutline, arrowUpCircleOutline, documentTextOutline });
+    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline });
     this.finanzasForm = this.fb.group({
       tipo: ['Gasto', Validators.required],
       categoria: ['Alimentación y Pastos', Validators.required],

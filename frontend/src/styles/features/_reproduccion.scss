@@ -1,12 +1,12 @@
 @use '../abstracts/variables';
 
-// Estilos para el módulo de Reproducción (Rustic & Simple)
+// Estilos para el módulo de Reproducción (Neutral & Simple)
 /**
  * Estilos para el Ciclo de Gestación
  * 100% Variable Sync - Forest & Earth
  */
 
-.repro-bg {
+.vac-repro-view {
   background: var(--ion-background-color);
 }
 
@@ -19,14 +19,14 @@
 }
 
 // Cuadrícula de Gestaciones (Cartas Grandes)
-.gestation-grid {
+.vac-gestation-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: variables.$spacing-md;
   margin-bottom: variables.$spacing-lg;
 }
 
-.vac-card {
+.vac-repro-card {
   --background: var(--ion-card-background);
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
@@ -55,7 +55,7 @@
     color: variables.$dark-color;
   }
 
-  .status-badge {
+  .vac-status-badge {
     margin-top: 10px;
     padding: 6px 12px;
     border-radius: 8px;
@@ -64,7 +64,7 @@
 }
 
 // Animación de Latido Suave para indicar vida/gestación
-.heart-pulse {
+.vac-animate-pulse {
   animation: pulseShadow 3s infinite ease-in-out;
 }
 
@@ -74,11 +74,11 @@
   100% { box-shadow: 0 8px 24px rgba(variables.$black, 0.06); }
 }
 
-// Separador Rustic
+// Separador Vacapp
 .vac-divider {
   --background: transparent;
-  --padding-top: $spacing-lg;
-  --padding-bottom: $spacing-sm;
+  --padding-top: #{variables.$spacing-lg};
+  --padding-bottom: #{variables.$spacing-sm};
   border-top: 1px solid rgba(variables.$gray-600, 0.1);
   margin-top: variables.$spacing-lg;
 
@@ -96,11 +96,11 @@
 }
 
 // Lista de Historial
-.transparent-list {
+.vac-list-transparent {
   background: transparent;
   padding: 0;
 
-  .history-item {
+  .vac-history-item {
     --background: var(--ion-card-background);
     --border-radius: 12px;
     margin-bottom: 8px;
@@ -144,13 +144,13 @@
 
 /* Feature Specific Styles moved from component */
 
-.item-card-pro { 
+.vac-item-card-pro { 
   --background: transparent;
   --padding-start: 12px; 
   --inner-padding-end: 16px; 
 }
 
-.history-avatar-bi { 
+.vac-history-icon { 
   width: 48px; 
   height: 48px; 
   display: flex; 
@@ -161,13 +161,9 @@
   color: #582f0e; 
 }
 
-.bg-earth-soft { background: rgba(88, 47, 14, 0.1); }
-
-.card-footer-actions-bi { 
+.vac-card-footer { 
   border-top: 1px solid rgba(0,0,0,0.05); 
   padding-top: 10px; 
   display: flex; 
   gap: 8px; 
 }
-
-.action-buttons-mini { display: flex; gap: 2px; }

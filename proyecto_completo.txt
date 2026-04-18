@@ -2623,7 +2623,7 @@ import { AuthService } from '../../services/auth.service';
         <ion-menu contentId="main-content" type="overlay" class="vac-sidebar">
           <ion-header class="ion-no-border">
             <ion-toolbar>
-              <div class="sidebar-header-luxe" *ngIf="!isCollapsed">
+              <div class="vac-sidebar-header" *ngIf="!isCollapsed">
                 <div class="brand-wrapper">
                   <div class="logo-circle">
                     <ion-icon name="leaf-outline" style="color: white;"></ion-icon>
@@ -2641,8 +2641,8 @@ import { AuthService } from '../../services/auth.service';
           </ion-header>
 
           <ion-content class="ion-no-padding">
-            <div class="nav-container-luxe">
-              <ion-list lines="none" class="ion-no-padding">
+            <div class="vac-nav-container">
+              <ion-list lines="none" class="ion-no-padding vac-nav-list">
                 <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
                   <ion-item 
                     button
@@ -2651,21 +2651,21 @@ import { AuthService } from '../../services/auth.service';
                     [routerLink]="p.url" 
                     routerLinkActive="active-link"
                     [title]="p.title"
-                    class="nav-item-luxe">
+                    class="vac-nav-item">
                     <div slot="start" class="icon-frame">
                       <ion-icon [name]="p.icon"></ion-icon>
                     </div>
-                    <ion-label *ngIf="!isCollapsed" class="label-luxe">{{ p.title }}</ion-label>
+                    <ion-label *ngIf="!isCollapsed" class="vac-label">{{ p.title }}</ion-label>
                   </ion-item>
                 </ion-menu-toggle>
                 
                 <div class="nav-separator"></div>
 
-                <ion-item class="nav-item-luxe logout-item" lines="none" button (click)="logout()">
+                <ion-item class="vac-nav-item logout-item" lines="none" button (click)="logout()">
                   <div slot="start" class="icon-frame danger">
                     <ion-icon name="log-out-outline"></ion-icon>
                   </div>
-                  <ion-label *ngIf="!isCollapsed" class="label-luxe">Cerrar Sesión</ion-label>
+                  <ion-label *ngIf="!isCollapsed" class="vac-label">Cerrar Sesión</ion-label>
                 </ion-item>
               </ion-list>
             </div>
@@ -4882,17 +4882,17 @@ Chart.register(...registerables);
       <div class="vac-container animate-fade-in pb-12">
         
         <!-- Header con Identidad -->
-        <div class="dashboard-header-bi mt-4">
-          <div class="header-flex-bi">
+        <div class="vac-page-header mt-4">
+          <div class="vac-header-flex">
             <div>
-              <h1 class="bi-title">Resumen Ejecutivo</h1>
-              <p class="bi-subtitle">
+              <h1 class="vac-page-title">Resumen Ejecutivo</h1>
+              <p class="vac-page-subtitle">
                 <ion-icon name="paw" class="icon-mr-sm"></ion-icon>
                 Finca actual: <strong>{{ finca()?.nombre || 'Cargando...' }}</strong>
               </p>
             </div>
-            <div class="bi-status">
-              <div class="online-indicator" [class.offline]="!isOnline()">
+            <div class="vac-status-container">
+              <div class="vac-online-indicator" [class.offline]="!isOnline()">
                 <span>{{ isOnline() ? 'Sincronizado' : 'Modo Offline' }}</span>
                 <div class="dot shadow-pulse"></div>
               </div>
@@ -4904,49 +4904,49 @@ Chart.register(...registerables);
         <ion-grid class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
-              <div class="bi-kpi-card glass animate-slide-up">
-                <div class="kpi-mini-icon" style="color: var(--ion-color-primary);">
+              <div class="vac-kpi-card glass animate-slide-up">
+                <div class="vac-kpi-mini-icon" style="color: var(--ion-color-primary);">
                   <ion-icon name="paw-outline"></ion-icon>
                 </div>
-                <div class="kpi-content">
-                  <span class="kpi-label">Hato Total</span>
-                  <h2 class="kpi-value" *ngIf="!cargando()">{{ totalBovinos() }}</h2>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Hato Total</span>
+                  <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ totalBovinos() }}</h2>
                   <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="bi-kpi-card glass animate-slide-up delay-100">
-                <div class="kpi-mini-icon" style="color: var(--ion-color-danger);">
+              <div class="vac-kpi-card glass animate-slide-up delay-100">
+                <div class="vac-kpi-mini-icon" style="color: var(--ion-color-danger);">
                   <ion-icon name="heart-outline"></ion-icon>
                 </div>
-                <div class="kpi-content">
-                  <span class="kpi-label">Gestantes</span>
-                  <h2 class="kpi-value" *ngIf="!cargando()">{{ gestacionesActivas().length }}</h2>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Gestantes</span>
+                  <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ gestacionesActivas().length }}</h2>
                   <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="bi-kpi-card glass animate-slide-up delay-200">
-                <div class="kpi-mini-icon" style="color: var(--ion-color-tertiary);">
+              <div class="vac-kpi-card glass animate-slide-up delay-200">
+                <div class="vac-kpi-mini-icon" style="color: var(--ion-color-tertiary);">
                   <ion-icon name="wallet-outline"></ion-icon>
                 </div>
-                <div class="kpi-content">
-                  <span class="kpi-label">Margen Bruto</span>
-                  <h2 class="kpi-value" *ngIf="!cargando()">{{ saldoMensual() | number:'1.0-0' }}€</h2>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Margen Bruto</span>
+                  <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ saldoMensual() | number:'1.0-0' }}€</h2>
                   <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="bi-kpi-card glass animate-slide-up delay-300">
-                <div class="kpi-mini-icon" style="color: var(--ion-color-secondary);">
+              <div class="vac-kpi-card glass animate-slide-up delay-300">
+                <div class="vac-kpi-mini-icon" style="color: var(--ion-color-secondary);">
                   <ion-icon name="scale-outline"></ion-icon>
                 </div>
-                <div class="kpi-content">
-                  <span class="kpi-label">Peso Medio</span>
-                  <h2 class="kpi-value" *ngIf="!cargando()">{{ pesoMedio() }} kg</h2>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Peso Medio</span>
+                  <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ pesoMedio() }} kg</h2>
                   <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
                 </div>
               </div>
@@ -4959,21 +4959,21 @@ Chart.register(...registerables);
           <ion-row>
             <!-- ÁREA CHART: EVOLUCIÓN PESO -->
             <ion-col size="12" size-lg="8">
-              <div class="bi-main-card animate-slide-up delay-400">
+              <div class="vac-main-card animate-slide-up delay-400">
                 <ion-card-header>
-                  <div class="bi-card-head">
-                    <div class="card-title-stack">
+                  <div class="vac-card-header-flex">
+                    <div class="vac-card-title-group">
                       <span>EVOLUCIÓN PONDERADA</span>
                       <strong>Control de Masa Total</strong>
                     </div>
-                    <div class="bi-mini-stat bg-primary-soft">
+                    <div class="vac-mini-stat bg-primary-soft">
                       <ion-icon name="trending-up-outline"></ion-icon>
                       <span>+8.2% este mes</span>
                     </div>
                   </div>
                 </ion-card-header>
                 <ion-card-content class="relative">
-                  <div *ngIf="cargando()" class="chart-skeleton">
+                  <div *ngIf="cargando()" class="vac-chart-skeleton">
                     <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
                   </div>
                   <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
@@ -4983,15 +4983,15 @@ Chart.register(...registerables);
 
             <!-- DONUT CHART: DISTRIBUCIÓN -->
             <ion-col size="12" size-lg="4">
-              <div class="bi-main-card animate-slide-up delay-500">
+              <div class="vac-main-card animate-slide-up delay-500">
                 <ion-card-header>
-                  <div class="card-title-stack">
+                  <div class="vac-card-title-group">
                     <span>DISTRIBUCIÓN</span>
                     <strong>Población por Lote</strong>
                   </div>
                 </ion-card-header>
-                <ion-card-content class="chart-container-donut">
-                  <div *ngIf="cargando()" class="chart-skeleton flex justify-center items-center">
+                <ion-card-content class="vac-chart-container-donut">
+                  <div *ngIf="cargando()" class="vac-chart-skeleton flex justify-center items-center">
                     <ion-skeleton-text animated style="width: 200px; height: 200px; border-radius: 50%;"></ion-skeleton-text>
                   </div>
                   <canvas #lotesChart [hidden]="cargando()"></canvas>
@@ -5001,9 +5001,9 @@ Chart.register(...registerables);
 
             <!-- BAR CHART: FINANZAS -->
             <ion-col size="12">
-              <div class="bi-main-card animate-slide-up delay-600">
+              <div class="vac-main-card animate-slide-up delay-600">
                 <ion-card-header>
-                  <div class="card-title-stack">
+                  <div class="vac-card-title-group">
                     <span>GESTIÓN ECONÓMICA</span>
                     <strong>Balance Mensual Comparativo</strong>
                   </div>
@@ -5184,7 +5184,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const stats = this.pesajeService.getEvolucionMensualHerd();
     
-    // Degradado "Rustic-Luxe"
+    // Degradado Estándar Vacapp
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, 'rgba(27, 67, 50, 0.3)');
     gradient.addColorStop(1, 'rgba(27, 67, 50, 0)');
@@ -5359,14 +5359,14 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         
 
         <!-- GRÁFICO DE ROI (Relocado) -->
-        <div class="bi-main-card animate-slide-up mb-8">
+        <div class="vac-main-card animate-slide-up mb-8">
           <ion-card-header>
-            <div class="bi-card-head">
-              <div class="card-title-stack">
+            <div class="vac-card-header-flex">
+              <div class="vac-card-title-group">
                 <span>ESTADO DE CUENTAS</span>
                 <strong>Ingresos vs Gastos Mensuales</strong>
               </div>
-              <div class="bi-mini-stat bg-primary-soft">
+              <div class="vac-mini-stat bg-primary-soft">
                 <ion-icon name="trending-up-outline"></ion-icon>
                 <span>ROI en Crecimiento</span>
               </div>
@@ -5382,24 +5382,24 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of finanzasService.records().slice(0, 20)">
-              <div class="tag-body-luxe">
-                <div class="card-header-flex">
-                  <div class="card-icon-box" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
+              <div class="vac-tag-body">
+                <div class="vac-card-header">
+                  <div class="vac-icon-box" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
                     <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'" [color]="r.tipo === 'Ingreso' ? 'light' : 'warning'"></ion-icon>
                   </div>
-                  <div class="card-title-stack">
+                  <div class="vac-card-title-group">
                     <strong>{{ r.categoria }}</strong>
                     <span>{{ r.fecha | date:'dd MMM yyyy' }}</span>
                   </div>
                   <div class="flex-1"></div>
                   <div class="ion-text-right">
-                    <h3 class="kpi-value-small" [ngStyle]="{'color': r.tipo === 'Ingreso' ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'}">
+                    <h3 class="vac-kpi-value-small" [ngStyle]="{'color': r.tipo === 'Ingreso' ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'}">
                       {{ r.tipo === 'Ingreso' ? '+' : '-' }}{{ r.monto | number:'1.0-0' }}€
                     </h3>
                   </div>
                 </div>
 
-                <div class="card-footer-actions mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
+                <div class="vac-card-footer mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
                   <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
                     <ion-icon name="create-outline" slot="icon-only"></ion-icon>
                   </ion-button>
@@ -5710,8 +5710,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 
 /**
- * Componente para el Módulo de Lotes/Recintos - Versión Rústica.
- * Refactorizado: 100% Sincronización de colores con _variables.scss.
+ * Componente para el Módulo de Lotes/Recintos - Versión Estándar.
+ * Refactorizado: 100% Sincronización de colores y nombres vac-.
  */
 @Component({
   selector: 'app-lotes',
@@ -5723,7 +5723,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonAvatar
   ],
   template: `
-    <ion-header class="ion-no-border header-luxe">
+    <ion-header class="ion-no-border vac-header">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-menu-button class="color-forest"></ion-menu-button>
@@ -5744,18 +5744,18 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
       <div class="vac-container animate-fade-in">
         
         <div class="vac-text-stack mb-8">
-          <h1 class="page-h1-rustic">Gestión de Potreros</h1>
-          <p class="page-p-rustic">Organiza y monitorea la carga animal por recinto</p>
+          <h1 class="vac-page-title">Gestión de Potreros</h1>
+          <p class="vac-page-subtitle">Organiza y monitorea la carga animal por recinto</p>
         </div>
 
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let lote of lotes">
-              <div class="bi-main-card mb-6 animate-fade-in">
-                <div class="card-header-flex">
-                  <div class="card-title-stack">
-                    <h3 class="card-title-luxe">{{ lote.nombre }}</h3>
-                    <p class="card-subtitle-luxe">
+              <div class="vac-main-card mb-6 animate-fade-in">
+                <div class="vac-card-header-flex">
+                  <div class="vac-card-title-group">
+                    <h3 class="vac-card-title">{{ lote.nombre }}</h3>
+                    <p class="vac-card-subtitle">
                       <ion-icon name="location-outline" class="mr-1"></ion-icon>
                       {{ lote.ubicacion || 'Sector General' }}
                     </p>
@@ -5776,7 +5776,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                   </div>
                 </div>
 
-                <div class="vac-card-footer mt-6 pt-4 border-t flex justify-end gap-2">
+                <div class="vac-card-footer mt-6 pt-4" style="border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: flex-end; gap: 8px;">
                    <button class="vac-btn-icon bg-light" (click)="openEditModal(lote)">
                       <ion-icon name="create-outline"></ion-icon>
                    </button>
@@ -5790,7 +5790,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ion-grid>
 
         <div *ngIf="lotes.length === 0" class="vac-empty-state">
-          <div class="empty-icon-ring">
+          <div class="vac-empty-icon">
             <ion-icon name="layers-outline"></ion-icon>
           </div>
           <h2>Sin lotes configurados</h2>
@@ -5803,7 +5803,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
-        <ion-fab-button (click)="openAddModal()" class="fab-luxe">
+        <ion-fab-button (click)="openAddModal()" class="vac-fab">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -5822,13 +5822,13 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             </ion-toolbar>
           </ion-header>
           
-          <ion-content class="ion-padding vac-modal-content">
-            <div class="form-intro mb-6">
-               <div class="icon-ring-luxe bg-wheat mb-3">
-                  <ion-icon name="layers-outline" class="color-earth text-3xl"></ion-icon>
+           <ion-content class="ion-padding vac-modal-content">
+            <div class="vac-modal-header ion-text-center ion-padding-vertical">
+               <div class="vac-icon-ring ion-margin-bottom">
+                  <ion-icon name="layers-outline"></ion-icon>
                </div>
-               <h3>Configuración de Espacio</h3>
-               <p>Define las características del potrero o recinto.</p>
+               <h3 class="vac-modal-title">Configuración de Espacio</h3>
+               <p class="vac-modal-subtitle">Define las características del potrero o recinto.</p>
             </div>
 
             <form [formGroup]="loteForm" class="vac-form-stack">
@@ -6023,58 +6023,52 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     </ion-searchbar>
 
     <!-- GRÁFICO DE PESO -->
-    <div class="bi-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
+    <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-card-header>
-        <div class="bi-card-head">
-          <div class="card-title-stack">
+        <div class="vac-card-header-flex">
+          <div class="vac-card-title-group">
             <span>ANÁLISIS DE RENDIMIENTO</span>
             <strong>Crecimiento (Peso en Kilos)</strong>
           </div>
-          <div class="bi-mini-stat bg-primary-soft">
+          <div class="vac-mini-stat bg-primary-soft">
             <ion-icon name="trending-up-outline"></ion-icon>
             <span>Hato Saludable</span>
           </div>
         </div>
       </ion-card-header>
       <ion-card-content>
-        <div class="chart-container-large" style="height: 300px;">
+        <div class="vac-chart-container">
            <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
         </div>
       </ion-card-content>
     </div>
 
     <!-- SKELETON LOADER -->
+    <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="tag-body-luxe">
-            <div class="card-header-flex">
-              <ion-avatar class="vac-avatar">
-                <ion-skeleton-text animated style="width: 100%; height: 100%;"></ion-skeleton-text>
+          <div class="vac-tag-body ion-padding">
+            <div class="vac-card-header-flex ion-margin-bottom">
+              <ion-avatar class="vac-avatar ion-margin-end">
+                <ion-skeleton-text animated style="width: 100%; height: 100%; border-radius: 12px;"></ion-skeleton-text>
               </ion-avatar>
-              <div class="card-title-stack" style="width: 50%;">
-                <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
+              <div class="vac-card-title-group" style="flex: 1;">
+                <ion-skeleton-text animated style="width: 70%; height: 16px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
               </div>
-              <div class="flex-1"></div>
-              <ion-skeleton-text animated style="width: 50px; height: 25px; border-radius: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 50px; height: 24px; border-radius: 8px;"></ion-skeleton-text>
             </div>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
-              </div>
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
-              </div>
+            <div class="ion-margin-vertical">
+              <ion-skeleton-text animated style="width: 60%; height: 12px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 45%; height: 14px;"></ion-skeleton-text>
             </div>
             
-            <div class="card-footer-actions">
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 80px; height: 35px; border-radius: 8px;"></ion-skeleton-text>
+            <div class="vac-card-footer mt-2 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05); display: flex; gap: 8px;">
+              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 80px; height: 32px; border-radius: 8px; margin-left: auto;"></ion-skeleton-text>
             </div>
           </div>
         </ion-col>
@@ -6085,15 +6079,17 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     <ion-grid class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-          <div class="tag-body-luxe">
-            <div class="card-header-flex">
-              <ion-avatar class="vac-avatar">
-                <div *ngIf="b.foto_url" class="avatar-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
-                <div *ngIf="!b.foto_url" class="avatar-placeholder">
-                  <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+          <div class="vac-cow-card">
+            <div class="vac-card-header-flex">
+              <div class="vac-avatar-wrapper ion-margin-end">
+                <div class="vac-avatar">
+                   <div *ngIf="b.foto_url" class="avatar-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
+                   <div *ngIf="!b.foto_url" class="avatar-placeholder">
+                     <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+                   </div>
                 </div>
-              </ion-avatar>
-              <div class="card-title-stack">
+              </div>
+              <div class="vac-card-title-group">
                 <strong>{{ b.nombre }}</strong>
                 <span>{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</span>
               </div>
@@ -6106,25 +6102,25 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
               </ion-badge>
             </div>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
+            <div class="vac-card-grid ion-margin-vertical">
+              <div class="vac-card-info">
                 <span class="label">Sexo / Aptitud</span>
                 <span class="value">{{ b.sexo }} • {{ b.aptitud }}</span>
               </div>
-              <div class="card-data-item">
+              <div class="vac-card-info">
                 <span class="label">Edad Actual</span>
                 <span class="value">{{ ganadoService.getEdadDesc(b) }}</span>
               </div>
             </div>
 
-            <div class="card-footer-actions">
+            <div class="vac-card-footer mt-2 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
               <ion-button fill="clear" color="medium" (click)="openEditModal(b)">
                 <ion-icon name="create-outline" slot="icon-only"></ion-icon>
               </ion-button>
               <ion-button fill="clear" color="danger" (click)="confirmDelete(b.id)">
                 <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
               </ion-button>
-              <ion-button fill="solid" color="primary" class="ion-no-margin">
+              <ion-button fill="solid" color="primary" class="ion-no-margin ml-auto btn-vac-sm">
                 Ver Ficha
               </ion-button>
             </div>
@@ -6188,11 +6184,11 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
       <ion-content class="ion-padding vac-modal-content">
         <form [formGroup]="bovinoForm">
           
-          <!-- Paso 1: Identidad -->
-          <div *ngIf="currentStep === 1" class="animate-slide-up">
-            <div class="form-intro">
-               <h3>Identificación Oficial</h3>
-               <p>Introduce los datos de trazabilidad obligatorios.</p>
+           <!-- Paso 1: Identidad -->
+           <div *ngIf="currentStep === 1" class="animate-slide-up">
+            <div class="vac-modal-header ion-padding-vertical">
+               <h3 class="vac-modal-title">Identificación Oficial</h3>
+               <p class="vac-modal-subtitle">Introduce los datos de trazabilidad obligatorios.</p>
             </div>
             <ion-item class="vac-input">
               <ion-label position="stacked">Nombre del Ejemplar *</ion-label>
@@ -6209,11 +6205,11 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
             </ion-item>
           </div>
 
-          <!-- Paso 2: Biología -->
-          <div *ngIf="currentStep === 2" class="animate-slide-up">
-            <div class="form-intro">
-               <h3>Rasgos Biológicos</h3>
-               <p>Información genética y cronológica del ejemplar.</p>
+           <!-- Paso 2: Biología -->
+           <div *ngIf="currentStep === 2" class="animate-slide-up">
+            <div class="vac-modal-header ion-padding-vertical">
+               <h3 class="vac-modal-title">Rasgos Biológicos</h3>
+               <p class="vac-modal-subtitle">Información genética y cronológica del ejemplar.</p>
             </div>
             <ion-item class="vac-input">
               <ion-label position="stacked">Sexo *</ion-label>
@@ -6248,11 +6244,11 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
             </ion-item>
           </div>
 
-          <!-- Paso 3: Ubicación -->
-          <div *ngIf="currentStep === 3" class="animate-slide-up">
-            <div class="form-intro">
-               <h3>Asignación de Lote</h3>
-               <p>Ubica al animal en su recinto correspondiente.</p>
+           <!-- Paso 3: Ubicación -->
+           <div *ngIf="currentStep === 3" class="animate-slide-up">
+            <div class="vac-modal-header ion-padding-vertical">
+               <h3 class="vac-modal-title">Asignación de Lote</h3>
+               <p class="vac-modal-subtitle">Ubica al animal en su recinto correspondiente.</p>
             </div>
             <ion-item class="vac-input">
               <ion-label position="stacked">Seleccionar Lote *</ion-label>
@@ -6641,8 +6637,8 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
- * Componente para el Módulo de Recría y Control de Pesaje - Versión Rústica.
- * Refactorizado: 100% Sincronización de colores con _variables.scss.
+ * Componente para el Módulo de Recría y Control de Pesaje - Versión Estándar.
+ * Refactorizado: 100% Sincronización de colores y nombres vac-.
  */
 @Component({
   selector: 'app-recria',
@@ -6655,7 +6651,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonSelect, IonSelectOption, IonLabel, IonCardContent
   ],
   template: `
-    <ion-header class="ion-no-border header-luxe">
+    <ion-header class="ion-no-border vac-header">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-menu-button class="color-forest"></ion-menu-button>
@@ -6678,8 +6674,8 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
         <!-- Cabecera de Selección -->
         <div *ngIf="selectedBovino" class="flex items-center justify-between mb-8 animate-fade-in">
           <div class="vac-text-stack">
-            <h1 class="page-h1-rustic">{{ selectedBovino.nombre }}</h1>
-            <p class="page-p-rustic">Seguimiento de maduración y conversión</p>
+            <h1 class="vac-page-title">{{ selectedBovino.nombre }}</h1>
+            <p class="vac-page-subtitle">Seguimiento de maduración y conversión</p>
           </div>
           <ion-button fill="outline" (click)="selectedBovino = null" color="dark" class="btn-vac-outline">
              <ion-icon name="close" slot="start"></ion-icon> Cambiar
@@ -6689,8 +6685,8 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
         <!-- LISTADO DE ANIMALES PARA SELECCIÓN -->
         <div *ngIf="!selectedBovino" class="animate-fade-in">
            <div class="vac-text-stack mb-6">
-             <h1 class="page-h1-rustic">Seleccionar Animal</h1>
-             <p class="page-p-rustic">Busca el ejemplar para registrar su pesaje</p>
+             <h1 class="vac-page-title">Seleccionar Animal</h1>
+             <p class="vac-page-subtitle">Busca el ejemplar para registrar su pesaje</p>
            </div>
 
            <div class="vac-search-wrapper mb-8">
@@ -6706,7 +6702,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <ion-grid class="ion-no-padding">
              <ion-row>
                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-                 <div class="tag-body-luxe mb-4" (click)="selectBovino(b)" style="cursor: pointer;">
+                 <div class="vac-tag-body mb-4" (click)="selectBovino(b)" style="cursor: pointer;">
                    <div class="vac-item-header">
                      <div class="vac-avatar-wrapper">
                        <div *ngIf="b.foto_url" class="vac-avatar" [style.background-image]="'url(' + b.foto_url + ')'"></div>
@@ -6739,22 +6735,22 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <ion-grid class="ion-no-padding mb-8">
               <ion-row>
                  <ion-col size="12" size-md="6">
-                    <div class="metric-card-luxe">
-                       <div class="metric-icon-box bg-wheat">
+                    <div class="vac-metric-card">
+                       <div class="vac-metric-icon bg-wheat">
                           <ion-icon name="scale-outline" class="color-earth"></ion-icon>
                        </div>
-                       <div class="metric-content">
+                       <div class="vac-metric-info">
                           <span class="label">Último Peso</span>
                           <span class="value">{{ getUltimoPeso() }} <small>KG</small></span>
                        </div>
                     </div>
                  </ion-col>
                  <ion-col size="12" size-md="6">
-                    <div class="metric-card-luxe">
-                       <div class="metric-icon-box bg-forest-light">
+                    <div class="vac-metric-card">
+                       <div class="vac-metric-icon bg-forest-light">
                           <ion-icon name="trending-up-outline" class="color-forest"></ion-icon>
                        </div>
-                       <div class="metric-content">
+                       <div class="vac-metric-info">
                           <span class="label">Ganancia Diaria (GMD)</span>
                           <span class="value" [ngClass]="getGMD() >= 0 ? 'color-forest' : 'color-danger'">
                              {{ getGMD() > 0 ? '+' : '' }}{{ getGMD() | number:'1.2-2' }} <small>kg/día</small>
@@ -6766,17 +6762,17 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            </ion-grid>
 
            <!-- GRÁFICO INDIVIDUAL -->
-           <div class="bi-main-card mb-8">
-              <div class="card-header-flex">
-                 <div class="card-title-stack">
-                    <h3 class="card-title-luxe">Curva de Crecimiento</h3>
-                    <p class="card-subtitle-luxe">Evolución del peso en el tiempo</p>
+           <div class="vac-main-card mb-8">
+              <div class="vac-card-header-flex">
+                 <div class="vac-card-title-group">
+                    <h3 class="vac-card-title">Curva de Crecimiento</h3>
+                    <p class="vac-card-subtitle">Evolución del peso en el tiempo</p>
                  </div>
                  <div class="vac-icon-circle bg-wheat">
                     <ion-icon name="bar-chart-outline" class="color-earth"></ion-icon>
                  </div>
               </div>
-              <div class="chart-wrapper mt-6" style="height: 300px;">
+              <div class="vac-chart-container mt-6">
                  <canvas baseChart [data]="chartDataIndividual" [options]="chartOptions" [type]="'line'"></canvas>
               </div>
            </div>
@@ -6790,7 +6786,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <ion-grid class="ion-no-padding">
              <ion-row>
                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajesFiltrados">
-                 <div class="tag-body-luxe mb-4">
+                 <div class="vac-tag-body mb-4">
                    <div class="vac-item-header">
                      <div class="vac-icon-avatar bg-light">
                         <ion-icon name="calendar-outline" class="color-medium"></ion-icon>
@@ -6808,7 +6804,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                        <ion-icon name="time-outline" class="mr-1"></ion-icon>
                        {{ p.fecha_pesaje | date:'dd MMM yyyy' }}
                      </span>
-                     <ion-badge slot="end" class="badge-luxe bg-forest ml-auto">Completado</ion-badge>
+                     <ion-badge slot="end" class="vac-badge bg-forest ml-auto">Completado</ion-badge>
                    </div>
                  </div>
                </ion-col>
@@ -6816,7 +6812,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            </ion-grid>
 
            <div *ngIf="pesajesFiltrados.length === 0" class="vac-empty-state">
-             <div class="empty-icon-ring">
+             <div class="vac-empty-icon">
                <ion-icon name="scale-outline"></ion-icon>
              </div>
              <h2>Sin pesajes registrados</h2>
@@ -6827,7 +6823,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
       </div>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
-        <ion-fab-button (click)="setOpen(true)" class="fab-luxe">
+        <ion-fab-button (click)="setOpen(true)" class="vac-fab">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
          <!-- MODAL DE PESAJE -->
@@ -6844,13 +6840,13 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
             </ion-toolbar>
           </ion-header>
 
-          <ion-content class="ion-padding vac-modal-content">
-            <div class="form-intro mb-6">
-               <div class="icon-ring-luxe bg-wheat mb-3">
-                  <ion-icon name="scale-outline" class="color-earth text-3xl"></ion-icon>
+           <ion-content class="ion-padding vac-modal-content">
+            <div class="vac-modal-header ion-text-center ion-padding-vertical">
+               <div class="vac-icon-ring ion-margin-bottom">
+                  <ion-icon name="scale-outline"></ion-icon>
                </div>
-               <h3>Entrada de Datos</h3>
-               <p>Registra el peso actual detectado en báscula.</p>
+               <h3 class="vac-modal-title">Entrada de Datos</h3>
+               <p class="vac-modal-subtitle">Registra el peso actual detectado en báscula.</p>
             </div>
 
             <form [formGroup]="pesajeForm" (ngSubmit)="onSubmit()" class="vac-form-stack">
@@ -7172,59 +7168,50 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     </ion-searchbar>
 
     <!-- GRÁFICO DE FERTILIDAD -->
-    <div class="bi-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
+    <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-card-header>
-        <div class="bi-card-head">
-          <div class="card-title-stack">
+        <div class="vac-card-header-flex">
+          <div class="vac-card-title-group">
             <span>EFICIENCIA REPRODUCTIVA</span>
             <strong>Preñeces con éxito</strong>
           </div>
-          <div class="bi-mini-stat bg-danger-soft">
+          <div class="vac-mini-stat bg-danger-soft">
             <ion-icon name="heart-outline"></ion-icon>
             <span>Tasa de éxito: 82%</span>
           </div>
         </div>
       </ion-card-header>
-      <ion-card-content>
-          <div class="chart-container-large" style="height: 300px;">
+        <ion-card-content>
+          <div class="vac-chart-container" style="height: 300px;">
             <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
           </div>
-      </ion-card-content>
+        </ion-card-content>
     </div>
 
     <h2 class="vac-section-title" *ngIf="!isLoading()">Próximos Partos</h2>
 
-    <!-- SKELETON LOADER -->
+    <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="tag-body-luxe">
-            <div class="card-header-flex">
-              <div class="card-icon-box" style="background-color: var(--ion-color-light);">
-                <ion-skeleton-text animated style="width: 24px; height: 24px; border-radius: 50%;"></ion-skeleton-text>
+          <div class="vac-tag-body ion-padding">
+            <div class="vac-card-header ion-margin-bottom">
+              <ion-skeleton-text animated style="width: 40px; height: 40px; border-radius: 12px;" class="ion-margin-end"></ion-skeleton-text>
+              <div class="vac-card-title-group" style="flex: 1;">
+                <ion-skeleton-text animated style="width: 70%; height: 16px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
               </div>
-              <div class="card-title-stack" style="width: 50%;">
-                <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
-              </div>
-              <div class="flex-1"></div>
-              <ion-skeleton-text animated style="width: 50px; height: 25px; border-radius: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 50px; height: 24px; border-radius: 8px;"></ion-skeleton-text>
             </div>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
-              </div>
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
-              </div>
+            <div class="ion-margin-vertical">
+              <ion-skeleton-text animated style="width: 60%; height: 12px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 45%; height: 14px;"></ion-skeleton-text>
             </div>
 
-            <div class="card-footer-actions">
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%;"></ion-skeleton-text>
+            <div class="vac-card-footer ion-padding-top" style="border-top: 1px solid rgba(0,0,0,0.05); display: flex; gap: 8px;">
+              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
             </div>
           </div>
         </ion-col>
@@ -7244,12 +7231,12 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <ion-grid class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredGestaciones()">
-          <div class="tag-body-luxe">
-            <div class="card-header-flex">
-              <div class="card-icon-box bg-danger-soft">
+          <div class="vac-tag-body">
+            <div class="vac-card-header">
+              <div class="vac-card-icon bg-danger-soft">
                 <ion-icon name="pulse-outline" color="danger"></ion-icon>
               </div>
-              <div class="card-title-stack">
+              <div class="vac-card-title-group">
                 <strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong>
                 <span>FPP: {{ r.fecha_parto_prevista | date:'dd MMM yyyy' }}</span>
               </div>
@@ -7257,14 +7244,14 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
               <ion-badge color="success" mode="ios">Gestante</ion-badge>
             </div>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
+            <div class="vac-card-grid">
+              <div class="vac-card-info">
                 <span class="label">Cuenta Atrás</span>
                 <span class="value">{{ getDaysToCalving(r) }} días para parto</span>
               </div>
             </div>
 
-            <div class="card-footer-actions">
+            <div class="vac-card-footer mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
               <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
                 <ion-icon name="create-outline" slot="icon-only"></ion-icon>
               </ion-button>
@@ -7283,12 +7270,12 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <ion-grid class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredReproducciones()">
-          <div class="tag-body-luxe">
-            <div class="card-header-flex">
-              <div class="card-icon-box bg-primary-soft">
+          <div class="vac-tag-body">
+            <div class="vac-card-header">
+              <div class="vac-card-icon bg-primary-soft">
                 <ion-icon name="female-outline" color="primary"></ion-icon>
               </div>
-              <div class="card-title-stack">
+              <div class="vac-card-title-group">
                 <strong>{{ r.bovino?.nombre }}</strong>
                 <span>{{ r.bovino?.crotal }}</span>
               </div>
@@ -7296,18 +7283,18 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
               <ion-badge [color]="getStatusColor(r.estado_gestacion)" mode="ios">{{ r.estado_gestacion }}</ion-badge>
             </div>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
+            <div class="vac-card-grid">
+              <div class="vac-card-info">
                 <span class="label">Método / Fecha</span>
                 <span class="value">{{ r.tipo_cubricion }} • {{ r.fecha_cubricion | date:'dd/MM/yyyy' }}</span>
               </div>
-              <div class="card-data-item">
+              <div class="vac-card-info">
                 <span class="label">FPP Estimada</span>
                 <span class="value">{{ r.fecha_parto_prevista ? (r.fecha_parto_prevista | date:'dd MMM yyyy') : 'Pendiente' }}</span>
               </div>
             </div>
 
-            <div class="card-footer-actions">
+            <div class="vac-card-footer mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
               <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
                 <ion-icon name="create-outline" slot="icon-only"></ion-icon>
               </ion-button>
@@ -7352,10 +7339,12 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
       </ion-header>
       
       <ion-content class="ion-padding vac-modal-content">
-        <div class="form-intro">
-           <ion-icon name="heart" class="color-earth text-3xl"></ion-icon>
-           <h3>Protocolo de Cría</h3>
-           <p>Registra eventos de monta e inseminación.</p>
+        <div class="vac-modal-header ion-text-center ion-padding-vertical">
+           <div class="vac-icon-ring ion-margin-bottom">
+              <ion-icon name="heart"></ion-icon>
+           </div>
+           <h3 class="vac-modal-title">Protocolo de Cría</h3>
+           <p class="vac-modal-subtitle">Registra eventos de monta e inseminación.</p>
         </div>
 
         <form [formGroup]="reproForm">
@@ -7722,46 +7711,43 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
   <div class="vac-container animate-fade-in">
 
     <!-- Buscador Premium -->
-    <ion-searchbar
-      mode="ios"
-      animated="true"
-      placeholder="Buscar por ejemplar o tratamiento..."
-      (ionInput)="onSearch($event)"
-      class="vac-filter-bar"
-      style="padding: 0; box-shadow: none; border: none; background: transparent;">
-    </ion-searchbar>
+    <div class="vac-searchbar-container">
+      <ion-searchbar
+        mode="ios"
+        animated="true"
+        placeholder="Buscar por ejemplar o tratamiento..."
+        (ionInput)="onSearch($event)">
+      </ion-searchbar>
+    </div>
 
-    <!-- SKELETON LOADER -->
-    <ion-grid class="ion-no-padding mt-4" *ngIf="isLoading()">
+    <!-- SKELETON LOADER CON IONIC UTILITIES -->
+    <ion-grid class="ion-no-padding ion-margin-top" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="tag-body-luxe">
-            <div class="card-header-flex">
-              <div class="card-icon-box" style="background-color: var(--ion-color-light);">
-                <ion-skeleton-text animated style="width: 24px; height: 24px; border-radius: 50%;"></ion-skeleton-text>
+          <div class="vac-tag-body ion-padding">
+            <div class="vac-card-header ion-margin-bottom">
+              <ion-skeleton-text animated style="width: 40px; height: 40px; border-radius: 12px;" class="ion-margin-end"></ion-skeleton-text>
+              <div class="vac-card-title-group" style="flex: 1;">
+                <ion-skeleton-text animated style="width: 70%; height: 16px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
               </div>
-              <div class="card-title-stack" style="width: 50%;">
-                <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
-              </div>
-              <div class="flex-1"></div>
-              <ion-skeleton-text animated style="width: 50px; height: 25px; border-radius: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 50px; height: 24px; border-radius: 8px;"></ion-skeleton-text>
             </div>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
-              </div>
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
-              </div>
-            </div>
+            <ion-row class="ion-margin-vertical">
+              <ion-col size="6">
+                <ion-skeleton-text animated style="width: 60%; height: 12px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 90%; height: 14px;"></ion-skeleton-text>
+              </ion-col>
+              <ion-col size="6">
+                <ion-skeleton-text animated style="width: 60%; height: 12px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 90%; height: 14px;"></ion-skeleton-text>
+              </ion-col>
+            </ion-row>
 
-            <div class="card-footer-actions">
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%;"></ion-skeleton-text>
+            <div class="vac-card-footer ion-padding-top" style="border-top: 1px solid rgba(0,0,0,0.05); display: flex; gap: 8px;">
+              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 8px;"></ion-skeleton-text>
             </div>
           </div>
         </ion-col>
@@ -7769,15 +7755,15 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     </ion-grid>
 
     <!-- LISTA ESTANDARIZADA -->
-    <ion-grid class="ion-no-padding mt-4" *ngIf="filteredSanidad().length > 0 && !isLoading()">
+    <ion-grid class="ion-no-padding ion-margin-top" *ngIf="filteredSanidad().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of filteredSanidad()">
-          <div class="tag-body-luxe">
-            <div class="card-header-flex">
-              <div class="card-icon-box" [style.background-color]="'var(--ion-color-light)'">
+          <div class="vac-tag-body">
+            <div class="vac-card-header">
+              <div class="vac-card-icon" [style.background-color]="'var(--ion-color-light)'">
                 <ion-icon [name]="getHealthIcon(s.tipo)" color="primary"></ion-icon>
               </div>
-              <div class="card-title-stack">
+              <div class="vac-card-title-group">
                 <strong>{{ s.bovino?.nombre || 'Ejemplar' }}</strong>
                 <span>{{ s.bovino?.crotal || 'S/N' }}</span>
               </div>
@@ -7787,18 +7773,18 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
               </ion-badge>
             </div>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
+            <div class="vac-card-grid">
+              <div class="vac-card-info">
                 <span class="label">Tratamiento</span>
                 <span class="value">{{ s.tipo }}: {{ s.producto }}</span>
               </div>
-              <div class="card-data-item">
+              <div class="vac-card-info">
                 <span class="label">Fecha Aplicación</span>
                 <span class="value">{{ s.fecha | date:'dd MMM yyyy' }}</span>
               </div>
             </div>
 
-            <div class="card-footer-actions">
+            <div class="vac-card-footer mt-4 pt-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
               <ion-button fill="clear" color="medium" (click)="openEditModal(s)">
                 <ion-icon name="create-outline" slot="icon-only"></ion-icon>
               </ion-button>
@@ -7843,10 +7829,12 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
       </ion-header>
       
       <ion-content class="ion-padding vac-modal-content">
-        <div class="form-intro">
-           <ion-icon name="medkit" class="color-earth text-3xl"></ion-icon>
-           <h3>Protocolo Veterinario</h3>
-           <p>Registra la intervención para mantener la trazabilidad sanitaria de la explotación.</p>
+        <div class="vac-modal-header ion-text-center ion-padding-vertical">
+           <div class="vac-icon-ring ion-margin-bottom">
+              <ion-icon name="medkit"></ion-icon>
+           </div>
+           <h3 class="vac-modal-title">Protocolo Veterinario</h3>
+           <p class="vac-modal-subtitle">Registra la intervención para mantener la trazabilidad sanitaria de la explotación.</p>
         </div>
 
         <form [formGroup]="healthForm">
@@ -8228,7 +8216,6 @@ ARCHIVO: .\frontend\src\styles\main.scss
 
 // 4. Características (Módulos de negocio)
 @use 'features/dashboard';
-@use 'features/ganado';
 @use 'features/manejo';
 @use 'features/reproduccion';
 @use 'features/sanidad';
@@ -8376,7 +8363,7 @@ $focus-ring-color: rgba($tertiary-color, 0.6); // Wheat color para los bordes de
 $shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 $shadow-md: 0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.12);
 $shadow-lg: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-$shadow-luxe: 0 20px 40px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.05);
+$vac-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.05);
 $shadow-focus: 0 0 0 $focus-ring-width $focus-ring-color;
 
 // Transitions (Smoother)
@@ -8645,12 +8632,12 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 
 @use "../abstracts/variables";
 
-/* BASE CARD - The "Floating" Luxe Estate */
+/* BASE CARD - Standard Vacapp Floating Card */
 .vac-base-card {
   background: variables.$white;
   border-radius: 20px;
   padding: 1.25rem;
-  box-shadow: variables.$shadow-luxe;
+  box-shadow: variables.$vac-shadow;
   border: 1px solid rgba(0, 0, 0, 0.03);
   margin: 12px 8px;
   position: relative;
@@ -8681,7 +8668,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 }
 
 /* KPI CARDS - Intelligence Center */
-.bi-kpi-card {
+.vac-kpi-card {
   @extend .vac-base-card;
   &.glass {
     background: rgba(255, 255, 255, 0.7);
@@ -8694,7 +8681,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   align-items: flex-start;
   gap: 15px;
 
-  .kpi-mini-icon {
+  .vac-kpi-mini-icon {
     width: 44px;
     height: 44px;
     border-radius: 12px;
@@ -8706,8 +8693,8 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   }
 
-  .kpi-content {
-    .kpi-label {
+  .vac-kpi-content {
+    .vac-kpi-label {
       font-size: 0.7rem;
       text-transform: uppercase;
       font-weight: 800;
@@ -8717,7 +8704,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
       margin-bottom: 4px;
       display: block;
     }
-    .kpi-value {
+    .vac-kpi-value {
       font-size: 1.75rem;
       font-weight: 900;
       margin: 0;
@@ -8728,7 +8715,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 }
 
 /* MAIN DASHBOARD CARDS */
-.bi-main-card {
+.vac-main-card {
   @extend .vac-base-card;
   padding: 0; /* Let header and content manage padding */
 
@@ -8736,7 +8723,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
     padding: 1.5rem;
     border-bottom: 1px solid rgba(0,0,0,0.03);
     
-    .bi-card-head {
+    .vac-card-header-flex {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -8748,7 +8735,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   }
 }
 
-.bi-mini-stat {
+.vac-mini-stat {
   padding: 6px 12px;
   border-radius: 99px;
   font-size: 0.75rem;
@@ -8764,14 +8751,14 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 }
 
 /* GLOBAL CARD LAYOUT CLASSES */
-.card-header-flex {
+.vac-card-header {
   display: flex;
   align-items: center;
   gap: 15px;
   margin-bottom: 15px;
 }
 
-.card-icon-box {
+.vac-card-icon {
   width: 52px;
   height: 52px;
   border-radius: 14px;
@@ -8789,7 +8776,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   &.bg-success { background: linear-gradient(135deg, variables.$success-color, #2d6a4f); }
 }
 
-.card-title-stack {
+.vac-card-title-group {
   display: flex;
   flex-direction: column;
 
@@ -8807,7 +8794,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   }
 }
 
-.card-data-grid {
+.vac-card-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 15px;
@@ -8817,7 +8804,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   border-radius: 12px;
 }
 
-.card-data-item {
+.vac-card-info {
   display: flex;
   flex-direction: column;
 
@@ -8841,7 +8828,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   }
 }
 
-.card-footer-actions {
+.vac-card-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -8858,12 +8845,12 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 }
 
 /* Modifiers for Specific Modules */
-.pro-card-luxe { 
+.vac-pro-card { 
   @extend .vac-base-card;
   border-top: 4px solid variables.$tertiary-color;
 }
 
-.tag-body-luxe, .field-card-body-luxe, .health-card-body-luxe, .repro-card-body-luxe, .weight-card-body-luxe {
+.vac-tag-body, .vac-field-card-body, .vac-health-card-body, .vac-repro-card-body, .vac-weight-card-body {
   @extend .vac-base-card;
 }
 
@@ -8907,7 +8894,7 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
     /* Dashboard: Estilos estructurales mínimos (Heredados de _luxe.scss) */
     .welcome-header-main { display: flex; align-items: center; gap: 15px; }
     .vac-chart-mock { height: 200px; display: flex; align-items: flex-end; gap: 20px; padding: 20px 0; border-bottom: 2px solid var(--ion-color-light); }
-    .chart-row-luxe { flex: 1; display: flex; align-items: flex-end; height: 100%; }
+    .vac-chart-row { flex: 1; display: flex; align-items: flex-end; height: 100%; }
     
     .vac-alert-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.1); padding: 15px; border-radius: 20px; }
     .alert-text strong { display: block; font-size: 0.95rem; }
@@ -8921,21 +8908,21 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
 /* From ganado.component.ts */
 
     /* Ganado: Estilos estructurales mínimos (Heredados de _luxe.scss) */
-    .animal-header-luxe { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-    .animal-info-luxe { flex: 1; }
+    .vac-animal-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .vac-animal-info { flex: 1; }
   
 
 
 /* From lotes.component.ts */
 
     /* Lotes: Estilos estructurales mínimos (Heredados de _luxe.scss) */
-    .field-header-luxe { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .vac-field-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .field-icon-box { 
       width: 48px; height: 48px; background: rgba(27, 67, 50, 0.05); 
       border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; 
     }
-    .field-info-luxe { flex: 1; }
-    .field-loc-luxe { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ion-color-secondary); font-weight: 700; margin-top: 4px; }
+    .vac-field-info { flex: 1; }
+    .vac-field-loc { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ion-color-secondary); font-weight: 700; margin-top: 4px; }
     .detail-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
   
 
@@ -8943,17 +8930,17 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
 /* From recria.component.ts */
 
     /* Recría: Estilos estructurales mínimos (Heredados de _luxe.scss) */
-    .weight-header-luxe { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .vac-weight-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
     .animal-name-txt { font-size: 1.3rem; font-weight: 900; color: var(--ion-color-primary); margin: 5px 0 0; }
-    .weight-date-luxe { display: flex; align-items: center; gap: 5px; color: var(--ion-color-tertiary); font-weight: 700; font-size: 0.8rem; }
+    .vac-weight-date { display: flex; align-items: center; gap: 5px; color: var(--ion-color-tertiary); font-weight: 700; font-size: 0.8rem; }
     
     .detail-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-    .data-val-luxe { display: flex; align-items: baseline; gap: 4px; }
-    .data-val-luxe .num-txt { font-size: 2rem; font-weight: 900; color: var(--ion-color-primary); }
-    .data-val-luxe .unit-txt { font-size: 0.85rem; font-weight: 800; color: var(--ion-color-secondary); }
+    .vac-data-val { display: flex; align-items: baseline; gap: 4px; }
+    .vac-data-val .num-txt { font-size: 2rem; font-weight: 900; color: var(--ion-color-primary); }
+    .vac-data-val .unit-txt { font-size: 0.85rem; font-weight: 800; color: var(--ion-color-secondary); }
 
-    .gain-val-luxe { display: flex; align-items: center; gap: 5px; font-size: 1.2rem; font-weight: 900; }
-    .tag-pesaje-luxe { display: flex; align-items: center; gap: 6px; color: var(--ion-color-secondary); font-weight: 800; font-size: 0.85rem; }
+    .vac-gain-val { display: flex; align-items: center; gap: 5px; font-size: 1.2rem; font-weight: 900; }
+    .vac-tag-pesaje { display: flex; align-items: center; gap: 6px; color: var(--ion-color-secondary); font-weight: 800; font-size: 0.85rem; }
     
     .vac-loading-state { text-align: center; padding: 40px; color: var(--ion-color-primary); }
     .vac-loading-state p { margin-top: 15px; font-weight: 600; font-size: 1.1rem; }
@@ -8963,15 +8950,15 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
 /* From reproduccion.component.ts */
 
     /* Reproducción: Estilos estructurales mínimos (Heredados de _luxe.scss) */
-    .repro-header-luxe { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .pulse-icon-luxe { font-size: 28px; color: var(--ion-color-danger); animation: pulse-luxe 2s infinite; }
-    @keyframes pulse-luxe { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
+    .vac-repro-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .vac-pulse-icon { font-size: 28px; color: var(--ion-color-danger); animation: vac-pulse 2s infinite; }
+    @keyframes vac-pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
 
     .countdown-parto { text-align: right; }
     .days-num-txt { font-size: 2.1rem; font-weight: 900; color: var(--ion-color-primary); display: block; line-height: 1; }
     .days-lbl-txt { font-size: 0.65rem; font-weight: 800; color: var(--ion-color-tertiary); text-transform: uppercase; }
 
-    .repro-animal-luxe { margin-bottom: 15px; }
+    .vac-repro-animal { margin-bottom: 15px; }
     .animal-ref-txt { font-size: 1.35rem; font-weight: 900; color: var(--ion-color-primary); margin: 0; }
     .crotal-ref-txt { font-size: 0.8rem; color: var(--ion-color-secondary); font-weight: 700; margin-top: 2px; display: block; }
     
@@ -9204,7 +9191,7 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
 .w-full { width: 100%; }
 
 /* 14. COMPONENT REFINEMENTS (Extracted from TS) */
-.avatar-mini-luxe { 
+.vac-avatar-mini { 
   width: 42px; height: 42px; background: rgba(variables.$primary-color, 0.05); 
   border-radius: 12px; display: flex; align-items: center; justify-content: center; 
   color: var(--ion-color-primary); font-size: 18px; 
@@ -9217,15 +9204,15 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
 
 .detail-lbl { font-size: 0.65rem; font-weight: 800; color: variables.$gray-600; text-transform: uppercase; }
 .detail-val { font-size: 0.9rem; font-weight: 800; color: variables.$black; }
-.detail-notes-luxe { margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(variables.$black, 0.1); }
-.notes-txt-luxe { font-size: 0.85rem; color: variables.$gray-600; font-weight: 600; font-style: italic; margin-top: 4px; }
+.vac-detail-notes { margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(variables.$black, 0.1); }
+.vac-notes-txt { font-size: 0.85rem; color: variables.$gray-600; font-weight: 600; font-style: italic; margin-top: 4px; }
 
 .vac-card-footer { 
   display: flex; justify-content: space-between; align-items: center; 
   border-top: 1px solid variables.$gray-100; padding-top: 10px; margin-top: 5px; 
 }
 
-.type-badge-luxe {
+.vac-type-badge {
   padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase;
   &.vacunacion { background: rgba(variables.$success-color, 0.1); color: variables.$success-color; }
   &.desparasitacion { background: rgba(variables.$secondary-color, 0.1); color: variables.$secondary-color; }
@@ -9246,21 +9233,21 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
 .step-active .step-circle { background: var(--ion-color-primary); color: variables.$white; }
 .wizard-line { flex: 1; height: 2px; background: variables.$gray-100; margin-top: -15px; }
 
-.history-panel-luxe { background: variables.$white; border-radius: 30px; margin: 0 10px; border: 1px solid rgba(variables.$black, 0.02); overflow: hidden; }
-.history-row-luxe { display: flex; align-items: center; gap: 15px; padding: 15px 20px; border-bottom: 1px solid variables.$gray-100; }
-.history-avatar-luxe { 
+.vac-history-panel { background: variables.$white; border-radius: 30px; margin: 0 10px; border: 1px solid rgba(variables.$black, 0.02); overflow: hidden; }
+.vac-history-row { display: flex; align-items: center; gap: 15px; padding: 15px 20px; border-bottom: 1px solid variables.$gray-100; }
+.vac-history-avatar { 
   width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; 
   justify-content: center; font-size: 20px; background: rgba(variables.$primary-color, 0.05); 
   color: var(--ion-color-primary); 
 }
-.history-data-luxe p { font-size: 0.8rem; color: variables.$gray-600; margin-top: 2px; font-weight: 600; }
+.vac-history-data p { font-size: 0.8rem; color: variables.$gray-600; margin-top: 2px; font-weight: 600; }
 
-.graph-bar-luxe { flex: 1; background: variables.$gray-100; border-radius: 8px; transition: variables.$transition-base; }
-.bar-accent-luxe { background: variables.$tertiary-color; }
-.icon-indicator-luxe { font-size: 24px; background: rgba(variables.$white, 0.1); padding: 12px; border-radius: 16px; min-width: 48px; }
-.progress-track-luxe { height: 8px; background: rgba(variables.$white, 0.1); border-radius: 10px; overflow: hidden; }
-.progress-fill-luxe { height: 100%; background: variables.$white; border-radius: 10px; }
-.panel-footer-luxe { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid variables.$gray-100; font-size: 0.8rem; color: variables.$gray-600; font-weight: 600; }
+.vac-graph-bar { flex: 1; background: variables.$gray-100; border-radius: 8px; transition: variables.$transition-base; }
+.vac-bar-accent { background: variables.$tertiary-color; }
+.vac-icon-indicator { font-size: 24px; background: rgba(variables.$white, 0.1); padding: 12px; border-radius: 16px; min-width: 48px; }
+.vac-progress-track { height: 8px; background: rgba(variables.$white, 0.1); border-radius: 10px; overflow: hidden; }
+.vac-progress-fill { height: 100%; background: variables.$white; border-radius: 10px; }
+.vac-panel-footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid variables.$gray-100; font-size: 0.8rem; color: variables.$gray-600; font-weight: 600; }
 
 
 
@@ -9341,7 +9328,7 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
 .color-finance-down { color: #bc6c25 !important; }
 /* Grid & Spacing extras */
 .grid-cols-1 { grid-template-columns: 1fr !important; }
-.badge-luxe { padding: 10px 16px !important; }
+.vac-badge { padding: 10px 16px !important; }
 .card-icon-box-img {
   padding: 0 !important;
   overflow: hidden;
@@ -9621,14 +9608,14 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
 ==================================================
 
 // _dashboard.scss
-// Dashboard Features - Luxe-Forest Theme
+// Dashboard Features - Standard Vacapp Layout
 
 @use '../abstracts/variables' as v;
 @use '../abstracts/mixins' as m;
 
 // .vac-toolbar moved to core/_ionic.scss for global standardization
 
-.bi-title {
+.vac-page-title {
   font-family: v.$font-family-base;
   font-size: 2.2rem;
   font-weight: 800;
@@ -9637,14 +9624,14 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
   letter-spacing: -0.5px;
 }
 
-.bi-subtitle {
+.vac-page-subtitle {
   font-family: v.$font-family-base;
   font-size: 1.1rem;
   color: v.$medium-color;
   margin-top: 4px;
 }
 
-.bi-kpi-card {
+.vac-kpi-card {
   border-radius: 16px;
   margin: 6px;
   border: 1px solid rgba(255, 255, 255, 0.4);
@@ -9655,58 +9642,47 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
   gap: 12px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
+
+  .vac-kpi-mini-icon {
+    font-size: 2rem;
+  }
+
+  .vac-kpi-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: v.$gray-600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .vac-kpi-value {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: v.$black;
+  }
 }
 
-.kpi-mini-icon {
-  font-size: 2rem;
-}
-
-.kpi-label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: v.$gray-600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.kpi-value {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: v.$black;
-}
-
-.bi-main-card {
+.vac-main-card {
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.4);
   margin: 8px;
   overflow: hidden;
   background: var(--ion-card-background);
-}
 
-.bi-card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.bi-mini-stat {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 30px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: v.$primary-color;
+  .vac-card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
 }
 
 .bg-primary-soft {
   background: rgba(27, 67, 50, 0.1);
 }
 
-.chart-container-donut {
+.vac-chart-container-donut {
   height: 300px;
   display: flex;
   align-items: center;
@@ -9714,13 +9690,13 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
   position: relative;
 }
 
-.chart-skeleton {
+.vac-chart-skeleton {
   height: 100%;
   width: 100%;
   min-height: 250px;
 }
 
-.online-indicator {
+.vac-online-indicator {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -9748,455 +9724,223 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
 
 
 ==================================================
-ARCHIVO: .\frontend\src\styles\features\_ganado.scss
+ARCHIVO: .\frontend\src\styles\features\_manejo.scss
 ==================================================
-
-// _ganado.scss
-// Ganado Features - Luxe-Forest Theme
 
 @use '../abstracts/variables' as v;
 @use '../abstracts/mixins' as m;
 
-.vac-bg-forest {
-  --background: v.$light-color;
+/**
+ * Standardized Manejo & Ganado Style System
+ */
+@use '../components/cards';
+
+
+.vac-manejo-content {
+  background: var(--ion-background-color);
 }
 
-.pro-card-luxe {
-  border-radius: 20px;
-  border-left: 5px solid v.$primary-color;
-  box-shadow: v.$shadow-sm;
-  margin: 12px 8px;
-  background: var(--ion-card-background);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* BARRA DE FILTROS */
+.vac-filter-bar {
+  background: var(--vac-card-background);
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 24px;
+  border: 1px solid var(--vac-border-color);
+  box-shadow: var(--vac-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: v.$shadow-md;
+/* SEGMENTO DESIGN */
+.vac-segment {
+  margin: 1.5rem 0;
+  --background: #f8f9fa;
+  border-radius: 12px;
+  padding: 4px;
+
+  ion-segment-button {
+    --indicator-color: var(--ion-color-primary);
+    --color: #666;
+    --color-checked: white;
+    --indicator-box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    min-height: 50px;
+    font-weight: 600;
   }
 }
 
-.badge-card-top {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 0.75rem;
-  padding: 4px 10px;
-  border-radius: 12px;
+/* TARJETA DE EJEMPLAR (VAC-TAG-BODY) */
+.vac-cow-card {
+  @extend .vac-tag-body !optional;
+  
+  .vac-avatar-wrapper {
+    position: relative;
+    
+    .vac-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      overflow: hidden;
+      
+      .avatar-img {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+      }
+      
+      .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--vac-bg-soft);
+        font-size: 1.5rem;
+        color: var(--ion-color-primary);
+      }
+    }
+  }
 }
 
-.card-footer-actions-bi {
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  padding-top: 10px;
+/* WIZARD & MODAL */
+.vac-wizard-stepper {
   display: flex;
-  gap: 8px;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  background: var(--vac-bg-main);
+  border-bottom: 1px solid var(--vac-border-color);
+
+  .wizard-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+
+    .step-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--vac-border-color);
+      color: var(--vac-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--vac-text-muted);
+    }
+
+    &.step-active {
+      opacity: 1;
+      .step-circle {
+        background: var(--ion-color-primary);
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.3);
+      }
+      span {
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+
+  .wizard-line {
+    flex: 0.2;
+    height: 2px;
+    background: var(--vac-border-color);
+    margin-top: -1.25rem;
+  }
 }
 
-// Animal image handling
-.card-icon-box-img {
-  background-size: cover;
-  background-position: center;
-  border-radius: 14px;
+/* LOTES */
+.vac-lote-card {
+  @extend .vac-tag-body;
+  border-left: 5px solid var(--ion-color-secondary);
+  
+  .lote-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    
+    .lote-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--vac-bg-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--ion-color-secondary);
+    }
+    
+    .lote-info {
+      flex: 1;
+      strong {
+        font-size: 1.1rem;
+        color: var(--vac-text-main);
+      }
+      p {
+        font-size: 0.85rem;
+        color: var(--vac-text-muted);
+        margin: 0;
+      }
+    }
+  }
 }
 
-// Empty state improvements
+/* EMPTY STATE */
 .vac-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 4rem 2rem;
   text-align: center;
 
   .empty-icon-ring {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: rgba(v.$primary-color, 0.1);
+    background: var(--vac-bg-soft);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 3rem;
-    color: v.$primary-color;
-    margin-bottom: 24px;
+    color: var(--ion-color-primary);
+    margin-bottom: 1.5rem;
     @include m.animate-pulse;
   }
 
   h2 {
-    font-family: v.$font-family-base;
-    color: v.$black;
+    font-size: 1.5rem;
     font-weight: 700;
+    color: var(--vac-text-main);
+    margin-bottom: 0.5rem;
   }
 
   p {
-    color: v.$gray-600;
-    max-width: 300px;
-    margin-bottom: 30px;
+    color: var(--vac-text-muted);
+    max-width: 280px;
+    margin-bottom: 2rem;
   }
 }
 
-
-==================================================
-ARCHIVO: .\frontend\src\styles\features\_manejo.scss
-==================================================
-
-@use '../abstracts/variables';
-
-// Estilos para el módulo de Manejo (Rustic & Simple)
-/**
- * Estilos para Ganado y Lotes (Manejo)
- * 100% Variable Sync - Forest & Earth
- */
-
-.manejo-content {
-  background: var(--ion-background-color);
-}
-
-// Barra de Filtros Rústica
-.vac-filter-bar {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 12px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  .search-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 0 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-
-    .search-icon {
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 1.2rem;
-      margin-right: 10px;
-    }
-
-    input {
-      background: transparent;
-      border: none;
-      color: white;
-      padding: 12px 0;
-      width: 100%;
-      outline: none;
-      font-size: 0.95rem;
-
-      &::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-      }
-    }
-  }
-
-  .filter-chips {
-    display: flex;
-    gap: 8px;
-
-    .chip {
-      padding: 6px 14px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.05);
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-
-      &.active {
-        background: variables.$tertiary-color;
-        color: variables.$dark-color;
-        border-color: variables.$tertiary-color;
-        box-shadow: 0 4px 10px rgba(variables.$tertiary-color, 0.3);
-      }
-
-      &:hover:not(.active) {
-        background: rgba(255, 255, 255, 0.1);
-      }
-    }
-  }
-}
-
-// Segmento Rustic (Botones grandes y fáciles de tocar)
-.vac-segment {
-  margin: variables.$spacing-md 0;
-  --background: #{variables.$gray-100};
-  border-radius: 12px;
-  padding: 4px;
-
-  ion-segment-button {
-    --indicator-color: #{variables.$primary-color};
-    --color: #{variables.$gray-600};
-    --color-checked: #{variables.$white};
-    --indicator-box-shadow: 0 4px 12px rgba($black, 0.1);
-    min-height: 60px;
-    font-weight: 600;
-  }
-}
-
-// Contenedor de la lista
-.list-container {
-  padding: 4px 0;
-}
-
-// Tarjeta de Vaca (Rustic) - Grande y Clara
-.cow-card {
-  --background: #{variables.$white};
-  --padding-top: $spacing-md;
-  --padding-bottom: $spacing-md;
-  --border-radius: 16px;
-  margin-bottom: 8px;
-  box-shadow: 0 4px 10px rgba(variables.$black, 0.03);
-  border: 1px solid rgba(variables.$primary-color, 0.1);
-
-  .cow-icon {
-    font-size: 2.2rem;
-    color: variables.$primary-color;
-    margin-right: variables.$spacing-sm;
-  }
-
-  .cow-name {
-    font-size: variables.$font-size-lg;
-    font-weight: 700;
-    color: variables.$dark-color;
-    margin-bottom: 2px;
-  }
-
-  .cow-id {
-    font-size: 0.95rem;
-    color: variables.$gray-600;
-    margin: 2px 0;
-  }
-
-  .cow-details {
-    font-size: 0.9rem;
-    color: variables.$primary-color;
-    font-weight: 500;
-  }
-
-  .vac-badge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-}
-
-// Estilo de los botones laterales (Slide)
-.vac-item {
-  border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-
-// MODAL RUSTIC (Wizard Paso a Paso)
-.vac-modal {
-  --border-radius: 24px;
-  --box-shadow: 0 28px 48px rgba($black, 0.4);
-
-  .modal-toolbar {
-    --background: #{variables.$primary-color};
-    --color: #{variables.$white};
-    padding-top: 10px;
-    
-    ion-title {
-      font-weight: 700;
-      font-size: 1.3rem;
-    }
-  }
-}
-
-// Indicador de Pasos del Wizard
-.step-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  padding: 15px 0;
-  background: variables.$primary-color;
-
-  div {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(variables.$white, 0.2);
-    color: variables.$white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    border: 1px solid rgba(variables.$white, 0.3);
-    transition: all 0.3s ease;
-
-    &.active {
-      background: variables.$white;
-      color: variables.$primary-color;
-      transform: scale(1.15);
-      box-shadow: 0 4px 10px rgba(variables.$black, 0.2);
-    }
-  }
-}
-
-// Contenedor de cada paso (Glassmorphism ligero)
-.step-container {
-  animation: slideUp 0.4s ease-out;
-  padding: variables.$spacing-md;
-
-  .step-title {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: variables.$dark-color;
-    margin-bottom: 8px;
-  }
-
-  .step-desc {
-    font-size: 1.05rem;
-    color: variables.$gray-600;
-    margin-bottom: variables.$spacing-lg;
-    line-height: 1.4;
-  }
-}
-
-// Campos de entrada Rustic (Más grandes)
-.vac-input {
-  --background: #{variables.$gray-100};
-  --border-radius: 12px;
-  margin-bottom: variables.$spacing-md;
-  --padding-start: 16px;
-  --padding-top: 10px;
-  --padding-bottom: 10px;
-
-  ion-label {
-    font-weight: 600;
-    color: variables.$primary-color;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-
-  ion-input, ion-select {
-    --padding-start: 0;
-    font-size: 1.2rem;
-    font-weight: 500;
-  }
-}
-
-// Botones de Navegación del Wizard
-.wizard-buttons {
-  margin-top: variables.$spacing-xl;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  .nav-btn {
-    --border-radius: 12px;
-    height: 56px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin: 0;
-  }
-
-  .next-btn {
-    --background: #{variables.$primary-color};
-  }
-
-  .save-btn {
-    --background: #{variables.$tertiary-color};
-    --color: #{variables.$dark-color};
-    margin-top: 10px;
-  }
-}
-
-// Tarjeta de Lote (Rustic) - Diseño Diferenciado
-.vac-lote-card {
-  --background: #{variables.$white};
-  border-radius: 16px;
-  margin-bottom: variables.$spacing-md;
-  box-shadow: 0 4px 15px rgba(variables.$black, 0.05);
-  overflow: hidden;
-  border: 1px solid rgba(variables.$primary-color, 0.05);
-
-  .lote-item {
-    --padding-top: $spacing-md;
-    --padding-bottom: $spacing-md;
-    
-    ion-icon {
-      font-size: 1.8rem;
-    }
-  }
-
-  .lote-name {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: variables.$dark-color;
-  }
-
-  .lote-desc {
-    font-size: 1rem;
-    color: variables.$gray-600;
-  }
-}
-
-// Estados Vacíos (Feedback visual cuando no hay datos)
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-  background: rgba(variables.$gray-100, 0.4);
-  border-radius: 20px;
-  margin-top: variables.$spacing-xl;
-  border: 2px dashed rgba(variables.$primary-color, 0.1);
-
-  .faded-icon {
-    font-size: 5rem;
-    color: rgba(variables.$primary-color, 0.1);
-    margin-bottom: variables.$spacing-md;
-  }
-
-  p {
-    font-size: 1.1rem;
-    color: variables.$gray-600;
-    font-weight: 500;
-  }
-}
-
-// Botones de acción lateral (Sliding)
-.option-btn {
-  --background: #{variables.$primary-color};
-  font-weight: 600;
-  
-  &[color="danger"] {
-    --background: #{variables.$danger-color};
-  }
-}
-
-// Estilos de Input mejorados para legibilidad extrema
-.vac-input {
-  ion-label {
-    font-size: 0.9rem !important;
-    text-transform: uppercase;
-    opacity: 0.8;
-  }
-  
-  ion-select, ion-input {
-    margin-top: 5px;
-    --padding-start: 4px;
-  }
-}
-
-// Animación de subida suave
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.vac-chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
 }
 
 
@@ -10206,188 +9950,164 @@ ARCHIVO: .\frontend\src\styles\features\_recria.scss
 
 /* --- Módulo de Recría y Control de Pesaje --- */
 
-.animal-selection-card {
-  background: var(--ion-card-background);
-  border-radius: 16px;
-  padding: 1.25rem;
-  margin-bottom: 1rem;
-  border: 1px solid rgba(0,0,0,0.05);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
+.vac-animal-selector {
+  margin-bottom: 1.5rem;
   
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    border-color: var(--ion-color-primary);
-  }
-
-  .card-header-flex {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .card-icon-box {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: white;
+  .vac-animal-card {
+    background: var(--vac-card-background);
+    border-radius: var(--vac-card-radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--vac-border-color);
+    box-shadow: var(--vac-shadow-sm);
+    transition: all 0.3s ease;
+    cursor: pointer;
     
-    &.bg-primary { background: var(--ion-color-primary); }
-    &.bg-secondary { background: var(--ion-color-secondary); }
-  }
-
-  .card-title-stack {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-
-    strong {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.1rem;
-      color: var(--ion-text-color);
-      line-height: 1.2;
-    }
-
-    span {
-      font-size: 0.85rem;
-      color: #666;
-      font-weight: 500;
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--vac-shadow-md);
+      border-color: var(--ion-color-primary);
     }
   }
 }
 
 /* MÉTRICAS DE RENDIMIENTO */
-.metric-card-luxe {
+.vac-metric-card {
   padding: 1.5rem;
-  border-radius: 18px;
-  background: var(--ion-card-background);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  border-radius: var(--vac-card-radius);
+  background: var(--vac-card-background);
+  box-shadow: var(--vac-shadow-sm);
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 1.25rem;
   height: 100%;
-  border: 1px solid rgba(0,0,0,0.02);
+  border: 1px solid var(--vac-border-color);
+  margin-bottom: 1rem;
 
-  .label {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #888;
-    font-weight: 600;
+  .vac-metric-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
   }
 
-  .value {
-    font-size: 2.2rem;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    color: #1b4332;
+  .vac-metric-info {
+    display: flex;
+    flex-direction: column;
+    
+    .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--vac-text-muted);
+      font-weight: 600;
+    }
 
-    small {
-      font-size: 1rem;
-      font-weight: 500;
-      color: #999;
+    .value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      font-family: var(--vac-font-title);
+      color: var(--vac-text-main);
+      line-height: 1.2;
+
+      small {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--vac-text-muted);
+      }
     }
   }
 }
 
-/* HISTORIAL DE PESADA (Versión Row) */
-.weight-card-row {
-  background: var(--ion-card-background);
+/* HISTORIAL DE PESADA */
+.vac-weight-row {
+  background: var(--vac-card-background);
   margin-bottom: 0.75rem;
   border-radius: 14px;
   padding: 1rem;
   border-left: 4px solid var(--ion-color-primary);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  box-shadow: var(--vac-shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
   
-  .card-content-flex {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-
-  .date-box {
+  .vac-date-box {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 55px;
-    padding-right: 1.25rem;
-    border-right: 1px solid #f0f0f0;
+    min-width: 60px;
+    padding-right: 1rem;
+    border-right: 1px solid var(--vac-border-color);
 
     strong {
-      font-size: 1.4rem;
-      line-height: 1;
-      color: var(--ion-text-color);
+      font-size: 1.25rem;
+      color: var(--vac-text-main);
     }
 
     span {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
-      color: #888;
+      color: var(--vac-text-muted);
       font-weight: 700;
     }
   }
 
-  .data-box {
+  .vac-data-box {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-
+    
     .weight {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: var(--ion-text-color);
-      font-family: 'Outfit', sans-serif;
+      color: var(--vac-text-main);
+      font-family: var(--vac-font-title);
     }
 
     .type {
-      font-size: 0.85rem;
-      color: #bc6c25;
+      font-size: 0.8rem;
+      color: var(--ion-color-secondary);
       font-weight: 600;
-      opacity: 0.8;
     }
   }
 }
 
-/* BUSCADOR RÚSTICO */
+/* BUSCADOR */
 .vac-search-wrapper {
-  position: relative;
-  background: var(--ion-card-background);
+  background: var(--vac-card-background);
   border-radius: 14px;
   padding: 0 1.25rem;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: var(--vac-shadow-sm);
+  border: 1px solid var(--vac-border-color);
 
   .vac-search-icon {
-    font-size: 1.3rem;
-    color: #bc6c25;
+    font-size: 1.25rem;
+    color: var(--vac-text-muted);
     margin-right: 0.75rem;
   }
 
   .vac-search-input-field {
     width: 100%;
     border: none;
-    padding: 1.15rem 0;
+    padding: 1rem 0;
     font-size: 1rem;
-    font-family: 'Inter', sans-serif;
-    color: #333;
+    font-family: var(--vac-font-main);
+    color: var(--vac-text-main);
     outline: none;
     background: transparent;
 
     &::placeholder {
-      color: #bbb;
+      color: var(--vac-text-muted);
+      opacity: 0.6;
     }
   }
 }
 
-.chart-container-large {
+.vac-chart-container {
   position: relative;
   height: 300px;
   width: 100%;
@@ -10400,13 +10120,13 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
 
 @use '../abstracts/variables';
 
-// Estilos para el módulo de Reproducción (Rustic & Simple)
+// Estilos para el módulo de Reproducción (Neutral & Simple)
 /**
  * Estilos para el Ciclo de Gestación
  * 100% Variable Sync - Forest & Earth
  */
 
-.repro-bg {
+.vac-repro-view {
   background: var(--ion-background-color);
 }
 
@@ -10419,14 +10139,14 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
 }
 
 // Cuadrícula de Gestaciones (Cartas Grandes)
-.gestation-grid {
+.vac-gestation-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: variables.$spacing-md;
   margin-bottom: variables.$spacing-lg;
 }
 
-.vac-card {
+.vac-repro-card {
   --background: var(--ion-card-background);
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
@@ -10455,7 +10175,7 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
     color: variables.$dark-color;
   }
 
-  .status-badge {
+  .vac-status-badge {
     margin-top: 10px;
     padding: 6px 12px;
     border-radius: 8px;
@@ -10464,7 +10184,7 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
 }
 
 // Animación de Latido Suave para indicar vida/gestación
-.heart-pulse {
+.vac-animate-pulse {
   animation: pulseShadow 3s infinite ease-in-out;
 }
 
@@ -10474,11 +10194,11 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
   100% { box-shadow: 0 8px 24px rgba(variables.$black, 0.06); }
 }
 
-// Separador Rustic
+// Separador Vacapp
 .vac-divider {
   --background: transparent;
-  --padding-top: $spacing-lg;
-  --padding-bottom: $spacing-sm;
+  --padding-top: #{variables.$spacing-lg};
+  --padding-bottom: #{variables.$spacing-sm};
   border-top: 1px solid rgba(variables.$gray-600, 0.1);
   margin-top: variables.$spacing-lg;
 
@@ -10496,11 +10216,11 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
 }
 
 // Lista de Historial
-.transparent-list {
+.vac-list-transparent {
   background: transparent;
   padding: 0;
 
-  .history-item {
+  .vac-history-item {
     --background: var(--ion-card-background);
     --border-radius: 12px;
     margin-bottom: 8px;
@@ -10544,13 +10264,13 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
 
 /* Feature Specific Styles moved from component */
 
-.item-card-pro { 
+.vac-item-card-pro { 
   --background: transparent;
   --padding-start: 12px; 
   --inner-padding-end: 16px; 
 }
 
-.history-avatar-bi { 
+.vac-history-icon { 
   width: 48px; 
   height: 48px; 
   display: flex; 
@@ -10561,23 +10281,19 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
   color: #582f0e; 
 }
 
-.bg-earth-soft { background: rgba(88, 47, 14, 0.1); }
-
-.card-footer-actions-bi { 
+.vac-card-footer { 
   border-top: 1px solid rgba(0,0,0,0.05); 
   padding-top: 10px; 
   display: flex; 
   gap: 8px; 
 }
 
-.action-buttons-mini { display: flex; gap: 2px; }
-
 
 ==================================================
 ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
 ==================================================
 
-// Estilos Rustic para el Módulo de Sanidad (Calendario y Tratamientos)
+// Estilos para el Módulo de Sanidad (Calendario y Tratamientos)
 @use '../abstracts/variables';
 
 /**
@@ -10585,13 +10301,13 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
  * 100% Variable Sync - Forest & Earth
  */
 
-.sanidad-content {
+.vac-sanidad-view {
   --background: #{variables.$gray-100};
   padding: variables.$spacing-md;
 }
 
-// Buscador Rustic
-.vac-searchbar {
+// Buscador Vacapp
+.vac-searchbar-container {
   --border-radius: 16px;
   --box-shadow: 0 4px 12px rgba($black, 0.05);
   --background: var(--ion-card-background);
@@ -10607,7 +10323,7 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
 }
 
 // Historial/Tabla de Datos (ion-grid)
-.health-table-container {
+.vac-health-table {
   background: var(--ion-card-background);
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
@@ -10615,7 +10331,7 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
   border: 1px solid rgba(variables.$primary-color, 0.08);
   margin-bottom: 80px; // Espacio para el FAB
 
-  .table-header {
+  .vac-table-header {
     background: rgba(variables.$primary-color, 0.04);
     border-bottom: 1px solid rgba(variables.$primary-color, 0.1);
     
@@ -10629,7 +10345,7 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
     }
   }
 
-  .table-row {
+  .vac-table-row {
     border-bottom: 1px solid rgba(variables.$gray-200, 0.5);
     transition: background 0.2s ease;
     align-items: center;
@@ -10650,26 +10366,26 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
       align-items: center;
     }
 
-    .date-cell {
+    .vac-date-cell {
       font-weight: 600;
       color: variables.$gray-600;
     }
 
-    .animal-cell {
+    .vac-animal-cell {
       flex-direction: column;
       align-items: flex-start;
       
-      .animal-name {
+      .vac-animal-name {
         font-weight: 700;
         color: variables.$primary-color;
       }
-      .animal-crotal {
+      .vac-animal-id {
         font-size: 0.8rem;
         color: variables.$gray-600;
       }
     }
 
-    .type-badge {
+    .vac-type-badge {
       padding: 6px 12px;
       border-radius: 20px;
       font-size: 0.75rem;
@@ -10685,7 +10401,7 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
 }
 
 // Modal de Sanidad
-.health-modal {
+.vac-health-modal {
   --border-radius: 28px 28px 0 0;
   --height: 85%;
   align-items: flex-end;
@@ -10699,17 +10415,17 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
     }
   }
 
-  .modal-content {
+  .vac-modal-body {
     padding: variables.$spacing-lg;
     
-    .modal-title {
+    .vac-modal-title {
       font-size: 1.8rem;
       font-weight: 800;
       color: variables.$primary-color;
       margin-bottom: 8px;
     }
 
-    .modal-subtitle {
+    .vac-modal-subtitle {
       font-size: 1rem;
       color: variables.$gray-600;
       margin-bottom: variables.$spacing-xl;
@@ -10717,8 +10433,8 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
   }
 }
 
-// Botón Flotante Rustic
-.fab-btn {
+// Botón Flotante Centralizado
+.vac-fab-main {
   --background: #{variables.$primary-color};
   --background-activated: #{variables.$primary-color};
   --box-shadow: 0 10px 20px rgba($primary-color, 0.3);
@@ -10811,22 +10527,25 @@ ion-split-pane.collapsed {
 }
 
 .vac-sidebar {
-  --background: linear-gradient(180deg, #{variables.$primary-color} 0%, #{variables.$dark-color} 100%) !important;
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  --ion-item-background: transparent !important;
+  background: transparent;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   transition: variables.$transition-base;
 }
 
 .vac-sidebar::part(container) {
-  background: transparent;
+  background: linear-gradient(180deg, #{variables.$primary-color} 0%, #{variables.$dark-color} 100%) !important;
   box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2);
 }
 
 .vac-sidebar ion-content {
-  --background: transparent;
+  --background: transparent !important;
   --padding-bottom: 20px;
 }
 
-.sidebar-header-luxe {
+.vac-sidebar-header {
   height: 100px;
   display: flex;
   align-items: center;
@@ -10876,11 +10595,15 @@ ion-split-pane.collapsed {
   opacity: 0.8;
 }
 
-.nav-container-luxe {
+.vac-nav-container {
   padding: 20px 10px;
 }
 
-.nav-item-luxe {
+.vac-nav-list {
+  background: transparent;
+}
+
+.vac-nav-item {
   --background: transparent;
   --background-focused: rgba(255, 255, 255, 0.05);
   --background-hover: rgba(255, 255, 255, 0.08);
@@ -10907,7 +10630,7 @@ ion-split-pane.collapsed {
       box-shadow: 0 4px 12px rgba(variables.$tertiary-color, 0.3);
     }
     
-    .label-luxe {
+  .vac-label {
       font-weight: 800;
       letter-spacing: 0.5px;
     }
@@ -10943,7 +10666,7 @@ ion-split-pane.collapsed {
   }
 }
 
-.label-luxe {
+.vac-label {
   font-size: 14px;
   font-weight: 600;
   transition: variables.$transition-fast;
@@ -10963,7 +10686,7 @@ ion-split-pane.collapsed {
       color: white;
       box-shadow: 0 4px 12px rgba(variables.$danger-color, 0.3);
     }
-    .label-luxe {
+    .vac-label {
       color: variables.$danger-color;
     }
   }
@@ -10998,7 +10721,7 @@ ARCHIVO: .\frontend\src\theme\variables.scss
 ==================================================
 
 :root {
-  /** 100% Sincronizado con _variables.scss - Tema Rústico y Armónico **/
+  /** 100% Sincronizado con _variables.scss - Vacapp Neutral Design System **/
   
   /* Verde Bosque Profundo ($primary-color) */
   --ion-color-primary: #1b4332;
@@ -11036,7 +10759,7 @@ ARCHIVO: .\frontend\src\theme\variables.scss
   --ion-color-warning-rgb: 221, 161, 94;
   --ion-color-warning-contrast: #212529;
 
-  /** Fondos Orgánicos Rustic-Luxe **/
+  /** Fondos Orgánicos Vacapp System **/
   --ion-background-color: #fefae0; /* Beige/Cream ($light-color) */
   --ion-background-color-rgb: 254, 250, 224;
 
@@ -11108,7 +10831,7 @@ ion-badge {
   font-weight: 600;
 }
 
-/* Efectos Globales de Personalización (Rústicos, no exagerados) */
+/* Efectos Globales de Personalización (Vacapp Neutral) */
 .vac-card {
   --border-radius: 12px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);

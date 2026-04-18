@@ -1,11 +1,11 @@
 @use "../abstracts/variables";
 
-/* BASE CARD - The "Floating" Luxe Estate */
+/* BASE CARD - Standard Vacapp Floating Card */
 .vac-base-card {
   background: variables.$white;
   border-radius: 20px;
   padding: 1.25rem;
-  box-shadow: variables.$shadow-luxe;
+  box-shadow: variables.$vac-shadow;
   border: 1px solid rgba(0, 0, 0, 0.03);
   margin: 12px 8px;
   position: relative;
@@ -36,7 +36,7 @@
 }
 
 /* KPI CARDS - Intelligence Center */
-.bi-kpi-card {
+.vac-kpi-card {
   @extend .vac-base-card;
   &.glass {
     background: rgba(255, 255, 255, 0.7);
@@ -49,7 +49,7 @@
   align-items: flex-start;
   gap: 15px;
 
-  .kpi-mini-icon {
+  .vac-kpi-mini-icon {
     width: 44px;
     height: 44px;
     border-radius: 12px;
@@ -61,8 +61,8 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   }
 
-  .kpi-content {
-    .kpi-label {
+  .vac-kpi-content {
+    .vac-kpi-label {
       font-size: 0.7rem;
       text-transform: uppercase;
       font-weight: 800;
@@ -72,7 +72,7 @@
       margin-bottom: 4px;
       display: block;
     }
-    .kpi-value {
+    .vac-kpi-value {
       font-size: 1.75rem;
       font-weight: 900;
       margin: 0;
@@ -83,7 +83,7 @@
 }
 
 /* MAIN DASHBOARD CARDS */
-.bi-main-card {
+.vac-main-card {
   @extend .vac-base-card;
   padding: 0; /* Let header and content manage padding */
 
@@ -91,7 +91,7 @@
     padding: 1.5rem;
     border-bottom: 1px solid rgba(0,0,0,0.03);
     
-    .bi-card-head {
+    .vac-card-header-flex {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -103,7 +103,7 @@
   }
 }
 
-.bi-mini-stat {
+.vac-mini-stat {
   padding: 6px 12px;
   border-radius: 99px;
   font-size: 0.75rem;
@@ -119,14 +119,14 @@
 }
 
 /* GLOBAL CARD LAYOUT CLASSES */
-.card-header-flex {
+.vac-card-header {
   display: flex;
   align-items: center;
   gap: 15px;
   margin-bottom: 15px;
 }
 
-.card-icon-box {
+.vac-card-icon {
   width: 52px;
   height: 52px;
   border-radius: 14px;
@@ -144,7 +144,7 @@
   &.bg-success { background: linear-gradient(135deg, variables.$success-color, #2d6a4f); }
 }
 
-.card-title-stack {
+.vac-card-title-group {
   display: flex;
   flex-direction: column;
 
@@ -162,7 +162,7 @@
   }
 }
 
-.card-data-grid {
+.vac-card-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 15px;
@@ -172,7 +172,7 @@
   border-radius: 12px;
 }
 
-.card-data-item {
+.vac-card-info {
   display: flex;
   flex-direction: column;
 
@@ -196,7 +196,7 @@
   }
 }
 
-.card-footer-actions {
+.vac-card-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -218,6 +218,122 @@
   border-top: 4px solid variables.$tertiary-color;
 }
 
-.vac-tag-body, .vac-field-card-body, .vac-health-card-body, .vac-repro-card-body, .vac-weight-card-body {
+.vac-tag-body, .vac-field-card-body, .vac-health-card-body, .vac-repro-card-body, .vac-weight-card-body, .vac-cow-card {
   @extend .vac-base-card;
+}
+
+/* UNIFORM CARD (Requested by Lead Architect) */
+.uniform-card {
+  @extend .vac-base-card;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  margin: 8px !important;
+
+  &.clickable-card {
+    cursor: pointer;
+    &:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+  }
+
+  &.vac-login-card {
+    max-width: 400px;
+    width: 100%;
+    margin: auto !important;
+  }
+}
+
+/* SKELETON UTILITIES */
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+.skeleton-avatar-lg {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+.skeleton-avatar-xl {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+}
+.skeleton-title {
+  width: 70%;
+  height: 16px;
+}
+.skeleton-subtitle {
+  width: 40%;
+  height: 12px;
+}
+.skeleton-badge {
+  width: 50px;
+  height: 24px;
+  border-radius: 8px;
+}
+.skeleton-kpi {
+  width: 60%;
+  height: 30px;
+}
+.skeleton-label {
+  width: 60%;
+  height: 12px;
+}
+.skeleton-value {
+  width: 90%;
+  height: 14px;
+}
+.skeleton-value-sm {
+  width: 45%;
+  height: 14px;
+}
+.skeleton-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+.skeleton-btn-wide {
+  width: 80px;
+  height: 32px;
+  border-radius: 8px;
+  margin-left: auto;
+}
+.skeleton-chart-main {
+  width: 100%;
+  height: 250px;
+}
+.chart-skeleton {
+  width: 100%;
+  height: 250px;
+}
+
+/* CARD LAYOUT UTILITIES */
+.vac-flex-1 {
+  flex: 1;
+}
+.card-footer-flex {
+  border-top: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.bg-light-soft {
+  background-color: var(--ion-color-light);
+}
+
+/* OTHER UTILITIES */
+.vac-transparent-searchbar {
+  padding: 0;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+.btn-rounded-12 {
+  --border-radius: 12px;
+}
+.chart-300px {
+  height: 300px;
 }

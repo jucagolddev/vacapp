@@ -30,66 +30,58 @@
       animated="true"
       placeholder="Buscar por ejemplar o método..."
       (ionInput)="onSearch($event)"
-      class="vac-filter-bar"
-      style="padding: 0; box-shadow: none; border: none; background: transparent;">
+      class="vac-filter-bar vac-transparent-searchbar">
     </ion-searchbar>
 
     <!-- GRÁFICO DE FERTILIDAD -->
-    <div class="bi-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
+    <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-card-header>
-        <div class="bi-card-head">
-          <div class="card-title-stack">
+        <div class="vac-card-header-flex">
+          <div class="vac-card-title-group">
             <span>EFICIENCIA REPRODUCTIVA</span>
             <strong>Preñeces con éxito</strong>
           </div>
-          <div class="bi-mini-stat bg-danger-soft">
+          <div class="vac-mini-stat bg-danger-soft">
             <ion-icon name="heart-outline"></ion-icon>
             <span>Tasa de éxito: 82%</span>
           </div>
         </div>
       </ion-card-header>
-      <ion-card-content>
-          <div class="chart-container-large" style="height: 300px;">
+        <ion-card-content>
+          <div class="vac-chart-container chart-300px">
             <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
           </div>
-      </ion-card-content>
+        </ion-card-content>
     </div>
 
     <h2 class="vac-section-title" *ngIf="!isLoading()">Próximos Partos</h2>
 
-    <!-- SKELETON LOADER -->
+    <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="vac-tag-body">
-            <div class="card-header-flex">
-              <div class="card-icon-box" style="background-color: var(--ion-color-light);">
-                <ion-skeleton-text animated style="width: 24px; height: 24px; border-radius: 50%;"></ion-skeleton-text>
-              </div>
-              <div class="card-title-stack" style="width: 50%;">
-                <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
-              </div>
-              <div class="flex-1"></div>
-              <ion-skeleton-text animated style="width: 50px; height: 25px; border-radius: 8px;"></ion-skeleton-text>
-            </div>
+          <ion-card class="uniform-card">
+            <ion-item lines="none" class="vac-card-header ion-margin-bottom">
+              <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
+              <ion-label class="vac-card-title-group vac-flex-1">
+                <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+              </ion-label>
+              <ion-skeleton-text animated class="skeleton-badge" slot="end"></ion-skeleton-text>
+            </ion-item>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+            <ion-card-content>
+              <div class="ion-margin-vertical">
+                <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-value-sm"></ion-skeleton-text>
               </div>
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
-              </div>
-            </div>
 
-            <div class="card-footer-actions">
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%;"></ion-skeleton-text>
-            </div>
-          </div>
+              <div class="card-footer-flex ion-padding-top mt-4">
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+              </div>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -107,35 +99,36 @@
     <ion-grid class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredGestaciones()">
-          <div class="vac-tag-body">
-            <div class="card-header-flex">
-              <div class="card-icon-box bg-danger-soft">
+          <ion-card class="uniform-card">
+            <ion-item lines="none" class="vac-card-header">
+              <div class="vac-card-icon bg-danger-soft" slot="start">
                 <ion-icon name="pulse-outline" color="danger"></ion-icon>
               </div>
-              <div class="card-title-stack">
-                <strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong>
-                <span>FPP: {{ r.fecha_parto_prevista | date:'dd MMM yyyy' }}</span>
-              </div>
-              <div class="flex-1"></div>
-              <ion-badge color="success" mode="ios">Gestante</ion-badge>
-            </div>
+              <ion-label class="vac-card-title-group ion-text-wrap">
+                <h2 class="ion-text-wrap"><strong>{{ r.bovino?.nombre || 'Res S/N' }}</strong></h2>
+                <h3 class="ion-text-wrap">FPP: {{ r.fecha_parto_prevista | date:'dd MMM yyyy' }}</h3>
+              </ion-label>
+              <ion-badge color="success" mode="ios" slot="end">Gestante</ion-badge>
+            </ion-item>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
-                <span class="label">Cuenta Atrás</span>
-                <span class="value">{{ getDaysToCalving(r) }} días para parto</span>
+            <ion-card-content>
+              <div class="vac-card-grid">
+                <div class="vac-card-info">
+                  <span class="label">Cuenta Atrás</span>
+                  <p class="value ion-text-wrap">{{ getDaysToCalving(r) }} días para parto</p>
+                </div>
               </div>
-            </div>
 
-            <div class="card-footer-actions">
-              <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
-                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" color="danger" (click)="confirmDelete(r)">
-                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-            </div>
-          </div>
+              <div class="card-footer-flex mt-4 pt-2">
+                <ion-button fill="clear" color="medium" (click)="openEditModal(r)" aria-label="Editar">
+                  <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="confirmDelete(r)" aria-label="Eliminar">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -146,39 +139,40 @@
     <ion-grid class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredReproducciones()">
-          <div class="vac-tag-body">
-            <div class="card-header-flex">
-              <div class="card-icon-box bg-primary-soft">
+          <ion-card class="uniform-card">
+            <ion-item lines="none" class="vac-card-header">
+              <div class="vac-card-icon bg-primary-soft" slot="start">
                 <ion-icon name="female-outline" color="primary"></ion-icon>
               </div>
-              <div class="card-title-stack">
-                <strong>{{ r.bovino?.nombre }}</strong>
-                <span>{{ r.bovino?.crotal }}</span>
-              </div>
-              <div class="flex-1"></div>
-              <ion-badge [color]="getStatusColor(r.estado_gestacion)" mode="ios">{{ r.estado_gestacion }}</ion-badge>
-            </div>
+              <ion-label class="vac-card-title-group ion-text-wrap">
+                <h2 class="ion-text-wrap"><strong>{{ r.bovino?.nombre }}</strong></h2>
+                <h3 class="ion-text-wrap">{{ r.bovino?.crotal }}</h3>
+              </ion-label>
+              <ion-badge [color]="getStatusColor(r.estado_gestacion)" mode="ios" slot="end">{{ r.estado_gestacion }}</ion-badge>
+            </ion-item>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
-                <span class="label">Método / Fecha</span>
-                <span class="value">{{ r.tipo_cubricion }} • {{ r.fecha_cubricion | date:'dd/MM/yyyy' }}</span>
+            <ion-card-content>
+              <div class="vac-card-grid">
+                <div class="vac-card-info">
+                  <span class="label">Método / Fecha</span>
+                  <p class="value ion-text-wrap">{{ r.tipo_cubricion }} • {{ r.fecha_cubricion | date:'dd/MM/yyyy' }}</p>
+                </div>
+                <div class="vac-card-info">
+                  <span class="label">FPP Estimada</span>
+                  <p class="value ion-text-wrap">{{ r.fecha_parto_prevista ? (r.fecha_parto_prevista | date:'dd MMM yyyy') : 'Pendiente' }}</p>
+                </div>
               </div>
-              <div class="card-data-item">
-                <span class="label">FPP Estimada</span>
-                <span class="value">{{ r.fecha_parto_prevista ? (r.fecha_parto_prevista | date:'dd MMM yyyy') : 'Pendiente' }}</span>
-              </div>
-            </div>
 
-            <div class="card-footer-actions">
-              <ion-button fill="clear" color="medium" (click)="openEditModal(r)">
-                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" color="danger" (click)="confirmDelete(r)">
-                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-            </div>
-          </div>
+              <div class="card-footer-flex mt-4 pt-2">
+                <ion-button fill="clear" color="medium" (click)="openEditModal(r)" aria-label="Editar">
+                  <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="confirmDelete(r)" aria-label="Eliminar">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -215,10 +209,12 @@
       </ion-header>
       
       <ion-content class="ion-padding vac-modal-content">
-        <div class="form-intro">
-           <ion-icon name="heart" class="color-earth text-3xl"></ion-icon>
-           <h3>Protocolo de Cría</h3>
-           <p>Registra eventos de monta e inseminación.</p>
+        <div class="vac-modal-header ion-text-center ion-padding-vertical">
+           <div class="vac-icon-ring ion-margin-bottom">
+              <ion-icon name="heart"></ion-icon>
+           </div>
+           <h3 class="vac-modal-title">Protocolo de Cría</h3>
+           <p class="vac-modal-subtitle">Registra eventos de monta e inseminación.</p>
         </div>
 
         <form [formGroup]="reproForm">

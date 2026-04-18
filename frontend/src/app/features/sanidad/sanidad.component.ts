@@ -4,7 +4,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem,
   IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-  IonCard, IonAvatar, IonCardContent, IonGrid, IonRow, IonCol,
+  IonGrid, IonRow, IonCol,
   IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -32,7 +32,7 @@ import { GanadoService } from '../../core/services/ganado.service';
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonItem, IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, 
     IonFab, IonFabButton, IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
-    IonCard, IonAvatar, IonCardContent, IonGrid, IonRow, IonCol,
+    IonGrid, IonRow, IonCol,
     IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
   ],
   templateUrl: './sanidad.component.html'

@@ -4,7 +4,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
   IonLabel, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput,
-  IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonAvatar
+  IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { GanadoService } from '../../core/services/ganado.service';
@@ -19,8 +19,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 
 /**
- * Componente para el Módulo de Lotes/Recintos - Versión Rústica.
- * Refactorizado: 100% Sincronización de colores con _variables.scss.
+ * Componente para el Módulo de Lotes/Recintos - Versión Estándar.
+ * Refactorizado: 100% Sincronización de colores y nombres vac-.
  */
 @Component({
   selector: 'app-lotes',
@@ -29,7 +29,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonItem, IonLabel, IonIcon, IonButtons, IonMenuButton, 
     IonFab, IonFabButton, IonModal, IonButton, IonInput, 
-    IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonAvatar
+    IonGrid, IonRow, IonCol
   ],
   template: `
     <ion-header class="ion-no-border vac-header">
@@ -53,16 +53,16 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
       <div class="vac-container animate-fade-in">
         
         <div class="vac-text-stack mb-8">
-          <h1 class="page-h1-rustic">Gestión de Potreros</h1>
-          <p class="page-p-rustic">Organiza y monitorea la carga animal por recinto</p>
+          <h1 class="vac-page-title">Gestión de Potreros</h1>
+          <p class="vac-page-subtitle">Organiza y monitorea la carga animal por recinto</p>
         </div>
 
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-md="6" size-xl="4" *ngFor="let lote of lotes">
-              <div class="bi-main-card mb-6 animate-fade-in">
-                <div class="card-header-flex">
-                  <div class="card-title-stack">
+              <div class="uniform-card">
+                <div class="vac-card-header-flex">
+                  <div class="vac-card-title-group">
                     <h3 class="vac-card-title">{{ lote.nombre }}</h3>
                     <p class="vac-card-subtitle">
                       <ion-icon name="location-outline" class="mr-1"></ion-icon>
@@ -85,7 +85,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                   </div>
                 </div>
 
-                <div class="vac-card-footer mt-6 pt-4 border-t flex justify-end gap-2">
+                <div class="vac-card-footer mt-6 pt-4 border-t-light flex justify-end gap-2">
                    <button class="vac-btn-icon bg-light" (click)="openEditModal(lote)">
                       <ion-icon name="create-outline"></ion-icon>
                    </button>
@@ -99,7 +99,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ion-grid>
 
         <div *ngIf="lotes.length === 0" class="vac-empty-state">
-          <div class="empty-icon-ring">
+          <div class="vac-empty-icon">
             <ion-icon name="layers-outline"></ion-icon>
           </div>
           <h2>Sin lotes configurados</h2>
@@ -131,30 +131,30 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             </ion-toolbar>
           </ion-header>
           
-          <ion-content class="ion-padding vac-modal-content">
-            <div class="form-intro mb-6">
-               <div class="vac-icon-ring bg-wheat mb-3">
-                  <ion-icon name="layers-outline" class="color-earth text-3xl"></ion-icon>
+           <ion-content class="ion-padding vac-modal-content">
+            <div class="vac-modal-header ion-text-center ion-padding-vertical">
+               <div class="vac-icon-ring ion-margin-bottom">
+                  <ion-icon name="layers-outline"></ion-icon>
                </div>
-               <h3>Configuración de Espacio</h3>
-               <p>Define las características del potrero o recinto.</p>
+               <h3 class="vac-modal-title">Configuración de Espacio</h3>
+               <p class="vac-modal-subtitle">Define las características del potrero o recinto.</p>
             </div>
 
-            <form [formGroup]="loteForm" class="vac-form-stack">
-              <div class="vac-input-group">
-                <label class="vac-label">Nombre del Lote *</label>
-                <input type="text" formControlName="nombre" placeholder="Ej: Potrero El Roble" class="vac-input-field">
-              </div>
+            <form [formGroup]="loteForm">
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Nombre del Lote *</ion-label>
+                <ion-input type="text" formControlName="nombre" placeholder="Ej: Potrero El Roble"></ion-input>
+              </ion-item>
 
-              <div class="vac-input-group">
-                <label class="vac-label">Ubicación / Coordenadas</label>
-                <input type="text" formControlName="ubicacion" placeholder="Ej: Zona Norte - Sector A" class="vac-input-field">
-              </div>
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Ubicación / Coordenadas</ion-label>
+                <ion-input type="text" formControlName="ubicacion" placeholder="Ej: Zona Norte - Sector A"></ion-input>
+              </ion-item>
 
-              <div class="vac-input-group">
-                <label class="vac-label">Capacidad Estimada (Cabezas)</label>
-                <input type="number" formControlName="capacidad" placeholder="0" class="vac-input-field">
-              </div>
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Capacidad Estimada (Cabezas)</ion-label>
+                <ion-input type="number" formControlName="capacidad" placeholder="0"></ion-input>
+              </ion-item>
               
               <div class="mt-8 pt-6 border-t border-gray-100">
                 <ion-button (click)="saveData()" [disabled]="loteForm.invalid" class="btn-vac-save" expand="block">

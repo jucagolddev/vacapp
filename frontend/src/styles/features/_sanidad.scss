@@ -1,4 +1,4 @@
-// Estilos Rustic para el Módulo de Sanidad (Calendario y Tratamientos)
+// Estilos para el Módulo de Sanidad (Calendario y Tratamientos)
 @use '../abstracts/variables';
 
 /**
@@ -6,13 +6,13 @@
  * 100% Variable Sync - Forest & Earth
  */
 
-.sanidad-content {
+.vac-sanidad-view {
   --background: #{variables.$gray-100};
   padding: variables.$spacing-md;
 }
 
-// Buscador Rustic
-.vac-searchbar {
+// Buscador Vacapp
+.vac-searchbar-container {
   --border-radius: 16px;
   --box-shadow: 0 4px 12px rgba($black, 0.05);
   --background: var(--ion-card-background);
@@ -28,7 +28,7 @@
 }
 
 // Historial/Tabla de Datos (ion-grid)
-.health-table-container {
+.vac-health-table {
   background: var(--ion-card-background);
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(variables.$black, 0.06);
@@ -36,7 +36,7 @@
   border: 1px solid rgba(variables.$primary-color, 0.08);
   margin-bottom: 80px; // Espacio para el FAB
 
-  .table-header {
+  .vac-table-header {
     background: rgba(variables.$primary-color, 0.04);
     border-bottom: 1px solid rgba(variables.$primary-color, 0.1);
     
@@ -50,7 +50,7 @@
     }
   }
 
-  .table-row {
+  .vac-table-row {
     border-bottom: 1px solid rgba(variables.$gray-200, 0.5);
     transition: background 0.2s ease;
     align-items: center;
@@ -71,26 +71,26 @@
       align-items: center;
     }
 
-    .date-cell {
+    .vac-date-cell {
       font-weight: 600;
       color: variables.$gray-600;
     }
 
-    .animal-cell {
+    .vac-animal-cell {
       flex-direction: column;
       align-items: flex-start;
       
-      .animal-name {
+      .vac-animal-name {
         font-weight: 700;
         color: variables.$primary-color;
       }
-      .animal-crotal {
+      .vac-animal-id {
         font-size: 0.8rem;
         color: variables.$gray-600;
       }
     }
 
-    .type-badge {
+    .vac-type-badge {
       padding: 6px 12px;
       border-radius: 20px;
       font-size: 0.75rem;
@@ -106,7 +106,7 @@
 }
 
 // Modal de Sanidad
-.health-modal {
+.vac-health-modal {
   --border-radius: 28px 28px 0 0;
   --height: 85%;
   align-items: flex-end;
@@ -120,17 +120,17 @@
     }
   }
 
-  .modal-content {
+  .vac-modal-body {
     padding: variables.$spacing-lg;
     
-    .modal-title {
+    .vac-modal-title {
       font-size: 1.8rem;
       font-weight: 800;
       color: variables.$primary-color;
       margin-bottom: 8px;
     }
 
-    .modal-subtitle {
+    .vac-modal-subtitle {
       font-size: 1rem;
       color: variables.$gray-600;
       margin-bottom: variables.$spacing-xl;
@@ -138,8 +138,8 @@
   }
 }
 
-// Botón Flotante Rustic
-.fab-btn {
+// Botón Flotante Centralizado
+.vac-fab-main {
   --background: #{variables.$primary-color};
   --background-activated: #{variables.$primary-color};
   --box-shadow: 0 10px 20px rgba($primary-color, 0.3);

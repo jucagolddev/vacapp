@@ -6,7 +6,7 @@ import {
   IonLabel, IonBadge, IonIcon,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
   IonButton, IonInput, IonSelect, IonSelectOption,
-  IonGrid, IonRow, IonCol, IonCard, IonAvatar, IonCardContent, IonCardHeader,
+  IonGrid, IonRow, IonCol,
   IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { BaseChartDirective } from 'ng2-charts';
@@ -36,8 +36,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonItem, IonLabel, IonBadge, IonIcon,
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal, IonButton,
-    IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol, IonCard, 
-    IonAvatar, IonCardContent, IonCardHeader,
+    IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol,
     IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
     BaseChartDirective
   ],

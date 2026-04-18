@@ -14,18 +14,21 @@ ion-split-pane.collapsed {
 }
 
 .vac-sidebar {
-  --background: linear-gradient(180deg, #{variables.$primary-color} 0%, #{variables.$dark-color} 100%) !important;
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  --ion-item-background: transparent !important;
+  background: transparent;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   transition: variables.$transition-base;
 }
 
 .vac-sidebar::part(container) {
-  background: transparent;
+  background: linear-gradient(180deg, #{variables.$primary-color} 0%, #{variables.$dark-color} 100%) !important;
   box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2);
 }
 
 .vac-sidebar ion-content {
-  --background: transparent;
+  --background: transparent !important;
   --padding-bottom: 20px;
 }
 
@@ -81,6 +84,10 @@ ion-split-pane.collapsed {
 
 .vac-nav-container {
   padding: 20px 10px;
+}
+
+.vac-nav-list {
+  background: transparent;
 }
 
 .vac-nav-item {
@@ -166,7 +173,7 @@ ion-split-pane.collapsed {
       color: white;
       box-shadow: 0 4px 12px rgba(variables.$danger-color, 0.3);
     }
-    .label-luxe {
+    .vac-label {
       color: variables.$danger-color;
     }
   }

@@ -30,65 +30,60 @@
       animated="true"
       placeholder="Buscar por crotal o nombre..."
       (ionInput)="handleSearch($event)"
-      class="vac-filter-bar"
-      style="padding: 0; box-shadow: none; border: none; background: transparent;">
+      class="vac-filter-bar vac-transparent-searchbar">
     </ion-searchbar>
 
     <!-- GRÁFICO DE PESO -->
-    <div class="bi-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
+    <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-card-header>
-        <div class="bi-card-head">
-          <div class="card-title-stack">
+        <div class="vac-card-header-flex">
+          <div class="vac-card-title-group">
             <span>ANÁLISIS DE RENDIMIENTO</span>
             <strong>Crecimiento (Peso en Kilos)</strong>
           </div>
-          <div class="bi-mini-stat bg-primary-soft">
+          <div class="vac-mini-stat bg-primary-soft">
             <ion-icon name="trending-up-outline"></ion-icon>
             <span>Hato Saludable</span>
           </div>
         </div>
       </ion-card-header>
       <ion-card-content>
-        <div class="chart-container-large" style="height: 300px;">
+        <div class="vac-chart-container">
            <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
         </div>
       </ion-card-content>
     </div>
 
     <!-- SKELETON LOADER -->
+    <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
-          <div class="vac-tag-body">
-            <div class="card-header-flex">
-              <ion-avatar class="vac-avatar">
-                <ion-skeleton-text animated style="width: 100%; height: 100%;"></ion-skeleton-text>
+          <ion-card class="uniform-card">
+            <ion-item lines="none" class="vac-card-header ion-margin-bottom">
+              <ion-avatar class="vac-avatar ion-margin-end" slot="start">
+                <ion-skeleton-text animated class="skeleton-avatar-lg"></ion-skeleton-text>
               </ion-avatar>
-              <div class="card-title-stack" style="width: 50%;">
-                <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
-              </div>
-              <div class="flex-1"></div>
-              <ion-skeleton-text animated style="width: 50px; height: 25px; border-radius: 8px;"></ion-skeleton-text>
-            </div>
+              <ion-label class="vac-card-title-group vac-flex-1">
+                <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+              </ion-label>
+              <ion-skeleton-text animated class="skeleton-badge" slot="end"></ion-skeleton-text>
+            </ion-item>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+            <ion-card-content>
+              <div class="ion-margin-vertical">
+                <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-value-sm"></ion-skeleton-text>
               </div>
-              <div class="card-data-item">
-                <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+              
+              <div class="card-footer-flex mt-2 pt-2">
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-btn-wide"></ion-skeleton-text>
               </div>
-            </div>
-            
-            <div class="card-footer-actions">
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 80px; height: 35px; border-radius: 8px;"></ion-skeleton-text>
-            </div>
-          </div>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -97,50 +92,55 @@
     <ion-grid class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
-          <div class="vac-tag-body">
-            <div class="card-header-flex">
-              <ion-avatar class="vac-avatar">
-                <div *ngIf="b.foto_url" class="avatar-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
-                <div *ngIf="!b.foto_url" class="avatar-placeholder">
-                  <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+          <ion-card class="uniform-card">
+            <ion-item lines="none" class="vac-card-header">
+              <div class="vac-avatar-wrapper ion-margin-end" slot="start">
+                <div class="vac-avatar">
+                   <div *ngIf="b.foto_url" class="avatar-img" [style.background-image]="'url(' + b.foto_url + ')'"></div>
+                   <div *ngIf="!b.foto_url" class="avatar-placeholder">
+                     <ion-icon [name]="b.sexo === 'Macho' ? 'male-outline' : 'female-outline'"></ion-icon>
+                   </div>
                 </div>
-              </ion-avatar>
-              <div class="card-title-stack">
-                <strong>{{ b.nombre }}</strong>
-                <span>{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</span>
               </div>
-              <div class="flex-1"></div>
-              <ion-badge *ngIf="b.estado_productivo === 'Alta'" color="success" mode="ios">
-                Activo
-              </ion-badge>
-              <ion-badge *ngIf="b.estado_productivo !== 'Alta'" color="warning" mode="ios">
-                {{ b.estado_productivo }}
-              </ion-badge>
-            </div>
+              <ion-label class="vac-card-title-group ion-text-wrap">
+                <h2 class="ion-text-wrap"><strong>{{ b.nombre }}</strong></h2>
+                <h3 class="ion-text-wrap">{{ b.crotal }} • {{ b.raza || 'Mestizo' }}</h3>
+              </ion-label>
+              <div slot="end">
+                <ion-badge *ngIf="b.estado_productivo === 'Alta'" color="success" mode="ios">
+                  Activo
+                </ion-badge>
+                <ion-badge *ngIf="b.estado_productivo !== 'Alta'" color="warning" mode="ios">
+                  {{ b.estado_productivo }}
+                </ion-badge>
+              </div>
+            </ion-item>
 
-            <div class="card-data-grid">
-              <div class="card-data-item">
-                <span class="label">Sexo / Aptitud</span>
-                <span class="value">{{ b.sexo }} • {{ b.aptitud }}</span>
+            <ion-card-content>
+              <div class="vac-card-grid ion-margin-vertical">
+                <div class="vac-card-info">
+                  <span class="label">Sexo / Aptitud</span>
+                  <p class="value ion-text-wrap">{{ b.sexo }} • {{ b.aptitud }}</p>
+                </div>
+                <div class="vac-card-info">
+                  <span class="label">Edad Actual</span>
+                  <p class="value ion-text-wrap">{{ ganadoService.getEdadDesc(b) }}</p>
+                </div>
               </div>
-              <div class="card-data-item">
-                <span class="label">Edad Actual</span>
-                <span class="value">{{ ganadoService.getEdadDesc(b) }}</span>
-              </div>
-            </div>
 
-            <div class="card-footer-actions">
-              <ion-button fill="clear" color="medium" (click)="openEditModal(b)">
-                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" color="danger" (click)="confirmDelete(b.id)">
-                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="solid" color="primary" class="ion-no-margin">
-                Ver Ficha
-              </ion-button>
-            </div>
-          </div>
+              <div class="card-footer-flex mt-2 pt-2">
+                <ion-button fill="clear" color="medium" (click)="openEditModal(b)" aria-label="Editar">
+                  <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="confirmDelete(b.id)" aria-label="Eliminar">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="solid" color="primary" class="ion-no-margin ml-auto btn-vac-sm">
+                  Ver Ficha
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -152,7 +152,7 @@
       </div>
       <h2>No hay animales registrados</h2>
       <p>Comienza registrando tu primer animal en el sistema.</p>
-      <ion-button fill="solid" (click)="openAddModal()" color="primary" style="--border-radius: 12px;">
+      <ion-button fill="solid" (click)="openAddModal()" color="primary" class="btn-rounded-12">
         <ion-icon name="add-circle" slot="start"></ion-icon> Añadir Ejemplar
       </ion-button>
     </div>
@@ -200,11 +200,11 @@
       <ion-content class="ion-padding vac-modal-content">
         <form [formGroup]="bovinoForm">
           
-          <!-- Paso 1: Identidad -->
-          <div *ngIf="currentStep === 1" class="animate-slide-up">
-            <div class="form-intro">
-               <h3>Identificación Oficial</h3>
-               <p>Introduce los datos de trazabilidad obligatorios.</p>
+           <!-- Paso 1: Identidad -->
+           <div *ngIf="currentStep === 1" class="animate-slide-up">
+            <div class="vac-modal-header ion-padding-vertical">
+               <h3 class="vac-modal-title">Identificación Oficial</h3>
+               <p class="vac-modal-subtitle">Introduce los datos de trazabilidad obligatorios.</p>
             </div>
             <ion-item class="vac-input">
               <ion-label position="stacked">Nombre del Ejemplar *</ion-label>
@@ -221,11 +221,11 @@
             </ion-item>
           </div>
 
-          <!-- Paso 2: Biología -->
-          <div *ngIf="currentStep === 2" class="animate-slide-up">
-            <div class="form-intro">
-               <h3>Rasgos Biológicos</h3>
-               <p>Información genética y cronológica del ejemplar.</p>
+           <!-- Paso 2: Biología -->
+           <div *ngIf="currentStep === 2" class="animate-slide-up">
+            <div class="vac-modal-header ion-padding-vertical">
+               <h3 class="vac-modal-title">Rasgos Biológicos</h3>
+               <p class="vac-modal-subtitle">Información genética y cronológica del ejemplar.</p>
             </div>
             <ion-item class="vac-input">
               <ion-label position="stacked">Sexo *</ion-label>
@@ -260,11 +260,11 @@
             </ion-item>
           </div>
 
-          <!-- Paso 3: Ubicación -->
-          <div *ngIf="currentStep === 3" class="animate-slide-up">
-            <div class="form-intro">
-               <h3>Asignación de Lote</h3>
-               <p>Ubica al animal en su recinto correspondiente.</p>
+           <!-- Paso 3: Ubicación -->
+           <div *ngIf="currentStep === 3" class="animate-slide-up">
+            <div class="vac-modal-header ion-padding-vertical">
+               <h3 class="vac-modal-title">Asignación de Lote</h3>
+               <p class="vac-modal-subtitle">Ubica al animal en su recinto correspondiente.</p>
             </div>
             <ion-item class="vac-input">
               <ion-label position="stacked">Seleccionar Lote *</ion-label>

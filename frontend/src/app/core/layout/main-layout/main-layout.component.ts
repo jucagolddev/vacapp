@@ -33,10 +33,10 @@ import { AuthService } from '../../services/auth.service';
         <ion-menu contentId="main-content" type="overlay" class="vac-sidebar">
           <ion-header class="ion-no-border">
             <ion-toolbar>
-              <div class="sidebar-header-luxe" *ngIf="!isCollapsed">
+              <div class="vac-sidebar-header" *ngIf="!isCollapsed">
                 <div class="brand-wrapper">
                   <div class="logo-circle">
-                    <ion-icon name="leaf-outline" style="color: white;"></ion-icon>
+                    <ion-icon name="leaf-outline" class="color-white"></ion-icon>
                   </div>
                   <div class="brand-text">
                     <span class="main-brand">VACAPP</span>
@@ -51,8 +51,8 @@ import { AuthService } from '../../services/auth.service';
           </ion-header>
 
           <ion-content class="ion-no-padding">
-            <div class="nav-container-luxe">
-              <ion-list lines="none" class="ion-no-padding">
+            <div class="vac-nav-container">
+              <ion-list lines="none" class="ion-no-padding vac-nav-list">
                 <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
                   <ion-item 
                     button
@@ -61,21 +61,21 @@ import { AuthService } from '../../services/auth.service';
                     [routerLink]="p.url" 
                     routerLinkActive="active-link"
                     [title]="p.title"
-                    class="nav-item-luxe">
+                    class="vac-nav-item">
                     <div slot="start" class="icon-frame">
                       <ion-icon [name]="p.icon"></ion-icon>
                     </div>
-                    <ion-label *ngIf="!isCollapsed" class="label-luxe">{{ p.title }}</ion-label>
+                    <ion-label *ngIf="!isCollapsed" class="vac-label">{{ p.title }}</ion-label>
                   </ion-item>
                 </ion-menu-toggle>
                 
                 <div class="nav-separator"></div>
 
-                <ion-item class="nav-item-luxe logout-item" lines="none" button (click)="logout()">
+                <ion-item class="vac-nav-item logout-item" lines="none" button (click)="logout()">
                   <div slot="start" class="icon-frame danger">
                     <ion-icon name="log-out-outline"></ion-icon>
                   </div>
-                  <ion-label *ngIf="!isCollapsed" class="label-luxe">Cerrar Sesión</ion-label>
+                  <ion-label *ngIf="!isCollapsed" class="vac-label">Cerrar Sesión</ion-label>
                 </ion-item>
               </ion-list>
             </div>

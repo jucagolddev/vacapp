@@ -2,7 +2,7 @@ import { Component, computed, inject, signal, OnInit, effect, ElementRef, ViewCh
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonButton,
-  IonButtons, IonMenuButton, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
+  IonButtons, IonMenuButton, IonGrid, IonRow, IonCol,
   IonIcon, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { GanadoService } from '../../core/services/ganado.service';
@@ -29,7 +29,7 @@ Chart.register(...registerables);
   standalone: true,
   imports: [
     CommonModule, IonContent, IonHeader, IonToolbar, IonTitle, 
-    IonButtons, IonMenuButton, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
+    IonButtons, IonMenuButton, IonGrid, IonRow, IonCol,
     IonIcon, IonSkeletonText, IonButton
   ],
   template: `
@@ -51,17 +51,17 @@ Chart.register(...registerables);
       <div class="vac-container animate-fade-in pb-12">
         
         <!-- Header con Identidad -->
-        <div class="dashboard-header-bi mt-4">
-          <div class="header-flex-bi">
+        <div class="vac-page-header mt-4">
+          <div class="vac-header-flex">
             <div>
-              <h1 class="bi-title">Resumen Ejecutivo</h1>
-              <p class="bi-subtitle">
+              <h1 class="vac-page-title">Resumen Ejecutivo</h1>
+              <p class="vac-page-subtitle">
                 <ion-icon name="paw" class="icon-mr-sm"></ion-icon>
                 Finca actual: <strong>{{ finca()?.nombre || 'Cargando...' }}</strong>
               </p>
             </div>
-            <div class="bi-status">
-              <div class="online-indicator" [class.offline]="!isOnline()">
+            <div class="vac-status-container">
+              <div class="vac-online-indicator" [class.offline]="!isOnline()">
                 <span>{{ isOnline() ? 'Sincronizado' : 'Modo Offline' }}</span>
                 <div class="dot shadow-pulse"></div>
               </div>
@@ -73,52 +73,52 @@ Chart.register(...registerables);
         <ion-grid class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
-              <div class="bi-kpi-card glass animate-slide-up">
-                <div class="kpi-mini-icon" style="color: var(--ion-color-primary);">
-                  <ion-icon name="paw-outline"></ion-icon>
+              <ion-card class="vac-kpi-card glass animate-slide-up m-0 shadow-none border-none">
+                <div class="vac-kpi-mini-icon">
+                  <ion-icon name="paw-outline" color="primary"></ion-icon>
                 </div>
-                <div class="kpi-content">
-                  <span class="kpi-label">Hato Total</span>
-                  <h2 class="kpi-value" *ngIf="!cargando()">{{ totalBovinos() }}</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Hato Total</span>
+                  <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ totalBovinos() }}</h2>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
-              </div>
+              </ion-card>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="bi-kpi-card glass animate-slide-up delay-100">
-                <div class="kpi-mini-icon" style="color: var(--ion-color-danger);">
-                  <ion-icon name="heart-outline"></ion-icon>
+              <ion-card class="vac-kpi-card glass animate-slide-up delay-100 m-0 shadow-none border-none">
+                <div class="vac-kpi-mini-icon">
+                  <ion-icon name="heart-outline" color="danger"></ion-icon>
                 </div>
-                <div class="kpi-content">
-                  <span class="kpi-label">Gestantes</span>
-                  <h2 class="kpi-value" *ngIf="!cargando()">{{ gestacionesActivas().length }}</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Gestantes</span>
+                  <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ gestacionesActivas().length }}</h2>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
-              </div>
+              </ion-card>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="bi-kpi-card glass animate-slide-up delay-200">
-                <div class="kpi-mini-icon" style="color: var(--ion-color-tertiary);">
-                  <ion-icon name="wallet-outline"></ion-icon>
+              <ion-card class="vac-kpi-card glass animate-slide-up delay-200 m-0 shadow-none border-none">
+                <div class="vac-kpi-mini-icon">
+                  <ion-icon name="wallet-outline" color="tertiary"></ion-icon>
                 </div>
-                <div class="kpi-content">
-                  <span class="kpi-label">Margen Bruto</span>
-                  <h2 class="kpi-value" *ngIf="!cargando()">{{ saldoMensual() | number:'1.0-0' }}€</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Margen Bruto</span>
+                  <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ saldoMensual() | number:'1.0-0' }}€</h2>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
-              </div>
+              </ion-card>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="bi-kpi-card glass animate-slide-up delay-300">
-                <div class="kpi-mini-icon" style="color: var(--ion-color-secondary);">
-                  <ion-icon name="scale-outline"></ion-icon>
+              <ion-card class="vac-kpi-card glass animate-slide-up delay-300 m-0 shadow-none border-none">
+                <div class="vac-kpi-mini-icon">
+                  <ion-icon name="scale-outline" color="secondary"></ion-icon>
                 </div>
-                <div class="kpi-content">
-                  <span class="kpi-label">Peso Medio</span>
-                  <h2 class="kpi-value" *ngIf="!cargando()">{{ pesoMedio() }} kg</h2>
-                  <ion-skeleton-text *ngIf="cargando()" animated style="width: 60%; height: 30px;"></ion-skeleton-text>
+                <div class="vac-kpi-content">
+                  <span class="vac-kpi-label">Peso Medio</span>
+                  <h2 class="vac-kpi-value" *ngIf="!cargando()">{{ pesoMedio() }} kg</h2>
+                  <ion-skeleton-text *ngIf="cargando()" animated class="skeleton-kpi"></ion-skeleton-text>
                 </div>
-              </div>
+              </ion-card>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -128,21 +128,21 @@ Chart.register(...registerables);
           <ion-row>
             <!-- ÁREA CHART: EVOLUCIÓN PESO -->
             <ion-col size="12" size-lg="8">
-              <div class="bi-main-card animate-slide-up delay-400">
+              <div class="vac-main-card animate-slide-up delay-400">
                 <ion-card-header>
-                  <div class="bi-card-head">
-                    <div class="card-title-stack">
+                  <div class="vac-card-header-flex">
+                    <div class="vac-card-title-group">
                       <span>EVOLUCIÓN PONDERADA</span>
                       <strong>Control de Masa Total</strong>
                     </div>
-                    <div class="bi-mini-stat bg-primary-soft">
+                    <div class="vac-mini-stat bg-primary-soft">
                       <ion-icon name="trending-up-outline"></ion-icon>
                       <span>+8.2% este mes</span>
                     </div>
                   </div>
                 </ion-card-header>
                 <ion-card-content class="relative">
-                  <div *ngIf="cargando()" class="chart-skeleton">
+                  <div *ngIf="cargando()" class="vac-chart-skeleton">
                     <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
                   </div>
                   <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
@@ -152,16 +152,16 @@ Chart.register(...registerables);
 
             <!-- DONUT CHART: DISTRIBUCIÓN -->
             <ion-col size="12" size-lg="4">
-              <div class="bi-main-card animate-slide-up delay-500">
+              <div class="vac-main-card animate-slide-up delay-500">
                 <ion-card-header>
-                  <div class="card-title-stack">
+                  <div class="vac-card-title-group">
                     <span>DISTRIBUCIÓN</span>
                     <strong>Población por Lote</strong>
                   </div>
                 </ion-card-header>
-                <ion-card-content class="chart-container-donut">
-                  <div *ngIf="cargando()" class="chart-skeleton flex justify-center items-center">
-                    <ion-skeleton-text animated style="width: 200px; height: 200px; border-radius: 50%;"></ion-skeleton-text>
+                <ion-card-content class="vac-chart-container-donut">
+                  <div *ngIf="cargando()" class="vac-chart-skeleton flex justify-center items-center">
+                    <ion-skeleton-text animated class="skeleton-avatar-xl"></ion-skeleton-text>
                   </div>
                   <canvas #lotesChart [hidden]="cargando()"></canvas>
                 </ion-card-content>
@@ -170,16 +170,16 @@ Chart.register(...registerables);
 
             <!-- BAR CHART: FINANZAS -->
             <ion-col size="12">
-              <div class="bi-main-card animate-slide-up delay-600">
+              <div class="vac-main-card animate-slide-up delay-600">
                 <ion-card-header>
-                  <div class="card-title-stack">
+                  <div class="vac-card-title-group">
                     <span>GESTIÓN ECONÓMICA</span>
                     <strong>Balance Mensual Comparativo</strong>
                   </div>
                 </ion-card-header>
                 <ion-card-content>
                   <div *ngIf="cargando()" class="chart-skeleton">
-                    <ion-skeleton-text animated style="width: 100%; height: 250px;"></ion-skeleton-text>
+                    <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
                   </div>
                   <canvas #financeChart class="chart-canvas-finance" [hidden]="cargando()"></canvas>
                 </ion-card-content>
@@ -353,7 +353,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const stats = this.pesajeService.getEvolucionMensualHerd();
     
-    // Degradado "Rustic-Luxe"
+    // Degradado Estándar Vacapp
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, 'rgba(27, 67, 50, 0.3)');
     gradient.addColorStop(1, 'rgba(27, 67, 50, 0)');
