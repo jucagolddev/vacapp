@@ -46,64 +46,7 @@
   @extend .uniform-card;
 }
 
-/* WIZARD & MODAL */
-.vac-wizard-stepper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1.5rem 1rem;
-  background: var(--vac-bg-main);
-  border-bottom: 1px solid var(--vac-border-color);
-
-  .wizard-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    opacity: 0.4;
-    transition: all 0.3s ease;
-
-    .step-circle {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--vac-border-color);
-      color: var(--vac-text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
-
-    span {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--vac-text-muted);
-    }
-
-    &.step-active {
-      opacity: 1;
-      .step-circle {
-        background: var(--ion-color-primary);
-        color: white;
-        transform: scale(1.1);
-        box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.3);
-      }
-      span {
-        color: var(--ion-color-primary);
-      }
-    }
-  }
-
-  .wizard-line {
-    flex: 0.2;
-    height: 2px;
-    background: var(--vac-border-color);
-    margin-top: -1.25rem;
-  }
-}
+/* WIZARD handled by utilities.scss */
 
 /* LOTES */
 .vac-lote-card {
@@ -142,42 +85,7 @@
   }
 }
 
-/* EMPTY STATE */
-.vac-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  text-align: center;
-
-  .empty-icon-ring {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: var(--vac-bg-soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    color: var(--ion-color-primary);
-    margin-bottom: 1.5rem;
-    @include m.animate-pulse;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--vac-text-main);
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    color: var(--vac-text-muted);
-    max-width: 280px;
-    margin-bottom: 2rem;
-  }
-}
+/* EMPTY STATE handled by utilities.scss */
 
 .vac-chart-container {
   position: relative;

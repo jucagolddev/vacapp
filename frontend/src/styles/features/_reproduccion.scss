@@ -86,23 +86,7 @@
   }
 }
 
-// Estado Vacío (Empty State)
-.empty-state {
-  text-align: center;
-  padding: variables.$spacing-xl 0;
-  color: variables.$gray-600;
-
-  ion-icon {
-    font-size: 4rem;
-    color: rgba(variables.$primary-color, 0.2);
-    margin-bottom: variables.$spacing-md;
-  }
-
-  p {
-    font-size: 1.1rem;
-    font-weight: 500;
-  }
-}
+/* EMPTY STATE handled by utilities.scss */
 
 // Botón Flotante Rustic
 .fab-btn {

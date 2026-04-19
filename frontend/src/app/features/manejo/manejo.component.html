@@ -28,7 +28,7 @@
     <ion-searchbar
       mode="ios"
       animated="true"
-      placeholder="Buscar por crotal o nombre..."
+      placeholder="Buscar animal..."
       (ionInput)="handleSearch($event)"
       class="vac-filter-bar vac-transparent-searchbar">
     </ion-searchbar>
@@ -56,9 +56,9 @@
 
     <!-- SKELETON LOADER -->
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
-    <ion-grid class="ion-no-padding" *ngIf="isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
           <div class="uniform-card">
             <ion-item lines="none" class="vac-card-header ion-margin-bottom">
               <div class="vac-avatar ion-margin-end" slot="start">
@@ -89,9 +89,9 @@
     </ion-grid>
 
     <!-- ANIMAL LIST -->
-    <ion-grid class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos()">
           <div class="uniform-card clickable-card" (click)="goToDetail(b.id)">
             <ion-item lines="none" class="vac-card-header">
               <div class="ion-margin-end" slot="start">

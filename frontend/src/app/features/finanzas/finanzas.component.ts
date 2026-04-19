@@ -200,8 +200,22 @@ export class FinanzasComponent {
     return {
       labels: data.map(d => d.label),
       datasets: [
-        { label: 'Ingresos (€)', data: data.map(d => d.ingresos), backgroundColor: '#1b4332', borderRadius: 6 },
-        { label: 'Gastos (€)', data: data.map(d => -d.gastos), backgroundColor: '#bc4749', borderRadius: 6 }
+        { 
+          label: 'Ingresos (€)', 
+          data: data.map(d => d.ingresos), 
+          backgroundColor: '#1b4332', 
+          borderColor: '#1b4332',
+          borderWidth: 0,
+          borderRadius: 4 
+        },
+        { 
+          label: 'Gastos (€)', 
+          data: data.map(d => -d.gastos), 
+          backgroundColor: '#bc8a5f', 
+          borderColor: '#bc8a5f',
+          borderWidth: 0,
+          borderRadius: 4 
+        }
       ]
     };
   });

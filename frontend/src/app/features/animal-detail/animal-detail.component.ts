@@ -70,38 +70,38 @@ interface TimelineEvent {
         <ion-grid class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass">
-                <div class="vac-kpi-mini-icon"><ion-icon name="fitness-outline" color="danger"></ion-icon></div>
-                <div class="vac-kpi-content">
-                  <span class="vac-kpi-label">Salud</span>
-                  <h2 class="vac-kpi-value-sm">{{ lastHealth() }}</h2>
+              <div class="vac-kpi-card-square">
+                <div class="vac-kpi-icon-minimal"><ion-icon name="fitness-outline" color="danger"></ion-icon></div>
+                <div class="vac-kpi-data-minimal">
+                  <span class="label">Salud</span>
+                  <strong class="value">{{ lastHealth() }}</strong>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass">
-                <div class="vac-kpi-mini-icon"><ion-icon name="scale" color="secondary"></ion-icon></div>
-                <div class="vac-kpi-content">
-                  <span class="vac-kpi-label">Peso Actual</span>
-                  <h2 class="vac-kpi-value-sm">{{ lastWeight() }} kg</h2>
+              <div class="vac-kpi-card-square">
+                <div class="vac-kpi-icon-minimal"><ion-icon name="scale" color="secondary"></ion-icon></div>
+                <div class="vac-kpi-data-minimal">
+                  <span class="label">Peso</span>
+                  <strong class="value">{{ lastWeight() }} kg</strong>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass">
-                <div class="vac-kpi-mini-icon"><ion-icon name="calendar" color="tertiary"></ion-icon></div>
-                <div class="vac-kpi-content">
-                  <span class="vac-kpi-label">Últ. Parto</span>
-                  <h2 class="vac-kpi-value-sm">{{ lastParto() }}</h2>
+              <div class="vac-kpi-card-square">
+                <div class="vac-kpi-icon-minimal"><ion-icon name="calendar" color="tertiary"></ion-icon></div>
+                <div class="vac-kpi-data-minimal">
+                  <span class="label">Últ. Parto</span>
+                  <strong class="value">{{ lastParto() }}</strong>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass">
-                <div class="vac-kpi-mini-icon"><ion-icon name="cash" color="success"></ion-icon></div>
-                <div class="vac-kpi-content">
-                  <span class="vac-kpi-label">Gastos Tot.</span>
-                  <h2 class="vac-kpi-value-sm">{{ totalExpenses() | number:'1.2-2' }}€</h2>
+              <div class="vac-kpi-card-square">
+                <div class="vac-kpi-icon-minimal"><ion-icon name="cash" color="success"></ion-icon></div>
+                <div class="vac-kpi-data-minimal">
+                  <span class="label">Inversión</span>
+                  <strong class="value">{{ totalExpenses() | number:'1.0-0' }}€</strong>
                 </div>
               </div>
             </ion-col>

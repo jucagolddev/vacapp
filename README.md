@@ -39,9 +39,9 @@
    ```
 3. Inicia el servidor de desarrollo:
    ```bash
-   npm run starthttp://localhost:4200
+   npm start
    ```
-4. Abre [](http://localhost:4200) en tu navegador.
+4. Abre [http://localhost:4200](http://localhost:4200) en tu navegador.
 
 ---
 

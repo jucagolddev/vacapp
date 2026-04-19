@@ -71,7 +71,7 @@ Chart.register(...registerables);
         </div>
 
         <!-- KPI GRID PRINCIPAL -->
-        <ion-grid class="ion-no-padding mt-4">
+        <ion-grid fixed class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
               <div class="vac-kpi-card glass animate-slide-up m-0 shadow-none border-none">
@@ -125,7 +125,7 @@ Chart.register(...registerables);
         </ion-grid>
 
         <!-- DASHBOARD DE GRÁFICOS -->
-        <ion-grid class="ion-no-padding mt-4">
+        <ion-grid fixed class="ion-no-padding mt-4">
           <ion-row>
             <!-- ÁREA CHART: EVOLUCIÓN PESO -->
             <ion-col size="12" size-lg="8">

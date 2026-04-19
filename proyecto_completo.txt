@@ -127,9 +127,9 @@ ARCHIVO: .\README.md
    ```
 3. Inicia el servidor de desarrollo:
    ```bash
-   npm run starthttp://localhost:4200
+   npm start
    ```
-4. Abre [](http://localhost:4200) en tu navegador.
+4. Abre [http://localhost:4200](http://localhost:4200) en tu navegador.
 
 ---
 
@@ -2301,6 +2301,9 @@ ARCHIVO: .\frontend\src\index.html
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <app-root></app-root>
@@ -4886,6 +4889,55 @@ ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.scss
   flex-shrink: 0;
 }
 
+/* KPI SQUARE CARDS - Minimalist & Premium */
+.vac-kpi-card-square {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid rgba(88, 47, 14, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  margin: 8px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  transition: variables.$transition-base;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+  }
+
+  .vac-kpi-icon-minimal {
+    font-size: 28px;
+    margin-bottom: 12px;
+    opacity: 0.9;
+  }
+
+  .vac-kpi-data-minimal {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: variables.$secondary-color;
+      letter-spacing: 0.5px;
+      opacity: 0.6;
+    }
+    .value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: variables.$primary-color;
+      line-height: 1;
+    }
+  }
+}
+
 /* TIMELINE STYLES - Centered in Design System */
 .timeline-container {
   padding: 10px 20px;
@@ -4898,8 +4950,9 @@ ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.scss
   left: 31px;
   top: 0;
   bottom: 0;
-  width: 2px;
-  background: rgba(0,0,0,0.05);
+  width: 1.5px;
+  background: variables.$tertiary-color; // Tierra color (#BC8A5F)
+  opacity: 0.4;
 }
 
 .timeline-item {
@@ -4910,18 +4963,19 @@ ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.scss
 
 .timeline-dot {
   position: absolute;
-  left: 17px;
+  left: 19px;
   top: 15px;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 16px;
+  font-size: 14px;
   z-index: 2;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 2px solid white;
 }
 
 .timeline-content {
@@ -4950,13 +5004,6 @@ ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.scss
   font-size: 0.85rem;
   opacity: 0.7;
   line-height: 1.4;
-}
-
-.vac-kpi-value-sm {
-   font-size: 1.2rem;
-   font-weight: 800;
-   margin: 0;
-   color: #1b4332;
 }
 
 
@@ -5036,38 +5083,38 @@ interface TimelineEvent {
         <ion-grid class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass">
-                <div class="vac-kpi-mini-icon"><ion-icon name="fitness-outline" color="danger"></ion-icon></div>
-                <div class="vac-kpi-content">
-                  <span class="vac-kpi-label">Salud</span>
-                  <h2 class="vac-kpi-value-sm">{{ lastHealth() }}</h2>
+              <div class="vac-kpi-card-square">
+                <div class="vac-kpi-icon-minimal"><ion-icon name="fitness-outline" color="danger"></ion-icon></div>
+                <div class="vac-kpi-data-minimal">
+                  <span class="label">Salud</span>
+                  <strong class="value">{{ lastHealth() }}</strong>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass">
-                <div class="vac-kpi-mini-icon"><ion-icon name="scale" color="secondary"></ion-icon></div>
-                <div class="vac-kpi-content">
-                  <span class="vac-kpi-label">Peso Actual</span>
-                  <h2 class="vac-kpi-value-sm">{{ lastWeight() }} kg</h2>
+              <div class="vac-kpi-card-square">
+                <div class="vac-kpi-icon-minimal"><ion-icon name="scale" color="secondary"></ion-icon></div>
+                <div class="vac-kpi-data-minimal">
+                  <span class="label">Peso</span>
+                  <strong class="value">{{ lastWeight() }} kg</strong>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass">
-                <div class="vac-kpi-mini-icon"><ion-icon name="calendar" color="tertiary"></ion-icon></div>
-                <div class="vac-kpi-content">
-                  <span class="vac-kpi-label">Últ. Parto</span>
-                  <h2 class="vac-kpi-value-sm">{{ lastParto() }}</h2>
+              <div class="vac-kpi-card-square">
+                <div class="vac-kpi-icon-minimal"><ion-icon name="calendar" color="tertiary"></ion-icon></div>
+                <div class="vac-kpi-data-minimal">
+                  <span class="label">Últ. Parto</span>
+                  <strong class="value">{{ lastParto() }}</strong>
                 </div>
               </div>
             </ion-col>
             <ion-col size="6" size-md="3">
-              <div class="vac-kpi-card glass">
-                <div class="vac-kpi-mini-icon"><ion-icon name="cash" color="success"></ion-icon></div>
-                <div class="vac-kpi-content">
-                  <span class="vac-kpi-label">Gastos Tot.</span>
-                  <h2 class="vac-kpi-value-sm">{{ totalExpenses() | number:'1.2-2' }}€</h2>
+              <div class="vac-kpi-card-square">
+                <div class="vac-kpi-icon-minimal"><ion-icon name="cash" color="success"></ion-icon></div>
+                <div class="vac-kpi-data-minimal">
+                  <span class="label">Inversión</span>
+                  <strong class="value">{{ totalExpenses() | number:'1.0-0' }}€</strong>
                 </div>
               </div>
             </ion-col>
@@ -6119,8 +6166,22 @@ export class FinanzasComponent {
     return {
       labels: data.map(d => d.label),
       datasets: [
-        { label: 'Ingresos (€)', data: data.map(d => d.ingresos), backgroundColor: '#1b4332', borderRadius: 6 },
-        { label: 'Gastos (€)', data: data.map(d => -d.gastos), backgroundColor: '#bc4749', borderRadius: 6 }
+        { 
+          label: 'Ingresos (€)', 
+          data: data.map(d => d.ingresos), 
+          backgroundColor: '#1b4332', 
+          borderColor: '#1b4332',
+          borderWidth: 0,
+          borderRadius: 4 
+        },
+        { 
+          label: 'Gastos (€)', 
+          data: data.map(d => -d.gastos), 
+          backgroundColor: '#bc8a5f', 
+          borderColor: '#bc8a5f',
+          borderWidth: 0,
+          borderRadius: 4 
+        }
       ]
     };
   });
@@ -6628,7 +6689,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     <ion-searchbar
       mode="ios"
       animated="true"
-      placeholder="Buscar por crotal o nombre..."
+      placeholder="Buscar animal..."
       (ionInput)="handleSearch($event)"
       class="vac-filter-bar vac-transparent-searchbar">
     </ion-searchbar>
@@ -7798,7 +7859,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <ion-searchbar
       mode="ios"
       animated="true"
-      placeholder="Buscar por ejemplar o método..."
+      placeholder="Buscar animal..."
       (ionInput)="onSearch($event)"
       class="vac-filter-bar vac-transparent-searchbar">
     </ion-searchbar>
@@ -8365,7 +8426,7 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
       <ion-searchbar
         mode="ios"
         animated="true"
-        placeholder="Buscar por ejemplar o tratamiento..."
+        placeholder="Buscar animal..."
         (ionInput)="onSearch($event)">
       </ion-searchbar>
     </div>
@@ -9253,11 +9314,15 @@ ARCHIVO: .\frontend\src\styles\base\_typography.scss
 @use '../abstracts/variables';
 
 body {
-  font-family: variables.$font-family-base;
+  font-family: 'Outfit', sans-serif !important;
   font-size: variables.$font-size-base;
   color: variables.$dark-color;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  font-family: 'Outfit', sans-serif !important;
 }
 
 h1, .h1 { font-size: 2.5rem; font-weight: 700; line-height: 1.2; margin-bottom: variables.$spacing-md; }
@@ -9527,19 +9592,58 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   @extend .vac-base-card;
 }
 
+/* ION-CARD GLOBAL STANDARDIZATION */
+ion-card {
+  --background: #{variables.$white};
+  border-radius: 20px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(88, 47, 14, 0.08) !important;
+  margin: 12px 8px;
+  transition: variables.$transition-base;
+  overflow: hidden;
+
+  ion-card-header {
+    padding: 1.5rem !important;
+    
+    ion-card-title {
+      font-weight: 700 !important;
+      font-size: 1.1rem !important;
+      color: variables.$primary-color;
+      margin: 0;
+    }
+    
+    ion-card-subtitle {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: variables.$secondary-color;
+      opacity: 0.7;
+    }
+  }
+
+  ion-card-content {
+    padding: 1.5rem !important;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  }
+}
+
 /* RUSTIC CARD - The definitive Vacapp standard */
 .rustic-card {
   background: variables.$white;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(88, 47, 14, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(88, 47, 14, 0.08);
+  transition: variables.$transition-base;
   overflow: hidden;
   margin: 12px 8px;
+  padding: 1.5rem;
   
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
   }
 }
 
@@ -9931,6 +10035,21 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
   color: variables.$gray-600;
   font-weight: 500;
 }
+
+/* ION-SEARCHBAR LUXE RESET */
+ion-searchbar {
+  --border-radius: 12px !important;
+  --background: #fdfaf7 !important;
+  --box-shadow: none !important;
+  --placeholder-color: #{variables.$gray-600};
+  --placeholder-font-weight: 600;
+  --color: #{variables.$black};
+  border: 1px solid rgba(88, 47, 14, 0.08);
+  border-radius: 12px;
+  margin: 10px 0;
+  padding-left: 8px;
+  padding-right: 8px;
+}
 /* 12. Estilos para Desplegables (Selects) y Calendarios (Dates) */
 ion-input[type="date"] {
   --padding-start: 1.2rem;
@@ -10234,6 +10353,162 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
     aspect-ratio: 1 / 1;
     border-radius: 50%;
   }
+}
+
+/* 17. SHARED COMPONENTS (CONSOLIDATED) */
+
+/* EMPTY STATE - Minimalist & Airy */
+.vac-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  .empty-icon-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(variables.$primary-color, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: variables.$primary-color;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(88, 47, 14, 0.05);
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: variables.$primary-color;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: variables.$gray-600;
+    max-width: 280px;
+    margin-bottom: 2rem;
+    font-weight: 600;
+  }
+}
+
+/* WIZARD STEPPER - Modern Dot & Line */
+.vac-wizard-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  background: variables.$white;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+
+  .wizard-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.4;
+    transition: variables.$transition-base;
+
+    .step-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: variables.$gray-100;
+      color: variables.$gray-600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    span {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: variables.$gray-600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &.step-active {
+      opacity: 1;
+      .step-circle {
+        background: variables.$primary-color;
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 4px 10px rgba(variables.$primary-color, 0.2);
+      }
+      span {
+        color: variables.$primary-color;
+      }
+    }
+  }
+
+  .wizard-line {
+    width: 40px;
+    height: 2px;
+    background: variables.$gray-100;
+    margin-top: -1.25rem;
+  }
+}
+
+/* MODAL HEADER SYSTEM */
+.vac-modal-header {
+  padding: 2rem 1rem;
+  text-align: center;
+  
+  .vac-icon-ring {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(variables.$tertiary-color, 0.1);
+    color: variables.$primary-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 1rem;
+    border: 1px solid rgba(variables.$tertiary-color, 0.2);
+  }
+
+  .vac-modal-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: variables.$primary-color;
+    margin: 0 0 0.5rem;
+  }
+
+  .vac-modal-subtitle {
+    font-size: 0.9rem;
+    color: variables.$gray-600;
+    max-width: 300px;
+    margin: 0 auto;
+    font-weight: 600;
+  }
+}
+
+/* OTHER UTILITIES */
+.mr-1 { margin-right: 0.25rem !important; }
+.mr-2 { margin-right: 0.5rem !important; }
+.ml-auto { margin-left: auto !important; }
+.text-end { text-align: end !important; }
+.text-center { text-align: center !important; }
+.pb-12 { padding-bottom: 3rem !important; }
+.pb-4 { padding-bottom: 1rem !important; }
+.border-t-light { border-top: 1px solid rgba(0,0,0,0.05) !important; }
+
+/* SECTION TITLES */
+.vac-section-title {
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: variables.$primary-color !important;
+  margin: 2.25rem 0 1.25rem !important;
+  padding-left: 8px;
+  letter-spacing: -0.2px;
 }
 
 
@@ -10632,64 +10907,7 @@ ARCHIVO: .\frontend\src\styles\features\_manejo.scss
   @extend .uniform-card;
 }
 
-/* WIZARD & MODAL */
-.vac-wizard-stepper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1.5rem 1rem;
-  background: var(--vac-bg-main);
-  border-bottom: 1px solid var(--vac-border-color);
-
-  .wizard-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    opacity: 0.4;
-    transition: all 0.3s ease;
-
-    .step-circle {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--vac-border-color);
-      color: var(--vac-text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
-
-    span {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--vac-text-muted);
-    }
-
-    &.step-active {
-      opacity: 1;
-      .step-circle {
-        background: var(--ion-color-primary);
-        color: white;
-        transform: scale(1.1);
-        box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.3);
-      }
-      span {
-        color: var(--ion-color-primary);
-      }
-    }
-  }
-
-  .wizard-line {
-    flex: 0.2;
-    height: 2px;
-    background: var(--vac-border-color);
-    margin-top: -1.25rem;
-  }
-}
+/* WIZARD handled by utilities.scss */
 
 /* LOTES */
 .vac-lote-card {
@@ -10728,42 +10946,7 @@ ARCHIVO: .\frontend\src\styles\features\_manejo.scss
   }
 }
 
-/* EMPTY STATE */
-.vac-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  text-align: center;
-
-  .empty-icon-ring {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: var(--vac-bg-soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    color: var(--ion-color-primary);
-    margin-bottom: 1.5rem;
-    @include m.animate-pulse;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--vac-text-main);
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    color: var(--vac-text-muted);
-    max-width: 280px;
-    margin-bottom: 2rem;
-  }
-}
+/* EMPTY STATE handled by utilities.scss */
 
 .vac-chart-container {
   position: relative;
@@ -10979,23 +11162,7 @@ ARCHIVO: .\frontend\src\styles\features\_reproduccion.scss
   }
 }
 
-// Estado Vacío (Empty State)
-.empty-state {
-  text-align: center;
-  padding: variables.$spacing-xl 0;
-  color: variables.$gray-600;
-
-  ion-icon {
-    font-size: 4rem;
-    color: rgba(variables.$primary-color, 0.2);
-    margin-bottom: variables.$spacing-md;
-  }
-
-  p {
-    font-size: 1.1rem;
-    font-weight: 500;
-  }
-}
+/* EMPTY STATE handled by utilities.scss */
 
 // Botón Flotante Rustic
 .fab-btn {
@@ -11048,97 +11215,7 @@ ARCHIVO: .\frontend\src\styles\features\_sanidad.scss
   padding: variables.$spacing-md;
 }
 
-// Buscador Vacapp
-.vac-searchbar-container {
-  --border-radius: 16px;
-  --box-shadow: 0 4px 12px rgba($black, 0.05);
-  --background: var(--ion-card-background);
-  --placeholder-color: #{variables.$gray-600};
-  --icon-color: #{variables.$primary-color};
-  margin-bottom: variables.$spacing-lg;
-  padding: 0;
-  
-  ion-searchbar {
-    --padding-top: 12px;
-    --padding-bottom: 12px;
-  }
-}
-
-// Historial/Tabla de Datos (Simulated with Cards for better UX)
-.vac-health-list {
-  margin-bottom: 80px;
-}
-
-// Modal de Sanidad
-.vac-health-modal {
-  --border-radius: 28px 28px 0 0;
-  --height: 85%;
-  align-items: flex-end;
-
-  ion-header {
-    --background: transparent;
-    ion-toolbar {
-      --background: transparent;
-      --border-style: none;
-      padding: 10px;
-    }
-  }
-
-  .vac-modal-body {
-    padding: variables.$spacing-lg;
-    
-    .vac-modal-title {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: variables.$primary-color;
-      margin-bottom: 8px;
-    }
-
-    .vac-modal-subtitle {
-      font-size: 1rem;
-      color: variables.$gray-600;
-      margin-bottom: variables.$spacing-xl;
-    }
-  }
-}
-
-// Botón Flotante Centralizado
-.vac-fab-main {
-  --background: #{variables.$primary-color};
-  --background-activated: #{variables.$primary-color};
-  --box-shadow: 0 10px 20px rgba($primary-color, 0.3);
-  width: 65px;
-  height: 65px;
-  
-  ion-icon {
-    font-size: 32px;
-  }
-}
-
-// Estados Vacíos
-.empty-history {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 40px;
-  text-align: center;
-  
-  ion-icon {
-    font-size: 4rem;
-    color: rgba(variables.$primary-color, 0.1);
-    margin-bottom: variables.$spacing-md;
-  }
-  
-  h3 {
-    font-weight: 700;
-    color: variables.$dark-color;
-  }
-  
-  p {
-    color: variables.$gray-600;
-  }
-}
+/* MODALS & EMPTY STATES handled by utilities.scss */
 
 // Animaciones
 .fade-in {
@@ -11161,7 +11238,7 @@ ARCHIVO: .\frontend\src\styles\layout\_containers.scss
 .vac-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1.5rem 60px;
+  padding: 0 1.5rem 100px; // More room for FABs and scrolling
 }
 
 .vac-welcome-section {

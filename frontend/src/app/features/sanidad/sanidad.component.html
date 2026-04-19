@@ -30,15 +30,15 @@
       <ion-searchbar
         mode="ios"
         animated="true"
-        placeholder="Buscar por ejemplar o tratamiento..."
+        placeholder="Buscar animal..."
         (ionInput)="onSearch($event)">
       </ion-searchbar>
     </div>
 
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
-    <ion-grid class="ion-no-padding" *ngIf="isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
           <div class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
@@ -60,9 +60,9 @@
     </ion-grid>
 
     <!-- LISTA ESTANDARIZADA -->
-    <ion-grid class="ion-no-padding" *ngIf="filteredSanidad().length > 0 && !isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="filteredSanidad().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of filteredSanidad()">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of filteredSanidad()">
           <div class="uniform-card clickable-card" (click)="goToDetail(s.bovino_id)">
             <div class="vac-card-header">
                <div class="vac-card-icon" [ngClass]="getBadgeColor(s.tipo)" slot="start">

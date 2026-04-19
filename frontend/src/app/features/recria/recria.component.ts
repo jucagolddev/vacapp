@@ -91,9 +91,9 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            </div>
 
            <!-- LISTA ESTANDARIZADA -->
-           <ion-grid class="ion-no-padding">
+           <ion-grid fixed class="ion-no-padding">
              <ion-row>
-                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+                <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos()">
                   <div class="uniform-card clickable-card" (click)="selectBovino(b)">
                    <div class="vac-card-header-flex">
                       <div class="ion-margin-end">
@@ -175,9 +175,9 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
              <span class="vac-badge-count">{{ pesajesFiltrados.length }} Registros</span>
            </div>
            
-           <ion-grid class="ion-no-padding">
+           <ion-grid fixed class="ion-no-padding">
              <ion-row>
-               <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajesFiltrados">
+               <ion-col size="12" size-md="6" size-lg="4" *ngFor="let p of pesajesFiltrados">
                  <div class="uniform-card">
                    <div class="vac-card-header-flex">
                      <div class="vac-icon-avatar bg-light">

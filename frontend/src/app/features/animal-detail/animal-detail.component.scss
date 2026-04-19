@@ -70,6 +70,55 @@
   flex-shrink: 0;
 }
 
+/* KPI SQUARE CARDS - Minimalist & Premium */
+.vac-kpi-card-square {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid rgba(88, 47, 14, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  margin: 8px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  transition: variables.$transition-base;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+  }
+
+  .vac-kpi-icon-minimal {
+    font-size: 28px;
+    margin-bottom: 12px;
+    opacity: 0.9;
+  }
+
+  .vac-kpi-data-minimal {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: variables.$secondary-color;
+      letter-spacing: 0.5px;
+      opacity: 0.6;
+    }
+    .value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: variables.$primary-color;
+      line-height: 1;
+    }
+  }
+}
+
 /* TIMELINE STYLES - Centered in Design System */
 .timeline-container {
   padding: 10px 20px;
@@ -82,8 +131,9 @@
   left: 31px;
   top: 0;
   bottom: 0;
-  width: 2px;
-  background: rgba(0,0,0,0.05);
+  width: 1.5px;
+  background: variables.$tertiary-color; // Tierra color (#BC8A5F)
+  opacity: 0.4;
 }
 
 .timeline-item {
@@ -94,18 +144,19 @@
 
 .timeline-dot {
   position: absolute;
-  left: 17px;
+  left: 19px;
   top: 15px;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 16px;
+  font-size: 14px;
   z-index: 2;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 2px solid white;
 }
 
 .timeline-content {
@@ -134,11 +185,4 @@
   font-size: 0.85rem;
   opacity: 0.7;
   line-height: 1.4;
-}
-
-.vac-kpi-value-sm {
-   font-size: 1.2rem;
-   font-weight: 800;
-   margin: 0;
-   color: #1b4332;
 }

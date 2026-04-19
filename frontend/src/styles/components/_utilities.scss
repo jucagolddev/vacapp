@@ -222,3 +222,159 @@
     border-radius: 50%;
   }
 }
+
+/* 17. SHARED COMPONENTS (CONSOLIDATED) */
+
+/* EMPTY STATE - Minimalist & Airy */
+.vac-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  .empty-icon-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(variables.$primary-color, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: variables.$primary-color;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(88, 47, 14, 0.05);
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: variables.$primary-color;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: variables.$gray-600;
+    max-width: 280px;
+    margin-bottom: 2rem;
+    font-weight: 600;
+  }
+}
+
+/* WIZARD STEPPER - Modern Dot & Line */
+.vac-wizard-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  background: variables.$white;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+
+  .wizard-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.4;
+    transition: variables.$transition-base;
+
+    .step-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: variables.$gray-100;
+      color: variables.$gray-600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    span {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: variables.$gray-600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &.step-active {
+      opacity: 1;
+      .step-circle {
+        background: variables.$primary-color;
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 4px 10px rgba(variables.$primary-color, 0.2);
+      }
+      span {
+        color: variables.$primary-color;
+      }
+    }
+  }
+
+  .wizard-line {
+    width: 40px;
+    height: 2px;
+    background: variables.$gray-100;
+    margin-top: -1.25rem;
+  }
+}
+
+/* MODAL HEADER SYSTEM */
+.vac-modal-header {
+  padding: 2rem 1rem;
+  text-align: center;
+  
+  .vac-icon-ring {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(variables.$tertiary-color, 0.1);
+    color: variables.$primary-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 1rem;
+    border: 1px solid rgba(variables.$tertiary-color, 0.2);
+  }
+
+  .vac-modal-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: variables.$primary-color;
+    margin: 0 0 0.5rem;
+  }
+
+  .vac-modal-subtitle {
+    font-size: 0.9rem;
+    color: variables.$gray-600;
+    max-width: 300px;
+    margin: 0 auto;
+    font-weight: 600;
+  }
+}
+
+/* OTHER UTILITIES */
+.mr-1 { margin-right: 0.25rem !important; }
+.mr-2 { margin-right: 0.5rem !important; }
+.ml-auto { margin-left: auto !important; }
+.text-end { text-align: end !important; }
+.text-center { text-align: center !important; }
+.pb-12 { padding-bottom: 3rem !important; }
+.pb-4 { padding-bottom: 1rem !important; }
+.border-t-light { border-top: 1px solid rgba(0,0,0,0.05) !important; }
+
+/* SECTION TITLES */
+.vac-section-title {
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: variables.$primary-color !important;
+  margin: 2.25rem 0 1.25rem !important;
+  padding-left: 8px;
+  letter-spacing: -0.2px;
+}

@@ -28,7 +28,7 @@
     <ion-searchbar
       mode="ios"
       animated="true"
-      placeholder="Buscar por ejemplar o método..."
+      placeholder="Buscar animal..."
       (ionInput)="onSearch($event)"
       class="vac-filter-bar vac-transparent-searchbar">
     </ion-searchbar>
@@ -57,9 +57,9 @@
     <h2 class="vac-section-title" *ngIf="!isLoading()">Próximos Partos</h2>
 
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
-    <ion-grid class="ion-no-padding mt-4" *ngIf="isLoading()">
+    <ion-grid fixed class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
           <div class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
@@ -96,9 +96,9 @@
     </div>
 
     <!-- Gestaciones confirmadas (Próximos Partos) -->
-    <ion-grid class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredGestaciones()">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredGestaciones()">
           <div class="uniform-card">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-danger-soft" slot="start">
@@ -139,9 +139,9 @@
     <h2 class="vac-section-title mt-8" *ngIf="!isLoading()">Historial Reproductivo</h2>
     
     <!-- Historial en Tarjetas Pro -->
-    <ion-grid class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredReproducciones()">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredReproducciones()">
           <div class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-primary-soft" slot="start">

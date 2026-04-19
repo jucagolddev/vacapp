@@ -222,19 +222,58 @@
   @extend .vac-base-card;
 }
 
+/* ION-CARD GLOBAL STANDARDIZATION */
+ion-card {
+  --background: #{variables.$white};
+  border-radius: 20px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(88, 47, 14, 0.08) !important;
+  margin: 12px 8px;
+  transition: variables.$transition-base;
+  overflow: hidden;
+
+  ion-card-header {
+    padding: 1.5rem !important;
+    
+    ion-card-title {
+      font-weight: 700 !important;
+      font-size: 1.1rem !important;
+      color: variables.$primary-color;
+      margin: 0;
+    }
+    
+    ion-card-subtitle {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: variables.$secondary-color;
+      opacity: 0.7;
+    }
+  }
+
+  ion-card-content {
+    padding: 1.5rem !important;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  }
+}
+
 /* RUSTIC CARD - The definitive Vacapp standard */
 .rustic-card {
   background: variables.$white;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(88, 47, 14, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(88, 47, 14, 0.08);
+  transition: variables.$transition-base;
   overflow: hidden;
   margin: 12px 8px;
+  padding: 1.5rem;
   
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
   }
 }
 

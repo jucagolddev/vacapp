@@ -97,7 +97,9 @@ import { AuthService } from '../../services/auth.service';
 
         </ion-menu>
         
-        <ion-router-outlet id="main-content" class="content-canvas"></ion-router-outlet>
+        <div class="main-container" id="main-content">
+          <ion-router-outlet class="content-canvas"></ion-router-outlet>
+        </div>
         
       </ion-split-pane>
   `

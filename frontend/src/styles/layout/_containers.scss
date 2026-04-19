@@ -4,7 +4,16 @@
 .vac-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1.5rem 60px;
+  padding: 0 1.5rem 100px; // More room for FABs and scrolling
+}
+
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .vac-welcome-section {
