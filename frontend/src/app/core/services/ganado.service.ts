@@ -3,7 +3,14 @@ import { SupabaseService } from './supabase.service';
 import { FincaService } from './finca.service';
 import { Bovino } from '../models/vacapp.models';
 import * as VacaConst from '../constants/vaca.constants';
+import { calculateAgeDesc } from '../../shared/utils/formatters';
 
+/**
+ * @class GanadoService
+ * @description Servicio de dominio que encapsula toda la lógica de negocio y el estado
+ * relacionado con el inventario principal de bovinos. 
+ * Utiliza Angular Signals para exponer un estado reactivo unidireccional a los componentes.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -75,6 +82,13 @@ export class GanadoService {
   });
 
   // Lógica de cálculo centralizada
+  
+  /**
+   * @description Determina la categoría zootécnica de un animal en función de su edad y sexo.
+   * Útil para segmentación de lotes, planes de alimentación o análisis económico.
+   * @param {Bovino} b El registro del bovino a evaluar.
+   * @returns {string} Categoría calculada (ej. 'Ternera', 'Novilla', 'Vaca').
+   */
   calculateCategoria(b: Bovino): string {
     if (!b.fecha_nacimiento) return 'Sin Categoría';
     const birthDate = new Date(b.fecha_nacimiento);
@@ -94,22 +108,22 @@ export class GanadoService {
     }
   }
 
+  /**
+   * @description Convierte la fecha de nacimiento en una cadena legible de edad.
+   * Maneja tanto años como meses para animales jóvenes.
+   * @param {Bovino} b El registro del bovino.
+   * @returns {string} Edad legible (ej. "3 años", "8 meses").
+   */
   getEdadDesc(b: Bovino): string {
-    if (!b.fecha_nacimiento) return 'S/N';
-    const birthDate = new Date(b.fecha_nacimiento);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    let months = today.getMonth() - birthDate.getMonth();
-    if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-      months += 12;
-    }
-    if (age > 0) {
-      return age === 1 ? '1 año' : `${age} años`;
-    }
-    return months === 1 ? '1 mes' : `${months} meses`;
+    return calculateAgeDesc(b.fecha_nacimiento);
   }
 
+  /**
+   * @description Calcula la Unidad de Ganado Mayor (UGM o UGB) basada en la edad.
+   * Fundamental para estudios de carga ganadera y capacidad de carga de los pastos.
+   * @param {Bovino} b El registro del bovino.
+   * @returns {number} Valor UGB (0.4 para terneros, 0.6 novillos, 1.0 adultos).
+   */
   getUgb(b: Bovino): number {
     if (!b.fecha_nacimiento) return 1.0;
     const birthDate = new Date(b.fecha_nacimiento);
@@ -134,6 +148,11 @@ export class GanadoService {
     });
   }
 
+  /**
+   * @description Inicia la carga principal del censo ganadero para la finca activa.
+   * Se orquesta de forma transparente consultando la base de datos o el fallback offline.
+   * @param {string} fincaId Identificador de la Finca.
+   */
   async loadBovinos(fincaId: string) {
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
@@ -145,8 +164,9 @@ export class GanadoService {
       if (error) throw error;
       
       this.bovinosSignal.set((data as Bovino[]) || []);
-    } catch (e: any) {
-      this.errorSignal.set(e.message || 'Error cargando bovinos');
+    } catch (e: unknown) {
+      const errorMsg = e instanceof Error ? e.message : 'Error cargando bovinos';
+      this.errorSignal.set(errorMsg);
       console.error(e);
     } finally {
       this.loadingSignal.set(false);
@@ -173,6 +193,11 @@ export class GanadoService {
     return { data: [], error };
   }
 
+  /**
+   * @description Da de alta un nuevo animal en el sistema asociándolo a la finca activa.
+   * @param {Partial<Bovino>} bovino Datos del nuevo animal recolectados del formulario.
+   * @returns {Promise<{data: Bovino | null, error: any}>}
+   */
   async createBovino(bovino: Partial<Bovino>) {
     const fincaId = this.fincaService.selectedFincaId();
     if (!fincaId) return { error: 'No hay finca seleccionada' };
@@ -186,6 +211,12 @@ export class GanadoService {
     return { data, error };
   }
 
+  /**
+   * @description Modifica la ficha de un animal existente y propaga el cambio al estado local (Signal).
+   * @param {string} id UUID del animal.
+   * @param {Partial<Bovino>} payload Objeto con los campos modificados.
+   * @returns {Promise<{data: Bovino | null, error: any}>}
+   */
   async updateBovino(id: string, payload: Partial<Bovino>) {
     const { data, error } = await this.supabase.update<Bovino>('bovinos', id, payload);
     if (data && !error) {

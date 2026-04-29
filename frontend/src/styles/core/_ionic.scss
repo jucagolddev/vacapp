@@ -115,3 +115,16 @@ ion-menu {
   gap: 16px;
   margin-bottom: 2rem;
 }
+
+/* FIX: Floating Action Button Mobile Layout */
+ion-fab[vertical="bottom"] {
+  /* Añadimos un margen inferior dinámico que respeta la zona segura del móvil */
+  margin-bottom: calc(env(safe-area-inset-bottom) + 16px) !important;
+  
+  /* Aseguramos que siempre esté por encima de cualquier otro elemento (como tarjetas) */
+  z-index: 9999 !important;
+}
+
+.tabs-bottom ion-fab[vertical="bottom"] {
+  margin-bottom: calc(env(safe-area-inset-bottom) + 70px) !important; 
+}

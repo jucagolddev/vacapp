@@ -5,10 +5,10 @@
     </ion-buttons>
     <ion-title class="ion-text-center">Montas y Cría</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" fill="clear">
+      <ion-button (click)="exportarPDF()" fill="clear" aria-label="Exportar a PDF">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button (click)="presentFilter($event)" fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear" aria-label="Abrir filtros">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -22,7 +22,7 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <div class="vac-container animate-fade-in">
+  <main class="vac-container animate-fade-in">
     
     <!-- CONTROL MANDO COLECTIVO -->
     <div class="vac-master-filter-bar mb-6 animate-fade-in">
@@ -53,8 +53,8 @@
     </ion-searchbar>
 
     <!-- GRÁFICO DE FERTILIDAD -->
-    <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
-      <div class="vac-card-header">
+    <section class="vac-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
+      <header class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>EFICIENCIA REPRODUCTIVA</span>
@@ -76,13 +76,13 @@
              </div>
           </div>
         </div>
-      </div>
+      </header>
       <div class="vac-card-content">
         <div class="vac-chart-container chart-300px">
           <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
         </div>
       </div>
-    </div>
+    </section>
 
     <h2 class="vac-section-title" *ngIf="!isLoading()">Próximos Partos</h2>
 
@@ -90,7 +90,7 @@
     <ion-grid fixed class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
-          <div class="uniform-card">
+          <article class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
               <div class="vac-card-title-group vac-flex-1">
@@ -111,7 +111,7 @@
                 <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -128,8 +128,8 @@
     <!-- Gestaciones confirmadas (Próximos Partos) -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredGestaciones()">
-          <div class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredGestaciones(); trackBy: trackById">
+          <article class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-danger-soft" slot="start">
                 <ion-icon name="pulse-outline" color="danger"></ion-icon>
@@ -161,7 +161,7 @@
                 </ion-button>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -171,8 +171,8 @@
     <!-- Historial en Tarjetas Pro -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredReproducciones()">
-          <div class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredReproducciones(); trackBy: trackById">
+          <article class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-primary-soft" slot="start">
                 <ion-icon name="female-outline" color="primary"></ion-icon>
@@ -205,7 +205,7 @@
                 </ion-button>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -219,10 +219,10 @@
       <p>No hay historial reproductivo registrado para esta búsqueda.</p>
     </div>
 
-  </div>
+  </main>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openAddModal()" color="primary">
+    <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Nuevo registro de cría">
       <ion-icon name="add-circle"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -234,7 +234,7 @@
         <ion-toolbar color="primary">
           <ion-title>{{ editingItem ? 'Actualizar Ficha' : 'Nuevo Evento' }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeModal()">
+            <ion-button (click)="closeModal()" aria-label="Cerrar modal">
               <ion-icon name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>

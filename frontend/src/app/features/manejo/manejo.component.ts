@@ -31,8 +31,10 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
- * Componente para el Módulo de Manejo (Antiguo Ganado).
- * Actualizado con Búsqueda en tiempo real, Skeletons y Pull-to-refresh.
+ * @class ManejoComponent
+ * @description Componente principal para el Módulo de Manejo (Inventario y Censo Ganadero).
+ * Implementa una interfaz "Rustic-Luxe" con capacidades de búsqueda en tiempo real (Signals),
+ * filtros avanzados, carga perezosa de imágenes (Skeletons) y soporte de sincronización Offline-First.
  */
 @Component({
   selector: 'app-manejo',
@@ -51,7 +53,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
   templateUrl: './manejo.component.html',
   styleUrls: ['./manejo.component.scss']
 })
-export class ManejoComponent implements OnInit {
+export class ManejoComponent {
   public ganadoService = inject(GanadoService);
   private fincaService = inject(FincaService);
   private storageService = inject(StorageService);
@@ -66,17 +68,23 @@ export class ManejoComponent implements OnInit {
   bovinos = this.ganadoService.bovinos;
   lotes = this.fincaService.lotes;
   
-  // Estados de interfaz y búsqueda
+  // Estados de interfaz reactivos (Signals)
+  /** Estado de carga asíncrona del servicio. */
   isLoading = signal<boolean>(true);
+  /** Término actual introducido en la barra de búsqueda. */
   searchTerm = signal<string>('');
   
   // Filtros Avanzados
   filterEstado = signal<string>('Todos');
   filterLote = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
-  // Computado que retorna la lista filtrada de bovinos basada en el searchbar y filtros
+  /**
+   * @description Computado maestro que devuelve la lista de bovinos procesada.
+   * Aplica en cascada: Búsqueda de texto -> Filtro por Estado -> Filtro por Lote.
+   * Se actualiza automáticamente (sin Zone.js explícito) cuando cambia cualquier signal dependiente.
+   */
   filteredBovinos = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const estado = this.filterEstado();
@@ -157,16 +165,29 @@ export class ManejoComponent implements OnInit {
     }, { allowSignalWrites: true });
   }
 
-  async ngOnInit() {
-    this.loadData();
+  trackById(index: number, item: any): string {
+    return item?.id || item || index.toString();
   }
 
-  async loadData() {
-    // Los lotes se cargan vía FincaService automáticamente
+  /**
+   * @description Retorna la clase CSS de borde según el estado reproductivo/salud del animal.
+   */
+  getStatusBorderClass(bovino: any): string {
+    const estado = (bovino.estado_reproductivo || '').toLowerCase();
+    if (estado.includes('gestante') || estado.includes('gestación')) return 'border-status-gestante';
+    if (estado.includes('lactante') || estado.includes('producción')) return 'border-status-produccion';
+    if (estado.includes('enferma') || estado.includes('urgente')) return 'border-status-enferma';
+    if (estado.includes('seca')) return 'border-status-seca';
+    if (estado.includes('engorde') || estado.includes('ceba')) return 'border-status-engorde';
+    return 'border-status-sano';
   }
 
-  handleSearch(event: any) {
-    this.searchTerm.set(event.detail.value || '');
+  /**
+   * @description Actualiza el Signal de búsqueda en base a la entrada del usuario.
+   * @param {Event} event Evento emitido por el componente ion-searchbar.
+   */
+  handleSearch(event: Event) {
+    this.searchTerm.set((event.target as HTMLInputElement).value || '');
   }
 
   goToDetail(id: string) {
@@ -176,7 +197,7 @@ export class ManejoComponent implements OnInit {
   }
 
   // --- LÓGICA DE FILTROS ---
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
@@ -188,14 +209,17 @@ export class ManejoComponent implements OnInit {
     this.isFilterPopoverOpen = false;
   }
 
-  async handleRefresh(event: any) {
+  async handleRefresh(event: Event) {
     const fincaId = this.fincaService.selectedFincaId();
     if (fincaId) {
       await this.ganadoService.loadBovinos(fincaId);
     }
-    event.target.complete();
+    (event.target as any).complete();
   }
 
+  /**
+   * @description Exporta el censo actual filtrado a formato PDF utilizando `PdfService`.
+   */
   async exportarPDF() {
     this.presentToast('Generando Censo de Animales...', 'primary');
     
@@ -246,8 +270,8 @@ export class ManejoComponent implements OnInit {
 
   closeModal() { this.isModalOpen = false; }
 
-  async onFileSelected(event: any) {
-    const file = event.target.files[0];
+  async onFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       if (!this.fincaService.selectedFincaId()) {
         this.presentToast('Debes seleccionar una finca primero', 'warning');
@@ -267,6 +291,10 @@ export class ManejoComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Persiste la ficha del animal (Creación o Actualización).
+   * Tiene conciencia de red (Offline-First): si no hay conexión, delega en `OfflineSyncService`.
+   */
   async saveData() {
     if (this.bovinoForm.invalid) return;
     const payload = this.bovinoForm.value;
@@ -298,6 +326,11 @@ export class ManejoComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Inicia el proceso de baja definitiva (purga) de un animal.
+   * Requiere confirmación doble (Alerta nativa destructiva) y soporta cola offline.
+   * @param {string} id UUID del bovino a purgar.
+   */
   async confirmDelete(id: string) {
     const alert = await this.alertCtrl.create({
       header: 'Purgar Registro',

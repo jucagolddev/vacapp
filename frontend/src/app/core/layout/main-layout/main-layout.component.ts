@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   IonSplitPane, IonMenu, IonContent, IonList, 
   IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
@@ -12,7 +12,7 @@ import {
   medkitOutline, scaleOutline, walletOutline, logOutOutline, chevronBackOutline, chevronForwardOutline, leafOutline,
   sunnyOutline, moonOutline
 } from 'ionicons/icons';
-import { AuthService } from '../../services/auth.service';
+import { SupabaseService } from '../../services/supabase.service';
 
 /**
  * Componente de Diseño Principal (Layout) - UI Profesional.
@@ -85,7 +85,7 @@ import { AuthService } from '../../services/auth.service';
                 <ion-icon name="leaf-outline" size="small" class="color-medium"></ion-icon>
                 <span class="color-medium text-sm font-semibold">Gestión Ganadera</span>
               </div>
-              <span class="color-medium opacity-80 text-xs mb-2">{{ profile()?.email }}</span>
+              <span class="color-medium opacity-80 text-xs mb-2">{{ profile.email }}</span>
               
               <!-- THEME TOGGLE BUTTON -->
               <ion-button fill="clear" color="medium" (click)="toggleTheme()" class="theme-toggle-btn">
@@ -105,9 +105,10 @@ import { AuthService } from '../../services/auth.service';
   `
 })
 export class MainLayoutComponent {
-  private auth = inject(AuthService);
+  private supabase = inject(SupabaseService);
+  private router = inject(Router);
   public isCollapsed = false;
-  public profile = this.auth.profile;
+  public profile = { email: 'Cargando...' }; // Podría leerse del session
 
   public appPages = [
     { title: 'Cuadro de Mando', url: '/dashboard', icon: 'pie-chart-outline' },
@@ -125,30 +126,36 @@ export class MainLayoutComponent {
     addIcons({ pieChartOutline, pawOutline, layersOutline, heartHalfOutline, medkitOutline, scaleOutline, walletOutline, logOutOutline, chevronBackOutline, chevronForwardOutline, leafOutline, sunnyOutline, moonOutline });
     
     // Iniciar Tema desde LocalStorage
-    const saved = localStorage.getItem('theme');
-    if (saved === 'dark') {
+    const saved = localStorage.getItem('vacapp-dark-mode');
+    if (saved === 'true') {
       this.isDarkMode = true;
-      document.body.classList.add('dark-theme');
+      document.documentElement.classList.add('ion-palette-dark');
+    }
+
+    this.loadProfile();
+  }
+
+  async loadProfile() {
+    const { data: { session } } = await this.supabase.getUserSession();
+    if (session?.user?.email) {
+      this.profile = { email: session.user.email };
+    } else {
+      this.profile = { email: 'propietario@finca.com' }; // Fallback para dev visual
     }
   }
 
   toggleTheme() {
     this.isDarkMode = !this.isDarkMode;
-    const theme = this.isDarkMode ? 'dark' : 'light';
-    localStorage.setItem('theme', theme);
-    
-    if (this.isDarkMode) {
-      document.body.classList.add('dark-theme');
-    } else {
-      document.body.classList.remove('dark-theme');
-    }
+    localStorage.setItem('vacapp-dark-mode', this.isDarkMode.toString());
+    document.documentElement.classList.toggle('ion-palette-dark', this.isDarkMode);
   }
 
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
   }
 
-  logout() {
-    this.auth.signOut();
+  async logout() {
+    await this.supabase.signOut();
+    this.router.navigate(['/auth/login'], { replaceUrl: true });
   }
 }

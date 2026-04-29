@@ -36,7 +36,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </ion-buttons>
         <ion-title class="ion-text-center">Gastos y Ganancias</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="presentFilter($event)" fill="clear">
+          <ion-button (click)="presentFilter($event)" fill="clear" aria-label="Abrir filtros">
             <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -44,7 +44,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="vac-container animate-fade-in pb-12">
+      <main class="vac-container animate-fade-in pb-12">
         
         <!-- CONTROL MANDO COLECTIVO (NUEVO) -->
         <div class="vac-master-filter-bar mb-6 animate-fade-in">
@@ -66,8 +66,8 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </div>
 
         <!-- GRÁFICO DE ROI (Relocado) -->
-        <div class="vac-main-card animate-slide-up mb-8">
-          <div class="vac-card-header-flex">
+        <section class="vac-main-card animate-slide-up mb-8">
+          <header class="vac-card-header-flex">
             <div class="vac-card-title-group">
               <span>ESTADO DE CUENTAS</span>
               <strong>Ingresos vs Gastos</strong>
@@ -87,18 +87,18 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
                  <span>ROI Dinámico</span>
                </div>
             </div>
-          </div>
+          </header>
           <div class="p-4">
              <canvas baseChart class="chart-canvas-finance" [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
           </div>
-        </div>
+        </section>
 
         <!-- Listado de Movimientos Recientes -->
         <h2 class="vac-section-title">Movimientos Filtrados</h2>
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredRecords()">
-              <div class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
+            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredRecords(); trackBy: trackById">
+              <article class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
                 <div class="vac-card-header-flex">
                   <div class="vac-icon-circle" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
                     <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-outline' : 'arrow-down-outline'" [class.color-light]="r.tipo === 'Ingreso'" [class.color-warning]="r.tipo !== 'Ingreso'"></ion-icon>
@@ -116,14 +116,14 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
                 </div>
 
                 <div class="vac-card-footer mt-4 pt-2 border-t-light flex justify-end gap-2">
-                  <button class="vac-btn-icon bg-light" (click)="openEditModal(r)">
+                  <button class="vac-btn-icon bg-light" (click)="openEditModal(r)" aria-label="Editar">
                     <ion-icon name="create-outline"></ion-icon>
                   </button>
-                  <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(r)">
+                  <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(r)" aria-label="Eliminar">
                     <ion-icon name="trash-outline"></ion-icon>
                   </button>
                 </div>
-              </div>
+              </article>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -136,7 +136,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
            <p>No se encontraron registros para los filtros aplicados.</p>
         </div>
 
-      </div>
+      </main>
 
       <!-- POPOVER DE FILTROS (RUSTIC-LUXE) -->
       <ion-popover [isOpen]="isFilterPopoverOpen" [event]="filterEvent" (didDismiss)="isFilterPopoverOpen = false" class="vac-popover">
@@ -182,7 +182,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
       </ion-popover>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" color="primary">
+        <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Añadir movimiento">
           <ion-icon name="add-circle"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -194,7 +194,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
             <ion-toolbar color="primary">
               <ion-title>{{ editingItem ? 'Actualizar Registro' : 'Añadir Movimiento' }}</ion-title>
               <ion-buttons slot="end">
-                <ion-button (click)="closeModal()">
+                <ion-button (click)="closeModal()" aria-label="Cerrar modal">
                   <ion-icon name="close-outline"></ion-icon>
                 </ion-button>
               </ion-buttons>
@@ -267,7 +267,7 @@ export class FinanzasComponent {
   filterTipo = signal<string>('Todos');
   filterCategoria = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
   todasLasCategorias = [
     'Venta Leche', 'Venta Carne', 'Venta Genética', 'Ayudas Gubernamentales', 'Otros Ingresos',
@@ -339,6 +339,10 @@ export class FinanzasComponent {
     if (id) {
       this.router.navigate(['/animal-detail', id]);
     }
+  }
+
+  trackById(index: number, item: Finanzas | any): string {
+    return item.id || index.toString();
   }
 
   constructor() {
@@ -500,7 +504,7 @@ export class FinanzasComponent {
   }
 
   // --- LÓGICA DE FILTROS ---
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }

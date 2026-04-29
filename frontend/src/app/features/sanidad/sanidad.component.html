@@ -5,10 +5,10 @@
     </ion-buttons>
     <ion-title class="ion-text-center">Salud y Medicinas</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" fill="clear">
+      <ion-button (click)="exportarPDF()" fill="clear" aria-label="Exportar a PDF">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button (click)="presentFilter($event)" fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear" aria-label="Abrir filtros">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -23,7 +23,7 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <div class="vac-container animate-fade-in">
+  <main class="vac-container animate-fade-in">
 
     <!-- CONTROL MANDO COLECTIVO -->
     <div class="vac-master-filter-bar mb-6 animate-fade-in">
@@ -48,8 +48,8 @@
     </div>
 
     <!-- GRÁFICO DE DISTRIBUCIÓN -->
-    <div class="vac-main-card animate-slide-up mb-8" *ngIf="!isLoading()">
-      <div class="vac-card-header">
+    <section class="vac-main-card animate-slide-up mb-8" *ngIf="!isLoading()">
+      <header class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>DIAGNÓSTICO GRUPAL</span>
@@ -70,29 +70,28 @@
              </ion-segment>
           </div>
         </div>
-      </div>
+      </header>
       <div class="vac-card-content">
         <div class="vac-chart-container chart-250px">
           <canvas baseChart [data]="chartSanidad()" [options]="chartOptions" [type]="'bar'"></canvas>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- Buscador Premium -->
-    <div class="vac-searchbar-container">
-      <ion-searchbar
-        mode="ios"
-        animated="true"
-        placeholder="Buscar animal..."
-        (ionInput)="onSearch($event)">
-      </ion-searchbar>
-    </div>
+    <ion-searchbar
+      mode="ios"
+      animated="true"
+      placeholder="Buscar animal..."
+      (ionInput)="onSearch($event)"
+      class="vac-filter-bar vac-transparent-searchbar">
+    </ion-searchbar>
 
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
-          <div class="uniform-card">
+          <article class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
               <div class="vac-card-title-group vac-flex-1">
@@ -107,16 +106,15 @@
                 <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
 
-    <!-- LISTA ESTANDARIZADA -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredSanidad().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of filteredSanidad()">
-          <div class="uniform-card clickable-card" (click)="goToDetail(s.bovino_id)">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of filteredSanidad(); trackBy: trackById">
+          <article class="uniform-card clickable-card" (click)="goToDetail(s.bovino_id)">
             <div class="vac-card-header">
                <div class="vac-card-icon" [ngClass]="getBadgeColor(s.tipo)" slot="start">
                  <ion-icon [name]="getHealthIcon(s.tipo)" color="light"></ion-icon>
@@ -155,7 +153,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -169,10 +167,10 @@
       <p>No se encontraron registros sanitarios para esta búsqueda.</p>
     </div>
 
-  </div>
+  </main>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openAddModal()" color="primary">
+    <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Nueva intervención">
       <ion-icon name="add-circle"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -184,7 +182,7 @@
         <ion-toolbar color="primary">
           <ion-title>{{ editingItem ? 'Actualizar Ficha' : 'Nueva Intervención' }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeModal()">
+            <ion-button (click)="closeModal()" aria-label="Cerrar modal">
               <ion-icon name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>

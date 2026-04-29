@@ -39,10 +39,10 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ion-buttons>
         <ion-title class="ion-text-center">Potreros y Recintos</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" fill="clear">
+          <ion-button (click)="exportarPDF()" fill="clear" aria-label="Exportar PDF">
             <ion-icon name="document-text-outline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear">
+          <ion-button fill="clear" aria-label="Filtrar">
             <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -50,7 +50,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="vac-container animate-fade-in">
+      <main class="vac-container animate-fade-in">
         
         <div class="vac-text-stack mb-8">
           <h1 class="vac-page-title">Gestión de Potreros</h1>
@@ -59,8 +59,8 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let lote of lotes">
-              <div class="uniform-card">
+            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let lote of lotes; trackBy: trackById">
+              <article class="uniform-card">
                 <div class="vac-card-header-flex">
                   <div class="vac-card-title-group">
                     <h3 class="vac-card-title">{{ lote.nombre }}</h3>
@@ -86,14 +86,14 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                 </div>
 
                 <div class="vac-card-footer mt-6 pt-4 border-t-light flex justify-end gap-2">
-                   <button class="vac-btn-icon bg-light" (click)="openEditModal(lote)">
+                   <button class="vac-btn-icon bg-light" (click)="openEditModal(lote)" aria-label="Editar">
                       <ion-icon name="create-outline"></ion-icon>
                    </button>
-                   <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(lote.id)">
+                   <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(lote.id)" aria-label="Eliminar">
                       <ion-icon name="trash-outline"></ion-icon>
                    </button>
                 </div>
-              </div>
+              </article>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -109,10 +109,10 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           </ion-button>
         </div>
 
-      </div>
+      </main>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
-        <ion-fab-button (click)="openAddModal()" class="vac-fab">
+        <ion-fab-button (click)="openAddModal()" class="vac-fab" aria-label="Añadir lote">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -124,7 +124,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             <ion-toolbar>
               <ion-title>{{ editingItem ? 'Actualizar Recinto' : 'Nuevo Recinto' }}</ion-title>
               <ion-buttons slot="end">
-                <ion-button (click)="closeModal()" class="color-medium">
+                <ion-button (click)="closeModal()" class="color-medium" aria-label="Cerrar modal">
                   <ion-icon name="close"></ion-icon>
                 </ion-button>
               </ion-buttons>
@@ -198,6 +198,10 @@ export class LotesComponent implements OnInit {
   async loadData() {
     const { data } = await this.supa.getAll<Lote>('lotes');
     this.lotes = data || [];
+  }
+
+  trackById(index: number, item: any): string {
+    return item?.id || index.toString();
   }
 
   async exportarPDF() {

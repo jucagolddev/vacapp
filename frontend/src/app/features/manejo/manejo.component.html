@@ -5,10 +5,10 @@
     </ion-buttons>
     <ion-title class="ion-text-center">Inventario Ganadero</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" fill="clear">
+      <ion-button (click)="exportarPDF()" fill="clear" aria-label="Exportar PDF">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button (click)="presentFilter($event)" fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear" aria-label="Abrir filtros">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -23,7 +23,7 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <div class="vac-container animate-fade-in">
+  <main class="vac-container animate-fade-in">
     <!-- Search Bar -->
     <ion-searchbar
       mode="ios"
@@ -34,8 +34,8 @@
     </ion-searchbar>
 
     <!-- GRÁFICO DE PESO -->
-    <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
-      <div class="vac-card-header">
+    <section class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
+      <header class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>ANÁLISIS DE RENDIMIENTO</span>
@@ -46,20 +46,20 @@
             <span>Hato Saludable</span>
           </div>
         </div>
-      </div>
+      </header>
       <div class="vac-card-content">
         <div class="vac-chart-container">
            <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- SKELETON LOADER -->
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
-          <div class="uniform-card">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]; trackBy: trackById">
+          <article class="uniform-card">
             <ion-item lines="none" class="vac-card-header ion-margin-bottom">
               <div class="vac-avatar ion-margin-end" slot="start">
                 <ion-skeleton-text animated class="skeleton-avatar-lg"></ion-skeleton-text>
@@ -83,7 +83,7 @@
                 <ion-skeleton-text animated class="skeleton-btn-wide"></ion-skeleton-text>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -91,8 +91,8 @@
     <!-- ANIMAL LIST -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos()">
-          <div class="uniform-card clickable-card" (click)="goToDetail(b.id)">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos(); trackBy: trackById">
+          <article class="uniform-card clickable-card" [ngClass]="getStatusBorderClass(b)" (click)="goToDetail(b.id)">
             <ion-item lines="none" class="vac-card-header">
               <div class="ion-margin-end" slot="start">
                  <img *ngIf="b.foto_url" [src]="b.foto_url" class="avatar-list" [alt]="b.nombre">
@@ -138,7 +138,7 @@
                 </ion-button>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -155,10 +155,10 @@
       </ion-button>
     </div>
 
-  </div>
+  </main>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openAddModal()" color="primary">
+    <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Añadir ejemplar">
       <ion-icon name="add-circle"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -170,7 +170,7 @@
         <ion-toolbar color="primary">
           <ion-title>{{ editingItem ? 'Actualizar Ficha' : 'Nuevo Registro' }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeModal()">
+            <ion-button (click)="closeModal()" aria-label="Cerrar modal">
               <ion-icon name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>

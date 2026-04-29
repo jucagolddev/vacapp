@@ -1,6 +1,6 @@
 /* From main-layout.component.ts */
 
-    /* Estilos estructurales mínimos (el resto en _luxe.scss) */
+    /* Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .sidebar-bottom-badge {
       position: absolute;
       bottom: 30px;
@@ -30,7 +30,7 @@
 
 /* From dashboard.component.ts */
 
-    /* Dashboard: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Dashboard: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .welcome-header-main { display: flex; align-items: center; gap: 15px; }
     .vac-chart-mock { height: 200px; display: flex; align-items: flex-end; gap: 20px; padding: 20px 0; border-bottom: 2px solid var(--ion-color-light); }
     .vac-chart-row { flex: 1; display: flex; align-items: flex-end; height: 100%; }
@@ -46,7 +46,7 @@
 
 /* From ganado.component.ts */
 
-    /* Ganado: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Ganado: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .vac-animal-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .vac-animal-info { flex: 1; }
   
@@ -54,7 +54,7 @@
 
 /* From lotes.component.ts */
 
-    /* Lotes: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Lotes: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .vac-field-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .field-icon-box { 
       width: 48px; height: 48px; background: rgba(27, 67, 50, 0.05); 
@@ -68,7 +68,7 @@
 
 /* From recria.component.ts */
 
-    /* Recría: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Recría: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .vac-weight-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
     .animal-name-txt { font-size: 1.3rem; font-weight: 900; color: var(--ion-color-primary); margin: 5px 0 0; }
     .vac-weight-date { display: flex; align-items: center; gap: 5px; color: var(--ion-color-tertiary); font-weight: 700; font-size: 0.8rem; }
@@ -88,7 +88,7 @@
 
 /* From reproduccion.component.ts */
 
-    /* Reproducción: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Reproducción: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .vac-repro-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .vac-pulse-icon { font-size: 28px; color: var(--ion-color-danger); animation: vac-pulse 2s infinite; }
     @keyframes vac-pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }

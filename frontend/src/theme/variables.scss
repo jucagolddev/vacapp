@@ -1,152 +1,135 @@
 :root {
-  /** 100% Sincronizado con _variables.scss - Vacapp Neutral Design System **/
+  /** 100% Sincronizado - Vacapp Neutral Design System (MODO CLARO) **/
   
-  /* Verde Bosque Profundo ($primary-color) */
+  /* Paleta Vibrante Rustic-Luxe */
   --ion-color-primary: #1b4332;
   --ion-color-primary-rgb: 27, 67, 50;
   --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-shade: #183b2c;
-  --ion-color-primary-tint: #325647;
-
-  /* Marrón Tierra Oscuro ($secondary-color) */
+  
   --ion-color-secondary: #582f0e;
   --ion-color-secondary-rgb: 88, 47, 14;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-shade: #4d290c;
-  --ion-color-secondary-tint: #694426;
-
-  /* Arena/Canela Suave ($tertiary-color - Wheat) */
+  
   --ion-color-tertiary: #d4a373;
   --ion-color-tertiary-rgb: 212, 163, 115;
-  --ion-color-tertiary-contrast: #212529;
-  --ion-color-tertiary-shade: #ba8f65;
-  --ion-color-tertiary-tint: #d8ac81;
 
-  /* Éxito: Verde Natural Suave ($success-color) */
-  --ion-color-success: #40916c;
-  --ion-color-success-rgb: 64, 145, 108;
-  --ion-color-success-contrast: #ffffff;
+  /** Fondos Claros (Rustic-Luxe Light) **/
+  --ion-background-color: #f8f9fa;
+  --ion-background-color-rgb: 248, 249, 250;
 
-  /* Peligro: Rojo Ladrillo ($danger-color) */
-  --ion-color-danger: #bc4749;
-  --ion-color-danger-rgb: 188, 71, 73;
-  --ion-color-danger-contrast: #ffffff;
-
-  /* Advertencia: Naranja Cosecha Muteado ($warning-color) */
-  --ion-color-warning: #dda15e;
-  --ion-color-warning-rgb: 221, 161, 94;
-  --ion-color-warning-contrast: #212529;
-
-  /** Fondos Orgánicos Vacapp System **/
-  --ion-background-color: #fefae0; /* Beige/Cream ($light-color) */
-  --ion-background-color-rgb: 254, 250, 224;
-
-  --ion-text-color: #212529;
-  --ion-text-color-rgb: 33, 37, 41;
+  --ion-text-color: #1a1a1a;
+  --ion-text-color-rgb: 26, 26, 26;
 
   --ion-item-background: #ffffff;
-  --ion-item-background-rgb: 255, 255, 255;
   --ion-card-background: #ffffff;
-  --ion-card-background-rgb: 255, 255, 255;
-}
 
-/* Modo Oscuro Manual (Rustic-Dark v2) */
-body.dark-theme {
-  --ion-color-primary: #95D5B2;
-  --ion-color-primary-rgb: 149, 213, 178;
-  --ion-color-primary-contrast: #121212;
-  --ion-color-primary-shade: #83bc9d;
-  --ion-color-primary-tint: #a0d9ba;
+  /* Step Colors for Light Mode */
+  --ion-color-step-150: #262626;
+  --ion-color-step-850: #e6e6e6;
 
-  --ion-color-secondary: #BC8A5F;
-  --ion-color-secondary-rgb: 188, 138, 95;
-  --ion-color-secondary-contrast: #ffffff;
-
-  --ion-color-tertiary: #804E32;
-  --ion-color-tertiary-contrast: #ffffff;
-
-  --ion-background-color: #121212;
-  --ion-background-color-rgb: 18, 18, 18;
-
-  --ion-text-color: #e0e0e0;
-  --ion-text-color-rgb: 224, 224, 224;
-
-  --ion-item-background: #1e1e1e;
-  --ion-item-background-rgb: 30, 30, 30;
-  --ion-card-background: #1e1e1e;
-  --ion-card-background-rgb: 30, 30, 30;
-  
-  --ion-color-step-50: #1e1e1e;
-  --ion-color-step-100: #2a2a2a;
-  --ion-color-step-150: #363636;
-  --ion-color-step-200: #414141;
-
+  /* Overrides para MODO CLARO */
   ion-card {
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    --background: #ffffff;
+    --ion-card-background: #ffffff;
+    color: #1a1a1a !important;
+    border: 1px solid rgba(27, 67, 50, 0.1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  ion-label, h1, h2, h3, h4, h5, h6, p, span, strong {
+    color: #1a1a1a !important;
+  }
+
+  .text-muted, .color-muted {
+    color: #666666 !important;
   }
 }
 
+/** 
+ * MODO OSCURO (Rustic-Dark Forest Night)
+ * Encapsulado estrictamente en .ion-palette-dark
+ */
+html.ion-palette-dark {
+  /* Fondos profundos */
+  --ion-background-color: #050a07;
+  --ion-background-color-rgb: 5, 10, 7;
+  
+  --ion-item-background: #0a140f;
+  --ion-text-color: #fdfaf7;
+  --ion-text-color-rgb: 253, 250, 247;
+
+  /* Colores de marca en modo oscuro (más vibrantes) */
+  --ion-color-primary: #95D5B2;
+  --ion-color-primary-rgb: 149, 213, 178;
+  --ion-color-primary-contrast: #050a07;
+
+  /* Overrides para MODO OSCURO */
+  ion-card {
+    --background: #0a140f;
+    --ion-card-background: #0a140f;
+    color: #fdfaf7 !important;
+    border: 1px solid rgba(188, 138, 95, 0.3) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  ion-label, h1, h2, h3, h4, h5, h6, p, span, strong {
+    color: #fdfaf7 !important;
+  }
+
+  /* Ajuste de componentes en modo noche */
+  ion-item, ion-searchbar, ion-select, ion-toolbar {
+    --background: #0a140f;
+    --color: #fdfaf7;
+  }
+
+  ion-content {
+    --background: #050a07;
+  }
+
+  .text-muted, .color-muted {
+    color: #a0a6a3 !important;
+  }
+
+  .uniform-card, .vac-main-card, .vac-metric-card, .vac-base-card {
+    background: #0a140f !important;
+    border-color: rgba(188, 138, 95, 0.3) !important;
+  }
+}
+
+/* Configuraciones Globales de Estilo (Independientes del Tema) */
 body {
   --ion-font-family: 'Outfit', sans-serif;
   font-family: var(--ion-font-family);
-  background-color: var(--ion-background-color);
 }
 
-/* Base Component Standardization (Rustic-Luxe v2) */
 ion-card {
   --border-radius: 24px !important;
   border-radius: 24px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
   margin-inline: 16px;
   margin-block: 12px;
-  border: 1px solid rgba(188, 138, 95, 0.15); /* Subtle Tierra border */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
-    background: linear-gradient(135deg, var(--ion-card-background) 0%, var(--ion-color-step-50) 100%);
   }
 }
 
 ion-button {
   --border-radius: 12px;
-  --box-shadow: none;
   font-weight: 700;
   text-transform: none;
-  letter-spacing: 0;
 }
 
 ion-badge {
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --padding-top: 6px;
-  --padding-bottom: 6px;
-  border-radius: 12px; /* Standardized radius */
+  border-radius: 12px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  padding: 6px 12px;
 }
 
-/* Efectos Globales de Personalización (Vacapp Neutral) */
-.vac-card {
-  --border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(88, 47, 14, 0.1);
-  transition: all 0.3s ease;
-}
-
-.vac-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.text-forest { color: #2b5329; }
-.text-earth { color: #c28e5c; }
-
-/* Scrollbars rústicos sincronizados ($secondary-color) */
+/* Scrollbars dinámicos */
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f8f9fa; }
-::-webkit-scrollbar-thumb { background: #d4a373; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #ba8f65; }
-
+::-webkit-scrollbar-track { background: var(--ion-background-color); }
+::-webkit-scrollbar-thumb { 
+  background: var(--ion-color-tertiary); 
+  border-radius: 10px; 
+}

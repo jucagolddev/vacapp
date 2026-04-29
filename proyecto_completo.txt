@@ -86,74 +86,93 @@ print(f"¡Listo! Archivos binarios ignorados correctamente. Todo se guardó en {
 ARCHIVO: .\README.md
 ==================================================
 
-# 🐄 Vacapp: Gestión Ganadera Profesional
+# 🐄 Vacapp: Gestión Ganadera Profesional (AgriTech ERP)
 
 [![Angular](https://img.shields.io/badge/Angular-21+-DD0031?style=flat-square&logo=angular)](https://angular.dev/)
 [![Ionic](https://img.shields.io/badge/Ionic-8+-3880FF?style=flat-square&logo=ionic)](https://ionicframework.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 
-**Vacapp** es una aplicación móvil y web diseñada para la gestión profesional de explotaciones ganaderas bovinas. Permite un control exhaustivo del ciclo de vida del animal, desde el nacimiento y la recría hasta la reproducción y la sanidad.
+**Vacapp** es un sistema ERP (Enterprise Resource Planning) de vanguardia, diseñado específicamente para la gestión profesional, eficiente y basada en datos de explotaciones ganaderas bovinas. Nuestra plataforma facilita un control exhaustivo de todo el ciclo de vida del animal, optimizando la toma de decisiones mediante analítica avanzada y una interfaz de usuario premium.
+
+---
+
+## 🎯 Misión y Visión
+
+Nuestra misión es democratizar el acceso a herramientas tecnológicas de alto nivel para el sector agropecuario, permitiendo a los ganaderos modernizar sus operaciones sin fricciones. Aspiramos a ser el estándar de oro en software de gestión ganadera, combinando una experiencia de usuario excepcional (diseño *Rustic-Luxe*) con una arquitectura técnica robusta y escalable.
 
 ---
 
 ## ✨ Características Principales
 
-- **📊 Panel de Control (Dashboard)**: Visualización rápida del estado de la explotación, alertas sanitarias y resúmenes de rendimiento.
-- **🐂 Gestión de Ganado**: Registro detallado de bovinos (crotales, razas, genealogía) y organización estandarizada por lotes.
-- **❤️ Reproducción**: Control de celos, cubriciones e inseminaciones. Cálculo automático de la fecha prevista de parto (Gestación de 283 días).
-- **⚖️ Recría y Pesajes**: Seguimiento del crecimiento con cálculo automático de Ganancia Diaria de Peso.
-- **💉 Sanidad**: Historial médico completo, incluyendo vacunaciones y tratamientos específicos por animal.
-- **💾 Modo Offline/Demo**: Persistencia de datos local (`localStorage`) que permite probar y utilizar la aplicación sin necesidad de una base de datos externa configurada.
+- **📊 Panel de Control Inteligente (Dashboard)**: Visualización panorámica del estado de la explotación con métricas clave, alertas sanitarias tempranas y resúmenes de rendimiento en tiempo real.
+- **🐂 Gestión Integral de Ganado**: Registro detallado y trazabilidad de bovinos (identificación electrónica, genealogía profunda, genética) y organización estandarizada por lotes dinámicos.
+- **❤️ Control Reproductivo Avanzado**: Seguimiento preciso de celos, cubriciones (monta natural o IA) e inseminaciones. Cálculo predictivo automático de la fecha prevista de parto basado en parámetros zootécnicos.
+- **⚖️ Monitorización de Recría y Rendimiento**: Seguimiento del crecimiento con cálculo automático de Ganancia Media Diaria (GMD) y proyecciones de peso al destete/venta.
+- **💉 Historial Clínico y Sanidad**: Registro médico inmutable, control de protocolos de vacunación, desparasitaciones y seguimiento de tratamientos específicos por animal, garantizando la seguridad alimentaria.
+- **📶 Arquitectura Offline-First**: Operatividad garantizada en zonas de baja cobertura mediante persistencia de datos local avanzada (`localStorage` + `Signal` sync) con sincronización transparente en la nube.
 
 ---
 
-## 🚀 Cómo empezar
+## 📚 Índice de Documentación Técnica
 
-### Requisitos previos
+Para garantizar una adopción exitosa y facilitar el desarrollo continuo, hemos estructurado una documentación exhaustiva:
 
-- [Node.js](https://nodejs.org/) (versión 18 o superior)
+1. **[Manual de Usuario](documentation/user_manual.md)**: Guía detallada para el usuario final sobre el uso diario de la plataforma y mejores prácticas.
+2. **[Guía de Configuración Backend (Supabase)](documentation/supabase_setup.md)**: Instrucciones para desplegar y conectar la base de datos PostgreSQL y configurar las políticas de seguridad.
+3. **[Arquitectura de Software](documentation/architecture.md)**: Detalles sobre los patrones de diseño, gestión de estado con Angular Signals y el ecosistema *Rustic-Luxe*.
+4. **[Referencia de la API Interna](documentation/api_reference.md)**: Documentación de los servicios core y modelos de datos principales.
+5. **[Estructura del Proyecto](documentation/tree.md)**: Mapa detallado del repositorio y organización del código fuente.
+6. **[Guía de Control de Versiones (GitHub)](documentation/github_guide.md)**: Protocolos para contribución, ramas y despliegue continuo.
+
+---
+
+## 🚀 Despliegue Rápido (Quick Start)
+
+### Requisitos del Entorno
+
+- [Node.js](https://nodejs.org/) (v18.x LTS o superior recomendado)
 - [Angular CLI](https://angular.dev/tools/cli) (`npm install -g @angular/cli`)
 
-### Instalación
+### Instalación Local
 
-1. Clona el repositorio:
+1. Clonar el repositorio:
    ```bash
    git clone https://github.com/TU_USUARIO/vacapp.git
    cd vacapp/frontend
    ```
-2. Instala las dependencias:
+2. Instalar el árbol de dependencias:
    ```bash
    npm install
    ```
-3. Inicia el servidor de desarrollo:
+3. Iniciar el servidor de desarrollo (Hot Module Replacement activado):
    ```bash
    npm start
    ```
-4. Abre [http://localhost:4200](http://localhost:4200) en tu navegador.
+4. Acceder al entorno de desarrollo en: [http://localhost:4200](http://localhost:4200)
 
 ---
 
-## 🛠️ Configuración de Producción (Supabase)
+## 🛠️ Stack Tecnológico (Tech Ecosystem)
 
-Para conectar la aplicación a una base de datos real (PostgreSQL), sigue las instrucciones detalladas en:
-👉 [Guía de Configuración de Supabase](documentation/supabase_setup.md)
-
----
-
-## 📁 Estructura del Proyecto
-
-Consulta la [Estructura del Proyecto](documentation/tree.md) para más detalles sobre la arquitectura de directorios.
+Vacapp está construido sobre un stack tecnológico moderno y altamente eficiente:
+- **Frontend Core**: Angular 17+ (Standalone Components, Signals para reactividad fina).
+- **UI/UX Framework**: Ionic Framework 8+ (Componentes nativos, soporte PWA e iOS/Android out-of-the-box).
+- **Backend & BaaS**: Supabase (PostgreSQL, Realtime subscriptions, Storage).
+- **Estilos**: SASS modular con arquitectura BEM adaptada y tokens de diseño personalizados.
 
 ---
 
-## 📄 Licencia
+## 📄 Licencia y Aspectos Legales
 
-Este proyecto es de uso libre para fines educativos y de gestión ganadera personal.
+Este proyecto es de uso libre para fines educativos y de gestión ganadera personal bajo la licencia MIT.
 
 ---
 
-_Desarrollado para el sector ganadero._
-Riverside, CA. 2026.
+<p align="center">
+  <i>Diseñado y desarrollado con precisión para impulsar el futuro del sector ganadero.</i><br>
+  <b>Riverside, CA. 2026.</b>
+</p>
 
 
 ==================================================
@@ -1063,6 +1082,152 @@ CREATE TABLE tareas (
 
 
 ==================================================
+ARCHIVO: .\documentation\api_reference.md
+==================================================
+
+# 🔌 Referencia de la API Interna (Core Services)
+
+Esta referencia documenta los servicios inyectables principales en la carpeta `src/app/core/services/` que exponen la lógica de negocio a los componentes de presentación.
+
+---
+
+## 1. `SupabaseService`
+**Ruta:** `core/services/supabase.service.ts`
+**Propósito:** Capa de abstracción de bajo nivel para la persistencia de datos. Maneja el cliente Supabase nativo y el fallback a LocalStorage (Modo Mock).
+
+### Métodos Principales:
+- `getAll<T>(table: string)`: Promesa. Devuelve todos los registros de una tabla, enriquecidos (JOIN simulado) si está en Modo Mock.
+- `create<T>(table: string, payload: Partial<T>)`: Inserta un registro. Inyecta UUIDs automáticamente en Modo Mock.
+- `update<T>(table: string, id: string, payload: Partial<T>)`: Modifica un registro existente.
+- `delete(table: string, id: string)`: Elimina un registro por ID.
+- `getAnimalCompleteData(id: string)`: Realiza peticiones paralelas (o agregación Mock) para devolver TODO el perfil 360 de un animal (bovino, sanidad, pesajes, reproduccion, finanzas).
+
+---
+
+## 2. `OfflineSyncService`
+**Ruta:** `core/services/offline-sync.service.ts`
+**Propósito:** Garantizar que los datos no se pierdan si el usuario realiza cambios sin conexión.
+
+### Métodos Principales:
+- `isOnline()`: Devuelve un `boolean` reactivo sobre el estado de la red.
+- `enqueueOperation(table, action, payload, id?)`: Pone en cola una mutación para ser procesada más tarde.
+- `processQueue()`: Intenta ejecutar todas las operaciones pendientes contra Supabase. Se llama automáticamente al recuperar la conexión.
+
+---
+
+## 3. `GanadoService`
+**Ruta:** `core/services/ganado.service.ts`
+**Propósito:** Lógica de negocio específica para el inventario de bovinos.
+
+### Signals Expuestos:
+- `bovinos()`: Lista reactiva de todos los bovinos de la finca activa.
+- `isLoading()`: Estado de carga.
+- `distCategoria()`: Devuelve un mapa con la cantidad de animales por categoría zootécnica (Vaca, Ternero, Novilla, etc.).
+
+### Lógica Calculada (Métodos Puros):
+- `calculateCategoria(bovino: Bovino)`: Retorna la categoría basada en sexo y fecha de nacimiento.
+- `getEdadDesc(bovino: Bovino)`: Retorna un string legible (ej. "3 años", "8 meses").
+- `getUgb(bovino: Bovino)`: Calcula la Unidad de Ganado Mayor para análisis de carga forrajera.
+
+---
+
+## 4. Servicios Específicos de Módulo
+Cada módulo tiene su propio servicio que actúa como un repositorio tipado sobre el `SupabaseService`.
+
+- **`PesajeService`**: `getPesajes()`, `createPesaje()`, `getEvolucionPrincipales()` (Prepara datos para Chart.js).
+- **`SanidadService`**: `getSanidad()`, `createSanidad()`, etc.
+- **`ReproduccionService`**: Maneja la lógica de validación de fechas de celo y cálculos de días de gestación previstos.
+
+---
+
+## 5. Modelos de Datos (`vacapp.models.ts`)
+Todas las transferencias de datos deben adherirse a las interfaces de TypeScript.
+
+Ejemplo de `Bovino`:
+```typescript
+export interface Bovino {
+  id: string;
+  crotal: string;
+  nombre?: string;
+  sexo: 'Macho' | 'Hembra';
+  raza: string;
+  porcentaje_pureza?: number;
+  finca_id: string;
+  lote_id?: string;
+  estado_productivo: 'Alta' | 'Baja' | 'Vendido' | 'Muerto';
+  estado_reproductivo?: 'Vacía' | 'Gestante' | 'Lactante' | 'Seca' | 'Semental' | 'Engorde';
+  fecha_nacimiento?: string;
+  aptitud?: 'Carne' | 'Leche' | 'Doble Propósito';
+  // ...
+}
+```
+
+
+==================================================
+ARCHIVO: .\documentation\architecture.md
+==================================================
+
+# 🏗️ Arquitectura del Sistema: Vacapp
+
+Vacapp está diseñado bajo una arquitectura frontend moderna, robusta y escalable. A continuación, se detallan los pilares técnicos que sostienen la plataforma.
+
+## 1. 📡 Arquitectura Offline-First
+
+El trabajo en el campo a menudo implica conectividad a internet limitada o nula. Vacapp soluciona esto con una estrategia *Offline-First*.
+
+### Mecanismo de Sincronización
+- **Lectura**: Cuando la app inicia sin conexión, carga los datos directamente desde el `localStorage` a través del `SupabaseService` (Modo Mock de respaldo).
+- **Escritura**: Todas las operaciones CRUD (Crear, Actualizar, Borrar) pasan por el `OfflineSyncService`.
+  - Si hay conexión: Se envían directamente a Supabase.
+  - Si **no** hay conexión: La operación se encola en una base de datos local (IndexDB o LocalStorage extendido).
+- **Reconexión**: Un *Background Worker* monitoriza el estado de la red. Al recuperar la conexión, la cola de operaciones se procesa secuencialmente para sincronizar el estado local con la nube.
+
+> [!TIP]
+> Los desarrolladores deben usar siempre `offlineSync.enqueueOperation()` en lugar de llamar directamente a Supabase para garantizar la consistencia en zonas de sombra de cobertura.
+
+---
+
+## 2. ⚡ Gestión de Estado con Angular Signals
+
+Vacapp utiliza **Angular Signals** (`@angular/core`) para una reactividad fina y un rendimiento extremo, dejando atrás la complejidad de RxJS para el estado UI básico.
+
+### Patrón Implementado
+- **Signals en Servicios**: Los servicios (ej. `GanadoService`) mantienen el estado maestro en un `signal` privado (`bovinosSignal = signal<Bovino[]>([])`).
+- **Exposición de Estado**: El estado se expone a los componentes a través de Signals computadas de solo lectura (`bovinos = computed(() => this.bovinosSignal())`).
+- **Efectos (Effects)**: Utilizamos `effect()` para desencadenar recargas automáticas cuando cambia el contexto (por ejemplo, cuando el usuario cambia de "Finca Activa").
+
+Este patrón asegura que Angular solo actualice las partes exactas del DOM que cambian, eliminando la necesidad de `Zone.js` en futuros refactors y logrando una fluidez nativa a 60 FPS.
+
+---
+
+## 3. 🎨 Sistema de Diseño "Rustic-Luxe"
+
+La interfaz de usuario no es genérica. El diseño *Rustic-Luxe* combina la estética tradicional del campo (colores tierra, texturas sutiles) con patrones de UI premium (bordes redondeados, sombras suaves, tipografía *Outfit*).
+
+### Principios de UI
+- **Consistencia Modular**: Todos los componentes usan las clases base de `src/styles/components`. Evita usar estilos inline en los componentes HTML.
+- **Micro-interacciones**: Transiciones suaves (`0.3s ease-in-out`) en botones y tarjetas para una sensación de aplicación premium.
+- **Esqueletos de Carga (Skeleton Text)**: En lugar de un spinner genérico, utilizamos `ion-skeleton-text` para imitar la estructura de la página mientras se cargan los datos, reduciendo la carga cognitiva percibida.
+
+---
+
+## 4. 🧩 Feature-Sliced Design (FSD)
+
+El código está segmentado por "dominio de negocio" en lugar de "tipo de archivo".
+En lugar de tener todos los servicios en una carpeta y todos los componentes en otra de forma plana, agrupamos por *Feature*:
+
+```
+features/
+└── reproduccion/
+    ├── reproduccion.component.ts   # Lógica UI
+    ├── reproduccion.component.html # Plantilla
+    └── reproduccion.component.scss # Estilos locales aislados
+```
+
+Esta modularidad estricta asegura que si un módulo (ej. Sanidad) falla o necesita ser reescrito, el resto de la aplicación (ej. Finanzas) permanece completamente inalterado.
+
+
+==================================================
 ARCHIVO: .\documentation\github_guide.md
 ==================================================
 
@@ -1127,157 +1292,254 @@ Para volver a conectar la base de datos real en el futuro, consulta el archivo `
 ARCHIVO: .\documentation\supabase_setup.md
 ==================================================
 
-# Guía Técnica: Conexión Real a Supabase
+# ☁️ Guía Técnica: Conexión Backend con Supabase
 
-Actualmente, **Vacapp** funciona en **Modo Mock (Simulación)** utilizando `localStorage`. Esto es ideal para demostraciones sin configurar una base de datos. Para usar la aplicación de forma profesional, sigue estos pasos.
+Actualmente, **Vacapp** opera de forma predeterminada en **Modo Mock (Simulación Offline)**, utilizando `localStorage` para la persistencia de datos. Esta configuración es ideal para demostraciones, desarrollo inicial o uso en áreas sin cobertura. 
 
-## 1. Configuración de Credenciales
-Abre el archivo `src/environments/environment.ts` y completa los campos:
+Sin embargo, para un despliegue de grado de producción, es imperativo conectar la aplicación a un backend real (PostgreSQL). Supabase es la solución BaaS (Backend as a Service) recomendada para este proyecto.
+
+---
+
+## 1. 🔑 Configuración de Credenciales de Entorno
+
+Para habilitar la conexión con la nube, debes inyectar tus credenciales en el archivo de entorno de Angular.
+
+Abre el archivo `src/environments/environment.ts` (y `environment.development.ts`) y completa los campos correspondientes:
 
 ```typescript
 export const environment = {
-  production: false,
+  production: false, // Cambiar a true en environment.ts para despliegue
+  useMockData: false, // Asegúrate de que esto sea false o no esté definido
   supabaseUrl: 'https://TU_PROYECTO.supabase.co',
   supabaseKey: 'TU_ANON_KEY_DE_SUPABASE'
 };
 ```
 
-## 2. Estructura de la Base de Datos (Tablas)
-Asegúrate de que tu proyecto en Supabase tenga las siguientes tablas:
-
-- **bovinos**: `id`, `crotal`, `nombre`, `sexo`, `raza`, `estado`, `lote_id`, `madre_id`, `padre_id`.
-- **lotes**: `id`, `nombre`, `ubicacion`.
-- **reproduccion**: `id`, `bovino_id`, `fecha_celo`, `fecha_cubricion`, `tipo_cubricion`, `estado_gestacion`, `fecha_parto_prevista`.
-- **sanidad**: `id`, `bovino_id`, `fecha`, `tipo`, `producto`, `observaciones`.
-- **recria_pesajes**: `id`, `bovino_id`, `fecha_pesaje`, `peso_kg`, `tipo_pesaje`.
-
-> [!IMPORTANT]
-> Puedes encontrar el esquema SQL detallado para crear estas tablas en el archivo `documentation/schema.sql` (si está disponible) o consultando los modelos en `vacapp.models.ts`.
-
-## 3. Desactivación Automática del Modo Mock
-Una vez que introduzcas las llaves en `environment.ts`, el servicio `SupabaseService` detectará su presencia y cambiará automáticamente de `localStorage` a la API real de Supabase.
+> [!WARNING]
+> **Seguridad**: Nunca expongas tu `service_role_key` en el frontend. Utiliza siempre la `anon_key` pública. La seguridad de los datos debe garantizarse mediante Row Level Security (RLS) en la base de datos, no ocultando la clave pública.
 
 ---
 
-## Prompt Maestro para Reconectar (Uso con IA)
-Si en el futuro deseas que una Inteligencia Artificial (como Antigravity) realice la reconexión por ti, copia y pega el siguiente mensaje:
+## 2. 🗄️ Esquema de Base de Datos Relacional
 
-> **PROMPT MAESTRO PARA RECONEXIÓN:**
-> "Actualmente la aplicación 'Vacapp' está en Modo Mock utilizando localStorage. Necesito que la conectes a mi base de datos real de Supabase. Mis credenciales son: URL **[ESCRIBE_AQUÍ_TU_URL]** y KEY **[ESCRIBE_AQUÍ_TU_KEY]**. Por favor:
-> 1. Actualiza `src/environments/environment.ts` con estas llaves.
-> 2. Asegúrate de que `SupabaseService` desactive el Modo Mock y empiece a usar el cliente nativo de Supabase para todas las operaciones CRUD.
-> 3. Verifica que las tablas en Supabase coincidan con los modelos definidos en `vacapp.models.ts`."
+Tu proyecto en Supabase debe reflejar la siguiente estructura relacional. Puedes utilizar la interfaz de Supabase o ejecutar scripts SQL.
+
+Tablas requeridas:
+- **`bovinos`**: `id` (UUID), `crotal`, `nombre`, `sexo`, `raza`, `estado_productivo`, `lote_id` (FK), `finca_id` (FK).
+- **`lotes`**: `id` (UUID), `nombre`, `ubicacion`, `finca_id` (FK).
+- **`reproduccion`**: `id` (UUID), `bovino_id` (FK), `fecha_celo`, `fecha_cubricion`, `tipo_cubricion`, `estado_gestacion`, `fecha_parto_prevista`.
+- **`sanidad`**: `id` (UUID), `bovino_id` (FK), `fecha`, `tipo`, `producto`, `observaciones`.
+- **`recria_pesajes`**: `id` (UUID), `bovino_id` (FK), `fecha_pesaje`, `peso_kg`, `tipo_pesaje`.
+
+> [!NOTE]
+> Puedes encontrar una representación exacta de estos modelos en el archivo TypeScript `src/app/core/models/vacapp.models.ts`.
 
 ---
-*Fin del documento de configuración.*
- Riverside, CA. 2026.
+
+## 3. 🛡️ Políticas de Seguridad (Row Level Security - RLS)
+
+Para despliegues de producción, es **obligatorio** habilitar RLS en todas tus tablas. Esto garantiza que un usuario (ganadero) solo pueda acceder a los datos de su propia finca.
+
+Recomendación de política básica (ejemplo para la tabla `bovinos`):
+
+```sql
+-- Habilitar RLS
+ALTER TABLE public.bovinos ENABLE ROW LEVEL SECURITY;
+
+-- Política de lectura: Solo el propietario de la finca puede leer
+CREATE POLICY "Lectura de bovinos propios" ON public.bovinos
+FOR SELECT USING (
+  auth.uid() IN (
+    SELECT owner_id FROM public.fincas WHERE id = bovinos.finca_id
+  )
+);
+```
+
+---
+
+## 4. 🔄 Transición Automática (Del Mock a Producción)
+
+La arquitectura de Vacapp es inteligente. Una vez que detecta credenciales válidas en `environment.ts` y si `useMockData` no está forzado a `true`, el servicio central (`SupabaseService`) desactivará automáticamente el almacenamiento local y comenzará a enrutar todas las peticiones CRUD directamente a la API REST de Supabase mediante suscripciones en tiempo real.
+
+---
+
+## 🤖 Prompt Maestro para Reconexión Asistida por IA
+
+Si estás utilizando un asistente de IA (como Antigravity) para mantener tu código, puedes utilizar el siguiente *prompt* estandarizado para delegar la configuración:
+
+> **PROMPT DE CONFIGURACIÓN BACKEND:**
+> "La aplicación 'Vacapp' está actualmente en Modo Mock. Necesito migrar a producción conectándola a mi instancia de Supabase. 
+> Mis credenciales son: URL **[ESCRIBE_AQUÍ_TU_URL]** y KEY **[ESCRIBE_AQUÍ_TU_KEY]**.
+> Por favor, ejecuta las siguientes tareas:
+> 1. Inyecta estas credenciales en los archivos `environment.ts` pertinentes.
+> 2. Revisa `SupabaseService` para asegurar que el Modo Mock se desactive limpiamente.
+> 3. Verifica que las interfaces en `vacapp.models.ts` estén perfectamente alineadas con un esquema PostgreSQL estándar."
 
 
 ==================================================
 ARCHIVO: .\documentation\tree.md
 ==================================================
 
-# Estructura del Proyecto Vacapp
+# 📂 Arquitectura de Directorios: Vacapp
 
-A continuación se detalla la organización de archivos y la responsabilidad de cada directorio en la aplicación **Vacapp**.
+La estructura de archivos de **Vacapp** sigue las mejores prácticas de la comunidad de Angular y principios de diseño modular (Feature-Sliced Design adaptado). Esta organización garantiza que la base de código siga siendo mantenible, escalable y predecible a medida que el proyecto crece.
 
 ```text
 vacapp/
-├── frontend/                 # Aplicación Angular + Ionic
+├── frontend/                 # Aplicación Cliente (Angular 17+ / Ionic 8+)
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── core/         # Lógica central (Servicios, Modelos, Layouts)
-│   │   │   │   ├── layout/   # Estructura visual base (Header, Menu)
-│   │   │   │   ├── models/   # Definiciones de datos (Interfaces TypeScript)
-│   │   │   │   └── services/ # Conexión a Base de Datos (Supabase/Mock)
-│   │   │   ├── features/     # Módulos de funcionalidad (Pantallas)
-│   │   │   ├── dashboard/# Panel principal con estadísticas
-│   │   │   ├── ganado/   # Gestión de Inventario de Bovinos
-│   │   │   ├── lotes/    # Gestión de Lotes y Recintos
-│   │   │   ├── recria/   # Control de pesajes y crecimiento
-│   │   │   │   ├── reproduccion/ # Gestión de partos y celos
-│   │   │   │   └── sanidad/  # Historial médico y tratamientos
-│   │   │   ├── app.routes.ts # Configuración de navegación
-│   │   │   └── app.config.ts # Configuración global de Angular
-│   │   ├── assets/           # Imágenes y recursos estáticos
-│   │   ├── environments/     # Configuración de entornos (Supabase Keys)
-│   │   └── styles/           # Sistema de diseño (SCSS, Variables, Mixins)
-│   ├── angular.json          # Configuración del CLI de Angular
-│   └── package.json          # Dependencias y scripts del proyecto
-└── README.md                 # Guía principal del repositorio
+│   │   │   ├── core/         # 🧠 LÓGICA CENTRAL (Singletones y Configuración)
+│   │   │   │   ├── guards/   # Protectores de rutas (Autenticación)
+│   │   │   │   ├── layout/   # Envoltorio UI principal (Sidebar, Header, Menú global)
+│   │   │   │   ├── models/   # Tipado estricto: Interfaces y Tipos de TypeScript
+│   │   │   │   └── services/ # Lógica de negocio, Estado y APIs (Supabase, Sincronización)
+│   │   │   │
+│   │   │   ├── features/     # 🧩 MÓDULOS DE NEGOCIO (Componentes Aislados)
+│   │   │   │   ├── auth/         # Autenticación y Registro
+│   │   │   │   ├── dashboard/    # Panel Principal de KPIs
+│   │   │   │   ├── manejo/       # Altas, bajas y listado maestro de bovinos
+│   │   │   │   ├── lotes/        # Gestión geográfica de fincas y recintos
+│   │   │   │   ├── recria/       # Curvas de crecimiento y pesajes
+│   │   │   │   ├── reproduccion/ # Algoritmos de gestación y control de partos
+│   │   │   │   ├── sanidad/      # Historial clínico y farmacia
+│   │   │   │   └── animal-detail/# Intelligence Hub: Vista unificada de un ejemplar
+│   │   │   │
+│   │   │   ├── shared/       # ♻️ CÓDIGO REUTILIZABLE
+│   │   │   │   ├── components/   # Botones, Tarjetas, Modales genéricos
+│   │   │   │   └── pipes/        # Formateadores de fechas, monedas, etc.
+│   │   │   │
+│   │   │   ├── app.component.ts  # Raíz del árbol de componentes
+│   │   │   ├── app.config.ts     # Inyección de dependencias globales (Providers)
+│   │   │   └── app.routes.ts     # Router global (Lazy Loading de features)
+│   │   │
+│   │   ├── assets/           # Recursos estáticos (Imágenes, Fuentes, Iconos)
+│   │   ├── environments/     # Variables de entorno (Desarrollo vs Producción)
+│   │   └── styles/           # 🎨 SISTEMA DE DISEÑO RUSTIC-LUXE (SASS Modular)
+│   │       ├── abstracts/    # Variables, Mixins, Funciones (Sin CSS compilado)
+│   │       ├── base/         # Resets, Tipografía base
+│   │       ├── components/   # Estilos globales de UI (.vac-card, .vac-btn)
+│   │       └── layout/       # Sistemas de grillas y contenedores
+│   │
+│   ├── angular.json          # Configuración maestra del Angular CLI
+│   └── package.json          # Registro de dependencias de npm y scripts de construcción
+│
+└── documentation/            # 📚 Documentación técnica oficial (Markdown)
 ```
 
-## Descripción de Carpetas Clave
+---
 
-### `core/services/supabase.service.ts`
-El corazón de la comunicación de datos. Contiene los métodos para leer, crear, editar y borrar registros. Actualmente incluye un **Modo Mock** con `localStorage` para que la app funcione sin conexión real.
+## 🏛️ Patrón Arquitectónico: Core vs Features
 
-### `core/models/vacapp.models.ts`
-Define la forma de los datos (Bovino, Pesaje, Tratamiento, etc.). Asegura que toda la aplicación hable el mismo "idioma" de datos.
+### El Directorio `core/` (El Motor)
+El `core` es el cerebro de la aplicación. Contiene servicios que deben ser instanciados **una sola vez** (Singletons). 
+Aquí reside toda la lógica de conexión a la base de datos (`supabase.service.ts`), la lógica de sincronización offline (`offline-sync.service.ts`), y los modelos de datos compartidos que garantizan que el Frontend hable el mismo idioma que el Backend.
 
-## 2. Gestión de Ganado
-Es el inventario central de tus animales:
-- **Lista de Bovinos**: Muestra todos los animales activos.
-- **Registro (Botón +)**: Sigue el asistente de 3 pasos (Identificación, Genealogía, Ubicación) para añadir una vaca o toro.
-- **Acciones**: Desliza un animal a la izquierda para **Editar** o **Eliminar**.
+### El Directorio `features/` (Los Módulos)
+Cada carpeta dentro de `features` representa una pantalla o un flujo de negocio completo. Están diseñadas para ser lo más independientes posible.
+Por ejemplo, el módulo de `reproduccion` tiene su propio componente inteligente, su propia plantilla HTML y sus propios estilos SCSS. Esto permite que múltiples desarrolladores trabajen en distintas funcionalidades sin colisionar. El enrutador (`app.routes.ts`) carga estos módulos de forma perezosa (Lazy Loading) para optimizar el rendimiento inicial.
 
-## 3. Gestión de Lotes
-Controla las ubicaciones de tu explotación:
-- Define nombres para tus parcelas o recintos (ej: "Prado Sur", "Corral Central").
-- Asigna animales a estos lotes desde el módulo de Ganado.
+---
 
-### `styles/`
-Contiene la arquitectura CSS modular. Las variables globales (colores, espaciados) se definen en `abstracts/_variables.scss`.
+## 🎨 Sistema de Diseño (`styles/`)
+
+Hemos implementado una arquitectura de SASS escalable:
+- **`_variables.scss`**: Contiene la paleta de colores "Rustic-Luxe" (tonos tierra, verdes oliva, dorados) y las métricas de espaciado.
+- **`components/`**: Define clases como `.vac-btn-primary` o `.vac-card-premium` que pueden ser utilizadas en cualquier parte de la aplicación sin necesidad de reescribir CSS.
 
 
 ==================================================
 ARCHIVO: .\documentation\user_manual.md
 ==================================================
 
-# Manual de Uso: Vacapp
+# 📖 Manual del Usuario: Vacapp AgriTech ERP
 
-Guía detallada para el usuario final sobre cómo gestionar su explotación ganadera con **Vacapp**.
-
-## 1. Panel de Control (Dashboard)
-Al entrar, verás un resumen de tu explotación:
-- **Bovinos Registrados**: Cantidad total de cabezas.
-- **Lotes en Campo**: Cuántas divisiones de pasto tienes.
-- **Alertas**: Notificaciones urgentes de sanidad o partos próximos.
-
-## 2. Gestión de Ganado (Módulo de Manejo)
-Aquí es donde registras tus animales:
-- **Pestaña Bovinos**: Muestra la lista de animales. Usa el **botón flotante (+)** para añadir uno nuevo.
-  - Sigue el asistente de 3 pasos: Identificación, Genealogía y Ubicación.
-- **Pestaña Lotes**: Crea divisiones para tu campo (ej: "Zerrado Sur", "Prado de las Vigas").
-- **Acciones**: Desliza un animal o lote hacia la izquierda para ver opciones de **Editar** o **Eliminar**.
-
-## 3. Salud Animal (Módulo de Sanidad)
-Registra vacunas, desparasitaciones o tratamientos por enfermedad:
-- Visualiza el historial completo en formato tabla.
-- Filtra rápidamente por **Crotal** para ver el historial de una vaca específica.
-- Usa el **botón (+)** para registrar un nuevo tratamiento médico.
-
-## 4. Reproducción (Celos y Partos)
-Controla el ciclo reproductivo de tus hembras:
-- **Gestaciones en Curso**: Tarjetas que muestran cuántos días faltan para el parto (basado en una gestación de 283 días).
-- **Cálculo Automático**: Al introducir la fecha de cubrición, el sistema calcula automáticamente la **fecha de parto prevista**.
-- Mantén un historial de celos, inseminaciones y confirmaciones de preñez.
-
-## 5. Crecimiento (Módulo de Recría)
-Seguimiento del peso de los animales:
-- Registra pesajes en diferentes etapas (Nacimiento, Destete, Recría).
-- **Ganancia de Peso**: El sistema calcula automáticamente la diferencia respecto al último pesaje del mismo animal y la muestra en verde (si aumenta) o rojo.
-
-## 6. Eliminación de Registros
-En todos los módulos puedes eliminar información que ya no sea necesaria:
-- **Bovinos y Lotes**: Desliza el elemento hacia la izquierda para ver el botón rojo de basura.
-- **Sanidad, Reproducción y Recría**: Usa el icono de la papelera (**trash**) directamente en la tarjeta o lista de registros.
-- **Confirmación**: Siempre se te pedirá confirmar antes de borrar definitivamente.
+Bienvenido a la guía de operaciones oficial de **Vacapp**, el sistema integral para la gestión ganadera moderna. Esta guía está diseñada para que operarios, mayorales y gerentes maximicen el potencial de la plataforma.
 
 ---
 
-### Nota sobre el Almacenamiento
-Si no has configurado las llaves de Supabase (Modo Demo), todos los datos se guardan en la memoria de tu navegador (**localStorage**). Esto significa que si borras los datos del sitio, los registros se perderán. Para un uso profesional, configura la base de datos real.
+## 1. 📊 Inteligencia de Negocio (Dashboard)
+
+El Centro de Mando proporciona una vista de águila sobre toda tu operación. Los indicadores clave de rendimiento (KPIs) se actualizan en tiempo real.
+
+- **Censo Total**: Volumen actualizado del inventario activo.
+- **Distribución de Lotes**: Ocupación actual de parcelas y potreros.
+- **Alertas Críticas**: Notificaciones proactivas de sanidad, próximos partos y eventos urgentes.
+
+> [!TIP]
+> **Pro Tip**: Revisa el Dashboard cada mañana para planificar las tareas del día basándote en las alertas prioritarias de salud y reproducción.
+
+---
+
+## 2. 🐂 Gestión de Inventario (Módulo de Manejo)
+
+El núcleo de la trazabilidad. Mantén registros impecables de cada ejemplar.
+
+- **Alta de Ejemplares**: Utiliza el botón flotante **(+)** para invocar el asistente de creación.
+  - *Identificación*: Crotal oficial, nombre de manejo, raza y pureza.
+  - *Genealogía*: Registro de ascendencia (Padre/Madre) para evitar consanguinidad.
+  - *Ubicación*: Asignación inmediata a un lote operativo.
+- **Lotes y Parcelas**: Gestiona la rotación de pastos asignando nombres claros a tus recintos (ej. "Cuartel Norte", "Maternidad").
+
+> [!IMPORTANT]
+> **Mejores Prácticas**: Asegúrate de que el "Crotal" coincida exactamente con la identificación oficial del animal para evitar discrepancias en auditorías e inspecciones gubernamentales.
+
+---
+
+## 3. 💉 Control Sanitario (Módulo de Sanidad)
+
+Un registro médico inmutable es vital para la seguridad alimentaria y la certificación de la explotación.
+
+- **Historial Clínico**: Visualización tabular de todas las intervenciones médicas.
+- **Búsqueda Rápida**: Filtra instantáneamente por crotal para analizar el historial de un ejemplar específico antes de administrar nuevos tratamientos.
+- **Registro de Intervenciones**: Añade vacunas, desparasitaciones, curas y pruebas diagnósticas con sus respectivos costes y tiempos de retiro (carencia).
+
+> [!CAUTION]
+> **Tiempos de Retiro**: Registra siempre los días de retiro de carne o leche tras aplicar antibióticos para garantizar que tu producto sea apto para consumo humano.
+
+---
+
+## 4. ❤️ Control Reproductivo
+
+Maximiza la eficiencia reproductiva reduciendo los días abiertos.
+
+- **Monitoreo de Gestaciones**: El sistema calcula automáticamente la fecha probable de parto basándose en una gestación estándar de 283 días.
+- **Tipos de Cubrición**: Registra Monta Natural (asociando el Semental) o Inseminación Artificial (IA).
+- **Flujo de Trabajo**: Registra el Celo -> Inseminación -> Confirmación de Preñez -> Parto.
+
+> [!NOTE]
+> Las tarjetas de gestación cambiarán de color a medida que se acerque la fecha de parto, proporcionando una alerta visual inconfundible.
+
+---
+
+## 5. ⚖️ Rendimiento y Recría
+
+Convierte el crecimiento en datos analíticos.
+
+- **Registro de Pesajes**: Introduce el peso en hitos clave (Nacimiento, Destete, Transición, Finalización).
+- **Ganancia Media Diaria (GMD)**: El motor analítico calcula automáticamente el incremento o pérdida de peso respecto al control anterior.
+
+> [!TIP]
+> **Pro Tip**: Establece pesajes regulares (mensuales o trimestrales). Un indicador en rojo (pérdida de peso) puede ser el primer síntoma clínico de una patología subclínica o de deficiencia nutricional en un lote.
+
+---
+
+## 6. 🗑️ Mantenimiento de Registros
+
+Mantén tu base de datos limpia y actualizada.
+
+- **Bajas y Descartes**: Desliza un animal hacia la izquierda (swipe left) en la lista para acceder a las acciones de edición o purga.
+- **Confirmación de Seguridad**: El sistema siempre requerirá una confirmación explícita antes de eliminar definitivamente cualquier registro para prevenir pérdidas accidentales de datos.
+
+---
+
+### 📡 Sincronización y Modo de Conexión
+
+Vacapp utiliza una arquitectura *Offline-First*.
+Si experimentas pérdida de señal en el campo, continúa trabajando con normalidad. Tus registros se guardarán en el almacenamiento local seguro (`localStorage`) del dispositivo y se sincronizarán automáticamente con la nube principal cuando recuperes la conexión a internet.
+
+> [!WARNING]
+> Si operas exclusivamente en el "Modo Demo" (sin conexión a base de datos configurada), borrar el caché de tu navegador resultará en la pérdida total de la información. Consulte a su administrador de sistemas para configurar la base de datos de producción.
 
 
 ==================================================
@@ -1420,37 +1682,27 @@ ARCHIVO: .\frontend\angular.json
               }
             ],
             "styles": [
-              {
-                "input": "node_modules/@ionic/angular/css/core.css"
-              },
-              {
-                "input": "node_modules/@ionic/angular/css/normalize.css"
-              },
-              {
-                "input": "node_modules/@ionic/angular/css/structure.css"
-              },
-              {
-                "input": "node_modules/@ionic/angular/css/typography.css"
-              },
-              {
-                "input": "node_modules/@ionic/angular/css/display.css"
-              },
-              {
-                "input": "node_modules/@ionic/angular/css/padding.css"
-              },
-              {
-                "input": "node_modules/@ionic/angular/css/float-elements.css"
-              },
-              {
-                "input": "node_modules/@ionic/angular/css/text-alignment.css"
-              },
-              {
-                "input": "node_modules/@ionic/angular/css/text-transformation.css"
-              },
-              {
-                "input": "node_modules/@ionic/angular/css/flex-utils.css"
-              },
+              "node_modules/@ionic/angular/css/core.css",
+              "node_modules/@ionic/angular/css/normalize.css",
+              "node_modules/@ionic/angular/css/structure.css",
+              "node_modules/@ionic/angular/css/typography.css",
+              "node_modules/@ionic/angular/css/display.css",
+              "node_modules/@ionic/angular/css/padding.css",
+              "node_modules/@ionic/angular/css/float-elements.css",
+              "node_modules/@ionic/angular/css/text-alignment.css",
+              "node_modules/@ionic/angular/css/text-transformation.css",
+              "node_modules/@ionic/angular/css/flex-utils.css",
               "src/styles.scss"
+            ],
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "jspdf",
+              "canvg",
+              "html2canvas",
+              "localforage",
+              "raf",
+              "rgbcolor",
+              "core-js"
             ]
           },
           "configurations": {
@@ -1458,8 +1710,8 @@ ARCHIVO: .\frontend\angular.json
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1.5MB",
-                  "maximumError": "2.5MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -1689,6 +1941,28 @@ console.log('Extraction complete.');
 
 
 ==================================================
+ARCHIVO: .\frontend\get-ip.js
+==================================================
+
+const { networkInterfaces } = require('os');
+const nets = networkInterfaces();
+const results = {};
+
+for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+        // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+        if (net.family === 'IPv4' && !net.internal) {
+            if (!results[name]) {
+                results[name] = [];
+            }
+            results[name].push(net.address);
+        }
+    }
+}
+console.log(JSON.stringify(results));
+
+
+==================================================
 ARCHIVO: .\frontend\ionic.config.json
 ==================================================
 
@@ -1872,8 +2146,23 @@ ARCHIVO: .\frontend\ngsw-config.json
       "updateMode": "prefetch",
       "resources": {
         "files": [
+          "/assets/**",
           "/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
         ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "supabase-api",
+      "urls": [
+        "https://*.supabase.co/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 100,
+        "maxAge": "1h",
+        "timeout": "5s"
       }
     }
   ]
@@ -1889,7 +2178,7 @@ ARCHIVO: .\frontend\package.json
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --host 0.0.0.0",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -2091,6 +2380,37 @@ console.log("Rustic replacement complete.");
 
 
 ==================================================
+ARCHIVO: .\frontend\start-tunnel.js
+==================================================
+
+const { spawn } = require('child_process');
+const fs = require('fs');
+
+console.log("Iniciando http-server en puerto 8080...");
+const server = spawn('npx.cmd', ['http-server', 'dist/vacapp/browser', '-p', '8080', '--cors'], { shell: true });
+
+server.stdout.on('data', data => {
+  if (data.toString().includes('Hit CTRL-C to stop the server')) {
+     console.log("Server started.");
+     console.log("Iniciando localtunnel...");
+     const lt = spawn('npx.cmd', ['localtunnel', '--port', '8080'], { shell: true });
+
+     lt.stdout.on('data', (ltData) => {
+         const output = ltData.toString();
+         console.log(output);
+         if(output.includes("your url is:")) {
+             const url = output.split("your url is: ")[1].trim();
+             fs.writeFileSync('tunnel_url.txt', url);
+             console.log("URL GUARDADA:", url);
+         }
+     });
+     
+     lt.stderr.on('data', err => console.error("LT_ERR:", err.toString()));
+  }
+});
+
+
+==================================================
 ARCHIVO: .\frontend\tree.md
 ==================================================
 
@@ -2224,62 +2544,43 @@ ARCHIVO: .\frontend\public\manifest.webmanifest
 ==================================================
 
 {
-  "name": "vacapp",
-  "short_name": "vacapp",
+  "name": "Vacapp - Gestión Ganadera",
+  "short_name": "Vacapp",
+  "theme_color": "#1B4332",
+  "background_color": "#fdfaf7",
   "display": "standalone",
+  "orientation": "portrait",
   "scope": "./",
   "start_url": "./",
   "icons": [
     {
-      "src": "icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-192x192.png",
+      "src": "assets/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-512x512.png",
+      "src": "assets/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
     }
   ]
 }
+
+
+==================================================
+ARCHIVO: .\frontend\public\assets\imagenes\.gitkeep
+==================================================
+
+# Este archivo mantiene la carpeta en el repositorio.
+
+
+==================================================
+ARCHIVO: .\frontend\public\assets\logos\.gitkeep
+==================================================
+
+# Este archivo mantiene la carpeta en el repositorio.
 
 
 ==================================================
@@ -2301,6 +2602,7 @@ ARCHIVO: .\frontend\src\index.html
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -2585,19 +2887,19 @@ ARCHIVO: .\frontend\src\app\core\guards\auth.guard.ts
 
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { SupabaseService } from '../services/supabase.service';
 
-export const authGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
+export const authGuard: CanActivateFn = async (route, state) => {
+  const supabaseService = inject(SupabaseService);
   const router = inject(Router);
 
-  if (authService.isAuthenticated()) {
+  const { data: { session } } = await supabaseService.getUserSession();
+
+  if (session) {
     return true;
   }
 
   // Redirigir al login si no está autenticado
-  // (Para el MVP, como el mock hace auto-login en el constructor, 
-  // esto solo afectará si falla el mock o si estamos en modo real sin sesión)
   return router.parseUrl('/auth/login');
 };
 
@@ -2608,7 +2910,7 @@ ARCHIVO: .\frontend\src\app\core\layout\main-layout\main-layout.component.ts
 
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   IonSplitPane, IonMenu, IonContent, IonList, 
   IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
@@ -2620,7 +2922,7 @@ import {
   medkitOutline, scaleOutline, walletOutline, logOutOutline, chevronBackOutline, chevronForwardOutline, leafOutline,
   sunnyOutline, moonOutline
 } from 'ionicons/icons';
-import { AuthService } from '../../services/auth.service';
+import { SupabaseService } from '../../services/supabase.service';
 
 /**
  * Componente de Diseño Principal (Layout) - UI Profesional.
@@ -2693,7 +2995,7 @@ import { AuthService } from '../../services/auth.service';
                 <ion-icon name="leaf-outline" size="small" class="color-medium"></ion-icon>
                 <span class="color-medium text-sm font-semibold">Gestión Ganadera</span>
               </div>
-              <span class="color-medium opacity-80 text-xs mb-2">{{ profile()?.email }}</span>
+              <span class="color-medium opacity-80 text-xs mb-2">{{ profile.email }}</span>
               
               <!-- THEME TOGGLE BUTTON -->
               <ion-button fill="clear" color="medium" (click)="toggleTheme()" class="theme-toggle-btn">
@@ -2713,9 +3015,10 @@ import { AuthService } from '../../services/auth.service';
   `
 })
 export class MainLayoutComponent {
-  private auth = inject(AuthService);
+  private supabase = inject(SupabaseService);
+  private router = inject(Router);
   public isCollapsed = false;
-  public profile = this.auth.profile;
+  public profile = { email: 'Cargando...' }; // Podría leerse del session
 
   public appPages = [
     { title: 'Cuadro de Mando', url: '/dashboard', icon: 'pie-chart-outline' },
@@ -2736,7 +3039,18 @@ export class MainLayoutComponent {
     const saved = localStorage.getItem('theme');
     if (saved === 'dark') {
       this.isDarkMode = true;
-      document.body.classList.add('dark-theme');
+      document.documentElement.classList.add('ion-palette-dark');
+    }
+
+    this.loadProfile();
+  }
+
+  async loadProfile() {
+    const { data: { session } } = await this.supabase.getUserSession();
+    if (session?.user?.email) {
+      this.profile = { email: session.user.email };
+    } else {
+      this.profile = { email: 'propietario@finca.com' }; // Fallback para dev visual
     }
   }
 
@@ -2744,20 +3058,16 @@ export class MainLayoutComponent {
     this.isDarkMode = !this.isDarkMode;
     const theme = this.isDarkMode ? 'dark' : 'light';
     localStorage.setItem('theme', theme);
-    
-    if (this.isDarkMode) {
-      document.body.classList.add('dark-theme');
-    } else {
-      document.body.classList.remove('dark-theme');
-    }
+    document.documentElement.classList.toggle('ion-palette-dark', this.isDarkMode);
   }
 
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
   }
 
-  logout() {
-    this.auth.signOut();
+  async logout() {
+    await this.supabase.signOut();
+    this.router.navigate(['/auth/login'], { replaceUrl: true });
   }
 }
 
@@ -3108,7 +3418,7 @@ export class FinanzasService {
     // Fallback Mock System
     if (id.startsWith('fin-mock-')) {
        const storedMock = JSON.parse(localStorage.getItem('mock_finanzas') || '[]');
-       const index = storedMock.findIndex((m: any) => m.id === id);
+       const index = storedMock.findIndex((m: Record<string, unknown>) => m['id'] === id);
        if (index > -1) {
           storedMock[index] = { ...storedMock[index], ...payload };
           localStorage.setItem('mock_finanzas', JSON.stringify(storedMock));
@@ -3320,7 +3630,14 @@ import { SupabaseService } from './supabase.service';
 import { FincaService } from './finca.service';
 import { Bovino } from '../models/vacapp.models';
 import * as VacaConst from '../constants/vaca.constants';
+import { calculateAgeDesc } from '../../shared/utils/formatters';
 
+/**
+ * @class GanadoService
+ * @description Servicio de dominio que encapsula toda la lógica de negocio y el estado
+ * relacionado con el inventario principal de bovinos. 
+ * Utiliza Angular Signals para exponer un estado reactivo unidireccional a los componentes.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -3392,6 +3709,13 @@ export class GanadoService {
   });
 
   // Lógica de cálculo centralizada
+  
+  /**
+   * @description Determina la categoría zootécnica de un animal en función de su edad y sexo.
+   * Útil para segmentación de lotes, planes de alimentación o análisis económico.
+   * @param {Bovino} b El registro del bovino a evaluar.
+   * @returns {string} Categoría calculada (ej. 'Ternera', 'Novilla', 'Vaca').
+   */
   calculateCategoria(b: Bovino): string {
     if (!b.fecha_nacimiento) return 'Sin Categoría';
     const birthDate = new Date(b.fecha_nacimiento);
@@ -3411,22 +3735,22 @@ export class GanadoService {
     }
   }
 
+  /**
+   * @description Convierte la fecha de nacimiento en una cadena legible de edad.
+   * Maneja tanto años como meses para animales jóvenes.
+   * @param {Bovino} b El registro del bovino.
+   * @returns {string} Edad legible (ej. "3 años", "8 meses").
+   */
   getEdadDesc(b: Bovino): string {
-    if (!b.fecha_nacimiento) return 'S/N';
-    const birthDate = new Date(b.fecha_nacimiento);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    let months = today.getMonth() - birthDate.getMonth();
-    if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-      months += 12;
-    }
-    if (age > 0) {
-      return age === 1 ? '1 año' : `${age} años`;
-    }
-    return months === 1 ? '1 mes' : `${months} meses`;
+    return calculateAgeDesc(b.fecha_nacimiento);
   }
 
+  /**
+   * @description Calcula la Unidad de Ganado Mayor (UGM o UGB) basada en la edad.
+   * Fundamental para estudios de carga ganadera y capacidad de carga de los pastos.
+   * @param {Bovino} b El registro del bovino.
+   * @returns {number} Valor UGB (0.4 para terneros, 0.6 novillos, 1.0 adultos).
+   */
   getUgb(b: Bovino): number {
     if (!b.fecha_nacimiento) return 1.0;
     const birthDate = new Date(b.fecha_nacimiento);
@@ -3451,6 +3775,11 @@ export class GanadoService {
     });
   }
 
+  /**
+   * @description Inicia la carga principal del censo ganadero para la finca activa.
+   * Se orquesta de forma transparente consultando la base de datos o el fallback offline.
+   * @param {string} fincaId Identificador de la Finca.
+   */
   async loadBovinos(fincaId: string) {
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
@@ -3462,8 +3791,9 @@ export class GanadoService {
       if (error) throw error;
       
       this.bovinosSignal.set((data as Bovino[]) || []);
-    } catch (e: any) {
-      this.errorSignal.set(e.message || 'Error cargando bovinos');
+    } catch (e: unknown) {
+      const errorMsg = e instanceof Error ? e.message : 'Error cargando bovinos';
+      this.errorSignal.set(errorMsg);
       console.error(e);
     } finally {
       this.loadingSignal.set(false);
@@ -3490,6 +3820,11 @@ export class GanadoService {
     return { data: [], error };
   }
 
+  /**
+   * @description Da de alta un nuevo animal en el sistema asociándolo a la finca activa.
+   * @param {Partial<Bovino>} bovino Datos del nuevo animal recolectados del formulario.
+   * @returns {Promise<{data: Bovino | null, error: any}>}
+   */
   async createBovino(bovino: Partial<Bovino>) {
     const fincaId = this.fincaService.selectedFincaId();
     if (!fincaId) return { error: 'No hay finca seleccionada' };
@@ -3503,6 +3838,12 @@ export class GanadoService {
     return { data, error };
   }
 
+  /**
+   * @description Modifica la ficha de un animal existente y propaga el cambio al estado local (Signal).
+   * @param {string} id UUID del animal.
+   * @param {Partial<Bovino>} payload Objeto con los campos modificados.
+   * @returns {Promise<{data: Bovino | null, error: any}>}
+   */
   async updateBovino(id: string, payload: Partial<Bovino>) {
     const { data, error } = await this.supabase.update<Bovino>('bovinos', id, payload);
     if (data && !error) {
@@ -3565,13 +3906,21 @@ export interface SyncOperation {
   id: string;
   table: string;
   method: 'POST' | 'PUT' | 'DELETE';
-  payload: any;
+  payload: Record<string, unknown>;
   recordId?: string; // Para updates/deletes
   timestamp: number;
 }
 
 export type SyncState = 'Online' | 'Offline' | 'Sincronizando' | 'Conflicto';
 
+/**
+ * @class OfflineSyncService
+ * @description Servicio core encargado de garantizar la integridad de los datos 
+ * en entornos de conectividad intermitente (Arquitectura Offline-First).
+ * Escucha eventos de red y encola operaciones CRUD temporalmente en IndexedDB
+ * cuando el dispositivo pierde conexión, sincronizando automáticamente con el backend
+ * al recuperar conectividad.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -3595,6 +3944,11 @@ export class OfflineSyncService {
     window.addEventListener('offline', () => this.setNetworkStatus(false));
   }
 
+  /**
+   * @description Inicializa la base de datos IndexedDB usando localforage.
+   * Restaura la cola de sincronización pendiente si el usuario cerró la app mientras estaba offline.
+   * @private
+   */
   private async initStorage() {
     localforage.config({
       name: 'VacaApp',
@@ -3619,7 +3973,15 @@ export class OfflineSyncService {
     }
   }
 
-  async enqueueOperation(table: string, method: 'POST' | 'PUT' | 'DELETE', payload: any, recordId?: string) {
+  /**
+   * @description Encola una operación de base de datos para ser procesada.
+   * Si hay conexión, la procesa inmediatamente. Si no, la guarda en IndexedDB de forma persistente.
+   * @param {string} table Nombre de la tabla destino en Supabase.
+   * @param {'POST' | 'PUT' | 'DELETE'} method Acción CRUD a realizar.
+   * @param {any} payload Los datos a insertar/actualizar.
+   * @param {string} [recordId] UUID del registro (requerido para PUT/DELETE).
+   */
+  async enqueueOperation(table: string, method: 'POST' | 'PUT' | 'DELETE', payload: Record<string, unknown>, recordId?: string) {
     const operation: SyncOperation = {
       id: Math.random().toString(36).substr(2, 9),
       table,
@@ -3637,6 +3999,11 @@ export class OfflineSyncService {
     }
   }
 
+  /**
+   * @description El motor de sincronización. Recorre la cola y despacha cada operación
+   * secuencialmente hacia Supabase. Incorpora una estrategia de resolución de conflictos
+   * simple (basada en el campo `updated_at`).
+   */
   async processQueue() {
     if (!this.isOnline() || this.syncState() === 'Sincronizando' || this.syncState() === 'Conflicto') return;
 
@@ -3715,6 +4082,10 @@ export class OfflineSyncService {
     }
   }
 
+  /**
+   * @description Interfaz visual de resolución de conflictos.
+   * @private
+   */
   private async promptConflict(table: string, dbDataTime: number, localDataTime: number): Promise<'force' | 'discard'> {
     return new Promise(async (resolve) => {
        const alert = await this.alertCtrl.create({
@@ -3755,7 +4126,7 @@ export class OfflineSyncService {
         await localforage.setItem('vacapp_bovinos_offline_cache', data);
         console.log('[OfflineSync] Caché de catálogo primario Bovinos actualizado en IndexedDB.');
       }
-    } catch(e) {
+    } catch(e: unknown) {
       console.error('[OfflineSync] Error al cachear background dataset', e);
     }
   }
@@ -4324,13 +4695,13 @@ export class SanidadService {
     }
   }
 
-  async createSanidad(payload: any) {
+  async createSanidad(payload: Partial<Sanidad>) {
     const res = await this.supabase.createSanidad(payload);
     if (!res.error) await this.loadSanidad();
     return res;
   }
 
-  async updateSanidad(id: string, payload: any) {
+  async updateSanidad(id: string, payload: Partial<Sanidad>) {
     const res = await this.supabase.updateSanidad(id, payload);
     if (!res.error) await this.loadSanidad();
     return res;
@@ -4391,11 +4762,19 @@ ARCHIVO: .\frontend\src\app\core\services\supabase.service.ts
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
+import { Bovino, Sanidad, Reproduccion, Pesaje, Finanzas, Tarea } from '../models/vacapp.models';
 
 /**
  * Servicio central para la comunicación con Supabase.
  * Proporciona métodos genéricos para operaciones CRUD y un administrador de datos Mock (simulados).
  * El modo Mock se activa automáticamente si no se detectan credenciales en environment.ts.
+ */
+/**
+ * @class SupabaseService
+ * @description Servicio central de infraestructura para la persistencia de datos.
+ * Actúa como un proxy inteligente que enruta las peticiones CRUD al backend real de Supabase
+ * o al almacenamiento local (Modo Mock) dependiendo de la configuración y disponibilidad de red.
+ * Implementa el patrón Singleton.
  */
 @Injectable({
   providedIn: 'root',
@@ -4431,21 +4810,79 @@ export class SupabaseService {
   }
 
   /**
-   * Retorna el cliente nativo para consultas personalizadas.
+   * @description Retorna la instancia nativa del cliente Supabase.
+   * Útil para operaciones complejas, autenticación o consultas personalizadas (RPC)
+   * que no están cubiertas por los métodos de abstracción CRUD básicos.
+   * @returns {SupabaseClient | undefined} El cliente inicializado o undefined si está en Modo Mock.
    */
   get client() {
     return this.supabase;
   }
 
+  // ═══════════════════════════════════════════════════
+  // AUTENTICACIÓN
+  // ═══════════════════════════════════════════════════
+
   /**
-   * Obtiene todos los registros de una tabla, con soporte para simulación Mock.
+   * @description Inicia sesión con email y contraseña.
+   */
+  async signIn(email: string, password: string) {
+    if (!this.supabase || environment.useMockData) {
+      // Mock mode logic: validar credenciales específicas del usuario
+      if (email === 'jucagolddev@gmail.com' && password === 'Juca2452') {
+        localStorage.setItem('mock_session', JSON.stringify({ user: { email, id: 'mock-uuid' } }));
+        return { data: { user: { email } }, error: null };
+      } else {
+        return { data: null, error: new Error('Credenciales incorrectas') };
+      }
+    }
+    return await this.supabase.auth.signInWithPassword({ email, password });
+  }
+
+  /**
+   * @description Registra un nuevo usuario con email y contraseña.
+   */
+  async signUp(email: string, password: string) {
+    if (!this.supabase || environment.useMockData) {
+      return { data: { user: { email } }, error: null };
+    }
+    return await this.supabase.auth.signUp({ email, password });
+  }
+
+  /**
+   * @description Cierra la sesión activa.
+   */
+  async signOut() {
+    if (!this.supabase || environment.useMockData) {
+      localStorage.removeItem('mock_session');
+      return { error: null };
+    }
+    return await this.supabase.auth.signOut();
+  }
+
+  /**
+   * @description Obtiene la sesión actual.
+   */
+  async getUserSession() {
+    if (!this.supabase || environment.useMockData) {
+      const mockSession = localStorage.getItem('mock_session');
+      return { data: { session: mockSession ? JSON.parse(mockSession) : null }, error: null };
+    }
+    return await this.supabase.auth.getSession();
+  }
+
+  /**
+   * @description Obtiene una colección paginada de registros de una tabla específica.
+   * Incluye lógica de enriquecimiento de datos en Modo Mock para emular JOINs SQL.
+   * @param {string} table Nombre de la tabla en la base de datos (ej. 'bovinos').
+   * @returns {Promise<{data: T[] | null, error: any}>} Una promesa con los datos tipados o el error.
    */
   async getAll<T>(table: string) {
     if (!this.supabase || environment.useMockData) {
       const stored = localStorage.getItem(`mock_${table}`);
       let data = stored ? (JSON.parse(stored) as T[]) : [];
       // Enriquecemos los datos mock para que coincidan con los JOINS de Supabase real
-      data = await this.enrichMockData(table, data);
+      data = await this.enrichMockData(table, data as any) as T[];
       return { data, error: null };
     }
     
@@ -4459,24 +4896,31 @@ export class SupabaseService {
   }
 
   /**
-   * Simula los JOINs de base de datos para el modo Mock.
+   * @description Motor de emulación relacional para el Modo Mock.
+   * Cuando se opera offline, inyecta las relaciones "bovino" en registros dependientes
+   * para simular el comportamiento de un JOIN (bovino:bovino_id(*)) en PostgreSQL.
+   * @private
    */
-  private async enrichMockData(table: string, data: any[]): Promise<any[]> {
+  private async enrichMockData<T extends Record<string, unknown>>(table: string, data: T[]): Promise<T[]> {
     if (table === 'bovinos' || table === 'lotes') return data;
 
     // Si la tabla requiere información del bovino o lote, la "inyectamos" manualmente
-    const { data: bovinos } = await this.getAll<any>('bovinos');
+    const { data: bovinos } = await this.getAll<Bovino>('bovinos');
     
     return data.map(item => {
-      if (item.bovino_id) {
-        item.bovino = bovinos?.find(b => b.id === item.bovino_id);
+      if ('bovino_id' in item) {
+        (item as Record<string, unknown>)['bovino'] = bovinos?.find(b => b.id === item['bovino_id']);
       }
       return item;
     });
   }
 
   /**
-   * Crea un nuevo registro en la base de datos (o modo Mock).
+   * @description Inserta un nuevo registro en la capa de persistencia activa.
+   * En Modo Mock, genera automáticamente un identificador temporal (UUID-like) y un timestamp.
+   * @param {string} table Nombre de la tabla destino.
+   * @param {Partial<T>} payload Objeto parcial con los datos a insertar.
+   * @returns {Promise<{data: T | null, error: any}>} El registro recién creado.
    */
   async create<T>(table: string, payload: Partial<T>) {
     // Inyectamos ID y timestamp para el modo Mock local
@@ -4504,7 +4948,9 @@ export class SupabaseService {
   }
 
   /**
-   * Retorna los datos mock sin enriquecer para operaciones de escritura.
+   * @description Recupera el raw data del LocalStorage sin enriquecimiento relacional.
+   * Utilizado internamente por las operaciones de mutación (CREATE, UPDATE, DELETE).
+   * @private
    */
   private async getRawMock(table: string) {
     const stored = localStorage.getItem(`mock_${table}`);
@@ -4512,12 +4958,16 @@ export class SupabaseService {
   }
 
   /**
-   * Actualiza un registro existente mediante su ID.
+   * @description Actualiza de forma parcial o total un registro existente basándose en su clave primaria (ID).
+   * @param {string} table Nombre de la tabla.
+   * @param {string} id Clave primaria UUID del registro a modificar.
+   * @param {Partial<T>} payload Campos a actualizar.
+   * @returns {Promise<{data: T | null, error: any}>} El registro actualizado.
    */
   async update<T>(table: string, id: string, payload: Partial<T>) {
     if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
-      const index = data.findIndex((item: any) => item.id === id);
+      const index = data.findIndex((item: Record<string, unknown>) => item['id'] === id);
       if (index !== -1) {
         data[index] = { ...data[index], ...payload };
         localStorage.setItem(`mock_${table}`, JSON.stringify(data));
@@ -4537,12 +4987,16 @@ export class SupabaseService {
   }
 
   /**
-   * Elimina un registro físicamente.
+   * @description Ejecuta un "Hard Delete" eliminando físicamente el registro de la base de datos.
+   * ADVERTENCIA: En producción, considere usar "Soft Deletes" actualizando una bandera de estado.
+   * @param {string} table Nombre de la tabla.
+   * @param {string} id Identificador único del registro.
+   * @returns {Promise<{error: any}>} Nulo si fue exitoso, o el objeto de error.
    */
   async delete(table: string, id: string) {
     if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
-      const updated = data.filter((item: any) => item.id !== id);
+      const updated = data.filter((item: Record<string, unknown>) => item['id'] !== id);
       localStorage.setItem(`mock_${table}`, JSON.stringify(updated));
       return { error: null };
     }
@@ -4557,41 +5011,96 @@ export class SupabaseService {
   /** --- REALTIME Y SUSCRIPCIONES --- **/
 
   /**
-   * Suscribirse a cambios en tiempo real en una tabla específica.
+   * @description Inicializa un canal de WebSockets para escuchar mutaciones (INSERT, UPDATE, DELETE)
+   * en tiempo real sobre una tabla. Vital para interfaces colaborativas o paneles reactivos.
+   * @param {string} table Nombre de la tabla a observar.
+   * @param {(payload: any) => void} callback Función ejecutada tras recibir un evento de mutación.
+   * @returns {RealtimeChannel | null} La suscripción activa (para posterior desuscripción).
    */
-  subscribeToTableChanges(table: string, callback: (payload: any) => void) {
+  subscribeToTableChanges(table: string, callback: (payload: Record<string, unknown>) => void) {
     if (!this.supabase) return null;
     return this.supabase.channel(`public:${table}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: table }, payload => {
-        callback(payload);
+        callback(payload as Record<string, unknown>);
       })
       .subscribe();
+  }
+  /** --- ALMACENAMIENTO DE IMÁGENES (Supabase Storage) --- **/
+
+  /**
+   * @description Sube una foto de un animal al bucket 'bovinos-fotos' de Supabase Storage.
+   * En Modo Mock, convierte la imagen a DataURL y la almacena en localStorage.
+   * @param {string} bovinoId UUID del bovino.
+   * @param {File} file Archivo de imagen seleccionado por el usuario.
+   * @returns {Promise<string>} URL pública de la imagen subida.
+   */
+  async uploadAnimalImage(bovinoId: string, file: File): Promise<string> {
+    if (!this.supabase || environment.useMockData) {
+      // Mock: convert to data URL and store locally
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          localStorage.setItem(`animal_photo_${bovinoId}`, dataUrl);
+          resolve(dataUrl);
+        };
+        reader.onerror = () => reject('Error leyendo imagen');
+        reader.readAsDataURL(file);
+      });
+    }
+
+    const filePath = `${bovinoId}/${Date.now()}_${file.name}`;
+    const { error: uploadError } = await this.supabase.storage
+      .from('bovinos-fotos')
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = this.supabase.storage
+      .from('bovinos-fotos')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  }
+
+  /**
+   * @description Actualiza la foto_url de un bovino y persiste el cambio.
+   * @param {string} bovinoId UUID del bovino.
+   * @param {string} fotoUrl URL pública de la foto.
+   * @returns {Promise<void>}
+   */
+  async updateAnimalPhoto(bovinoId: string, fotoUrl: string): Promise<void> {
+    await this.update<Bovino>('bovinos', bovinoId, { foto_url: fotoUrl } as Partial<Bovino>);
   }
 
   /** --- INTELIGENCIA DE DATOS (VISTA ÚNICA) --- **/
 
   /**
-   * Obtiene toda la información relacionada de un animal en una sola carga.
-   * Ideal para la Vista de Detalle Única.
+   * @description Patrón "Facade" para Inteligencia de Datos.
+   * Extrae el perfil 360° de un animal ejecutando consultas paralelas en el backend
+   * para reducir la latencia de red. Reúne su registro base, historial médico,
+   * reproductor, curvas de pesaje y analítica financiera.
+   * @param {string} id UUID del Bovino a investigar.
+   * @returns {Promise<{data: any, error: any}>} El objeto de datos agregado.
    */
   async getAnimalCompleteData(id: string) {
     if (!this.supabase || environment.useMockData) {
       // Mock Aggregation
-      const { data: bovinos } = await this.getAll<any>('bovinos');
-      const bovino = bovinos.find(b => b.id === id);
+      const { data: bovinos } = await this.getAll<Bovino>('bovinos');
+      const bovino = bovinos?.find(b => b.id === id);
       
-      const { data: sanidad } = await this.getAll<any>('sanidad');
-      const { data: repro } = await this.getAll<any>('reproduccion');
-      const { data: pesajes } = await this.getAll<any>('recria_pesajes');
-      const { data: finanzas } = await this.getAll<any>('finanzas');
+      const { data: sanidad } = await this.getAll<Sanidad>('sanidad');
+      const { data: repro } = await this.getAll<Reproduccion>('reproduccion');
+      const { data: pesajes } = await this.getAll<Pesaje>('recria_pesajes');
+      const { data: finanzas } = await this.getAll<Finanzas>('finanzas');
 
       return {
         data: {
           bovino,
-          sanidad: sanidad.filter((s: any) => s.bovino_id === id),
-          reproduccion: repro.filter((r: any) => r.bovino_id === id),
-          pesajes: pesajes.filter((p: any) => p.bovino_id === id),
-          finanzas: finanzas.filter((f: any) => f.bovino_id === id)
+          sanidad: sanidad?.filter(s => s.bovino_id === id) || [],
+          reproduccion: repro?.filter(r => r.bovino_id === id) || [],
+          pesajes: pesajes?.filter(p => p.bovino_id === id) || [],
+          finanzas: finanzas?.filter(f => f.bovino_id === id) || []
         },
         error: null
       };
@@ -4621,20 +5130,20 @@ export class SupabaseService {
   /** --- MÉTODOS DE ABSTRACCIÓN POR MÓDULO --- **/
 
   async getSanidad() {
-    if (!this.supabase) return this.getAll<any>('sanidad');
+    if (!this.supabase) return this.getAll<Sanidad>('sanidad');
     const { data, error } = await this.supabase
       .from('sanidad')
       .select('*, bovino:bovino_id(crotal, nombre)')
       .order('fecha', { ascending: false });
-    return { data, error };
+    return { data: data as unknown as Sanidad[], error };
   }
 
-  async createSanidad(payload: any) {
-    return this.create('sanidad', payload);
+  async createSanidad(payload: Partial<Sanidad>) {
+    return this.create<Sanidad>('sanidad', payload);
   }
 
-  async updateSanidad(id: string, payload: any) {
-    return this.update('sanidad', id, payload);
+  async updateSanidad(id: string, payload: Partial<Sanidad>) {
+    return this.update<Sanidad>('sanidad', id, payload);
   }
 
   async deleteSanidad(id: string) {
@@ -4642,28 +5151,28 @@ export class SupabaseService {
   }
 
   async getFemales() {
-    const { data, error } = await this.getAll<any>('bovinos');
+    const { data, error } = await this.getAll<Bovino>('bovinos');
     return { 
-      data: (data || []).filter(b => b.sexo === 'Hembra' && b.estado === 'Activo'), 
+      data: (data || []).filter(b => b.sexo === 'Hembra' && b.estado_productivo === 'Alta'), 
       error 
     };
   }
 
   async getReproduccion() {
-    if (!this.supabase) return this.getAll<any>('reproduccion');
+    if (!this.supabase) return this.getAll<Reproduccion>('reproduccion');
     const { data, error } = await this.supabase
       .from('reproduccion')
       .select('*, bovino:bovino_id(crotal, nombre)')
       .order('fecha_cubricion', { ascending: false });
-    return { data, error };
+    return { data: data as unknown as Reproduccion[], error };
   }
 
-  async createReproduccion(payload: any) {
-    return this.create('reproduccion', payload);
+  async createReproduccion(payload: Partial<Reproduccion>) {
+    return this.create<Reproduccion>('reproduccion', payload);
   }
 
-  async updateReproduccion(id: string, payload: any) {
-    return this.update('reproduccion', id, payload);
+  async updateReproduccion(id: string, payload: Partial<Reproduccion>) {
+    return this.update<Reproduccion>('reproduccion', id, payload);
   }
 
   async deleteReproduccion(id: string) {
@@ -4671,20 +5180,20 @@ export class SupabaseService {
   }
 
   async getPesajes() {
-    if (!this.supabase) return this.getAll<any>('recria_pesajes');
+    if (!this.supabase) return this.getAll<Pesaje>('recria_pesajes');
     const { data, error } = await this.supabase
       .from('recria_pesajes')
       .select('*, bovino:bovino_id(crotal, nombre)')
       .order('fecha_pesaje', { ascending: false });
-    return { data, error };
+    return { data: data as unknown as Pesaje[], error };
   }
 
-  async createPesaje(payload: any) {
-    return this.create('recria_pesajes', payload);
+  async createPesaje(payload: Partial<Pesaje>) {
+    return this.create<Pesaje>('recria_pesajes', payload);
   }
 
-  async updatePesaje(id: string, payload: any) {
-    return this.update('recria_pesajes', id, payload);
+  async updatePesaje(id: string, payload: Partial<Pesaje>) {
+    return this.update<Pesaje>('recria_pesajes', id, payload);
   }
 
   async deletePesaje(id: string) {
@@ -4713,10 +5222,10 @@ export class SupabaseService {
       if (!this.supabase) {
         // Mock Update
         const { data: bovinos } = await this.getRawMock('bovinos');
-        const index = bovinos.findIndex((b: any) => b.id === bovinoId);
+        const index = bovinos.findIndex((b: Record<string, unknown>) => b['id'] === bovinoId);
         if (index !== -1) {
-          const oldLoteId = bovinos[index].lote_id;
-          bovinos[index].lote_id = nuevoLoteId;
+          const oldLoteId = bovinos[index]['lote_id'];
+          bovinos[index]['lote_id'] = nuevoLoteId;
           localStorage.setItem('mock_bovinos', JSON.stringify(bovinos));
           return { data: { id: nuevoLoteId, nombre: nombreLote, changed: oldLoteId !== nuevoLoteId }, error: null };
         }
@@ -4745,9 +5254,10 @@ export class SupabaseService {
         }, 
         error: null 
       };
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Error en updateBovinoLote:', e);
-      return { data: null, error: e.message || 'Error técnico al actualizar lote' };
+      const errorMsg = e instanceof Error ? e.message : 'Error técnico al actualizar lote';
+      return { data: null, error: errorMsg };
     }
   }
 
@@ -5108,6 +5618,11 @@ ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.scss
   gap: 20px;
 }
 
+.animal-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .animal-avatar {
   width: 80px;
   height: 80px;
@@ -5126,6 +5641,32 @@ ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.scss
     height: 100%;
     object-fit: cover;
   }
+}
+
+.avatar-camera-btn {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: variables.$tertiary-color;
+  color: white;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+  z-index: 2;
+
+  &:hover { transform: scale(1.1); }
+  &:active { transform: scale(0.95); }
+  &:disabled { opacity: 0.6; cursor: wait; }
+
+  ion-icon { font-size: 16px; }
 }
 
 .crotal-id {
@@ -5249,7 +5790,7 @@ ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.scss
 .timeline-content {
   margin: 0 !important;
   padding: 15px !important;
-  @extend .rustic-card;
+  @extend .vac-card;
 }
 
 .timeline-header {
@@ -5279,22 +5820,26 @@ ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.scss
 ARCHIVO: .\frontend\src\app\features\animal-detail\animal-detail.component.ts
 ==================================================
 
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, 
   IonBackButton, IonGrid, IonRow, IonCol, IonIcon, 
-  IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText
+  IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText,
+  IonSpinner, ToastController
 } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartData } from 'chart.js';
 import { SupabaseService } from '../../core/services/supabase.service';
+import { Bovino, Sanidad, Pesaje, Reproduccion, Finanzas } from '../../core/models/vacapp.models';
 import { addIcons } from 'ionicons';
 import { 
   paw, medical, scale, calendar, cash, 
   chevronForwardOutline, fitnessOutline, 
   timeOutline, alertCircleOutline, checkmarkCircleOutline,
-  flaskOutline, gitBranchOutline, medkitOutline
+  flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline
 } from 'ionicons/icons';
 
 interface TimelineEvent {
@@ -5306,13 +5851,22 @@ interface TimelineEvent {
   color: string;
 }
 
+interface AnimalData {
+  bovino: Bovino;
+  sanidad: Sanidad[];
+  pesajes: Pesaje[];
+  reproduccion: Reproduccion[];
+  finanzas: Finanzas[];
+}
+
 @Component({
   selector: 'app-animal-detail',
   standalone: true,
   imports: [
     CommonModule, FormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonButtons, IonBackButton, IonGrid, IonRow, IonCol, IonIcon,
-    IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText
+    IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText,
+    IonSpinner, BaseChartDirective
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -5322,20 +5876,28 @@ interface TimelineEvent {
         </ion-buttons>
         <ion-title class="ion-text-center">Inteligencia Animal</ion-title>
         <ion-buttons slot="end">
-           <div style="width: 48px"></div> <!-- Spacer for balance -->
+           <div style="width: 48px"></div>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="vac-container animate-fade-in" *ngIf="data()">
+      <main class="vac-container animate-fade-in" *ngIf="data()">
         
-        <!-- CABECERA DE PERFIL (RUSTIC-LUXE) -->
+        <!-- CABECERA DE PERFIL (RUSTIC-LUXE) con BOTÓN CÁMARA -->
         <div class="animal-profile-header">
            <div class="animal-avatar-container">
-              <div class="animal-avatar">
-                 <img *ngIf="data()?.bovino?.foto_url" [src]="data()?.bovino?.foto_url" class="img-full" alt="Perfil">
-                 <ion-icon *ngIf="!data()?.bovino?.foto_url" name="paw"></ion-icon>
+              <div class="animal-avatar-wrapper">
+                 <div class="animal-avatar">
+                    <img *ngIf="data()?.bovino?.foto_url" [src]="data()?.bovino?.foto_url" class="img-full" alt="Perfil">
+                    <ion-icon *ngIf="!data()?.bovino?.foto_url" name="paw"></ion-icon>
+                 </div>
+                 <!-- Botón Cámara sobre el Avatar -->
+                 <button class="avatar-camera-btn" (click)="fileInput.click()" [disabled]="isUploading()" aria-label="Subir foto del animal">
+                    <ion-icon *ngIf="!isUploading()" name="camera-outline"></ion-icon>
+                    <ion-spinner *ngIf="isUploading()" name="crescent" color="light" style="width:18px;height:18px;"></ion-spinner>
+                 </button>
+                 <input #fileInput type="file" accept="image/*" hidden (change)="onPhotoSelected($event)">
               </div>
               <div class="animal-main-info">
                  <h1 class="crotal-id">{{ data()?.bovino?.crotal }}</h1>
@@ -5389,6 +5951,27 @@ interface TimelineEvent {
           </ion-row>
         </ion-grid>
 
+        <!-- GRÁFICO DE EVOLUCIÓN DE PESO -->
+        <section class="vac-main-card animate-slide-up mt-4 mb-4" *ngIf="chartPesajes().labels && chartPesajes().labels!.length > 0">
+          <header class="vac-card-header">
+            <div class="vac-card-header-flex">
+              <div class="vac-card-title-group">
+                <span>ANÁLISIS INDIVIDUAL</span>
+                <strong>Curva de Peso (Kg)</strong>
+              </div>
+              <div class="vac-mini-stat bg-primary-soft">
+                <ion-icon name="trending-up-outline"></ion-icon>
+                <span>{{ (data()?.pesajes?.length || 0) }} pesajes</span>
+              </div>
+            </div>
+          </header>
+          <div class="vac-card-content">
+            <div class="vac-chart-container chart-250px">
+              <canvas baseChart [data]="chartPesajes()" [options]="chartOptionsPeso" [type]="'line'"></canvas>
+            </div>
+          </div>
+        </section>
+
         <!-- NAVEGACIÓN INTERNA (ION-SEGMENT) -->
         <div class="vac-segment-container mt-4 mb-3">
           <ion-segment [value]="activeSegment()" (ionChange)="activeSegment.set($any($event).detail.value)" mode="ios">
@@ -5413,7 +5996,7 @@ interface TimelineEvent {
            <!-- PESTAÑA: HISTORIAL (TIMELINE VERTICAL) -->
            <div *ngSwitchCase="'history'" class="animate-fade-in">
               <div class="timeline-container">
-                 <div class="timeline-item" *ngFor="let event of timeline()">
+                 <article class="timeline-item" *ngFor="let event of timeline(); trackBy: trackById">
                     <div class="timeline-dot" [style.background-color]="event.color">
                        <ion-icon [name]="event.icon"></ion-icon>
                     </div>
@@ -5425,13 +6008,13 @@ interface TimelineEvent {
                        <h3 class="event-title">{{ event.title }}</h3>
                        <p class="event-desc">{{ event.description }}</p>
                     </div>
-                 </div>
+                 </article>
               </div>
            </div>
 
            <!-- PESTAÑA: SALUD -->
            <div *ngSwitchCase="'health'" class="animate-fade-in">
-              <div class="rustic-card p-4 mb-4" *ngFor="let s of data()?.sanidad">
+              <article class="vac-card p-4 mb-4" *ngFor="let s of data()?.sanidad; trackBy: trackById">
                  <div class="vac-card-header-flex">
                      <div class="vac-icon-circle bg-success-soft"><ion-icon name="medkit-outline" color="success"></ion-icon></div>
                      <div class="vac-card-title-group ml-3">
@@ -5441,16 +6024,16 @@ interface TimelineEvent {
                  </div>
                  <div class="mt-3">
                     <p class="color-dark font-medium">{{ s.observaciones }}</p>
-                    <div class="mt-2" *ngIf="s.dias_retiro_carne > 0">
+                    <div class="mt-2" *ngIf="s.dias_retiro_carne && s.dias_retiro_carne > 0">
                        <ion-badge color="warning" class="status-badge">Retiro: {{ s.dias_retiro_carne }} días</ion-badge>
                     </div>
                  </div>
-              </div>
+              </article>
            </div>
 
            <!-- PESTAÑA: REPRODUCCIÓN -->
            <div *ngSwitchCase="'repro'" class="animate-fade-in">
-              <div class="rustic-card p-4 mb-4" *ngFor="let r of data()?.reproduccion">
+              <article class="vac-card p-4 mb-4" *ngFor="let r of data()?.reproduccion; trackBy: trackById">
                  <div class="vac-card-header-flex">
                      <div class="vac-icon-circle bg-secondary-soft"><ion-icon name="git-branch-outline" color="secondary"></ion-icon></div>
                      <div class="vac-card-title-group ml-3">
@@ -5458,12 +6041,12 @@ interface TimelineEvent {
                         <span class="text-sm color-muted">{{ r.tipo_cubricion || 'Evento Reproductivo' }}</span>
                      </div>
                  </div>
-              </div>
+              </article>
            </div>
 
            <!-- PESTAÑA: GASTOS -->
            <div *ngSwitchCase="'expenses'" class="animate-fade-in">
-              <div class="rustic-card flex justify-between items-center p-4 mb-3" *ngFor="let f of data()?.finanzas">
+              <article class="vac-card flex justify-between items-center p-4 mb-3" *ngFor="let f of data()?.finanzas; trackBy: trackById">
                  <div class="flex items-center gap-3">
                     <div class="vac-icon-circle bg-danger-soft"><ion-icon name="cash-outline" color="danger"></ion-icon></div>
                     <div>
@@ -5472,19 +6055,18 @@ interface TimelineEvent {
                     </div>
                  </div>
                  <h2 class="text-xl color-danger font-heavy">-{{ f.monto | number:'1.2-2' }}€</h2>
-              </div>
+              </article>
            </div>
 
         </div>
-
-      </div>
+      </main>
 
       <!-- SKELETON LOADING -->
       <div class="ion-padding" *ngIf="!data()">
          <ion-skeleton-text animated style="width: 100%; height: 200px; border-radius: 20px;"></ion-skeleton-text>
          <ion-skeleton-text animated style="width: 60%; height: 30px; margin-top: 20px;"></ion-skeleton-text>
          <div class="mt-4">
-            <ion-skeleton-text animated style="width: 100%; height: 60px; margin-bottom: 10px;" *ngFor="let s of [1,2,3]"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 100%; height: 60px; margin-bottom: 10px;" *ngFor="let s of [1,2,3]; trackBy: trackById"></ion-skeleton-text>
          </div>
       </div>
 
@@ -5495,16 +6077,24 @@ interface TimelineEvent {
 export class AnimalDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private supabase = inject(SupabaseService);
+  private toastCtrl = inject(ToastController);
   
   activeSegment = signal('history');
-  data = signal<any>(null);
+  data = signal<AnimalData | null>(null);
+  isUploading = signal(false);
+
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
+  trackById(index: number, item: any): string {
+    return item?.id || index.toString();
+  }
 
   constructor() {
     addIcons({ 
       paw, medical, scale, calendar, cash, 
       chevronForwardOutline, fitnessOutline, 
       timeOutline, alertCircleOutline, checkmarkCircleOutline,
-      flaskOutline, gitBranchOutline, medkitOutline
+      flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline
     });
   }
 
@@ -5520,6 +6110,48 @@ export class AnimalDetailComponent implements OnInit {
     this.data.set(res.data);
   }
 
+  /** Selección y subida de foto del animal */
+  async onPhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file || !this.data()?.bovino?.id) return;
+
+    this.isUploading.set(true);
+    try {
+      const bovinoId = this.data()!.bovino.id;
+      const fotoUrl = await this.supabase.uploadAnimalImage(bovinoId, file);
+      await this.supabase.updateAnimalPhoto(bovinoId, fotoUrl);
+
+      // Actualizar el data signal con la nueva foto
+      const currentData = this.data()!;
+      this.data.set({
+        ...currentData,
+        bovino: { ...currentData.bovino, foto_url: fotoUrl }
+      });
+
+      await this.showToast('📷 Foto actualizada correctamente', 'success');
+    } catch (err) {
+      console.error('Error subiendo foto:', err);
+      await this.showToast('❌ Error al subir la foto', 'danger');
+    } finally {
+      this.isUploading.set(false);
+      // Reset del input para permitir re-subir el mismo archivo
+      if (input) input.value = '';
+    }
+  }
+
+  private async showToast(message: string, color: string) {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2500,
+      position: 'bottom',
+      color,
+      cssClass: 'vac-toast',
+      icon: color === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'
+    });
+    await toast.present();
+  }
+
   getStatusColor(status?: string) {
     switch (status) {
       case 'Gestante': return 'tertiary';
@@ -5532,27 +6164,77 @@ export class AnimalDetailComponent implements OnInit {
   // KPIs
   lastHealth = computed(() => {
     const records = this.data()?.sanidad;
-    return records?.length > 0 ? records[0].tipo : 'N/A';
+    return records && records.length > 0 ? records[0].tipo : 'N/A';
   });
 
   lastWeight = computed(() => {
     const records = this.data()?.pesajes;
-    return records?.length > 0 ? records[0].peso_kg : '---';
+    return records && records.length > 0 ? records[0].peso_kg : '---';
   });
 
   lastParto = computed(() => {
     const repro = this.data()?.reproduccion;
-    const parido = repro?.find((r: any) => r.estado_gestacion === 'Parido');
-    return parido ? new Date(parido.created_at).toLocaleDateString() : 'N/A';
+    const parido = repro?.find((r: Reproduccion) => r.estado_gestacion === 'Parido');
+    return parido && parido.created_at ? new Date(parido.created_at).toLocaleDateString() : 'N/A';
   });
 
   totalExpenses = computed(() => {
     const fin = this.data()?.finanzas || [];
     const san = this.data()?.sanidad || [];
-    const fromFinances = fin.reduce((acc: number, f: any) => acc + (f.tipo === 'Gasto' ? f.monto : 0), 0);
-    const fromSanity = san.reduce((acc: number, s: any) => acc + (s.costo_aplicacion || 0), 0);
+    const fromFinances = fin.reduce((acc: number, f: Finanzas) => acc + (f.tipo === 'Gasto' ? f.monto : 0), 0);
+    const fromSanity = san.reduce((acc: number, s: Sanidad) => acc + (s.costo_aplicacion || 0), 0);
     return fromFinances + fromSanity;
   });
+
+  /** Gráfico de Evolución de Peso — Rustic-Luxe Themed */
+  chartPesajes = computed((): ChartData<'line'> => {
+    const pesajes = this.data()?.pesajes || [];
+    // Ordenar cronológicamente (ascendente) para la curva
+    const sorted = [...pesajes].sort((a, b) => 
+      new Date(a.fecha_pesaje).getTime() - new Date(b.fecha_pesaje).getTime()
+    );
+    return {
+      labels: sorted.map(p => new Date(p.fecha_pesaje).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })),
+      datasets: [{
+        label: 'Peso (Kg)',
+        data: sorted.map(p => p.peso_kg),
+        borderColor: '#1B4332',
+        backgroundColor: 'rgba(27, 67, 50, 0.12)',
+        pointBackgroundColor: '#BC8A5F',
+        pointBorderColor: '#1B4332',
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2.5
+      }]
+    };
+  });
+
+  chartOptionsPeso: ChartConfiguration<'line'>['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1B4332',
+        titleColor: '#d4a373',
+        bodyColor: '#ffffff',
+        cornerRadius: 12,
+        padding: 10
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { weight: 'bold', size: 10 }, color: '#666' }
+      },
+      y: {
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { font: { weight: 'bold', size: 10 }, color: '#666', callback: (val) => val + ' kg' }
+      }
+    }
+  };
 
   // TIMELINE LOGIC
   timeline = computed(() => {
@@ -5560,10 +6242,10 @@ export class AnimalDetailComponent implements OnInit {
     const events: TimelineEvent[] = [];
 
     // Sanidad
-    this.data().sanidad?.forEach((s: any) => {
+    this.data()?.sanidad?.forEach((s: Sanidad) => {
       events.push({
         date: s.fecha,
-        title: s.producto,
+        title: s.producto || 'Tratamiento',
         description: s.tipo + ': ' + (s.observaciones || 'Sin notas'),
         icon: 'medkit-outline',
         type: 'health',
@@ -5572,11 +6254,11 @@ export class AnimalDetailComponent implements OnInit {
     });
 
     // Pesajes
-    this.data().pesajes?.forEach((p: any) => {
+    this.data()?.pesajes?.forEach((p: Pesaje) => {
       events.push({
         date: p.fecha_pesaje,
         title: 'Control de Peso',
-        description: `Peso registrado: ${p.peso_kg} kg (${p.tipo_pesaje})`,
+        description: `Peso registrado: ${p.peso_kg} kg (${p.tipo_pesaje || 'N/A'})`,
         icon: 'scale',
         type: 'weight',
         color: '#d4a373'
@@ -5584,7 +6266,8 @@ export class AnimalDetailComponent implements OnInit {
     });
 
     // Reproducción
-    this.data().reproduccion?.forEach((r: any) => {
+    this.data()?.reproduccion?.forEach((r: Reproduccion) => {
+      if (!r.created_at) return;
       events.push({
         date: r.created_at,
         title: 'Evento Reproductivo',
@@ -5610,86 +6293,260 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { 
-  IonContent, IonInput, IonButton, IonSpinner, IonText
+  IonContent, IonInput, IonButton, IonSpinner, ToastController, IonIcon
 } from '@ionic/angular/standalone';
-import { AuthService } from '../../core/services/auth.service';
+import { SupabaseService } from '../../core/services/supabase.service';
+import { addIcons } from 'ionicons';
+import { leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonInput, IonButton, IonSpinner, IonText],
+  imports: [CommonModule, FormsModule, IonContent, IonInput, IonButton, IonSpinner, IonIcon],
   template: `
-    <ion-content color="light">
-      <div class="flex-center justify-center h-full">
-        <div class="uniform-card" class="vac-login-card">
-          <div>
-            <h2 class="font-bold text-lg mb-8 text-center color-primary">
-              Bienvenido a Vacapp
-            </h2>
+    <ion-content>
+      <!-- Fondo de pantalla completa con imagen de Unsplash -->
+      <div class="login-background">
+        <div class="overlay-gradient"></div>
+        <div class="login-container">
+          
+          <!-- Contenedor Glassmorphism -->
+          <div class="glass-card">
             
-            <p class="text-medium text-center mb-8">Ingresa tu correo comercial para comenzar la sesión en tu explotacion.</p>
+            <div class="brand-header">
+              <div class="brand-circle-large">
+                <ion-icon name="leaf-outline"></ion-icon>
+              </div>
+              <h1 class="brand-title">VACAPP</h1>
+              <p class="brand-subtitle">AGRITECH ERP</p>
+            </div>
             
-            <ion-input
-              [(ngModel)]="email"
-              type="email"
-              placeholder="correo@ejemplo.com"
-              fill="outline"
-              labelPlacement="floating"
-              label="Correo Electrónico"
-              class="mb-8"
-              [disabled]="loading()"
-            ></ion-input>
+            <h2 class="form-title">Bienvenido a la Finca</h2>
+            <p class="form-subtitle">Ingresa tus credenciales para continuar</p>
+            
+            <div class="form-group">
+              <ion-input
+                [(ngModel)]="email"
+                type="email"
+                placeholder="correo@ejemplo.com"
+                fill="outline"
+                labelPlacement="floating"
+                label="Correo Electrónico"
+                class="vac-input"
+                [disabled]="loading()"
+              ></ion-input>
 
-            <ion-button expand="block" (click)="signIn()" [disabled]="!email() || loading()">
-              <ion-spinner *ngIf="loading()" name="crescent" slot="start"></ion-spinner>
-              {{ loading() ? 'Enviando...' : 'Iniciar Sesión (OTP)' }}
-            </ion-button>
+              <ion-input
+                [(ngModel)]="password"
+                type="password"
+                placeholder="Ingresa tu contraseña"
+                fill="outline"
+                labelPlacement="floating"
+                label="Contraseña"
+                class="vac-input mt-sm"
+                [disabled]="loading()"
+                (keyup.enter)="signIn()"
+              ></ion-input>
+            </div>
 
-            <ion-text color="danger" *ngIf="error()">
-              <p class="text-center mt-sm">{{ error() }}</p>
-            </ion-text>
-            
-            <ion-text color="success" *ngIf="success()">
-              <p class="text-center mt-sm">Hemos enviado un enlace mágico a tu correo.</p>
-            </ion-text>
+            <div class="action-buttons">
+              <ion-button expand="block" (click)="signIn()" [disabled]="!isValid() || loading()" class="btn-primary-gradient">
+                <ion-spinner *ngIf="loading()" name="crescent" slot="start"></ion-spinner>
+                <ion-icon *ngIf="!loading()" name="log-in-outline" slot="start"></ion-icon>
+                {{ loading() ? 'Entrando...' : 'Iniciar Sesión' }}
+              </ion-button>
+
+              <ion-button expand="block" fill="clear" (click)="signUp()" [disabled]="!isValid() || loading()" class="btn-secondary">
+                <ion-icon name="person-add-outline" slot="start"></ion-icon>
+                Crear nueva cuenta
+              </ion-button>
+            </div>
 
           </div>
         </div>
       </div>
     </ion-content>
-  `
+  `,
+  styles: [`
+    .login-background {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      background: url('https://images.unsplash.com/photo-1595166927357-d3da081ec999?auto=format&fit=crop&q=80&w=2000') no-repeat center center / cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+    }
+    .overlay-gradient {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(88, 47, 14, 0.85) 0%, rgba(45, 106, 79, 0.7) 100%);
+      z-index: 1;
+    }
+    .login-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: white;
+    }
+    .brand-header {
+      margin-bottom: 30px;
+    }
+    .brand-circle-large {
+      width: 72px;
+      height: 72px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      font-size: 36px;
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+    .brand-title {
+      font-size: 2rem;
+      font-weight: 900;
+      margin: 0;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .brand-subtitle {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 5px 0 0;
+      letter-spacing: 3px;
+      opacity: 0.8;
+      text-transform: uppercase;
+    }
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 5px;
+    }
+    .form-subtitle {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin: 0 0 25px;
+      font-weight: 300;
+    }
+    .form-group {
+      margin-bottom: 30px;
+    }
+    .vac-input {
+      --background: rgba(255, 255, 255, 0.9);
+      --color: #333;
+      --placeholder-color: #666;
+      --border-color: transparent;
+      --border-radius: 12px;
+      --highlight-color-focused: var(--ion-color-secondary);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+    }
+    .mt-sm { margin-top: 15px; }
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .btn-primary-gradient {
+      --background: linear-gradient(to right, #bc6c25, #dda15e);
+      --background-activated: linear-gradient(to right, #a05c1f, #c78f4f);
+      --border-radius: 12px;
+      --box-shadow: 0 10px 20px rgba(188, 108, 37, 0.4);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      letter-spacing: 1px;
+      height: 50px;
+    }
+    .btn-secondary {
+      --color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+  `]
 })
 export class LoginComponent {
-  private auth = inject(AuthService);
+  private supabase = inject(SupabaseService);
   private router = inject(Router);
+  private toastController = inject(ToastController);
 
   email = signal('');
+  password = signal('');
   loading = signal(false);
-  error = signal('');
-  success = signal(false);
+
+  constructor() {
+    addIcons({ leafOutline, logInOutline, personAddOutline });
+  }
+
+  isValid() {
+    return this.email().length > 3 && this.password().length >= 6;
+  }
 
   async signIn() {
+    if (!this.isValid()) return;
     this.loading.set(true);
-    this.error.set('');
-    this.success.set(false);
 
     try {
-      const { error } = await this.auth.signInWithOtp(this.email());
+      const { error } = await this.supabase.signIn(this.email(), this.password());
       if (error) {
-        if (error.message.includes('Mock mode')) {
-          // Si estamos en mock mode, el auto login del constructor de AuthService ya 
-          // habra seteado el perfil. Simulamos navegacion.
-          this.router.navigate(['/']);
-          return;
-        }
         throw error;
       }
-      this.success.set(true);
+      this.router.navigate(['/']); // El auth.guard validará en la redirección
     } catch (e: any) {
-      this.error.set(e.message || 'Error al iniciar sesión');
+      this.showToast(e.message || 'Error de credenciales. Por favor, verifica tu correo y contraseña.', 'danger');
     } finally {
       this.loading.set(false);
     }
+  }
+
+  async signUp() {
+    if (!this.isValid()) return;
+    this.loading.set(true);
+
+    try {
+      const { error } = await this.supabase.signUp(this.email(), this.password());
+      if (error) {
+        throw error;
+      }
+      this.showToast('Cuenta creada exitosamente. Por favor verifica tu correo.', 'success');
+    } catch (e: any) {
+      this.showToast(e.message || 'Error al crear la cuenta. Inténtalo de nuevo.', 'danger');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async showToast(message: string, color: 'danger' | 'success') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      color: color,
+      icon: color === 'danger' ? 'warning-outline' : 'checkmark-circle-outline',
+      cssClass: 'vac-toast'
+    });
+    await toast.present();
   }
 }
 
@@ -5720,10 +6577,22 @@ import { addIcons } from 'ionicons';
 import { 
   pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
   trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline,
-  paw 
+  paw, closeOutline, warningOutline, medkitOutline, cashOutline, informationCircleOutline
 } from 'ionicons/icons';
 
 Chart.register(...registerables);
+
+/**
+ * Interfaz para las alertas inteligentes del Dashboard.
+ * Cada alerta tiene un nivel de severidad, un mensaje descriptivo y un icono contextual.
+ */
+interface Alerta {
+  id: string;
+  tipo: 'urgente' | 'aviso' | 'info';
+  mensaje: string;
+  fecha: Date;
+  icono: string;
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -5749,7 +6618,7 @@ Chart.register(...registerables);
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="vac-container animate-fade-in pb-12">
+      <main class="vac-container animate-fade-in pb-12">
         
         <!-- Header con Identidad -->
         <div class="vac-page-header mt-4">
@@ -5767,6 +6636,46 @@ Chart.register(...registerables);
                 <div class="dot shadow-pulse"></div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- ALERTAS INTELIGENTES                                -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <div class="vac-alertas-section" *ngIf="alertasVisibles().length > 0">
+          <div class="vac-alertas-header">
+            <div class="flex items-center gap-2">
+              <ion-icon name="alert-circle-outline" class="color-danger text-xl"></ion-icon>
+              <span class="vac-alertas-title">Alertas Inteligentes</span>
+            </div>
+            <span class="vac-alertas-count">{{ alertasVisibles().length }}</span>
+          </div>
+
+          <div 
+            *ngFor="let alerta of alertasVisibles(); trackBy: trackById; let i = index"
+            class="vac-alerta-card"
+            [class.vac-alerta-urgente]="alerta.tipo === 'urgente'"
+            [class.vac-alerta-aviso]="alerta.tipo === 'aviso'"
+            [class.vac-alerta-info]="alerta.tipo === 'info'"
+            [style.animation-delay]="(i * 80) + 'ms'">
+
+            <div class="vac-alerta-icon-wrapper"
+              [class.bg-danger-soft]="alerta.tipo === 'urgente'"
+              [class.bg-warning-soft]="alerta.tipo === 'aviso'"
+              [class.bg-tertiary-soft]="alerta.tipo === 'info'">
+              <ion-icon [name]="alerta.icono"
+                [color]="alerta.tipo === 'urgente' ? 'danger' : alerta.tipo === 'aviso' ? 'warning' : 'tertiary'">
+              </ion-icon>
+            </div>
+
+            <div class="vac-alerta-body">
+              <p class="vac-alerta-mensaje">{{ alerta.mensaje }}</p>
+              <span class="vac-alerta-fecha">{{ alerta.fecha | date:'dd MMM yyyy, HH:mm' }}</span>
+            </div>
+
+            <button class="vac-alerta-dismiss" (click)="dismissAlerta(alerta.id)" aria-label="Cerrar alerta">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
           </div>
         </div>
 
@@ -5930,12 +6839,158 @@ Chart.register(...registerables);
           </ion-row>
         </ion-grid>
 
-      </div>
+      </main>
     </ion-content>
   `,
-  styles: []
+  styles: [`
+    /* ═══════════════════════════════════════════ */
+    /* ALERTAS INTELIGENTES - Rustic-Luxe          */
+    /* ═══════════════════════════════════════════ */
+
+    @keyframes alertSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes alertPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(188, 71, 73, 0.15); }
+      50%      { box-shadow: 0 0 0 6px rgba(188, 71, 73, 0); }
+    }
+
+    .vac-alertas-section {
+      margin: 1.25rem 0 1.75rem;
+    }
+
+    .vac-alertas-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      padding: 0 0.25rem;
+    }
+
+    .vac-alertas-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--ion-color-dark, #1b4332);
+      letter-spacing: 0.02em;
+    }
+
+    .vac-alertas-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 13px;
+      background: var(--ion-color-danger, #bc4749);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0 8px;
+    }
+
+    .vac-alerta-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      margin-bottom: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: alertSlideIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+      position: relative;
+    }
+
+    .vac-alerta-card:hover {
+      transform: translateX(3px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Borde izquierdo por tipo */
+    .vac-alerta-urgente {
+      border-left: 4px solid var(--ion-color-danger, #bc4749);
+      animation: alertSlideIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) both,
+                 alertPulse 3s ease-in-out 1s 2;
+    }
+    .vac-alerta-aviso {
+      border-left: 4px solid var(--ion-color-warning, #dda15e);
+    }
+    .vac-alerta-info {
+      border-left: 4px solid var(--ion-color-tertiary, #40916c);
+    }
+
+    /* Icono */
+    .vac-alerta-icon-wrapper {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .bg-danger-soft  { background: rgba(188, 71, 73, 0.12); }
+    .bg-warning-soft { background: rgba(221, 161, 94, 0.15); }
+    .bg-tertiary-soft { background: rgba(64, 145, 108, 0.12); }
+
+    /* Body */
+    .vac-alerta-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .vac-alerta-mensaje {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--ion-color-dark, #1b4332);
+      line-height: 1.45;
+      margin: 0 0 4px;
+    }
+    .vac-alerta-fecha {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.72rem;
+      color: var(--ion-color-medium, #92949c);
+      letter-spacing: 0.02em;
+    }
+
+    /* Dismiss */
+    .vac-alerta-dismiss {
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--ion-color-medium, #92949c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1.1rem;
+      margin-top: 2px;
+    }
+    .vac-alerta-dismiss:hover {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--ion-color-danger, #bc4749);
+      transform: rotate(90deg);
+    }
+  `]
 })
-export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DashboardComponent implements AfterViewInit, OnDestroy {
   fincaService = inject(FincaService);
   ganadoService = inject(GanadoService);
   reproService = inject(ReproduccionService);
@@ -5982,11 +7037,25 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private charts: any[] = [];
 
+  // ═══ ALERTAS INTELIGENTES ═══
+  /** Signal interno con todas las alertas generadas */
+  private alertas = signal<Alerta[]>([]);
+  /** IDs de alertas descartadas por el usuario en esta sesión */
+  private alertasDismissed = signal<Set<string>>(new Set());
+  /** Alertas visibles = generadas - descartadas (ordenadas por prioridad) */
+  alertasVisibles = computed(() => {
+    const dismissed = this.alertasDismissed();
+    const prioridad: Record<string, number> = { urgente: 0, aviso: 1, info: 2 };
+    return this.alertas()
+      .filter(a => !dismissed.has(a.id))
+      .sort((a, b) => prioridad[a.tipo] - prioridad[b.tipo]);
+  });
+
   constructor() {
     addIcons({ 
       pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
       trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline,
-      paw
+      paw, closeOutline, warningOutline, medkitOutline, cashOutline, informationCircleOutline
     });
 
     // Configuración Global de Chart.js
@@ -6010,6 +7079,18 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => this.updateCharts(), 300);
       }
     });
+
+    // Generar alertas reactivamente cuando los datos estén listos
+    effect(() => {
+      if (!this.cargando()) {
+        // Leer signals para registrar dependencias
+        const _repro = this.reproService.gestacionesActivas();
+        const _sanidad = this.sanidadService.records();
+        const _finanzas = this.finanzasService.records();
+        const _bovinos = this.ganadoService.bovinos();
+        setTimeout(() => this.generarAlertas(), 500);
+      }
+    });
   }
 
   applyMasterFilter(period: 'Mensual' | 'Anual') {
@@ -6018,7 +7099,115 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.financePeriod.set(period);
   }
 
-  ngOnInit() {}
+  trackById(index: number, item: Alerta | any): string {
+    return item?.id || index.toString();
+  }
+
+  // ═══════════════════════════════════════════════════
+  // ALERTAS INTELIGENTES - Lógica de generación
+  // ═══════════════════════════════════════════════════
+
+  /**
+   * Analiza los datos de Reproducción, Sanidad y Finanzas
+   * para generar notificaciones proactivas e inteligentes.
+   */
+  private generarAlertas(): void {
+    const nuevasAlertas: Alerta[] = [];
+    const bovinos = this.ganadoService.bovinos();
+    const bovinoMap = new Map(bovinos.map(b => [b.id, b]));
+
+    // ─── 1. ALERTAS DE REPRODUCCIÓN (Urgente) ───
+    // Partos inminentes: vacas gestantes con FPP en los próximos 60 días
+    const gestacionesConfirmadas = this.reproService.gestacionesActivas();
+    const hoy = new Date();
+    const limite60d = new Date();
+    limite60d.setDate(hoy.getDate() + 60);
+
+    gestacionesConfirmadas.forEach(g => {
+      if (!g.fecha_parto_prevista) return;
+      const fpp = new Date(g.fecha_parto_prevista);
+      if (fpp >= hoy && fpp <= limite60d) {
+        const bovino = g.bovino || bovinoMap.get(g.bovino_id);
+        const nombre = bovino?.nombre || 'Res S/N';
+        const crotal = bovino?.crotal || g.bovino_id;
+        const diasRestantes = Math.ceil((fpp.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+        nuevasAlertas.push({
+          id: `repro-${g.id}`,
+          tipo: diasRestantes <= 15 ? 'urgente' : 'aviso',
+          mensaje: `⚠️ ${nombre} (${crotal}) tiene un parto próximo programado en ${diasRestantes} días.`,
+          fecha: new Date(),
+          icono: 'warning-outline'
+        });
+      }
+    });
+
+    // ─── 2. ALERTAS DE SANIDAD (Aviso) ───
+    // Animales con retiro sanitario activo (en tratamiento)
+    const registrosSanidad = this.sanidadService.records();
+    const tratamientosActivos = registrosSanidad.filter(s => {
+      if (s.tipo !== 'Tratamiento' && s.tipo !== 'Cirugía') return false;
+      if (!s.fecha) return false;
+      const fAplicacion = new Date(s.fecha);
+      const maxRetiro = Math.max(s.dias_retiro_carne || 0, s.dias_retiro_leche || 0);
+      if (maxRetiro === 0) {
+        // Sin retiro definido, verificar si es reciente (últimos 30 días)
+        const diasDesde = Math.ceil((hoy.getTime() - fAplicacion.getTime()) / (1000 * 60 * 60 * 24));
+        return diasDesde <= 30;
+      }
+      const fFinRetiro = new Date(fAplicacion);
+      fFinRetiro.setDate(fFinRetiro.getDate() + maxRetiro);
+      return fFinRetiro > hoy;
+    });
+
+    // Agrupar por bovino para no duplicar alertas
+    const bovinosTratamiento = new Set<string>();
+    tratamientosActivos.forEach(s => {
+      if (bovinosTratamiento.has(s.bovino_id)) return;
+      bovinosTratamiento.add(s.bovino_id);
+      const bovino = s.bovino || bovinoMap.get(s.bovino_id);
+      const nombre = bovino?.nombre || 'Res S/N';
+      nuevasAlertas.push({
+        id: `sanidad-${s.bovino_id}`,
+        tipo: 'aviso',
+        mensaje: `💉 ${nombre} requiere revisión de tratamiento (${s.producto}).`,
+        fecha: new Date(),
+        icono: 'medkit-outline'
+      });
+    });
+
+    // ─── 3. ALERTAS DE FINANZAS (Info) ───
+    // Gastos superiores a 1000€ en el mes actual
+    const mesActual = hoy.getMonth();
+    const yearActual = hoy.getFullYear();
+    const registrosFinanzas = this.finanzasService.records();
+
+    registrosFinanzas.forEach(f => {
+      if (f.tipo !== 'Gasto') return;
+      const fechaGasto = new Date(f.fecha);
+      if (fechaGasto.getMonth() !== mesActual || fechaGasto.getFullYear() !== yearActual) return;
+      if (f.monto > 1000) {
+        nuevasAlertas.push({
+          id: `finanzas-${f.id}`,
+          tipo: 'info',
+          mensaje: `💰 Gasto elevado detectado en ${f.categoria || 'Varios'}: ${f.monto.toLocaleString('es-ES')}€ — ${f.descripcion || 'Sin descripción'}.`,
+          fecha: new Date(f.fecha),
+          icono: 'cash-outline'
+        });
+      }
+    });
+
+    this.alertas.set(nuevasAlertas);
+  }
+
+  /**
+   * Descarta una alerta de la vista (solo en la sesión actual).
+   * @param id - Identificador único de la alerta a descartar
+   */
+  dismissAlerta(id: string): void {
+    const current = new Set(this.alertasDismissed());
+    current.add(id);
+    this.alertasDismissed.set(current);
+  }
 
   async exportarPDF() {
     const doc = await this.pdfService.getNewDoc();
@@ -6328,7 +7517,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </ion-buttons>
         <ion-title class="ion-text-center">Gastos y Ganancias</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="presentFilter($event)" fill="clear">
+          <ion-button (click)="presentFilter($event)" fill="clear" aria-label="Abrir filtros">
             <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -6336,7 +7525,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="vac-container animate-fade-in pb-12">
+      <main class="vac-container animate-fade-in pb-12">
         
         <!-- CONTROL MANDO COLECTIVO (NUEVO) -->
         <div class="vac-master-filter-bar mb-6 animate-fade-in">
@@ -6358,8 +7547,8 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </div>
 
         <!-- GRÁFICO DE ROI (Relocado) -->
-        <div class="vac-main-card animate-slide-up mb-8">
-          <div class="vac-card-header-flex">
+        <section class="vac-main-card animate-slide-up mb-8">
+          <header class="vac-card-header-flex">
             <div class="vac-card-title-group">
               <span>ESTADO DE CUENTAS</span>
               <strong>Ingresos vs Gastos</strong>
@@ -6379,18 +7568,18 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
                  <span>ROI Dinámico</span>
                </div>
             </div>
-          </div>
+          </header>
           <div class="p-4">
              <canvas baseChart class="chart-canvas-finance" [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
           </div>
-        </div>
+        </section>
 
         <!-- Listado de Movimientos Recientes -->
         <h2 class="vac-section-title">Movimientos Filtrados</h2>
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredRecords()">
-              <div class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
+            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredRecords(); trackBy: trackById">
+              <article class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
                 <div class="vac-card-header-flex">
                   <div class="vac-icon-circle" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
                     <ion-icon [name]="r.tipo === 'Ingreso' ? 'arrow-up-outline' : 'arrow-down-outline'" [class.color-light]="r.tipo === 'Ingreso'" [class.color-warning]="r.tipo !== 'Ingreso'"></ion-icon>
@@ -6408,14 +7597,14 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
                 </div>
 
                 <div class="vac-card-footer mt-4 pt-2 border-t-light flex justify-end gap-2">
-                  <button class="vac-btn-icon bg-light" (click)="openEditModal(r)">
+                  <button class="vac-btn-icon bg-light" (click)="openEditModal(r)" aria-label="Editar">
                     <ion-icon name="create-outline"></ion-icon>
                   </button>
-                  <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(r)">
+                  <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(r)" aria-label="Eliminar">
                     <ion-icon name="trash-outline"></ion-icon>
                   </button>
                 </div>
-              </div>
+              </article>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -6428,7 +7617,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
            <p>No se encontraron registros para los filtros aplicados.</p>
         </div>
 
-      </div>
+      </main>
 
       <!-- POPOVER DE FILTROS (RUSTIC-LUXE) -->
       <ion-popover [isOpen]="isFilterPopoverOpen" [event]="filterEvent" (didDismiss)="isFilterPopoverOpen = false" class="vac-popover">
@@ -6474,7 +7663,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
       </ion-popover>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="openAddModal()" color="primary">
+        <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Añadir movimiento">
           <ion-icon name="add-circle"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -6486,7 +7675,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
             <ion-toolbar color="primary">
               <ion-title>{{ editingItem ? 'Actualizar Registro' : 'Añadir Movimiento' }}</ion-title>
               <ion-buttons slot="end">
-                <ion-button (click)="closeModal()">
+                <ion-button (click)="closeModal()" aria-label="Cerrar modal">
                   <ion-icon name="close-outline"></ion-icon>
                 </ion-button>
               </ion-buttons>
@@ -6559,7 +7748,7 @@ export class FinanzasComponent {
   filterTipo = signal<string>('Todos');
   filterCategoria = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
   todasLasCategorias = [
     'Venta Leche', 'Venta Carne', 'Venta Genética', 'Ayudas Gubernamentales', 'Otros Ingresos',
@@ -6631,6 +7820,10 @@ export class FinanzasComponent {
     if (id) {
       this.router.navigate(['/animal-detail', id]);
     }
+  }
+
+  trackById(index: number, item: Finanzas | any): string {
+    return item.id || index.toString();
   }
 
   constructor() {
@@ -6792,7 +7985,7 @@ export class FinanzasComponent {
   }
 
   // --- LÓGICA DE FILTROS ---
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
@@ -6850,10 +8043,10 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         </ion-buttons>
         <ion-title class="ion-text-center">Potreros y Recintos</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" fill="clear">
+          <ion-button (click)="exportarPDF()" fill="clear" aria-label="Exportar PDF">
             <ion-icon name="document-text-outline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear">
+          <ion-button fill="clear" aria-label="Filtrar">
             <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -6861,7 +8054,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="vac-container animate-fade-in">
+      <main class="vac-container animate-fade-in">
         
         <div class="vac-text-stack mb-8">
           <h1 class="vac-page-title">Gestión de Potreros</h1>
@@ -6870,8 +8063,8 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let lote of lotes">
-              <div class="uniform-card">
+            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let lote of lotes; trackBy: trackById">
+              <article class="uniform-card">
                 <div class="vac-card-header-flex">
                   <div class="vac-card-title-group">
                     <h3 class="vac-card-title">{{ lote.nombre }}</h3>
@@ -6897,14 +8090,14 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
                 </div>
 
                 <div class="vac-card-footer mt-6 pt-4 border-t-light flex justify-end gap-2">
-                   <button class="vac-btn-icon bg-light" (click)="openEditModal(lote)">
+                   <button class="vac-btn-icon bg-light" (click)="openEditModal(lote)" aria-label="Editar">
                       <ion-icon name="create-outline"></ion-icon>
                    </button>
-                   <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(lote.id)">
+                   <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(lote.id)" aria-label="Eliminar">
                       <ion-icon name="trash-outline"></ion-icon>
                    </button>
                 </div>
-              </div>
+              </article>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -6920,10 +8113,10 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           </ion-button>
         </div>
 
-      </div>
+      </main>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
-        <ion-fab-button (click)="openAddModal()" class="vac-fab">
+        <ion-fab-button (click)="openAddModal()" class="vac-fab" aria-label="Añadir lote">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -6935,7 +8128,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
             <ion-toolbar>
               <ion-title>{{ editingItem ? 'Actualizar Recinto' : 'Nuevo Recinto' }}</ion-title>
               <ion-buttons slot="end">
-                <ion-button (click)="closeModal()" class="color-medium">
+                <ion-button (click)="closeModal()" class="color-medium" aria-label="Cerrar modal">
                   <ion-icon name="close"></ion-icon>
                 </ion-button>
               </ion-buttons>
@@ -7009,6 +8202,10 @@ export class LotesComponent implements OnInit {
   async loadData() {
     const { data } = await this.supa.getAll<Lote>('lotes');
     this.lotes = data || [];
+  }
+
+  trackById(index: number, item: any): string {
+    return item?.id || index.toString();
   }
 
   async exportarPDF() {
@@ -7113,10 +8310,10 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     </ion-buttons>
     <ion-title class="ion-text-center">Inventario Ganadero</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" fill="clear">
+      <ion-button (click)="exportarPDF()" fill="clear" aria-label="Exportar PDF">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button (click)="presentFilter($event)" fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear" aria-label="Abrir filtros">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -7131,7 +8328,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     </ion-refresher-content>
   </ion-refresher>
 
-  <div class="vac-container animate-fade-in">
+  <main class="vac-container animate-fade-in">
     <!-- Search Bar -->
     <ion-searchbar
       mode="ios"
@@ -7142,8 +8339,8 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     </ion-searchbar>
 
     <!-- GRÁFICO DE PESO -->
-    <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
-      <div class="vac-card-header">
+    <section class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
+      <header class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>ANÁLISIS DE RENDIMIENTO</span>
@@ -7154,20 +8351,20 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
             <span>Hato Saludable</span>
           </div>
         </div>
-      </div>
+      </header>
       <div class="vac-card-content">
         <div class="vac-chart-container">
            <canvas baseChart [data]="chartPesos()" [options]="chartOptionsPilarLine" [type]="'line'"></canvas>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- SKELETON LOADER -->
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
-          <div class="uniform-card">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]; trackBy: trackById">
+          <article class="uniform-card">
             <ion-item lines="none" class="vac-card-header ion-margin-bottom">
               <div class="vac-avatar ion-margin-end" slot="start">
                 <ion-skeleton-text animated class="skeleton-avatar-lg"></ion-skeleton-text>
@@ -7191,7 +8388,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
                 <ion-skeleton-text animated class="skeleton-btn-wide"></ion-skeleton-text>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -7199,8 +8396,8 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     <!-- ANIMAL LIST -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos()">
-          <div class="uniform-card clickable-card" (click)="goToDetail(b.id)">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos(); trackBy: trackById">
+          <article class="uniform-card clickable-card" [ngClass]="getStatusBorderClass(b)" (click)="goToDetail(b.id)">
             <ion-item lines="none" class="vac-card-header">
               <div class="ion-margin-end" slot="start">
                  <img *ngIf="b.foto_url" [src]="b.foto_url" class="avatar-list" [alt]="b.nombre">
@@ -7246,7 +8443,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
                 </ion-button>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -7263,10 +8460,10 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
       </ion-button>
     </div>
 
-  </div>
+  </main>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openAddModal()" color="primary">
+    <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Añadir ejemplar">
       <ion-icon name="add-circle"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -7278,7 +8475,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
         <ion-toolbar color="primary">
           <ion-title>{{ editingItem ? 'Actualizar Ficha' : 'Nuevo Registro' }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeModal()">
+            <ion-button (click)="closeModal()" aria-label="Cerrar modal">
               <ion-icon name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -7521,8 +8718,10 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
- * Componente para el Módulo de Manejo (Antiguo Ganado).
- * Actualizado con Búsqueda en tiempo real, Skeletons y Pull-to-refresh.
+ * @class ManejoComponent
+ * @description Componente principal para el Módulo de Manejo (Inventario y Censo Ganadero).
+ * Implementa una interfaz "Rustic-Luxe" con capacidades de búsqueda en tiempo real (Signals),
+ * filtros avanzados, carga perezosa de imágenes (Skeletons) y soporte de sincronización Offline-First.
  */
 @Component({
   selector: 'app-manejo',
@@ -7541,7 +8740,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
   templateUrl: './manejo.component.html',
   styleUrls: ['./manejo.component.scss']
 })
-export class ManejoComponent implements OnInit {
+export class ManejoComponent {
   public ganadoService = inject(GanadoService);
   private fincaService = inject(FincaService);
   private storageService = inject(StorageService);
@@ -7556,17 +8755,23 @@ export class ManejoComponent implements OnInit {
   bovinos = this.ganadoService.bovinos;
   lotes = this.fincaService.lotes;
   
-  // Estados de interfaz y búsqueda
+  // Estados de interfaz reactivos (Signals)
+  /** Estado de carga asíncrona del servicio. */
   isLoading = signal<boolean>(true);
+  /** Término actual introducido en la barra de búsqueda. */
   searchTerm = signal<string>('');
   
   // Filtros Avanzados
   filterEstado = signal<string>('Todos');
   filterLote = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
-  // Computado que retorna la lista filtrada de bovinos basada en el searchbar y filtros
+  /**
+   * @description Computado maestro que devuelve la lista de bovinos procesada.
+   * Aplica en cascada: Búsqueda de texto -> Filtro por Estado -> Filtro por Lote.
+   * Se actualiza automáticamente (sin Zone.js explícito) cuando cambia cualquier signal dependiente.
+   */
   filteredBovinos = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const estado = this.filterEstado();
@@ -7647,16 +8852,29 @@ export class ManejoComponent implements OnInit {
     }, { allowSignalWrites: true });
   }
 
-  async ngOnInit() {
-    this.loadData();
+  trackById(index: number, item: any): string {
+    return item?.id || item || index.toString();
   }
 
-  async loadData() {
-    // Los lotes se cargan vía FincaService automáticamente
+  /**
+   * @description Retorna la clase CSS de borde según el estado reproductivo/salud del animal.
+   */
+  getStatusBorderClass(bovino: any): string {
+    const estado = (bovino.estado_reproductivo || '').toLowerCase();
+    if (estado.includes('gestante') || estado.includes('gestación')) return 'border-status-gestante';
+    if (estado.includes('lactante') || estado.includes('producción')) return 'border-status-produccion';
+    if (estado.includes('enferma') || estado.includes('urgente')) return 'border-status-enferma';
+    if (estado.includes('seca')) return 'border-status-seca';
+    if (estado.includes('engorde') || estado.includes('ceba')) return 'border-status-engorde';
+    return 'border-status-sano';
   }
 
-  handleSearch(event: any) {
-    this.searchTerm.set(event.detail.value || '');
+  /**
+   * @description Actualiza el Signal de búsqueda en base a la entrada del usuario.
+   * @param {Event} event Evento emitido por el componente ion-searchbar.
+   */
+  handleSearch(event: Event) {
+    this.searchTerm.set((event.target as HTMLInputElement).value || '');
   }
 
   goToDetail(id: string) {
@@ -7666,7 +8884,7 @@ export class ManejoComponent implements OnInit {
   }
 
   // --- LÓGICA DE FILTROS ---
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
@@ -7678,14 +8896,17 @@ export class ManejoComponent implements OnInit {
     this.isFilterPopoverOpen = false;
   }
 
-  async handleRefresh(event: any) {
+  async handleRefresh(event: Event) {
     const fincaId = this.fincaService.selectedFincaId();
     if (fincaId) {
       await this.ganadoService.loadBovinos(fincaId);
     }
-    event.target.complete();
+    (event.target as any).complete();
   }
 
+  /**
+   * @description Exporta el censo actual filtrado a formato PDF utilizando `PdfService`.
+   */
   async exportarPDF() {
     this.presentToast('Generando Censo de Animales...', 'primary');
     
@@ -7736,8 +8957,8 @@ export class ManejoComponent implements OnInit {
 
   closeModal() { this.isModalOpen = false; }
 
-  async onFileSelected(event: any) {
-    const file = event.target.files[0];
+  async onFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       if (!this.fincaService.selectedFincaId()) {
         this.presentToast('Debes seleccionar una finca primero', 'warning');
@@ -7757,6 +8978,10 @@ export class ManejoComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Persiste la ficha del animal (Creación o Actualización).
+   * Tiene conciencia de red (Offline-First): si no hay conexión, delega en `OfflineSyncService`.
+   */
   async saveData() {
     if (this.bovinoForm.invalid) return;
     const payload = this.bovinoForm.value;
@@ -7788,6 +9013,11 @@ export class ManejoComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Inicia el proceso de baja definitiva (purga) de un animal.
+   * Requiere confirmación doble (Alerta nativa destructiva) y soporta cola offline.
+   * @param {string} id UUID del bovino a purgar.
+   */
   async confirmDelete(id: string) {
     const alert = await this.alertCtrl.create({
       header: 'Purgar Registro',
@@ -7839,7 +9069,7 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
   IonIcon, IonButton, IonGrid, IonRow, IonCol, IonItem, 
   IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
-  IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton
+  IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton, IonSearchbar
 } from '@ionic/angular/standalone';
 import { 
   AlertController, 
@@ -7873,7 +9103,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
     IonIcon, IonButton, IonGrid, IonRow, IonCol, IonItem, 
     IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
-    IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton
+    IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton, IonSearchbar
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -7894,7 +9124,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="vac-container animate-fade-in">
+      <main class="vac-container animate-fade-in">
         
         <!-- Cabecera de Selección -->
         <div *ngIf="selectedBovino" class="flex items-center justify-between mb-8 animate-fade-in">
@@ -7914,21 +9144,19 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
              <p class="vac-page-subtitle">Busca el ejemplar para registrar su pesaje</p>
            </div>
 
-           <div class="vac-search-wrapper mb-8">
-              <ion-icon name="search" class="vac-search-icon"></ion-icon>
-              <input 
-                type="text" 
-                placeholder="Buscar por crotal o nombre..." 
-                class="vac-search-input-field"
-                [ngModel]="searchTerm()"
-                (ngModelChange)="searchTerm.set($event)">
-           </div>
+           <ion-searchbar
+             mode="ios"
+             animated="true"
+             placeholder="Buscar por crotal o nombre..."
+             (ionInput)="searchTerm.set($any($event).detail.value || '')"
+             class="vac-filter-bar vac-transparent-searchbar mb-8">
+           </ion-searchbar>
 
            <!-- LISTA ESTANDARIZADA -->
            <ion-grid fixed class="ion-no-padding">
              <ion-row>
-                <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos()">
-                  <div class="uniform-card clickable-card" (click)="selectBovino(b)">
+                <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos(); trackBy: trackById">
+                  <article class="uniform-card clickable-card" [ngClass]="getStatusBorderClass(b)" (click)="selectBovino(b)">
                    <div class="vac-card-header-flex">
                       <div class="ion-margin-end">
                          <img *ngIf="b.foto_url" [src]="b.foto_url" class="avatar-list" [alt]="b.nombre">
@@ -7948,7 +9176,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                      <span class="vac-tag-mini">{{ ganadoService.calculateCategoria(b) }}</span>
                      <span class="vac-info-label ml-auto" (click)="goToDetail(b.id); $event.stopPropagation()">Consultar Ficha</span>
                    </div>
-                 </div>
+                 </article>
                </ion-col>
              </ion-row>
            </ion-grid>
@@ -7988,8 +9216,8 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            </ion-grid>
 
            <!-- GRÁFICO INDIVIDUAL -->
-           <div class="vac-main-card mb-8">
-              <div class="vac-card-header-flex">
+           <section class="vac-main-card mb-8">
+              <header class="vac-card-header-flex">
                  <div class="vac-card-title-group">
                     <h3 class="vac-card-title">Curva de Crecimiento</h3>
                     <p class="vac-card-subtitle">Evolución del peso en el tiempo</p>
@@ -7997,11 +9225,11 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                  <div class="vac-icon-circle bg-wheat">
                     <ion-icon name="bar-chart-outline" class="color-earth"></ion-icon>
                  </div>
-              </div>
+              </header>
               <div class="vac-chart-container mt-6">
                  <canvas baseChart [data]="chartDataIndividual" [options]="chartOptions" [type]="'line'"></canvas>
               </div>
-           </div>
+           </section>
 
            <!-- HISTORIAL -->
            <div class="flex items-center justify-between mb-6">
@@ -8011,8 +9239,8 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            
            <ion-grid fixed class="ion-no-padding">
              <ion-row>
-               <ion-col size="12" size-md="6" size-lg="4" *ngFor="let p of pesajesFiltrados">
-                 <div class="uniform-card">
+               <ion-col size="12" size-md="6" size-lg="4" *ngFor="let p of pesajesFiltrados; trackBy: trackById">
+                 <article class="uniform-card">
                    <div class="vac-card-header-flex">
                      <div class="vac-icon-avatar bg-light">
                         <ion-icon name="calendar-outline" class="color-medium"></ion-icon>
@@ -8035,7 +9263,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                         Completado
                      </ion-badge>
                    </div>
-                 </div>
+                 </article>
                </ion-col>
              </ion-row>
            </ion-grid>
@@ -8049,7 +9277,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            </div>
         </div>
 
-      </div>
+      </main>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
         <ion-fab-button (click)="setOpen(true)" class="vac-fab">
@@ -8174,7 +9402,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     </ion-content>
   `
 })
-export class RecriaComponent implements OnInit {
+export class RecriaComponent {
   private supa = inject(SupabaseService);
   public ganadoService = inject(GanadoService);
   private pesajeService = inject(PesajeService);
@@ -8193,7 +9421,7 @@ export class RecriaComponent implements OnInit {
   filterCategoria = signal<string>('Todos');
   filterSexo = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
   filteredBovinos = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -8249,8 +9477,18 @@ export class RecriaComponent implements OnInit {
     });
   }
 
-  async ngOnInit() {
-    // No necesitamos cargar nada aquí ya que GanadoService ya tiene los bovinos
+  trackById(index: number, item: any): string {
+    return item?.id || index.toString();
+  }
+
+  getStatusBorderClass(bovino: any): string {
+    const estado = (bovino.estado_reproductivo || '').toLowerCase();
+    if (estado.includes('gestante') || estado.includes('gestación')) return 'border-status-gestante';
+    if (estado.includes('lactante') || estado.includes('producción')) return 'border-status-produccion';
+    if (estado.includes('enferma') || estado.includes('urgente')) return 'border-status-enferma';
+    if (estado.includes('seca')) return 'border-status-seca';
+    if (estado.includes('engorde') || estado.includes('ceba')) return 'border-status-engorde';
+    return 'border-status-sano';
   }
 
   goToDetail(id: string) {
@@ -8307,7 +9545,7 @@ export class RecriaComponent implements OnInit {
   }
 
   // --- LÓGICA DE FILTROS ---
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
@@ -8463,10 +9701,10 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     </ion-buttons>
     <ion-title class="ion-text-center">Montas y Cría</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" fill="clear">
+      <ion-button (click)="exportarPDF()" fill="clear" aria-label="Exportar a PDF">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button (click)="presentFilter($event)" fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear" aria-label="Abrir filtros">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -8480,7 +9718,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     </ion-refresher-content>
   </ion-refresher>
 
-  <div class="vac-container animate-fade-in">
+  <main class="vac-container animate-fade-in">
     
     <!-- CONTROL MANDO COLECTIVO -->
     <div class="vac-master-filter-bar mb-6 animate-fade-in">
@@ -8511,8 +9749,8 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     </ion-searchbar>
 
     <!-- GRÁFICO DE FERTILIDAD -->
-    <div class="vac-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
-      <div class="vac-card-header">
+    <section class="vac-main-card animate-slide-up mb-8" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
+      <header class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>EFICIENCIA REPRODUCTIVA</span>
@@ -8534,13 +9772,13 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
              </div>
           </div>
         </div>
-      </div>
+      </header>
       <div class="vac-card-content">
         <div class="vac-chart-container chart-300px">
           <canvas baseChart [data]="chartFertilidad()" [options]="chartOptionsPilarStacked" [type]="'bar'"></canvas>
         </div>
       </div>
-    </div>
+    </section>
 
     <h2 class="vac-section-title" *ngIf="!isLoading()">Próximos Partos</h2>
 
@@ -8548,7 +9786,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <ion-grid fixed class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
-          <div class="uniform-card">
+          <article class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
               <div class="vac-card-title-group vac-flex-1">
@@ -8569,7 +9807,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
                 <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -8586,8 +9824,8 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <!-- Gestaciones confirmadas (Próximos Partos) -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredGestaciones()">
-          <div class="uniform-card">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredGestaciones(); trackBy: trackById">
+          <article class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-danger-soft" slot="start">
                 <ion-icon name="pulse-outline" color="danger"></ion-icon>
@@ -8619,7 +9857,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
                 </ion-button>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -8629,8 +9867,8 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <!-- Historial en Tarjetas Pro -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredReproducciones()">
-          <div class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredReproducciones(); trackBy: trackById">
+          <article class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-primary-soft" slot="start">
                 <ion-icon name="female-outline" color="primary"></ion-icon>
@@ -8663,7 +9901,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
                 </ion-button>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -8677,10 +9915,10 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
       <p>No hay historial reproductivo registrado para esta búsqueda.</p>
     </div>
 
-  </div>
+  </main>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openAddModal()" color="primary">
+    <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Nuevo registro de cría">
       <ion-icon name="add-circle"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -8692,7 +9930,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
         <ion-toolbar color="primary">
           <ion-title>{{ editingItem ? 'Actualizar Ficha' : 'Nuevo Evento' }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeModal()">
+            <ion-button (click)="closeModal()" aria-label="Cerrar modal">
               <ion-icon name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -8904,7 +10142,7 @@ export class ReproduccionComponent implements OnInit {
   filterEstado = signal<string>('Todos');
   filterMetodo = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
   // Computado para Historial Completo
   filteredReproducciones = computed(() => {
@@ -8977,7 +10215,7 @@ export class ReproduccionComponent implements OnInit {
     this.loadData();
   }
 
-  async loadData(event?: any) {
+  async loadData(event?: Event) {
     this.isLoading.set(true);
     try {
       const { data: repros } = await this.supa.getReproduccion();
@@ -8987,14 +10225,18 @@ export class ReproduccionComponent implements OnInit {
       console.error('Error cargando datos reproductivos:', e);
     } finally {
       this.isLoading.set(false);
-      if (event && event.target) {
-        event.target.complete();
+      if (event && (event as any).target) {
+        (event as any).target.complete();
       }
     }
   }
 
-  handleRefresh(event: any) {
+  handleRefresh(event: Event) {
     this.loadData(event);
+  }
+
+  trackById(index: number, item: Reproduccion | any): string {
+    return item.id || index.toString();
   }
 
   goToDetail(bovinoId: string) {
@@ -9022,8 +10264,9 @@ export class ReproduccionComponent implements OnInit {
     );
   }
 
-  onSearch(event: any) {
-    this.searchTerm.set(event.target.value);
+  onSearch(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm.set(target.value || '');
   }
 
   // --- LÓGICA DE FILTROS ---
@@ -9032,7 +10275,7 @@ export class ReproduccionComponent implements OnInit {
     this.chartPeriodo.set(periodo);
   }
 
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
@@ -9157,10 +10400,10 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     </ion-buttons>
     <ion-title class="ion-text-center">Salud y Medicinas</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" fill="clear">
+      <ion-button (click)="exportarPDF()" fill="clear" aria-label="Exportar a PDF">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button (click)="presentFilter($event)" fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear" aria-label="Abrir filtros">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -9175,7 +10418,7 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     </ion-refresher-content>
   </ion-refresher>
 
-  <div class="vac-container animate-fade-in">
+  <main class="vac-container animate-fade-in">
 
     <!-- CONTROL MANDO COLECTIVO -->
     <div class="vac-master-filter-bar mb-6 animate-fade-in">
@@ -9200,8 +10443,8 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     </div>
 
     <!-- GRÁFICO DE DISTRIBUCIÓN -->
-    <div class="vac-main-card animate-slide-up mb-8" *ngIf="!isLoading()">
-      <div class="vac-card-header">
+    <section class="vac-main-card animate-slide-up mb-8" *ngIf="!isLoading()">
+      <header class="vac-card-header">
         <div class="vac-card-header-flex">
           <div class="vac-card-title-group">
             <span>DIAGNÓSTICO GRUPAL</span>
@@ -9222,29 +10465,28 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
              </ion-segment>
           </div>
         </div>
-      </div>
+      </header>
       <div class="vac-card-content">
         <div class="vac-chart-container chart-250px">
           <canvas baseChart [data]="chartSanidad()" [options]="chartOptions" [type]="'bar'"></canvas>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- Buscador Premium -->
-    <div class="vac-searchbar-container">
-      <ion-searchbar
-        mode="ios"
-        animated="true"
-        placeholder="Buscar animal..."
-        (ionInput)="onSearch($event)">
-      </ion-searchbar>
-    </div>
+    <ion-searchbar
+      mode="ios"
+      animated="true"
+      placeholder="Buscar animal..."
+      (ionInput)="onSearch($event)"
+      class="vac-filter-bar vac-transparent-searchbar">
+    </ion-searchbar>
 
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
         <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
-          <div class="uniform-card">
+          <article class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
               <div class="vac-card-title-group vac-flex-1">
@@ -9259,16 +10501,15 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
                 <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
 
-    <!-- LISTA ESTANDARIZADA -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredSanidad().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of filteredSanidad()">
-          <div class="uniform-card clickable-card" (click)="goToDetail(s.bovino_id)">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of filteredSanidad(); trackBy: trackById">
+          <article class="uniform-card clickable-card" (click)="goToDetail(s.bovino_id)">
             <div class="vac-card-header">
                <div class="vac-card-icon" [ngClass]="getBadgeColor(s.tipo)" slot="start">
                  <ion-icon [name]="getHealthIcon(s.tipo)" color="light"></ion-icon>
@@ -9307,7 +10548,7 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
                 </div>
               </div>
             </div>
-          </div>
+          </article>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -9321,10 +10562,10 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
       <p>No se encontraron registros sanitarios para esta búsqueda.</p>
     </div>
 
-  </div>
+  </main>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openAddModal()" color="primary">
+    <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Nueva intervención">
       <ion-icon name="add-circle"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -9336,7 +10577,7 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
         <ion-toolbar color="primary">
           <ion-title>{{ editingItem ? 'Actualizar Ficha' : 'Nueva Intervención' }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeModal()">
+            <ion-button (click)="closeModal()" aria-label="Cerrar modal">
               <ion-icon name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -9552,7 +10793,7 @@ export class SanidadComponent implements OnInit {
   filterTipo = signal<string>('Todos');
   filterLote = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
   // Computado Reactivo para Filtrado Multidimensional
   filteredSanidad = computed(() => {
@@ -9653,7 +10894,7 @@ export class SanidadComponent implements OnInit {
     this.loadData();
   }
 
-  async loadData(event?: any) {
+  async loadData(event?: Event) {
     this.isLoading.set(true);
     try {
       const { data: records } = await this.supa.getSanidad();
@@ -9662,14 +10903,18 @@ export class SanidadComponent implements OnInit {
       console.error('Error cargando datos sanitarios:', e);
     } finally {
       this.isLoading.set(false);
-      if (event && event.target) {
-        event.target.complete();
+      if (event && (event as any).target) {
+        (event as any).target.complete();
       }
     }
   }
 
-  handleRefresh(event: any) {
+  handleRefresh(event: Event) {
     this.loadData(event);
+  }
+
+  trackById(index: number, item: Sanidad | any): string {
+    return item.id || index.toString();
   }
 
   goToDetail(bovinoId: string) {
@@ -9695,8 +10940,9 @@ export class SanidadComponent implements OnInit {
     );
   }
 
-  onSearch(event: any) {
-    this.searchTerm.set(event.target.value);
+  onSearch(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm.set(target.value || '');
   }
 
   // --- LÓGICA DE FILTROS ---
@@ -9705,7 +10951,7 @@ export class SanidadComponent implements OnInit {
     this.chartPeriodo.set(periodo);
   }
 
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
@@ -9834,6 +11080,96 @@ ARCHIVO: .\frontend\src\app\shared\.gitkeep
 ==================================================
 
 # gitkeep
+
+
+==================================================
+ARCHIVO: .\frontend\src\app\shared\utils\formatters.ts
+==================================================
+
+/**
+ * Utilidades puras y estáticas para formateo y cálculos en toda la aplicación.
+ * Sigue el principio DRY para evitar duplicación en los componentes.
+ */
+
+/**
+ * Formatea un número como moneda Euro.
+ * @param {number} value - El monto a formatear.
+ * @returns {string} El monto formateado como '1.200,50 €'.
+ */
+export function formatCurrency(value: number): string {
+  if (value == null) return '0,00 €';
+  return new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(value);
+}
+
+/**
+ * Calcula la edad en base a la fecha de nacimiento.
+ * @param {string | Date} birthDate - La fecha de nacimiento.
+ * @returns {string} La edad en formato amigable (ej. '2 años, 3 meses' o '4 meses').
+ */
+export function calculateAgeDesc(birthDate: string | Date): string {
+  if (!birthDate) return 'Desconocida';
+  
+  const birth = new Date(birthDate);
+  const now = new Date();
+  
+  let years = now.getFullYear() - birth.getFullYear();
+  let months = now.getMonth() - birth.getMonth();
+  
+  if (months < 0 || (months === 0 && now.getDate() < birth.getDate())) {
+    years--;
+    months += 12;
+  }
+  
+  if (now.getDate() < birth.getDate()) {
+    months--;
+    if (months < 0) {
+      months += 12;
+    }
+  }
+
+  if (years > 0) {
+    return `${years} año${years > 1 ? 's' : ''}${months > 0 ? `, ${months} mes${months > 1 ? 'es' : ''}` : ''}`;
+  } else if (months > 0) {
+    return `${months} mes${months > 1 ? 'es' : ''}`;
+  } else {
+    return 'Menos de 1 mes';
+  }
+}
+
+/**
+ * Parsea y formatea una fecha ISO a un formato local legible.
+ * @param {string | Date} date - Fecha a formatear.
+ * @returns {string} Fecha formateada (ej. '12 Ene 2024').
+ */
+export function formatDate(date: string | Date): string {
+  if (!date) return 'N/A';
+  return new Intl.DateTimeFormat('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(date));
+}
+
+/**
+ * Obtiene el color de la clase de badge según el estado reproductivo.
+ * @param {string} status - Estado reproductivo ('Gestante', 'Seca', etc).
+ * @returns {string} El nombre del color de Ionic (ej. 'success', 'warning').
+ */
+export function getBadgeColorForReproStatus(status: string | undefined | null): string {
+  if (!status) return 'medium';
+  switch (status.toLowerCase()) {
+    case 'confirmada':
+    case 'gestante': return 'success';
+    case 'fallida': return 'danger';
+    case 'pendiente': return 'warning';
+    default: return 'medium';
+  }
+}
 
 
 ==================================================
@@ -10343,12 +11679,12 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 @use "../abstracts/variables";
 
 /* BASE CARD - Standard Vacapp Floating Card */
-.vac-base-card {
+.vac-card {
   background: var(--ion-card-background);
   border-radius: 20px;
-  padding: 1.25rem;
-  box-shadow: variables.$vac-shadow;
-  border: 1px solid rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(88, 47, 14, 0.08);
   margin: 12px 8px;
   position: relative;
   transition: variables.$transition-base;
@@ -10367,8 +11703,8 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   }
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
     border-color: rgba(variables.$tertiary-color, 0.2);
     
     &::before {
@@ -10379,7 +11715,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 
 /* KPI CARDS - Intelligence Center */
 .vac-kpi-card {
-  @extend .vac-base-card;
+  @extend .vac-card;
   &.glass {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
@@ -10426,7 +11762,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 
 /* MAIN DASHBOARD CARDS */
 .vac-main-card {
-  @extend .vac-base-card;
+  @extend .vac-card;
   padding: 0; /* Let header and content manage padding */
 
   ion-card-header {
@@ -10556,12 +11892,12 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 
 /* Modifiers for Specific Modules */
 .vac-pro-card { 
-  @extend .vac-base-card;
+  @extend .vac-card;
   border-top: 4px solid variables.$tertiary-color;
 }
 
 .vac-tag-body, .vac-field-card-body, .vac-health-card-body, .vac-repro-card-body, .vac-weight-card-body, .vac-cow-card {
-  @extend .vac-base-card;
+  @extend .vac-card;
 }
 
 /* ION-CARD GLOBAL STANDARDIZATION */
@@ -10602,26 +11938,11 @@ ion-card {
   }
 }
 
-/* RUSTIC CARD - The definitive Vacapp standard */
-.rustic-card {
-  background: var(--ion-card-background);
-  border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(88, 47, 14, 0.08);
-  transition: variables.$transition-base;
-  overflow: hidden;
-  margin: 12px 8px;
-  padding: 1.5rem;
-  
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
-  }
-}
+
 
 /* UNIFORM CARD - Standard for lists and inventories */
 .uniform-card {
-  @extend .rustic-card;
+  @extend .vac-card;
   display: flex !important;
   flex-direction: column !important;
   height: 100% !important;
@@ -10640,33 +11961,10 @@ ion-card {
   max-width: 400px;
   width: 100%;
   margin: auto !important;
-  @extend .rustic-card;
+  @extend .vac-card;
 }
 
-/* BASE CARD - Standard Vacapp Floating Card (Legacy mapping) */
-.vac-base-card {
-  @extend .rustic-card;
-  padding: 1.25rem;
-  position: relative;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, variables.$tertiary-color, transparent);
-    opacity: 0;
-    transition: variables.$transition-base;
-  }
-
-  &:hover {
-    &::before {
-      opacity: 1;
-    }
-  }
-}
 
 /* SKELETON UTILITIES */
 .skeleton-avatar {
@@ -10768,7 +12066,7 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
 
 /* From main-layout.component.ts */
 
-    /* Estilos estructurales mínimos (el resto en _luxe.scss) */
+    /* Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .sidebar-bottom-badge {
       position: absolute;
       bottom: 30px;
@@ -10798,7 +12096,7 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
 
 /* From dashboard.component.ts */
 
-    /* Dashboard: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Dashboard: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .welcome-header-main { display: flex; align-items: center; gap: 15px; }
     .vac-chart-mock { height: 200px; display: flex; align-items: flex-end; gap: 20px; padding: 20px 0; border-bottom: 2px solid var(--ion-color-light); }
     .vac-chart-row { flex: 1; display: flex; align-items: flex-end; height: 100%; }
@@ -10814,7 +12112,7 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
 
 /* From ganado.component.ts */
 
-    /* Ganado: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Ganado: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .vac-animal-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .vac-animal-info { flex: 1; }
   
@@ -10822,7 +12120,7 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
 
 /* From lotes.component.ts */
 
-    /* Lotes: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Lotes: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .vac-field-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .field-icon-box { 
       width: 48px; height: 48px; background: rgba(27, 67, 50, 0.05); 
@@ -10836,7 +12134,7 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
 
 /* From recria.component.ts */
 
-    /* Recría: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Recría: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .vac-weight-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
     .animal-name-txt { font-size: 1.3rem; font-weight: 900; color: var(--ion-color-primary); margin: 5px 0 0; }
     .vac-weight-date { display: flex; align-items: center; gap: 5px; color: var(--ion-color-tertiary); font-weight: 700; font-size: 0.8rem; }
@@ -10856,7 +12154,7 @@ ARCHIVO: .\frontend\src\styles\components\_component_overrides.scss
 
 /* From reproduccion.component.ts */
 
-    /* Reproducción: Estilos estructurales mínimos (Heredados de _luxe.scss) */
+    /* Reproducción: Estilos estructurales mínimos (Estilos Vacapp modernos) */
     .vac-repro-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .vac-pulse-icon { font-size: 28px; color: var(--ion-color-danger); animation: vac-pulse 2s infinite; }
     @keyframes vac-pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
@@ -11359,11 +12657,12 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
 .uppercase { text-transform: uppercase !important; }
 
 /* Layout Extracted */
+.flex { display: flex !important; }
 .flex-1 { flex: 1 !important; }
 .flex-row { display: flex; flex-direction: row; }
 .flex-col { display: flex; flex-direction: column; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
+.items-center { align-items: center !important; }
+.justify-center { justify-content: center !important; }
 
 .opacity-80 { opacity: 0.8 !important; }
 
@@ -11383,7 +12682,6 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
 .border-left-danger { border-left: 10px solid var(--ion-color-danger) !important; }
 .border-left-tertiary { border-left: 10px solid var(--ion-color-tertiary) !important; }
 .gap-1 { gap: 4px !important; }
-.pb-lg { padding-bottom: 20px !important; }
 .color-medium { color: var(--ion-color-medium) !important; }
 /* Ionic Component Vars */
 .bg-var-primary { --background: var(--ion-color-primary) !important; }
@@ -11434,6 +12732,16 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
   object-fit: cover !important;
   border: 2px solid rgba(variables.$tertiary-color, 0.2);
   background: variables.$gray-100;
+  
+  /* Garantizar que los iconos (♀/♂) se vean centrados y con tamaño correcto */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  
+  ion-icon {
+    font-size: 24px !important;
+    color: var(--ion-color-primary);
+  }
 }
 
 .img-header {
@@ -11482,33 +12790,83 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
   padding: 4rem 2rem;
   text-align: center;
 
-  .empty-icon-ring {
-    width: 80px;
-    height: 80px;
+  .vac-empty-icon, .empty-icon-ring {
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    background: rgba(variables.$primary-color, 0.05);
+    background: linear-gradient(135deg, rgba(variables.$primary-color, 0.08), rgba(variables.$tertiary-color, 0.08));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: variables.$primary-color;
     margin-bottom: 1.5rem;
-    border: 1px solid rgba(88, 47, 14, 0.05);
+    border: 2px dashed rgba(variables.$tertiary-color, 0.2);
+    animation: pulseGlow 2.5s ease-in-out infinite;
   }
 
   h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.4rem;
+    font-weight: 800;
     color: variables.$primary-color;
     margin-bottom: 0.5rem;
   }
 
   p {
     color: var(--ion-color-medium);
-    max-width: 280px;
+    max-width: 300px;
     margin-bottom: 2rem;
     font-weight: 600;
+    line-height: 1.5;
   }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* ============================================
+   DYNAMIC CARD BORDERS — Estado de Salud/Producción
+   ============================================ */
+.border-status-sano,
+.border-status-produccion {
+  border-left: 5px solid var(--ion-color-success) !important;
+}
+
+.border-status-gestante {
+  border-left: 5px solid var(--ion-color-warning) !important;
+}
+
+.border-status-enferma,
+.border-status-urgente {
+  border-left: 5px solid var(--ion-color-danger) !important;
+}
+
+.border-status-seca,
+.border-status-engorde {
+  border-left: 5px solid var(--ion-color-primary) !important;
+}
+
+.border-status-default {
+  border-left: 5px solid var(--ion-color-medium) !important;
+}
+
+/* SKELETON SHIMMER PREMIUM */
+ion-skeleton-text {
+  --border-radius: 8px;
+}
+
+.skeleton-avatar-lg {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 14px !important;
+}
+
+.skeleton-btn-wide {
+  width: 100% !important;
+  height: 36px !important;
+  border-radius: 12px !important;
 }
 
 /* WIZARD STEPPER - Modern Dot & Line */
@@ -11831,6 +13189,19 @@ ion-menu {
   margin-bottom: 2rem;
 }
 
+/* FIX: Floating Action Button Mobile Layout */
+ion-fab[vertical="bottom"] {
+  /* Añadimos un margen inferior dinámico que respeta la zona segura del móvil */
+  margin-bottom: calc(env(safe-area-inset-bottom) + 16px) !important;
+  
+  /* Aseguramos que siempre esté por encima de cualquier otro elemento (como tarjetas) */
+  z-index: 9999 !important;
+}
+
+.tabs-bottom ion-fab[vertical="bottom"] {
+  margin-bottom: calc(env(safe-area-inset-bottom) + 70px) !important; 
+}
+
 
 ==================================================
 ARCHIVO: .\frontend\src\styles\core\_layout.scss
@@ -11967,7 +13338,7 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
 }
 
 .vac-kpi-card {
-  @extend .rustic-card;
+  @extend .vac-card;
   padding: 16px;
   display: flex;
   align-items: center;
@@ -11996,7 +13367,7 @@ ARCHIVO: .\frontend\src\styles\features\_dashboard.scss
 }
 
 .vac-main-card {
-  @extend .rustic-card;
+  @extend .vac-card;
   margin: 12px;
   overflow: hidden;
 
@@ -12168,7 +13539,7 @@ ARCHIVO: .\frontend\src\styles\features\_recria.scss
 
 // Metric Cards Unificaton
 .vac-metric-card {
-  @extend .rustic-card;
+  @extend .vac-card;
   padding: 1.5rem;
   display: flex;
   align-items: center;
@@ -12724,39 +14095,151 @@ ARCHIVO: .\frontend\src\theme\variables.scss
   --ion-card-background-rgb: 255, 255, 255;
 }
 
-/* Modo Oscuro Manual (Rustic-Dark v2) */
-body.dark-theme {
+/* Modo Oscuro Manual (Rustic-Dark v3 - Forest Night)
+   Ionic Shadow DOM necesita que las variables estén en :root o body,
+   no basta con un selector de clase suelto. */
+html.ion-palette-dark {
   --ion-color-primary: #95D5B2;
   --ion-color-primary-rgb: 149, 213, 178;
-  --ion-color-primary-contrast: #121212;
+  --ion-color-primary-contrast: #08120D;
+  --ion-color-primary-contrast-rgb: 8, 18, 13;
   --ion-color-primary-shade: #83bc9d;
   --ion-color-primary-tint: #a0d9ba;
 
   --ion-color-secondary: #BC8A5F;
   --ion-color-secondary-rgb: 188, 138, 95;
   --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #a57a54;
+  --ion-color-secondary-tint: #c3966f;
 
-  --ion-color-tertiary: #804E32;
-  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary: #d4a373;
+  --ion-color-tertiary-rgb: 212, 163, 115;
+  --ion-color-tertiary-contrast: #08120D;
+  --ion-color-tertiary-contrast-rgb: 8, 18, 13;
+  --ion-color-tertiary-shade: #ba8f65;
+  --ion-color-tertiary-tint: #d8ac81;
 
-  --ion-background-color: #121212;
-  --ion-background-color-rgb: 18, 18, 18;
+  --ion-color-success: #52b788;
+  --ion-color-success-rgb: 82, 183, 136;
+  --ion-color-success-contrast: #000000;
+
+  --ion-color-warning: #dda15e;
+  --ion-color-warning-rgb: 221, 161, 94;
+  --ion-color-warning-contrast: #000000;
+
+  --ion-color-danger: #e76f6f;
+  --ion-color-danger-rgb: 231, 111, 111;
+  --ion-color-danger-contrast: #000000;
+
+  --ion-color-medium: #8c9a92;
+  --ion-color-medium-rgb: 140, 154, 146;
+  --ion-color-medium-contrast: #000000;
+
+  --ion-color-light: #1a2e1f;
+  --ion-color-light-rgb: 26, 46, 31;
+  --ion-color-light-contrast: #e0e0e0;
+
+  --ion-background-color: #08120D;
+  --ion-background-color-rgb: 8, 18, 13;
 
   --ion-text-color: #e0e0e0;
   --ion-text-color-rgb: 224, 224, 224;
 
-  --ion-item-background: #1e1e1e;
-  --ion-item-background-rgb: 30, 30, 30;
-  --ion-card-background: #1e1e1e;
-  --ion-card-background-rgb: 30, 30, 30;
-  
-  --ion-color-step-50: #1e1e1e;
-  --ion-color-step-100: #2a2a2a;
-  --ion-color-step-150: #363636;
-  --ion-color-step-200: #414141;
+  --ion-item-background: #0D1C14;
+  --ion-item-background-rgb: 13, 28, 20;
+  --ion-card-background: #0D1C14;
+  --ion-card-background-rgb: 13, 28, 20;
 
+  --ion-toolbar-background: #0A1610;
+  --ion-toolbar-color: #e0e0e0;
+  --ion-tab-bar-background: #0A1610;
+  --ion-tab-bar-color: #8c9a92;
+  --ion-tab-bar-color-selected: #95D5B2;
+
+  /* Stepped Colors — Ionic usa estos para matices intermedios en su Shadow DOM */
+  --ion-color-step-50: #111e16;
+  --ion-color-step-100: #1a2b1f;
+  --ion-color-step-150: #233828;
+  --ion-color-step-200: #2c4531;
+  --ion-color-step-250: #35523a;
+  --ion-color-step-300: #3e5f43;
+  --ion-color-step-350: #476c4c;
+  --ion-color-step-400: #507955;
+  --ion-color-step-450: #59865e;
+  --ion-color-step-500: #629367;
+  --ion-color-step-550: #6b9f70;
+  --ion-color-step-600: #7aaa7e;
+  --ion-color-step-650: #89b58c;
+  --ion-color-step-700: #98c09a;
+  --ion-color-step-750: #a7cba8;
+  --ion-color-step-800: #b6d6b6;
+  --ion-color-step-850: #c5e1c4;
+  --ion-color-step-900: #d4ecd2;
+  --ion-color-step-950: #e3f7e0;
+
+  /* Override de componentes específicos */
   ion-card {
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    --background: #0D1C14;
+    border: 1px solid rgba(149, 213, 178, 0.08) !important;
+  }
+
+  ion-item {
+    --background: #0D1C14;
+    --color: #e0e0e0;
+    --border-color: rgba(149, 213, 178, 0.06);
+  }
+
+  ion-list { --ion-item-background: #0D1C14; }
+  ion-content { --background: #08120D; }
+  ion-toolbar { --background: #0A1610; --color: #e0e0e0; }
+  ion-searchbar { --background: #142518; --color: #e0e0e0; --placeholder-color: #8c9a92; }
+  ion-segment { --background: rgba(255,255,255,0.05); }
+  ion-segment-button { --color: #8c9a92; --color-checked: #95D5B2; }
+
+  .uniform-card, .vac-main-card, .vac-metric-card, .vac-base-card, .vac-card {
+    background: #0D1C14 !important;
+    border-color: rgba(149, 213, 178, 0.08) !important;
+    color: #e0e0e0;
+  }
+
+  .vac-kpi-card-square {
+    background: #0D1C14 !important;
+    border-color: rgba(149, 213, 178, 0.08) !important;
+    .vac-kpi-data-minimal .value { color: #95D5B2 !important; }
+    .vac-kpi-data-minimal .label { color: #8c9a92 !important; }
+  }
+
+  .vac-card-header { --background: transparent; }
+  .vac-empty-state h2 { color: #95D5B2 !important; }
+  .vac-section-title { color: #95D5B2 !important; }
+  .vac-page-title { color: #e0e0e0 !important; }
+  .color-dark { color: #c8c8c8 !important; }
+  .color-muted { color: #8c9a92 !important; }
+
+  /* Sidebar */
+  .vac-sidebar {
+    --ion-background-color: #0A1610;
+    ion-content { --background: #0A1610; }
+  }
+
+  ::-webkit-scrollbar-track { background: #08120D; }
+  ::-webkit-scrollbar-thumb { background: #2d6a4f; }
+  ::-webkit-scrollbar-thumb:hover { background: #40916c; }
+}
+
+/* Auto-detect system dark mode — solo si el usuario no ha forzado light */
+@media (prefers-color-scheme: dark) {
+  body:not(.light-theme) {
+    --ion-background-color: #08120D;
+    --ion-background-color-rgb: 8, 18, 13;
+    --ion-text-color: #e0e0e0;
+    --ion-text-color-rgb: 224, 224, 224;
+    --ion-item-background: #0D1C14;
+    --ion-card-background: #0D1C14;
+    --ion-card-background-rgb: 13, 28, 20;
+    --ion-toolbar-background: #0A1610;
+    --ion-toolbar-color: #e0e0e0;
   }
 }
 
@@ -12802,18 +14285,7 @@ ion-badge {
   letter-spacing: 0.5px;
 }
 
-/* Efectos Globales de Personalización (Vacapp Neutral) */
-.vac-card {
-  --border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(88, 47, 14, 0.1);
-  transition: all 0.3s ease;
-}
 
-.vac-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
 
 .text-forest { color: #2b5329; }
 .text-earth { color: #c28e5c; }

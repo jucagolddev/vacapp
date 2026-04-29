@@ -58,13 +58,13 @@ export class SanidadService {
     }
   }
 
-  async createSanidad(payload: any) {
+  async createSanidad(payload: Partial<Sanidad>) {
     const res = await this.supabase.createSanidad(payload);
     if (!res.error) await this.loadSanidad();
     return res;
   }
 
-  async updateSanidad(id: string, payload: any) {
+  async updateSanidad(id: string, payload: Partial<Sanidad>) {
     const res = await this.supabase.updateSanidad(id, payload);
     if (!res.error) await this.loadSanidad();
     return res;

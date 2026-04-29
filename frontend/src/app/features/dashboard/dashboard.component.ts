@@ -20,10 +20,22 @@ import { addIcons } from 'ionicons';
 import { 
   pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
   trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline,
-  paw 
+  paw, closeOutline, warningOutline, medkitOutline, cashOutline, informationCircleOutline
 } from 'ionicons/icons';
 
 Chart.register(...registerables);
+
+/**
+ * Interfaz para las alertas inteligentes del Dashboard.
+ * Cada alerta tiene un nivel de severidad, un mensaje descriptivo y un icono contextual.
+ */
+interface Alerta {
+  id: string;
+  tipo: 'urgente' | 'aviso' | 'info';
+  mensaje: string;
+  fecha: Date;
+  icono: string;
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -49,7 +61,7 @@ Chart.register(...registerables);
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="vac-container animate-fade-in pb-12">
+      <main class="vac-container animate-fade-in pb-12">
         
         <!-- Header con Identidad -->
         <div class="vac-page-header mt-4">
@@ -67,6 +79,46 @@ Chart.register(...registerables);
                 <div class="dot shadow-pulse"></div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- ALERTAS INTELIGENTES                                -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <div class="vac-alertas-section" *ngIf="alertasVisibles().length > 0">
+          <div class="vac-alertas-header">
+            <div class="flex items-center gap-2">
+              <ion-icon name="alert-circle-outline" class="color-danger text-xl"></ion-icon>
+              <span class="vac-alertas-title">Alertas Inteligentes</span>
+            </div>
+            <span class="vac-alertas-count">{{ alertasVisibles().length }}</span>
+          </div>
+
+          <div 
+            *ngFor="let alerta of alertasVisibles(); trackBy: trackById; let i = index"
+            class="vac-alerta-card"
+            [class.vac-alerta-urgente]="alerta.tipo === 'urgente'"
+            [class.vac-alerta-aviso]="alerta.tipo === 'aviso'"
+            [class.vac-alerta-info]="alerta.tipo === 'info'"
+            [style.animation-delay]="(i * 80) + 'ms'">
+
+            <div class="vac-alerta-icon-wrapper"
+              [class.bg-danger-soft]="alerta.tipo === 'urgente'"
+              [class.bg-warning-soft]="alerta.tipo === 'aviso'"
+              [class.bg-tertiary-soft]="alerta.tipo === 'info'">
+              <ion-icon [name]="alerta.icono"
+                [color]="alerta.tipo === 'urgente' ? 'danger' : alerta.tipo === 'aviso' ? 'warning' : 'tertiary'">
+              </ion-icon>
+            </div>
+
+            <div class="vac-alerta-body">
+              <p class="vac-alerta-mensaje">{{ alerta.mensaje }}</p>
+              <span class="vac-alerta-fecha">{{ alerta.fecha | date:'dd MMM yyyy, HH:mm' }}</span>
+            </div>
+
+            <button class="vac-alerta-dismiss" (click)="dismissAlerta(alerta.id)" aria-label="Cerrar alerta">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
           </div>
         </div>
 
@@ -230,12 +282,158 @@ Chart.register(...registerables);
           </ion-row>
         </ion-grid>
 
-      </div>
+      </main>
     </ion-content>
   `,
-  styles: []
+  styles: [`
+    /* ═══════════════════════════════════════════ */
+    /* ALERTAS INTELIGENTES - Rustic-Luxe          */
+    /* ═══════════════════════════════════════════ */
+
+    @keyframes alertSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes alertPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(188, 71, 73, 0.15); }
+      50%      { box-shadow: 0 0 0 6px rgba(188, 71, 73, 0); }
+    }
+
+    .vac-alertas-section {
+      margin: 1.25rem 0 1.75rem;
+    }
+
+    .vac-alertas-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      padding: 0 0.25rem;
+    }
+
+    .vac-alertas-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--ion-color-dark, #1b4332);
+      letter-spacing: 0.02em;
+    }
+
+    .vac-alertas-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 13px;
+      background: var(--ion-color-danger, #bc4749);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0 8px;
+    }
+
+    .vac-alerta-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      margin-bottom: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: alertSlideIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+      position: relative;
+    }
+
+    .vac-alerta-card:hover {
+      transform: translateX(3px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Borde izquierdo por tipo */
+    .vac-alerta-urgente {
+      border-left: 4px solid var(--ion-color-danger, #bc4749);
+      animation: alertSlideIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) both,
+                 alertPulse 3s ease-in-out 1s 2;
+    }
+    .vac-alerta-aviso {
+      border-left: 4px solid var(--ion-color-warning, #dda15e);
+    }
+    .vac-alerta-info {
+      border-left: 4px solid var(--ion-color-tertiary, #40916c);
+    }
+
+    /* Icono */
+    .vac-alerta-icon-wrapper {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .bg-danger-soft  { background: rgba(188, 71, 73, 0.12); }
+    .bg-warning-soft { background: rgba(221, 161, 94, 0.15); }
+    .bg-tertiary-soft { background: rgba(64, 145, 108, 0.12); }
+
+    /* Body */
+    .vac-alerta-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .vac-alerta-mensaje {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--ion-color-dark, #1b4332);
+      line-height: 1.45;
+      margin: 0 0 4px;
+    }
+    .vac-alerta-fecha {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.72rem;
+      color: var(--ion-color-medium, #92949c);
+      letter-spacing: 0.02em;
+    }
+
+    /* Dismiss */
+    .vac-alerta-dismiss {
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--ion-color-medium, #92949c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1.1rem;
+      margin-top: 2px;
+    }
+    .vac-alerta-dismiss:hover {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--ion-color-danger, #bc4749);
+      transform: rotate(90deg);
+    }
+  `]
 })
-export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DashboardComponent implements AfterViewInit, OnDestroy {
   fincaService = inject(FincaService);
   ganadoService = inject(GanadoService);
   reproService = inject(ReproduccionService);
@@ -282,11 +480,25 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private charts: any[] = [];
 
+  // ═══ ALERTAS INTELIGENTES ═══
+  /** Signal interno con todas las alertas generadas */
+  private alertas = signal<Alerta[]>([]);
+  /** IDs de alertas descartadas por el usuario en esta sesión */
+  private alertasDismissed = signal<Set<string>>(new Set());
+  /** Alertas visibles = generadas - descartadas (ordenadas por prioridad) */
+  alertasVisibles = computed(() => {
+    const dismissed = this.alertasDismissed();
+    const prioridad: Record<string, number> = { urgente: 0, aviso: 1, info: 2 };
+    return this.alertas()
+      .filter(a => !dismissed.has(a.id))
+      .sort((a, b) => prioridad[a.tipo] - prioridad[b.tipo]);
+  });
+
   constructor() {
     addIcons({ 
       pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
       trendingUpOutline, trendingDownOutline, walletOutline, scaleOutline, pieChartOutline, documentTextOutline,
-      paw
+      paw, closeOutline, warningOutline, medkitOutline, cashOutline, informationCircleOutline
     });
 
     // Configuración Global de Chart.js
@@ -310,6 +522,18 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => this.updateCharts(), 300);
       }
     });
+
+    // Generar alertas reactivamente cuando los datos estén listos
+    effect(() => {
+      if (!this.cargando()) {
+        // Leer signals para registrar dependencias
+        const _repro = this.reproService.gestacionesActivas();
+        const _sanidad = this.sanidadService.records();
+        const _finanzas = this.finanzasService.records();
+        const _bovinos = this.ganadoService.bovinos();
+        setTimeout(() => this.generarAlertas(), 500);
+      }
+    });
   }
 
   applyMasterFilter(period: 'Mensual' | 'Anual') {
@@ -318,7 +542,115 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.financePeriod.set(period);
   }
 
-  ngOnInit() {}
+  trackById(index: number, item: Alerta | any): string {
+    return item?.id || index.toString();
+  }
+
+  // ═══════════════════════════════════════════════════
+  // ALERTAS INTELIGENTES - Lógica de generación
+  // ═══════════════════════════════════════════════════
+
+  /**
+   * Analiza los datos de Reproducción, Sanidad y Finanzas
+   * para generar notificaciones proactivas e inteligentes.
+   */
+  private generarAlertas(): void {
+    const nuevasAlertas: Alerta[] = [];
+    const bovinos = this.ganadoService.bovinos();
+    const bovinoMap = new Map(bovinos.map(b => [b.id, b]));
+
+    // ─── 1. ALERTAS DE REPRODUCCIÓN (Urgente) ───
+    // Partos inminentes: vacas gestantes con FPP en los próximos 60 días
+    const gestacionesConfirmadas = this.reproService.gestacionesActivas();
+    const hoy = new Date();
+    const limite60d = new Date();
+    limite60d.setDate(hoy.getDate() + 60);
+
+    gestacionesConfirmadas.forEach(g => {
+      if (!g.fecha_parto_prevista) return;
+      const fpp = new Date(g.fecha_parto_prevista);
+      if (fpp >= hoy && fpp <= limite60d) {
+        const bovino = g.bovino || bovinoMap.get(g.bovino_id);
+        const nombre = bovino?.nombre || 'Res S/N';
+        const crotal = bovino?.crotal || g.bovino_id;
+        const diasRestantes = Math.ceil((fpp.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+        nuevasAlertas.push({
+          id: `repro-${g.id}`,
+          tipo: diasRestantes <= 15 ? 'urgente' : 'aviso',
+          mensaje: `⚠️ ${nombre} (${crotal}) tiene un parto próximo programado en ${diasRestantes} días.`,
+          fecha: new Date(),
+          icono: 'warning-outline'
+        });
+      }
+    });
+
+    // ─── 2. ALERTAS DE SANIDAD (Aviso) ───
+    // Animales con retiro sanitario activo (en tratamiento)
+    const registrosSanidad = this.sanidadService.records();
+    const tratamientosActivos = registrosSanidad.filter(s => {
+      if (s.tipo !== 'Tratamiento' && s.tipo !== 'Cirugía') return false;
+      if (!s.fecha) return false;
+      const fAplicacion = new Date(s.fecha);
+      const maxRetiro = Math.max(s.dias_retiro_carne || 0, s.dias_retiro_leche || 0);
+      if (maxRetiro === 0) {
+        // Sin retiro definido, verificar si es reciente (últimos 30 días)
+        const diasDesde = Math.ceil((hoy.getTime() - fAplicacion.getTime()) / (1000 * 60 * 60 * 24));
+        return diasDesde <= 30;
+      }
+      const fFinRetiro = new Date(fAplicacion);
+      fFinRetiro.setDate(fFinRetiro.getDate() + maxRetiro);
+      return fFinRetiro > hoy;
+    });
+
+    // Agrupar por bovino para no duplicar alertas
+    const bovinosTratamiento = new Set<string>();
+    tratamientosActivos.forEach(s => {
+      if (bovinosTratamiento.has(s.bovino_id)) return;
+      bovinosTratamiento.add(s.bovino_id);
+      const bovino = s.bovino || bovinoMap.get(s.bovino_id);
+      const nombre = bovino?.nombre || 'Res S/N';
+      nuevasAlertas.push({
+        id: `sanidad-${s.bovino_id}`,
+        tipo: 'aviso',
+        mensaje: `💉 ${nombre} requiere revisión de tratamiento (${s.producto}).`,
+        fecha: new Date(),
+        icono: 'medkit-outline'
+      });
+    });
+
+    // ─── 3. ALERTAS DE FINANZAS (Info) ───
+    // Gastos superiores a 1000€ en el mes actual
+    const mesActual = hoy.getMonth();
+    const yearActual = hoy.getFullYear();
+    const registrosFinanzas = this.finanzasService.records();
+
+    registrosFinanzas.forEach(f => {
+      if (f.tipo !== 'Gasto') return;
+      const fechaGasto = new Date(f.fecha);
+      if (fechaGasto.getMonth() !== mesActual || fechaGasto.getFullYear() !== yearActual) return;
+      if (f.monto > 1000) {
+        nuevasAlertas.push({
+          id: `finanzas-${f.id}`,
+          tipo: 'info',
+          mensaje: `💰 Gasto elevado detectado en ${f.categoria || 'Varios'}: ${f.monto.toLocaleString('es-ES')}€ — ${f.descripcion || 'Sin descripción'}.`,
+          fecha: new Date(f.fecha),
+          icono: 'cash-outline'
+        });
+      }
+    });
+
+    this.alertas.set(nuevasAlertas);
+  }
+
+  /**
+   * Descarta una alerta de la vista (solo en la sesión actual).
+   * @param id - Identificador único de la alerta a descartar
+   */
+  dismissAlerta(id: string): void {
+    const current = new Set(this.alertasDismissed());
+    current.add(id);
+    this.alertasDismissed.set(current);
+  }
 
   async exportarPDF() {
     const doc = await this.pdfService.getNewDoc();

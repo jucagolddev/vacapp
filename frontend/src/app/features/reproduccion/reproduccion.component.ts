@@ -92,7 +92,7 @@ export class ReproduccionComponent implements OnInit {
   filterEstado = signal<string>('Todos');
   filterMetodo = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
   // Computado para Historial Completo
   filteredReproducciones = computed(() => {
@@ -165,7 +165,7 @@ export class ReproduccionComponent implements OnInit {
     this.loadData();
   }
 
-  async loadData(event?: any) {
+  async loadData(event?: Event) {
     this.isLoading.set(true);
     try {
       const { data: repros } = await this.supa.getReproduccion();
@@ -175,14 +175,18 @@ export class ReproduccionComponent implements OnInit {
       console.error('Error cargando datos reproductivos:', e);
     } finally {
       this.isLoading.set(false);
-      if (event && event.target) {
-        event.target.complete();
+      if (event && (event as any).target) {
+        (event as any).target.complete();
       }
     }
   }
 
-  handleRefresh(event: any) {
+  handleRefresh(event: Event) {
     this.loadData(event);
+  }
+
+  trackById(index: number, item: Reproduccion | any): string {
+    return item.id || index.toString();
   }
 
   goToDetail(bovinoId: string) {
@@ -210,8 +214,9 @@ export class ReproduccionComponent implements OnInit {
     );
   }
 
-  onSearch(event: any) {
-    this.searchTerm.set(event.target.value);
+  onSearch(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm.set(target.value || '');
   }
 
   // --- LÓGICA DE FILTROS ---
@@ -220,7 +225,7 @@ export class ReproduccionComponent implements OnInit {
     this.chartPeriodo.set(periodo);
   }
 
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }

@@ -24,7 +24,7 @@
 }
 
 .vac-kpi-card {
-  @extend .rustic-card;
+  @extend .vac-card;
   padding: 16px;
   display: flex;
   align-items: center;
@@ -53,7 +53,7 @@
 }
 
 .vac-main-card {
-  @extend .rustic-card;
+  @extend .vac-card;
   margin: 12px;
   overflow: hidden;
 

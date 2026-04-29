@@ -83,7 +83,7 @@ export class FinanzasService {
     // Fallback Mock System
     if (id.startsWith('fin-mock-')) {
        const storedMock = JSON.parse(localStorage.getItem('mock_finanzas') || '[]');
-       const index = storedMock.findIndex((m: any) => m.id === id);
+       const index = storedMock.findIndex((m: Record<string, unknown>) => m['id'] === id);
        if (index > -1) {
           storedMock[index] = { ...storedMock[index], ...payload };
           localStorage.setItem('mock_finanzas', JSON.stringify(storedMock));

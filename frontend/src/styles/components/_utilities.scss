@@ -111,11 +111,12 @@
 .uppercase { text-transform: uppercase !important; }
 
 /* Layout Extracted */
+.flex { display: flex !important; }
 .flex-1 { flex: 1 !important; }
 .flex-row { display: flex; flex-direction: row; }
 .flex-col { display: flex; flex-direction: column; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
+.items-center { align-items: center !important; }
+.justify-center { justify-content: center !important; }
 
 .opacity-80 { opacity: 0.8 !important; }
 
@@ -135,7 +136,6 @@
 .border-left-danger { border-left: 10px solid var(--ion-color-danger) !important; }
 .border-left-tertiary { border-left: 10px solid var(--ion-color-tertiary) !important; }
 .gap-1 { gap: 4px !important; }
-.pb-lg { padding-bottom: 20px !important; }
 .color-medium { color: var(--ion-color-medium) !important; }
 /* Ionic Component Vars */
 .bg-var-primary { --background: var(--ion-color-primary) !important; }
@@ -186,6 +186,16 @@
   object-fit: cover !important;
   border: 2px solid rgba(variables.$tertiary-color, 0.2);
   background: variables.$gray-100;
+  
+  /* Garantizar que los iconos (♀/♂) se vean centrados y con tamaño correcto */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  
+  ion-icon {
+    font-size: 24px !important;
+    color: var(--ion-color-primary);
+  }
 }
 
 .img-header {
@@ -234,33 +244,83 @@
   padding: 4rem 2rem;
   text-align: center;
 
-  .empty-icon-ring {
-    width: 80px;
-    height: 80px;
+  .vac-empty-icon, .empty-icon-ring {
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    background: rgba(variables.$primary-color, 0.05);
+    background: linear-gradient(135deg, rgba(variables.$primary-color, 0.08), rgba(variables.$tertiary-color, 0.08));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: variables.$primary-color;
     margin-bottom: 1.5rem;
-    border: 1px solid rgba(88, 47, 14, 0.05);
+    border: 2px dashed rgba(variables.$tertiary-color, 0.2);
+    animation: pulseGlow 2.5s ease-in-out infinite;
   }
 
   h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.4rem;
+    font-weight: 800;
     color: variables.$primary-color;
     margin-bottom: 0.5rem;
   }
 
   p {
     color: var(--ion-color-medium);
-    max-width: 280px;
+    max-width: 300px;
     margin-bottom: 2rem;
     font-weight: 600;
+    line-height: 1.5;
   }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* ============================================
+   DYNAMIC CARD BORDERS — Estado de Salud/Producción
+   ============================================ */
+.border-status-sano,
+.border-status-produccion {
+  border-left: 5px solid var(--ion-color-success) !important;
+}
+
+.border-status-gestante {
+  border-left: 5px solid var(--ion-color-warning) !important;
+}
+
+.border-status-enferma,
+.border-status-urgente {
+  border-left: 5px solid var(--ion-color-danger) !important;
+}
+
+.border-status-seca,
+.border-status-engorde {
+  border-left: 5px solid var(--ion-color-primary) !important;
+}
+
+.border-status-default {
+  border-left: 5px solid var(--ion-color-medium) !important;
+}
+
+/* SKELETON SHIMMER PREMIUM */
+ion-skeleton-text {
+  --border-radius: 8px;
+}
+
+.skeleton-avatar-lg {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 14px !important;
+}
+
+.skeleton-btn-wide {
+  width: 100% !important;
+  height: 36px !important;
+  border-radius: 12px !important;
 }
 
 /* WIZARD STEPPER - Modern Dot & Line */

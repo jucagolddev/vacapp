@@ -60,7 +60,7 @@ export class SanidadComponent implements OnInit {
   filterTipo = signal<string>('Todos');
   filterLote = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
   // Computado Reactivo para Filtrado Multidimensional
   filteredSanidad = computed(() => {
@@ -161,7 +161,7 @@ export class SanidadComponent implements OnInit {
     this.loadData();
   }
 
-  async loadData(event?: any) {
+  async loadData(event?: Event) {
     this.isLoading.set(true);
     try {
       const { data: records } = await this.supa.getSanidad();
@@ -170,14 +170,18 @@ export class SanidadComponent implements OnInit {
       console.error('Error cargando datos sanitarios:', e);
     } finally {
       this.isLoading.set(false);
-      if (event && event.target) {
-        event.target.complete();
+      if (event && (event as any).target) {
+        (event as any).target.complete();
       }
     }
   }
 
-  handleRefresh(event: any) {
+  handleRefresh(event: Event) {
     this.loadData(event);
+  }
+
+  trackById(index: number, item: Sanidad | any): string {
+    return item.id || index.toString();
   }
 
   goToDetail(bovinoId: string) {
@@ -203,8 +207,9 @@ export class SanidadComponent implements OnInit {
     );
   }
 
-  onSearch(event: any) {
-    this.searchTerm.set(event.target.value);
+  onSearch(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm.set(target.value || '');
   }
 
   // --- LÓGICA DE FILTROS ---
@@ -213,7 +218,7 @@ export class SanidadComponent implements OnInit {
     this.chartPeriodo.set(periodo);
   }
 
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }

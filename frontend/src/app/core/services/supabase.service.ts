@@ -1,11 +1,19 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
+import { Bovino, Sanidad, Reproduccion, Pesaje, Finanzas, Tarea } from '../models/vacapp.models';
 
 /**
  * Servicio central para la comunicación con Supabase.
  * Proporciona métodos genéricos para operaciones CRUD y un administrador de datos Mock (simulados).
  * El modo Mock se activa automáticamente si no se detectan credenciales en environment.ts.
+ */
+/**
+ * @class SupabaseService
+ * @description Servicio central de infraestructura para la persistencia de datos.
+ * Actúa como un proxy inteligente que enruta las peticiones CRUD al backend real de Supabase
+ * o al almacenamiento local (Modo Mock) dependiendo de la configuración y disponibilidad de red.
+ * Implementa el patrón Singleton.
  */
 @Injectable({
   providedIn: 'root',
@@ -41,21 +49,79 @@ export class SupabaseService {
   }
 
   /**
-   * Retorna el cliente nativo para consultas personalizadas.
+   * @description Retorna la instancia nativa del cliente Supabase.
+   * Útil para operaciones complejas, autenticación o consultas personalizadas (RPC)
+   * que no están cubiertas por los métodos de abstracción CRUD básicos.
+   * @returns {SupabaseClient | undefined} El cliente inicializado o undefined si está en Modo Mock.
    */
   get client() {
     return this.supabase;
   }
 
+  // ═══════════════════════════════════════════════════
+  // AUTENTICACIÓN
+  // ═══════════════════════════════════════════════════
+
   /**
-   * Obtiene todos los registros de una tabla, con soporte para simulación Mock.
+   * @description Inicia sesión con email y contraseña.
+   */
+  async signIn(email: string, password: string) {
+    if (!this.supabase || environment.useMockData) {
+      // Mock mode logic: validar credenciales específicas del usuario
+      if (email === 'jucagolddev@gmail.com' && password === 'Juca2452') {
+        localStorage.setItem('mock_session', JSON.stringify({ user: { email, id: 'mock-uuid' } }));
+        return { data: { user: { email } }, error: null };
+      } else {
+        return { data: null, error: new Error('Credenciales incorrectas') };
+      }
+    }
+    return await this.supabase.auth.signInWithPassword({ email, password });
+  }
+
+  /**
+   * @description Registra un nuevo usuario con email y contraseña.
+   */
+  async signUp(email: string, password: string) {
+    if (!this.supabase || environment.useMockData) {
+      return { data: { user: { email } }, error: null };
+    }
+    return await this.supabase.auth.signUp({ email, password });
+  }
+
+  /**
+   * @description Cierra la sesión activa.
+   */
+  async signOut() {
+    if (!this.supabase || environment.useMockData) {
+      localStorage.removeItem('mock_session');
+      return { error: null };
+    }
+    return await this.supabase.auth.signOut();
+  }
+
+  /**
+   * @description Obtiene la sesión actual.
+   */
+  async getUserSession() {
+    if (!this.supabase || environment.useMockData) {
+      const mockSession = localStorage.getItem('mock_session');
+      return { data: { session: mockSession ? JSON.parse(mockSession) : null }, error: null };
+    }
+    return await this.supabase.auth.getSession();
+  }
+
+  /**
+   * @description Obtiene una colección paginada de registros de una tabla específica.
+   * Incluye lógica de enriquecimiento de datos en Modo Mock para emular JOINs SQL.
+   * @param {string} table Nombre de la tabla en la base de datos (ej. 'bovinos').
+   * @returns {Promise<{data: T[] | null, error: any}>} Una promesa con los datos tipados o el error.
    */
   async getAll<T>(table: string) {
     if (!this.supabase || environment.useMockData) {
       const stored = localStorage.getItem(`mock_${table}`);
       let data = stored ? (JSON.parse(stored) as T[]) : [];
       // Enriquecemos los datos mock para que coincidan con los JOINS de Supabase real
-      data = await this.enrichMockData(table, data);
+      data = await this.enrichMockData(table, data as any) as T[];
       return { data, error: null };
     }
     
@@ -69,24 +135,31 @@ export class SupabaseService {
   }
 
   /**
-   * Simula los JOINs de base de datos para el modo Mock.
+   * @description Motor de emulación relacional para el Modo Mock.
+   * Cuando se opera offline, inyecta las relaciones "bovino" en registros dependientes
+   * para simular el comportamiento de un JOIN (bovino:bovino_id(*)) en PostgreSQL.
+   * @private
    */
-  private async enrichMockData(table: string, data: any[]): Promise<any[]> {
+  private async enrichMockData<T extends Record<string, unknown>>(table: string, data: T[]): Promise<T[]> {
     if (table === 'bovinos' || table === 'lotes') return data;
 
     // Si la tabla requiere información del bovino o lote, la "inyectamos" manualmente
-    const { data: bovinos } = await this.getAll<any>('bovinos');
+    const { data: bovinos } = await this.getAll<Bovino>('bovinos');
     
     return data.map(item => {
-      if (item.bovino_id) {
-        item.bovino = bovinos?.find(b => b.id === item.bovino_id);
+      if ('bovino_id' in item) {
+        (item as Record<string, unknown>)['bovino'] = bovinos?.find(b => b.id === item['bovino_id']);
       }
       return item;
     });
   }
 
   /**
-   * Crea un nuevo registro en la base de datos (o modo Mock).
+   * @description Inserta un nuevo registro en la capa de persistencia activa.
+   * En Modo Mock, genera automáticamente un identificador temporal (UUID-like) y un timestamp.
+   * @param {string} table Nombre de la tabla destino.
+   * @param {Partial<T>} payload Objeto parcial con los datos a insertar.
+   * @returns {Promise<{data: T | null, error: any}>} El registro recién creado.
    */
   async create<T>(table: string, payload: Partial<T>) {
     // Inyectamos ID y timestamp para el modo Mock local
@@ -114,7 +187,9 @@ export class SupabaseService {
   }
 
   /**
-   * Retorna los datos mock sin enriquecer para operaciones de escritura.
+   * @description Recupera el raw data del LocalStorage sin enriquecimiento relacional.
+   * Utilizado internamente por las operaciones de mutación (CREATE, UPDATE, DELETE).
+   * @private
    */
   private async getRawMock(table: string) {
     const stored = localStorage.getItem(`mock_${table}`);
@@ -122,12 +197,16 @@ export class SupabaseService {
   }
 
   /**
-   * Actualiza un registro existente mediante su ID.
+   * @description Actualiza de forma parcial o total un registro existente basándose en su clave primaria (ID).
+   * @param {string} table Nombre de la tabla.
+   * @param {string} id Clave primaria UUID del registro a modificar.
+   * @param {Partial<T>} payload Campos a actualizar.
+   * @returns {Promise<{data: T | null, error: any}>} El registro actualizado.
    */
   async update<T>(table: string, id: string, payload: Partial<T>) {
     if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
-      const index = data.findIndex((item: any) => item.id === id);
+      const index = data.findIndex((item: Record<string, unknown>) => item['id'] === id);
       if (index !== -1) {
         data[index] = { ...data[index], ...payload };
         localStorage.setItem(`mock_${table}`, JSON.stringify(data));
@@ -147,12 +226,16 @@ export class SupabaseService {
   }
 
   /**
-   * Elimina un registro físicamente.
+   * @description Ejecuta un "Hard Delete" eliminando físicamente el registro de la base de datos.
+   * ADVERTENCIA: En producción, considere usar "Soft Deletes" actualizando una bandera de estado.
+   * @param {string} table Nombre de la tabla.
+   * @param {string} id Identificador único del registro.
+   * @returns {Promise<{error: any}>} Nulo si fue exitoso, o el objeto de error.
    */
   async delete(table: string, id: string) {
     if (!this.supabase || environment.useMockData) {
       const { data } = await this.getRawMock(table);
-      const updated = data.filter((item: any) => item.id !== id);
+      const updated = data.filter((item: Record<string, unknown>) => item['id'] !== id);
       localStorage.setItem(`mock_${table}`, JSON.stringify(updated));
       return { error: null };
     }
@@ -167,41 +250,96 @@ export class SupabaseService {
   /** --- REALTIME Y SUSCRIPCIONES --- **/
 
   /**
-   * Suscribirse a cambios en tiempo real en una tabla específica.
+   * @description Inicializa un canal de WebSockets para escuchar mutaciones (INSERT, UPDATE, DELETE)
+   * en tiempo real sobre una tabla. Vital para interfaces colaborativas o paneles reactivos.
+   * @param {string} table Nombre de la tabla a observar.
+   * @param {(payload: any) => void} callback Función ejecutada tras recibir un evento de mutación.
+   * @returns {RealtimeChannel | null} La suscripción activa (para posterior desuscripción).
    */
-  subscribeToTableChanges(table: string, callback: (payload: any) => void) {
+  subscribeToTableChanges(table: string, callback: (payload: Record<string, unknown>) => void) {
     if (!this.supabase) return null;
     return this.supabase.channel(`public:${table}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: table }, payload => {
-        callback(payload);
+        callback(payload as Record<string, unknown>);
       })
       .subscribe();
+  }
+  /** --- ALMACENAMIENTO DE IMÁGENES (Supabase Storage) --- **/
+
+  /**
+   * @description Sube una foto de un animal al bucket 'bovinos-fotos' de Supabase Storage.
+   * En Modo Mock, convierte la imagen a DataURL y la almacena en localStorage.
+   * @param {string} bovinoId UUID del bovino.
+   * @param {File} file Archivo de imagen seleccionado por el usuario.
+   * @returns {Promise<string>} URL pública de la imagen subida.
+   */
+  async uploadAnimalImage(bovinoId: string, file: File): Promise<string> {
+    if (!this.supabase || environment.useMockData) {
+      // Mock: convert to data URL and store locally
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          localStorage.setItem(`animal_photo_${bovinoId}`, dataUrl);
+          resolve(dataUrl);
+        };
+        reader.onerror = () => reject('Error leyendo imagen');
+        reader.readAsDataURL(file);
+      });
+    }
+
+    const filePath = `${bovinoId}/${Date.now()}_${file.name}`;
+    const { error: uploadError } = await this.supabase.storage
+      .from('bovinos-fotos')
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = this.supabase.storage
+      .from('bovinos-fotos')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  }
+
+  /**
+   * @description Actualiza la foto_url de un bovino y persiste el cambio.
+   * @param {string} bovinoId UUID del bovino.
+   * @param {string} fotoUrl URL pública de la foto.
+   * @returns {Promise<void>}
+   */
+  async updateAnimalPhoto(bovinoId: string, fotoUrl: string): Promise<void> {
+    await this.update<Bovino>('bovinos', bovinoId, { foto_url: fotoUrl } as Partial<Bovino>);
   }
 
   /** --- INTELIGENCIA DE DATOS (VISTA ÚNICA) --- **/
 
   /**
-   * Obtiene toda la información relacionada de un animal en una sola carga.
-   * Ideal para la Vista de Detalle Única.
+   * @description Patrón "Facade" para Inteligencia de Datos.
+   * Extrae el perfil 360° de un animal ejecutando consultas paralelas en el backend
+   * para reducir la latencia de red. Reúne su registro base, historial médico,
+   * reproductor, curvas de pesaje y analítica financiera.
+   * @param {string} id UUID del Bovino a investigar.
+   * @returns {Promise<{data: any, error: any}>} El objeto de datos agregado.
    */
   async getAnimalCompleteData(id: string) {
     if (!this.supabase || environment.useMockData) {
       // Mock Aggregation
-      const { data: bovinos } = await this.getAll<any>('bovinos');
-      const bovino = bovinos.find(b => b.id === id);
+      const { data: bovinos } = await this.getAll<Bovino>('bovinos');
+      const bovino = bovinos?.find(b => b.id === id);
       
-      const { data: sanidad } = await this.getAll<any>('sanidad');
-      const { data: repro } = await this.getAll<any>('reproduccion');
-      const { data: pesajes } = await this.getAll<any>('recria_pesajes');
-      const { data: finanzas } = await this.getAll<any>('finanzas');
+      const { data: sanidad } = await this.getAll<Sanidad>('sanidad');
+      const { data: repro } = await this.getAll<Reproduccion>('reproduccion');
+      const { data: pesajes } = await this.getAll<Pesaje>('recria_pesajes');
+      const { data: finanzas } = await this.getAll<Finanzas>('finanzas');
 
       return {
         data: {
           bovino,
-          sanidad: sanidad.filter((s: any) => s.bovino_id === id),
-          reproduccion: repro.filter((r: any) => r.bovino_id === id),
-          pesajes: pesajes.filter((p: any) => p.bovino_id === id),
-          finanzas: finanzas.filter((f: any) => f.bovino_id === id)
+          sanidad: sanidad?.filter(s => s.bovino_id === id) || [],
+          reproduccion: repro?.filter(r => r.bovino_id === id) || [],
+          pesajes: pesajes?.filter(p => p.bovino_id === id) || [],
+          finanzas: finanzas?.filter(f => f.bovino_id === id) || []
         },
         error: null
       };
@@ -231,20 +369,20 @@ export class SupabaseService {
   /** --- MÉTODOS DE ABSTRACCIÓN POR MÓDULO --- **/
 
   async getSanidad() {
-    if (!this.supabase) return this.getAll<any>('sanidad');
+    if (!this.supabase) return this.getAll<Sanidad>('sanidad');
     const { data, error } = await this.supabase
       .from('sanidad')
       .select('*, bovino:bovino_id(crotal, nombre)')
       .order('fecha', { ascending: false });
-    return { data, error };
+    return { data: data as unknown as Sanidad[], error };
   }
 
-  async createSanidad(payload: any) {
-    return this.create('sanidad', payload);
+  async createSanidad(payload: Partial<Sanidad>) {
+    return this.create<Sanidad>('sanidad', payload);
   }
 
-  async updateSanidad(id: string, payload: any) {
-    return this.update('sanidad', id, payload);
+  async updateSanidad(id: string, payload: Partial<Sanidad>) {
+    return this.update<Sanidad>('sanidad', id, payload);
   }
 
   async deleteSanidad(id: string) {
@@ -252,28 +390,28 @@ export class SupabaseService {
   }
 
   async getFemales() {
-    const { data, error } = await this.getAll<any>('bovinos');
+    const { data, error } = await this.getAll<Bovino>('bovinos');
     return { 
-      data: (data || []).filter(b => b.sexo === 'Hembra' && b.estado === 'Activo'), 
+      data: (data || []).filter(b => b.sexo === 'Hembra' && b.estado_productivo === 'Alta'), 
       error 
     };
   }
 
   async getReproduccion() {
-    if (!this.supabase) return this.getAll<any>('reproduccion');
+    if (!this.supabase) return this.getAll<Reproduccion>('reproduccion');
     const { data, error } = await this.supabase
       .from('reproduccion')
       .select('*, bovino:bovino_id(crotal, nombre)')
       .order('fecha_cubricion', { ascending: false });
-    return { data, error };
+    return { data: data as unknown as Reproduccion[], error };
   }
 
-  async createReproduccion(payload: any) {
-    return this.create('reproduccion', payload);
+  async createReproduccion(payload: Partial<Reproduccion>) {
+    return this.create<Reproduccion>('reproduccion', payload);
   }
 
-  async updateReproduccion(id: string, payload: any) {
-    return this.update('reproduccion', id, payload);
+  async updateReproduccion(id: string, payload: Partial<Reproduccion>) {
+    return this.update<Reproduccion>('reproduccion', id, payload);
   }
 
   async deleteReproduccion(id: string) {
@@ -281,20 +419,20 @@ export class SupabaseService {
   }
 
   async getPesajes() {
-    if (!this.supabase) return this.getAll<any>('recria_pesajes');
+    if (!this.supabase) return this.getAll<Pesaje>('recria_pesajes');
     const { data, error } = await this.supabase
       .from('recria_pesajes')
       .select('*, bovino:bovino_id(crotal, nombre)')
       .order('fecha_pesaje', { ascending: false });
-    return { data, error };
+    return { data: data as unknown as Pesaje[], error };
   }
 
-  async createPesaje(payload: any) {
-    return this.create('recria_pesajes', payload);
+  async createPesaje(payload: Partial<Pesaje>) {
+    return this.create<Pesaje>('recria_pesajes', payload);
   }
 
-  async updatePesaje(id: string, payload: any) {
-    return this.update('recria_pesajes', id, payload);
+  async updatePesaje(id: string, payload: Partial<Pesaje>) {
+    return this.update<Pesaje>('recria_pesajes', id, payload);
   }
 
   async deletePesaje(id: string) {
@@ -323,10 +461,10 @@ export class SupabaseService {
       if (!this.supabase) {
         // Mock Update
         const { data: bovinos } = await this.getRawMock('bovinos');
-        const index = bovinos.findIndex((b: any) => b.id === bovinoId);
+        const index = bovinos.findIndex((b: Record<string, unknown>) => b['id'] === bovinoId);
         if (index !== -1) {
-          const oldLoteId = bovinos[index].lote_id;
-          bovinos[index].lote_id = nuevoLoteId;
+          const oldLoteId = bovinos[index]['lote_id'];
+          bovinos[index]['lote_id'] = nuevoLoteId;
           localStorage.setItem('mock_bovinos', JSON.stringify(bovinos));
           return { data: { id: nuevoLoteId, nombre: nombreLote, changed: oldLoteId !== nuevoLoteId }, error: null };
         }
@@ -355,9 +493,10 @@ export class SupabaseService {
         }, 
         error: null 
       };
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Error en updateBovinoLote:', e);
-      return { data: null, error: e.message || 'Error técnico al actualizar lote' };
+      const errorMsg = e instanceof Error ? e.message : 'Error técnico al actualizar lote';
+      return { data: null, error: errorMsg };
     }
   }
 

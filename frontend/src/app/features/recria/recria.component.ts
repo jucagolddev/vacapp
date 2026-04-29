@@ -6,7 +6,7 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
   IonIcon, IonButton, IonGrid, IonRow, IonCol, IonItem, 
   IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
-  IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton
+  IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton, IonSearchbar
 } from '@ionic/angular/standalone';
 import { 
   AlertController, 
@@ -40,7 +40,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
     IonIcon, IonButton, IonGrid, IonRow, IonCol, IonItem, 
     IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
-    IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton
+    IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton, IonSearchbar
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -61,7 +61,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     </ion-header>
 
     <ion-content class="ion-padding-vertical">
-      <div class="vac-container animate-fade-in">
+      <main class="vac-container animate-fade-in">
         
         <!-- Cabecera de Selección -->
         <div *ngIf="selectedBovino" class="flex items-center justify-between mb-8 animate-fade-in">
@@ -81,21 +81,19 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
              <p class="vac-page-subtitle">Busca el ejemplar para registrar su pesaje</p>
            </div>
 
-           <div class="vac-search-wrapper mb-8">
-              <ion-icon name="search" class="vac-search-icon"></ion-icon>
-              <input 
-                type="text" 
-                placeholder="Buscar por crotal o nombre..." 
-                class="vac-search-input-field"
-                [ngModel]="searchTerm()"
-                (ngModelChange)="searchTerm.set($event)">
-           </div>
+           <ion-searchbar
+             mode="ios"
+             animated="true"
+             placeholder="Buscar por crotal o nombre..."
+             (ionInput)="searchTerm.set($any($event).detail.value || '')"
+             class="vac-filter-bar vac-transparent-searchbar mb-8">
+           </ion-searchbar>
 
            <!-- LISTA ESTANDARIZADA -->
            <ion-grid fixed class="ion-no-padding">
              <ion-row>
-                <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos()">
-                  <div class="uniform-card clickable-card" (click)="selectBovino(b)">
+                <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos(); trackBy: trackById">
+                  <article class="uniform-card clickable-card" [ngClass]="getStatusBorderClass(b)" (click)="selectBovino(b)">
                    <div class="vac-card-header-flex">
                       <div class="ion-margin-end">
                          <img *ngIf="b.foto_url" [src]="b.foto_url" class="avatar-list" [alt]="b.nombre">
@@ -115,7 +113,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                      <span class="vac-tag-mini">{{ ganadoService.calculateCategoria(b) }}</span>
                      <span class="vac-info-label ml-auto" (click)="goToDetail(b.id); $event.stopPropagation()">Consultar Ficha</span>
                    </div>
-                 </div>
+                 </article>
                </ion-col>
              </ion-row>
            </ion-grid>
@@ -155,8 +153,8 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            </ion-grid>
 
            <!-- GRÁFICO INDIVIDUAL -->
-           <div class="vac-main-card mb-8">
-              <div class="vac-card-header-flex">
+           <section class="vac-main-card mb-8">
+              <header class="vac-card-header-flex">
                  <div class="vac-card-title-group">
                     <h3 class="vac-card-title">Curva de Crecimiento</h3>
                     <p class="vac-card-subtitle">Evolución del peso en el tiempo</p>
@@ -164,11 +162,11 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                  <div class="vac-icon-circle bg-wheat">
                     <ion-icon name="bar-chart-outline" class="color-earth"></ion-icon>
                  </div>
-              </div>
+              </header>
               <div class="vac-chart-container mt-6">
                  <canvas baseChart [data]="chartDataIndividual" [options]="chartOptions" [type]="'line'"></canvas>
               </div>
-           </div>
+           </section>
 
            <!-- HISTORIAL -->
            <div class="flex items-center justify-between mb-6">
@@ -178,8 +176,8 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            
            <ion-grid fixed class="ion-no-padding">
              <ion-row>
-               <ion-col size="12" size-md="6" size-lg="4" *ngFor="let p of pesajesFiltrados">
-                 <div class="uniform-card">
+               <ion-col size="12" size-md="6" size-lg="4" *ngFor="let p of pesajesFiltrados; trackBy: trackById">
+                 <article class="uniform-card">
                    <div class="vac-card-header-flex">
                      <div class="vac-icon-avatar bg-light">
                         <ion-icon name="calendar-outline" class="color-medium"></ion-icon>
@@ -202,7 +200,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                         Completado
                      </ion-badge>
                    </div>
-                 </div>
+                 </article>
                </ion-col>
              </ion-row>
            </ion-grid>
@@ -216,7 +214,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            </div>
         </div>
 
-      </div>
+      </main>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
         <ion-fab-button (click)="setOpen(true)" class="vac-fab">
@@ -341,7 +339,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     </ion-content>
   `
 })
-export class RecriaComponent implements OnInit {
+export class RecriaComponent {
   private supa = inject(SupabaseService);
   public ganadoService = inject(GanadoService);
   private pesajeService = inject(PesajeService);
@@ -360,7 +358,7 @@ export class RecriaComponent implements OnInit {
   filterCategoria = signal<string>('Todos');
   filterSexo = signal<string>('Todos');
   isFilterPopoverOpen = false;
-  filterEvent: any = null;
+  filterEvent: Event | null = null;
 
   filteredBovinos = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -416,8 +414,18 @@ export class RecriaComponent implements OnInit {
     });
   }
 
-  async ngOnInit() {
-    // No necesitamos cargar nada aquí ya que GanadoService ya tiene los bovinos
+  trackById(index: number, item: any): string {
+    return item?.id || index.toString();
+  }
+
+  getStatusBorderClass(bovino: any): string {
+    const estado = (bovino.estado_reproductivo || '').toLowerCase();
+    if (estado.includes('gestante') || estado.includes('gestación')) return 'border-status-gestante';
+    if (estado.includes('lactante') || estado.includes('producción')) return 'border-status-produccion';
+    if (estado.includes('enferma') || estado.includes('urgente')) return 'border-status-enferma';
+    if (estado.includes('seca')) return 'border-status-seca';
+    if (estado.includes('engorde') || estado.includes('ceba')) return 'border-status-engorde';
+    return 'border-status-sano';
   }
 
   goToDetail(id: string) {
@@ -474,7 +482,7 @@ export class RecriaComponent implements OnInit {
   }
 
   // --- LÓGICA DE FILTROS ---
-  presentFilter(event: any) {
+  presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }

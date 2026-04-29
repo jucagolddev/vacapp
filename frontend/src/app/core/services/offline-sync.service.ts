@@ -7,13 +7,21 @@ export interface SyncOperation {
   id: string;
   table: string;
   method: 'POST' | 'PUT' | 'DELETE';
-  payload: any;
+  payload: Record<string, unknown>;
   recordId?: string; // Para updates/deletes
   timestamp: number;
 }
 
 export type SyncState = 'Online' | 'Offline' | 'Sincronizando' | 'Conflicto';
 
+/**
+ * @class OfflineSyncService
+ * @description Servicio core encargado de garantizar la integridad de los datos 
+ * en entornos de conectividad intermitente (Arquitectura Offline-First).
+ * Escucha eventos de red y encola operaciones CRUD temporalmente en IndexedDB
+ * cuando el dispositivo pierde conexión, sincronizando automáticamente con el backend
+ * al recuperar conectividad.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -37,6 +45,11 @@ export class OfflineSyncService {
     window.addEventListener('offline', () => this.setNetworkStatus(false));
   }
 
+  /**
+   * @description Inicializa la base de datos IndexedDB usando localforage.
+   * Restaura la cola de sincronización pendiente si el usuario cerró la app mientras estaba offline.
+   * @private
+   */
   private async initStorage() {
     localforage.config({
       name: 'VacaApp',
@@ -61,7 +74,15 @@ export class OfflineSyncService {
     }
   }
 
-  async enqueueOperation(table: string, method: 'POST' | 'PUT' | 'DELETE', payload: any, recordId?: string) {
+  /**
+   * @description Encola una operación de base de datos para ser procesada.
+   * Si hay conexión, la procesa inmediatamente. Si no, la guarda en IndexedDB de forma persistente.
+   * @param {string} table Nombre de la tabla destino en Supabase.
+   * @param {'POST' | 'PUT' | 'DELETE'} method Acción CRUD a realizar.
+   * @param {any} payload Los datos a insertar/actualizar.
+   * @param {string} [recordId] UUID del registro (requerido para PUT/DELETE).
+   */
+  async enqueueOperation(table: string, method: 'POST' | 'PUT' | 'DELETE', payload: Record<string, unknown>, recordId?: string) {
     const operation: SyncOperation = {
       id: Math.random().toString(36).substr(2, 9),
       table,
@@ -79,6 +100,11 @@ export class OfflineSyncService {
     }
   }
 
+  /**
+   * @description El motor de sincronización. Recorre la cola y despacha cada operación
+   * secuencialmente hacia Supabase. Incorpora una estrategia de resolución de conflictos
+   * simple (basada en el campo `updated_at`).
+   */
   async processQueue() {
     if (!this.isOnline() || this.syncState() === 'Sincronizando' || this.syncState() === 'Conflicto') return;
 
@@ -157,6 +183,10 @@ export class OfflineSyncService {
     }
   }
 
+  /**
+   * @description Interfaz visual de resolución de conflictos.
+   * @private
+   */
   private async promptConflict(table: string, dbDataTime: number, localDataTime: number): Promise<'force' | 'discard'> {
     return new Promise(async (resolve) => {
        const alert = await this.alertCtrl.create({
@@ -197,7 +227,7 @@ export class OfflineSyncService {
         await localforage.setItem('vacapp_bovinos_offline_cache', data);
         console.log('[OfflineSync] Caché de catálogo primario Bovinos actualizado en IndexedDB.');
       }
-    } catch(e) {
+    } catch(e: unknown) {
       console.error('[OfflineSync] Error al cachear background dataset', e);
     }
   }
