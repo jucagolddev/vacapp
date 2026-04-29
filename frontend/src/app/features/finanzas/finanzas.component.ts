@@ -1,21 +1,21 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
   IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
-  IonGrid, IonRow, IonCol
+  IonGrid, IonRow, IonCol, IonPopover, IonSegment, IonSegmentButton,
+  ToastController, AlertController
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { PdfService } from '../../core/services/pdf.service';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { FinanzasService } from '../../core/services/finanzas.service';
 import { Finanzas } from '../../core/models/vacapp.models';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AlertController, ToastController } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { PdfService } from '../../core/services/pdf.service';
-import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline } from 'ionicons/icons';
+import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-finanzas',
@@ -25,6 +25,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
     IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
     IonGrid, IonRow, IonCol,
+    IonPopover, IonSegment, IonSegmentButton,
     BaseChartDirective
   ],
   template: `
@@ -35,8 +36,8 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </ion-buttons>
         <ion-title class="ion-text-center">Gastos y Ganancias</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" color="primary">
-            <ion-icon name="document-text-outline"></ion-icon>
+          <ion-button (click)="presentFilter($event)" fill="clear">
+            <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -45,17 +46,46 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     <ion-content class="ion-padding-vertical">
       <div class="vac-container animate-fade-in pb-12">
         
+        <!-- CONTROL MANDO COLECTIVO (NUEVO) -->
+        <div class="vac-master-filter-bar mb-6 animate-fade-in">
+           <div class="flex items-center gap-3">
+              <ion-icon name="stats-chart-outline" class="color-primary text-xl"></ion-icon>
+              <div class="vac-text-stack">
+                 <span class="text-xs uppercase tracking-widest color-medium font-bold">Mando Colectivo</span>
+                 <strong class="text-lg">Periodo de Análisis</strong>
+              </div>
+           </div>
+           <ion-segment [value]="filterGlobal()" (ionChange)="applyGlobalFilter($any($event).detail.value)" mode="ios" class="vac-segment-earth mt-4">
+              <ion-segment-button value="Mensual">
+                <ion-label>Mensual</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="Anual">
+                <ion-label>Anual</ion-label>
+              </ion-segment-button>
+           </ion-segment>
+        </div>
 
         <!-- GRÁFICO DE ROI (Relocado) -->
         <div class="vac-main-card animate-slide-up mb-8">
           <div class="vac-card-header-flex">
             <div class="vac-card-title-group">
               <span>ESTADO DE CUENTAS</span>
-              <strong>Ingresos vs Gastos Mensuales</strong>
+              <strong>Ingresos vs Gastos</strong>
             </div>
-            <div class="vac-mini-stat bg-primary-soft">
-              <ion-icon name="trending-up-outline"></ion-icon>
-              <span>ROI en Crecimiento</span>
+            <!-- CONTROL INDIVIDUAL (NUEVO) -->
+            <div class="flex items-center gap-2">
+               <ion-segment [value]="chartPeriodo()" (ionChange)="chartPeriodo.set($any($event).detail.value)" mode="ios" class="vac-segment-mini">
+                  <ion-segment-button value="Mensual">
+                    <ion-label>M</ion-label>
+                  </ion-segment-button>
+                  <ion-segment-button value="Anual">
+                    <ion-label>A</ion-label>
+                  </ion-segment-button>
+               </ion-segment>
+               <div class="vac-mini-stat bg-primary-soft hidden-sm">
+                 <ion-icon name="trending-up-outline"></ion-icon>
+                 <span>ROI Dinámico</span>
+               </div>
             </div>
           </div>
           <div class="p-4">
@@ -64,10 +94,10 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </div>
 
         <!-- Listado de Movimientos Recientes -->
-        <h2 class="vac-section-title">Últimos Movimientos</h2>
-        <ion-grid class="ion-no-padding">
+        <h2 class="vac-section-title">Movimientos Filtrados</h2>
+        <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of finanzasService.records().slice(0, 20)">
+            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredRecords()">
               <div class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
                 <div class="vac-card-header-flex">
                   <div class="vac-icon-circle" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
@@ -98,15 +128,58 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
           </ion-row>
         </ion-grid>
         
-        <div *ngIf="finanzasService.records().length === 0" class="vac-empty-state">
+        <div *ngIf="filteredRecords().length === 0" class="vac-empty-state">
            <div class="empty-icon-ring">
               <ion-icon name="cash-outline"></ion-icon>
            </div>
            <h2>Cero Movimientos</h2>
-           <p>Aún no has registrado ningún gasto o beneficio en tu cuenta.</p>
+           <p>No se encontraron registros para los filtros aplicados.</p>
         </div>
 
       </div>
+
+      <!-- POPOVER DE FILTROS (RUSTIC-LUXE) -->
+      <ion-popover [isOpen]="isFilterPopoverOpen" [event]="filterEvent" (didDismiss)="isFilterPopoverOpen = false" class="vac-popover">
+        <ng-template>
+          <div class="vac-filter-panel ion-padding">
+            <div class="vac-filter-header mb-4">
+              <ion-icon name="filter-outline" class="color-primary align-middle"></ion-icon>
+              <span class="ml-2 font-bold color-primary">Filtrar Finanzas</span>
+            </div>
+
+            <div class="filter-section mb-6">
+              <ion-label class="vac-filter-label">Naturaleza</ion-label>
+              <ion-segment [value]="filterTipo()" (ionChange)="filterTipo.set($any($event).detail.value)" mode="ios" class="vac-segment-earth">
+                <ion-segment-button value="Todos">
+                  <ion-label>Todos</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="Ingreso">
+                  <ion-label>Ingresos</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="Gasto">
+                  <ion-label>Gastos</ion-label>
+                </ion-segment-button>
+              </ion-segment>
+            </div>
+
+            <div class="filter-section mb-6">
+              <ion-label class="vac-filter-label">Categoría Específica</ion-label>
+              <ion-item lines="none" class="vac-input-select-mini">
+                <ion-select [value]="filterCategoria()" (ionChange)="filterCategoria.set($event.detail.value)" interface="popover">
+                  <ion-select-option value="Todos">Todas las categorías</ion-select-option>
+                  <ion-select-option *ngFor="let c of todasLasCategorias" [value]="c">{{ c }}</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <div class="vac-filter-footer pt-2 border-top-soft">
+               <ion-button expand="block" fill="clear" color="danger" (click)="clearFilters()">
+                 Limpiar Filtros
+               </ion-button>
+            </div>
+          </div>
+        </ng-template>
+      </ion-popover>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
         <ion-fab-button (click)="openAddModal()" color="primary">
@@ -190,13 +263,42 @@ export class FinanzasComponent {
   editingItem: Finanzas | null = null;
   finanzasForm: FormGroup;
 
+  // Filtros Avanzados
+  filterTipo = signal<string>('Todos');
+  filterCategoria = signal<string>('Todos');
+  isFilterPopoverOpen = false;
+  filterEvent: any = null;
+
+  todasLasCategorias = [
+    'Venta Leche', 'Venta Carne', 'Venta Genética', 'Ayudas Gubernamentales', 'Otros Ingresos',
+    'Alimentación y Pastos', 'Veterinaria y Semen', 'Mantenimiento y Equipos', 'Sueldos', 'Otros Gastos'
+  ];
+
+  filteredRecords = computed(() => {
+    const tipo = this.filterTipo();
+    const cat = this.filterCategoria();
+    let list = this.finanzasService.records();
+
+    if (tipo !== 'Todos') {
+      list = list.filter(r => r.tipo === tipo);
+    }
+    if (cat !== 'Todos') {
+      list = list.filter(r => r.categoria === cat);
+    }
+
+    return list.slice(0, 50); // Mostrar top 50 filtrados
+  });
+
   categoriasIngreso = ['Venta Leche', 'Venta Carne', 'Venta Genética', 'Ayudas Gubernamentales', 'Otros Ingresos'];
   categoriasGasto = ['Alimentación y Pastos', 'Veterinaria y Semen', 'Mantenimiento y Equipos', 'Sueldos', 'Otros Gastos'];
   categoriasDisponibles: string[] = [];
   
   // Gráfico de Finanzas (ROI) - Agrupado Mensual por defecto
+  chartPeriodo = signal<'Mensual' | 'Anual'>('Mensual');
+  filterGlobal = signal<'Mensual' | 'Anual'>('Mensual');
+
   chartFinanzas = computed<ChartConfiguration<'bar'>['data']>(() => {
-    const data = this.finanzasService.getDatosFinancierosPorPeriodo('Mensual');
+    const data = this.finanzasService.getDatosFinancierosPorPeriodo(this.chartPeriodo());
     return {
       labels: data.map(d => d.label),
       datasets: [
@@ -206,15 +308,15 @@ export class FinanzasComponent {
           backgroundColor: '#1b4332', 
           borderColor: '#1b4332',
           borderWidth: 0,
-          borderRadius: 4 
+          borderRadius: 8 
         },
         { 
           label: 'Gastos (€)', 
           data: data.map(d => -d.gastos), 
-          backgroundColor: '#bc8a5f', 
-          borderColor: '#bc8a5f',
+          backgroundColor: '#bc4749', // Rojo Ladrillo ($danger-color)
+          borderColor: '#bc4749',
           borderWidth: 0,
-          borderRadius: 4 
+          borderRadius: 8 
         }
       ]
     };
@@ -240,7 +342,7 @@ export class FinanzasComponent {
   }
 
   constructor() {
-    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline });
+    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline });
     this.finanzasForm = this.fb.group({
       tipo: ['Gasto', Validators.required],
       categoria: ['Alimentación y Pastos', Validators.required],
@@ -388,5 +490,24 @@ export class FinanzasComponent {
       mode: 'ios'
     });
     toast.present();
+  }
+
+  // --- LÓGICA DE FILTROS ---
+  applyGlobalFilter(periodo: 'Mensual' | 'Anual') {
+    this.filterGlobal.set(periodo);
+    this.chartPeriodo.set(periodo);
+    // Aquí se podrían sincronizar otros gráficos si los hubiera en esta vista
+  }
+
+  // --- LÓGICA DE FILTROS ---
+  presentFilter(event: any) {
+    this.filterEvent = event;
+    this.isFilterPopoverOpen = true;
+  }
+
+  clearFilters() {
+    this.filterTipo.set('Todos');
+    this.filterCategoria.set('Todos');
+    this.isFilterPopoverOpen = false;
   }
 }

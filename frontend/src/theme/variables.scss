@@ -45,7 +45,9 @@
   --ion-text-color-rgb: 33, 37, 41;
 
   --ion-item-background: #ffffff;
+  --ion-item-background-rgb: 255, 255, 255;
   --ion-card-background: #ffffff;
+  --ion-card-background-rgb: 255, 255, 255;
 }
 
 /* Modo Oscuro Manual (Rustic-Dark v2) */
@@ -70,7 +72,9 @@ body.dark-theme {
   --ion-text-color-rgb: 224, 224, 224;
 
   --ion-item-background: #1e1e1e;
+  --ion-item-background-rgb: 30, 30, 30;
   --ion-card-background: #1e1e1e;
+  --ion-card-background-rgb: 30, 30, 30;
   
   --ion-color-step-50: #1e1e1e;
   --ion-color-step-100: #2a2a2a;
@@ -82,12 +86,9 @@ body.dark-theme {
   }
 }
 
-body, * {
-  --ion-font-family: 'Outfit', sans-serif !important;
-  font-family: var(--ion-font-family) !important;
-}
-
 body {
+  --ion-font-family: 'Outfit', sans-serif;
+  font-family: var(--ion-font-family);
   background-color: var(--ion-background-color);
 }
 
@@ -105,7 +106,7 @@ ion-card {
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
-    background: linear-gradient(135deg, var(--ion-card-background) 0%, #fdfaf7 100%);
+    background: linear-gradient(135deg, var(--ion-card-background) 0%, var(--ion-color-step-50) 100%);
   }
 }
 
@@ -148,3 +149,4 @@ ion-badge {
 ::-webkit-scrollbar-track { background: #f8f9fa; }
 ::-webkit-scrollbar-thumb { background: #d4a373; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #ba8f65; }
+

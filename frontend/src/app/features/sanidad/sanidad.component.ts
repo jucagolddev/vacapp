@@ -1,22 +1,23 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem,
   IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
   IonGrid, IonRow, IonCol,
-  IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
+  IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
+  IonPopover, IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Sanidad, Bovino } from '../../core/models/vacapp.models';
 import { addIcons } from 'ionicons';
 import { 
   medkitOutline, flaskOutline, medicalOutline, addCircle, closeOutline, saveOutline, searchOutline, 
   calendarOutline, personOutline, createOutline, trashOutline, leafOutline, pulseOutline, waterOutline, 
-  thermometerOutline, bandageOutline, warningOutline, filterOutline, arrowDownOutline, documentTextOutline
+  thermometerOutline, bandageOutline, warningOutline, filterOutline, arrowDownOutline, documentTextOutline, statsChartOutline
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PdfService } from '../../core/services/pdf.service';
@@ -36,7 +37,9 @@ import { GanadoService } from '../../core/services/ganado.service';
     IonItem, IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, 
     IonFab, IonFabButton, IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
     IonGrid, IonRow, IonCol,
-    IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
+    IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
+    IonPopover, IonSegment, IonSegmentButton,
+    BaseChartDirective
   ],
   templateUrl: './sanidad.component.html'
 })
@@ -49,19 +52,96 @@ export class SanidadComponent implements OnInit {
   private pdfService = inject(PdfService);
   private router = inject(Router);
   
-  sanidadRecords: Sanidad[] = [];
-  filteredSanidad = signal<Sanidad[]>([]);
+  sanidadRecords = signal<Sanidad[]>([]);
   isLoading = signal<boolean>(true);
+  searchTerm = signal<string>('');
+  
+  // Filtros Avanzados
+  filterTipo = signal<string>('Todos');
+  filterLote = signal<string>('Todos');
+  isFilterPopoverOpen = false;
+  filterEvent: any = null;
+
+  // Computado Reactivo para Filtrado Multidimensional
+  filteredSanidad = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const tipo = this.filterTipo();
+    const loteId = this.filterLote();
+    let list = this.sanidadRecords();
+
+    // 1. Texto (Animal, Crotal, Producto, Tipo)
+    if (term) {
+      list = list.filter(s => 
+        s.bovino?.nombre?.toLowerCase().includes(term) ||
+        s.bovino?.crotal?.toLowerCase().includes(term) ||
+        s.producto?.toLowerCase().includes(term) ||
+        s.tipo?.toLowerCase().includes(term)
+      );
+    }
+
+    // 2. Tipo de intervención
+    if (tipo !== 'Todos') {
+      list = list.filter(s => s.tipo === tipo);
+    }
+
+    // 3. Lote (Recinto)
+    if (loteId !== 'Todos') {
+      list = list.filter(s => s.bovino?.lote_id === loteId);
+    }
+
+    return list;
+  });
   
   isModalOpen = false;
   editingItem: Sanidad | null = null;
   healthForm: FormGroup;
 
+  chartPeriodo = signal<'3m' | '6m' | '12m'>('6m');
+  filterGlobal = signal<'3m' | '6m' | '12m'>('6m');
+
+  // Gráfico de Distribución Sanitaria
+  chartSanidad = computed<ChartConfiguration<'bar'>['data']>(() => {
+    const list = this.filteredSanidad();
+    const period = this.chartPeriodo();
+    
+    // Filtro temporal real
+    const months = period === '3m' ? 3 : period === '6m' ? 6 : 12;
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - months);
+    
+    const recs = list.filter(s => s.fecha && new Date(s.fecha) >= cutoff);
+    
+    const stats: Record<string, number> = {};
+    recs.forEach(r => {
+      stats[r.tipo] = (stats[r.tipo] || 0) + 1;
+    });
+
+    return {
+      labels: Object.keys(stats),
+      datasets: [{
+        label: 'Nº Intervenciones',
+        data: Object.values(stats),
+        backgroundColor: ['#1b4332', '#52b788', '#d4a373', '#bc4749', '#582f0e'],
+        borderRadius: 8
+      }]
+    };
+  });
+
+  chartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#6c757d' } },
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#6c757d', stepSize: 1 } }
+    }
+  };
+
   constructor() {
     addIcons({ 
       medkitOutline, flaskOutline, medicalOutline, addCircle, closeOutline, saveOutline, searchOutline, calendarOutline, 
       personOutline, createOutline, trashOutline, leafOutline, pulseOutline, waterOutline, thermometerOutline, bandageOutline, warningOutline, filterOutline, arrowDownOutline,
-      documentTextOutline
+      documentTextOutline, statsChartOutline
     });
     
     this.healthForm = this.fb.group({
@@ -85,8 +165,7 @@ export class SanidadComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const { data: records } = await this.supa.getSanidad();
-      this.sanidadRecords = records || [];
-      this.filteredSanidad.set([...this.sanidadRecords]);
+      this.sanidadRecords.set(records || []);
     } catch (e) {
       console.error('Error cargando datos sanitarios:', e);
     } finally {
@@ -107,51 +186,43 @@ export class SanidadComponent implements OnInit {
     }
   }
 
-  exportarPDF() {
-    const doc = new jsPDF();
-    
-    // Título del PDF
-    doc.setFontSize(18);
-    doc.text('Registro Oficial de Sanidad - Vacapp', 14, 22);
-    
-    doc.setFontSize(11);
-    doc.text(`Fecha de exportación: ${new Date().toLocaleDateString()}`, 14, 30);
-
-    // Mapeamos los datos
-    const data = this.filteredSanidad().map(item => [
+  async exportarPDF() {
+    const headers = [['Fecha', 'Crotal', 'Tratamiento', 'Producto']];
+    const data = this.filteredSanidad().map((item: Sanidad) => [
       item.fecha ? new Date(item.fecha).toLocaleDateString() : 'N/A',
       item.bovino?.crotal || 'S/N',
       item.tipo || '-',
       item.producto || '-'
     ]);
 
-    // Generar la tabla
-    autoTable(doc, {
-      startY: 35,
-      head: [['Fecha', 'Crotal', 'Tratamiento', 'Producto']],
-      body: data,
-      headStyles: { fillColor: [92, 131, 116] }, // Color primario de tu app en RGB
-      alternateRowStyles: { fillColor: [245, 245, 245] }
-    });
-
-    // Descargar el archivo
-    doc.save('registro_sanidad.pdf');
+    await this.pdfService.generateTablePDF(
+      'Registro Oficial de Sanidad - Vacapp',
+      headers,
+      data,
+      'registro_sanidad_vacapp'
+    );
   }
 
   onSearch(event: any) {
-    const term = event.target.value.toLowerCase();
-    if (!term) {
-      this.filteredSanidad.set([...this.sanidadRecords]);
-      return;
-    }
-    
-    const filtered = this.sanidadRecords.filter(s => 
-      s.bovino?.nombre?.toLowerCase().includes(term) ||
-      s.bovino?.crotal?.toLowerCase().includes(term) ||
-      s.producto.toLowerCase().includes(term) ||
-      s.tipo.toLowerCase().includes(term)
-    );
-    this.filteredSanidad.set(filtered);
+    this.searchTerm.set(event.target.value);
+  }
+
+  // --- LÓGICA DE FILTROS ---
+  applyGlobalFilter(periodo: '3m' | '6m' | '12m') {
+    this.filterGlobal.set(periodo);
+    this.chartPeriodo.set(periodo);
+  }
+
+  presentFilter(event: any) {
+    this.filterEvent = event;
+    this.isFilterPopoverOpen = true;
+  }
+
+  clearFilters() {
+    this.filterTipo.set('Todos');
+    this.filterLote.set('Todos');
+    this.searchTerm.set('');
+    this.isFilterPopoverOpen = false;
   }
 
   getHealthIcon(tipo: string): string {

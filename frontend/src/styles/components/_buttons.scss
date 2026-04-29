@@ -1,0 +1,18 @@
+@use "../abstracts/variables";
+
+/**
+ * CUSTOM BUTTONS - Rustic-Luxe v2 (FINAL STABLE VERSION)
+ * High-visibility and premium feel for specific actions.
+ */
+
+
+/* Secondary Actions */
+.vac-btn-icon-soft {
+  --background: rgba(108, 117, 125, 0.1);
+  --color: #6c757d;
+  --border-radius: 10px;
+  
+  &:hover {
+    --background: rgba(108, 117, 125, 0.15);
+  }
+}

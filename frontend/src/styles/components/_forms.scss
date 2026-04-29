@@ -2,7 +2,7 @@
 
 /* 10. ELEMENTOS DE FORMULARIO LUXE */
 .vac-input {
-  --background: #{variables.$white};
+  --background: var(--ion-item-background);
   --border-radius: 16px;
   margin-bottom: 1.5rem;
   --padding-start: 1.2rem;
@@ -10,12 +10,12 @@
   --padding-top: 10px;
   --padding-bottom: 10px;
   --inner-padding-end: 0;
-  box-shadow: 0 4px 10px rgba(variables.$black, 0.03);
-  border: 1px solid rgba(variables.$primary-color, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
   transition: all 0.3s ease;
 
   &.item-has-focus {
-    --background: #{variables.$white};
+    --background: var(--ion-item-background);
     border-color: var(--ion-color-tertiary);
     box-shadow: variables.$shadow-focus;
   }
@@ -77,7 +77,7 @@
 /* 11. Buscador */
 .vac-search-wrapper { 
   margin: 10px 12px 25px; 
-  background: variables.$white; 
+  background: var(--ion-item-background); 
   border-radius: 20px; 
   display: flex; 
   align-items: center; 
@@ -114,7 +114,7 @@
   padding: 18px 0;
   font-size: 1rem;
   font-weight: 600;
-  color: variables.$black;
+  color: var(--ion-text-color);
   transition: all 0.3s ease;
 }
 
@@ -126,11 +126,11 @@
 /* ION-SEARCHBAR LUXE RESET (v2) */
 ion-searchbar {
   --border-radius: 24px !important;
-  --background: #fdfaf7 !important;
+  --background: var(--ion-color-step-50) !important;
   --box-shadow: none !important;
   --placeholder-color: #{variables.$gray-600};
   --placeholder-font-weight: 600;
-  --color: #{variables.$black};
+  --color: var(--ion-text-color);
   border: 1px solid rgba(188, 138, 95, 0.12); /* Subtle Tierra border */
   border-radius: 24px;
   margin: 10px 0;

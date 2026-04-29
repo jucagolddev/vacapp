@@ -32,17 +32,17 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     IonGrid, IonRow, IonCol
   ],
   template: `
-    <ion-header class="ion-no-border vac-header">
+    <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button class="color-forest"></ion-menu-button>
+          <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Potreros y Recintos</ion-title>
+        <ion-title class="ion-text-center">Potreros y Recintos</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" color="primary">
+          <ion-button (click)="exportarPDF()" fill="clear">
             <ion-icon name="document-text-outline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear" class="color-forest">
+          <ion-button fill="clear">
             <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -57,9 +57,9 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           <p class="vac-page-subtitle">Organiza y monitorea la carga animal por recinto</p>
         </div>
 
-        <ion-grid class="ion-no-padding">
+        <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let lote of lotes">
+            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let lote of lotes">
               <div class="uniform-card">
                 <div class="vac-card-header-flex">
                   <div class="vac-card-title-group">

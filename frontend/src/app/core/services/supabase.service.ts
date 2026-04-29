@@ -532,6 +532,7 @@ export class SupabaseService {
       finca_id: 'finca-1',
       lote_id: 'lote-engorde',
       estado_productivo: 'Alta',
+      aptitud: 'Carne',
       fecha_nacimiento: monthsAgo(8),
       created_at: monthsAgo(8)
     });
@@ -581,7 +582,7 @@ export class SupabaseService {
         finca_id: 'finca-1',
         lote_id: 'lote-maternidad',
         estado_productivo: 'Alta',
-        estado_reproductivo: 'Seca',
+        estado_reproductivo: 'Gestante',
         fecha_nacimiento: yearsAgo(3),
         created_at: yearsAgo(3)
     });

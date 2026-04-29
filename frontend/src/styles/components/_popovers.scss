@@ -1,0 +1,132 @@
+@use "../abstracts/variables" as v;
+
+/**
+ * POPOVER DESIGN - Rustic-Luxe v2
+ */
+
+.vac-popover {
+  --width: 320px;
+  --border-radius: 20px;
+  --box-shadow: 0 10px 40px rgba(27, 67, 50, 0.15);
+  
+  &::part(content) {
+    border: 1px solid rgba(27, 67, 50, 0.08);
+  }
+}
+
+.vac-filter-panel {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  
+  .vac-filter-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #f1f1f1;
+    padding-bottom: 12px;
+    
+    ion-icon {
+      font-size: 20px;
+    }
+    
+    span {
+      font-size: 1.1rem;
+      font-family: 'Outfit', sans-serif;
+    }
+  }
+
+  .vac-filter-label {
+    display: block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #8d7b68;
+    font-weight: 700;
+    margin-bottom: 8px;
+    margin-left: 4px;
+  }
+
+  /* Segmented Control - Earthy Look */
+  .vac-segment-earth {
+    background: #fdfaf7;
+    border-radius: 12px;
+    padding: 3px;
+    --background: #fdfaf7;
+    
+    ion-segment-button {
+      --color: #8d7b68;
+      --color-checked: #ffffff;
+      --indicator-color: #1b4332;
+      --indicator-box-shadow: 0 4px 10px rgba(27, 67, 50, 0.2);
+      font-size: 0.85rem;
+      min-height: 40px;
+      font-weight: 600;
+      
+      &::part(native) {
+        border-radius: 9px;
+      }
+    }
+  }
+
+  .vac-input-select-mini {
+    --background: #fdfaf7;
+    --border-radius: 12px;
+    --padding-start: 12px;
+    font-size: 0.95rem;
+    border: 1px solid rgba(27, 67, 50, 0.05);
+    margin: 4px 0;
+    
+    ion-select {
+      width: 100%;
+      --placeholder-color: #8d7b68;
+      --placeholder-opacity: 0.6;
+    }
+  }
+
+  .vac-filter-footer {
+    border-top: 1px solid #f1f1f1;
+    
+    ion-button {
+      --color: #bc4749;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: none;
+    }
+  }
+}
+
+/* Adaptación para Modo Oscuro */
+body.dark-theme {
+  .vac-filter-panel {
+    background: #1a1a1a;
+    
+    .vac-filter-header {
+      border-bottom-color: #333;
+      .color-primary { color: #ffffff !important; }
+    }
+    
+    .vac-segment-earth {
+      background: #2a2a2a;
+      --background: #2a2a2a;
+      
+      ion-segment-button {
+        --color: #aaa;
+        --indicator-color: #2d6a4f;
+      }
+    }
+    
+    .vac-input-select-mini {
+      background: #2a2a2a;
+      --background: #2a2a2a;
+      border-color: #444;
+      
+      ion-select {
+        color: white;
+      }
+    }
+    
+    .vac-filter-footer {
+       border-top-color: #333;
+    }
+  }
+}

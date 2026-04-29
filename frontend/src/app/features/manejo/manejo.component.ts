@@ -7,7 +7,8 @@ import {
   IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
   IonBadge,
-  IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText
+  IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText,
+  IonPopover, IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Bovino, Lote } from '../../core/models/vacapp.models';
@@ -44,6 +45,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
     IonBadge,
     IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText,
+    IonPopover, IonSegment, IonSegmentButton,
     BaseChartDirective
   ],
   templateUrl: './manejo.component.html',
@@ -62,22 +64,50 @@ export class ManejoComponent implements OnInit {
   private router = inject(Router);
   
   bovinos = this.ganadoService.bovinos;
-  lotesArr: Lote[] = []; // Opcional, dependiendo de si quieres rellenarlo aquí.
-  lotes = this.fincaService.fincas;
+  lotes = this.fincaService.lotes;
   
   // Estados de interfaz y búsqueda
   isLoading = signal<boolean>(true);
   searchTerm = signal<string>('');
+  
+  // Filtros Avanzados
+  filterEstado = signal<string>('Todos');
+  filterLote = signal<string>('Todos');
+  isFilterPopoverOpen = false;
+  filterEvent: any = null;
 
-  // Computado que retorna la lista filtrada de bovinos basada en el searchbar
+  // Computado que retorna la lista filtrada de bovinos basada en el searchbar y filtros
   filteredBovinos = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
-    const list = this.bovinos();
-    if (!term) return list;
-    return list.filter(b => 
-      (b.nombre?.toLowerCase() || '').includes(term) || 
-      (b.crotal?.toLowerCase() || '').includes(term)
-    );
+    const estado = this.filterEstado();
+    const loteId = this.filterLote();
+    let list = this.bovinos();
+
+    // 1. Filtro por búsqueda
+    if (term) {
+      list = list.filter(b => 
+        (b.nombre?.toLowerCase() || '').includes(term) || 
+        (b.crotal?.toLowerCase() || '').includes(term)
+      );
+    }
+
+    // 2. Filtro por Estado (Mapeo a datos reales)
+    if (estado !== 'Todos') {
+      list = list.filter(b => {
+        if (estado === 'Producción') return b.estado_reproductivo === 'Lactante';
+        if (estado === 'Gestación') return b.estado_reproductivo === 'Gestante';
+        if (estado === 'Seca') return b.estado_reproductivo === 'Seca';
+        if (estado === 'Engorde') return b.aptitud === 'Carne';
+        return true;
+      });
+    }
+
+    // 3. Filtro por Lote
+    if (loteId !== 'Todos') {
+      list = list.filter(b => b.lote_id === loteId);
+    }
+
+    return list;
   });
 
   // Gráfico de Pesos
@@ -106,7 +136,7 @@ export class ManejoComponent implements OnInit {
   bovinoForm: FormGroup;
 
   constructor() {
-    addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, filterOutline: 'filter-outline', searchOutline, documentTextOutline });
+    addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline });
     this.bovinoForm = this.fb.group({
       nombre: ['', Validators.required],
       crotal: ['', Validators.required],
@@ -132,7 +162,7 @@ export class ManejoComponent implements OnInit {
   }
 
   async loadData() {
-    this.lotesArr = []; 
+    // Los lotes se cargan vía FincaService automáticamente
   }
 
   handleSearch(event: any) {
@@ -143,6 +173,19 @@ export class ManejoComponent implements OnInit {
     if (id) {
       this.router.navigate(['/animal-detail', id]);
     }
+  }
+
+  // --- LÓGICA DE FILTROS ---
+  presentFilter(event: any) {
+    this.filterEvent = event;
+    this.isFilterPopoverOpen = true;
+  }
+
+  clearFilters() {
+    this.filterEstado.set('Todos');
+    this.filterLote.set('Todos');
+    this.searchTerm.set('');
+    this.isFilterPopoverOpen = false;
   }
 
   async handleRefresh(event: any) {

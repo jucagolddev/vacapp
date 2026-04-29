@@ -1,7 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
-import { Finca, Empresa } from '../models/vacapp.models';
+import { Finca, Empresa, Lote } from '../models/vacapp.models';
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +13,12 @@ export class FincaService {
   // Estado reactivo (Signals)
   private fincasSignal = signal<Finca[]>([]);
   private selectedFincaIdSignal = signal<string | null>(null);
+  private lotesSignal = signal<Lote[]>([]);
 
   // Selectores computados listos para usarse en componentes
   readonly fincas = computed(() => this.fincasSignal());
   readonly selectedFincaId = computed(() => this.selectedFincaIdSignal());
+  readonly lotes = computed(() => this.lotesSignal());
   
   readonly currentFinca = computed(() => {
     const fincas = this.fincasSignal();
@@ -34,6 +36,17 @@ export class FincaService {
       } else {
         this.fincasSignal.set([]);
         this.selectedFincaIdSignal.set(null);
+        this.lotesSignal.set([]);
+      }
+    });
+
+    // Reaccionar a cambios de Finca para cargar Lotes
+    effect(() => {
+      const fincaId = this.selectedFincaId();
+      if (fincaId) {
+        this.loadLotes(fincaId);
+      } else {
+        this.lotesSignal.set([]);
       }
     });
   }
@@ -55,9 +68,18 @@ export class FincaService {
     }
   }
 
-  selectFinca(fincaId: string) {
+  async selectFinca(fincaId: string) {
     this.selectedFincaIdSignal.set(fincaId);
     localStorage.setItem('vacapp_current_finca', fincaId);
+  }
+
+  async loadLotes(fincaId: string) {
+    let { data, error } = await this.supabase.getAll<Lote>('lotes');
+    if (data && !error) {
+      // Filtrar por finca
+      data = data.filter(l => l.finca_id === fincaId);
+      this.lotesSignal.set(data);
+    }
   }
 
   // Futuras implementaciones (Crear Finca, Editar Finca)

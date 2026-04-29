@@ -8,7 +8,8 @@ import {
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
   IonButton, IonInput, IonSelect, IonSelectOption,
   IonGrid, IonRow, IonCol,
-  IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
+  IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
+  IonPopover, IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
 import { BaseChartDirective } from 'ng2-charts';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -39,6 +40,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal, IonButton,
     IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol,
     IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
+    IonPopover, IonSegment, IonSegmentButton,
     BaseChartDirective
   ],
   templateUrl: './reproduccion.component.html'
@@ -56,9 +58,12 @@ export class ReproduccionComponent implements OnInit {
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
   
+  chartPeriodo = signal<'Mensual' | 'Anual'>('Mensual');
+  filterGlobal = signal<'Mensual' | 'Anual'>('Mensual');
+
   // Gráfico de Fertilidad
   chartFertilidad = computed<ChartConfiguration<'bar'>['data']>(() => {
-    const data = this.reproService.getEstadisticasConcepcion('Mensual');
+    const data = this.reproService.getEstadisticasConcepcion(this.chartPeriodo());
     return {
       labels: data.map(d => d.label),
       datasets: [
@@ -77,12 +82,63 @@ export class ReproduccionComponent implements OnInit {
     }
   };
   
-  reproducciones: Reproduccion[] = [];
-  gestacionesActivas: Reproduccion[] = [];
+  reproducciones = signal<Reproduccion[]>([]);
+  gestacionesActivas = signal<Reproduccion[]>([]);
   
-  filteredReproducciones = signal<Reproduccion[]>([]);
-  filteredGestaciones = signal<Reproduccion[]>([]);
   isLoading = signal<boolean>(true);
+  searchTerm = signal<string>('');
+
+  // Filtros Avanzados
+  filterEstado = signal<string>('Todos');
+  filterMetodo = signal<string>('Todos');
+  isFilterPopoverOpen = false;
+  filterEvent: any = null;
+
+  // Computado para Historial Completo
+  filteredReproducciones = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const estado = this.filterEstado();
+    const metodo = this.filterMetodo();
+    let list = this.reproducciones();
+
+    if (term) {
+      list = list.filter(r => 
+        r.bovino?.nombre?.toLowerCase().includes(term) ||
+        r.bovino?.crotal?.toLowerCase().includes(term) ||
+        r.tipo_cubricion?.toLowerCase().includes(term)
+      );
+    }
+
+    if (estado !== 'Todos') {
+      list = list.filter(r => r.estado_gestacion === estado);
+    }
+
+    if (metodo !== 'Todos') {
+      list = list.filter(r => r.tipo_cubricion === metodo);
+    }
+
+    return list;
+  });
+
+  // Computado para Gestaciones Activas (Solo 'Confirmada')
+  filteredGestaciones = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const metodo = this.filterMetodo();
+    let list = this.gestacionesActivas();
+
+    if (term) {
+      list = list.filter(r => 
+        r.bovino?.nombre?.toLowerCase().includes(term) ||
+        r.bovino?.crotal?.toLowerCase().includes(term)
+      );
+    }
+
+    if (metodo !== 'Todos') {
+      list = list.filter(r => r.tipo_cubricion === metodo);
+    }
+
+    return list;
+  });
 
   isModalOpen = false;
   editingItem: Reproduccion | null = null;
@@ -113,11 +169,8 @@ export class ReproduccionComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const { data: repros } = await this.supa.getReproduccion();
-      this.reproducciones = repros || [];
-      this.gestacionesActivas = this.reproducciones.filter(r => r.estado_gestacion === 'Confirmada');
-      
-      this.filteredReproducciones.set([...this.reproducciones]);
-      this.filteredGestaciones.set([...this.gestacionesActivas]);
+      this.reproducciones.set(repros || []);
+      this.gestacionesActivas.set((repros || []).filter(r => r.estado_gestacion === 'Confirmada'));
     } catch (e) {
       console.error('Error cargando datos reproductivos:', e);
     } finally {
@@ -158,26 +211,25 @@ export class ReproduccionComponent implements OnInit {
   }
 
   onSearch(event: any) {
-    const term = event.target.value.toLowerCase();
-    if (!term) {
-      this.filteredReproducciones.set([...this.reproducciones]);
-      this.filteredGestaciones.set([...this.gestacionesActivas]);
-      return;
-    }
-    
-    const reproFilter = this.reproducciones.filter(r => 
-      r.bovino?.nombre?.toLowerCase().includes(term) ||
-      r.bovino?.crotal?.toLowerCase().includes(term) ||
-      r.tipo_cubricion?.toLowerCase().includes(term)
-    );
-    this.filteredReproducciones.set(reproFilter);
+    this.searchTerm.set(event.target.value);
+  }
 
-    const gestFilter = this.gestacionesActivas.filter(r => 
-      r.bovino?.nombre?.toLowerCase().includes(term) ||
-      r.bovino?.crotal?.toLowerCase().includes(term) ||
-      r.tipo_cubricion?.toLowerCase().includes(term)
-    );
-    this.filteredGestaciones.set(gestFilter);
+  // --- LÓGICA DE FILTROS ---
+  applyGlobalFilter(periodo: 'Mensual' | 'Anual') {
+    this.filterGlobal.set(periodo);
+    this.chartPeriodo.set(periodo);
+  }
+
+  presentFilter(event: any) {
+    this.filterEvent = event;
+    this.isFilterPopoverOpen = true;
+  }
+
+  clearFilters() {
+    this.filterEstado.set('Todos');
+    this.filterMetodo.set('Todos');
+    this.searchTerm.set('');
+    this.isFilterPopoverOpen = false;
   }
 
   private calculateParto(fechaCubricion: string) {

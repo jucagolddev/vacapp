@@ -2,7 +2,7 @@
 
 /* BASE CARD - Standard Vacapp Floating Card */
 .vac-base-card {
-  background: variables.$white;
+  background: var(--ion-card-background);
   border-radius: 20px;
   padding: 1.25rem;
   box-shadow: variables.$vac-shadow;
@@ -140,7 +140,7 @@
   
   &.bg-primary { background: linear-gradient(135deg, variables.$primary-color, variables.$dark-color); }
   &.bg-secondary { background: linear-gradient(135deg, variables.$secondary-color, #8b5a2b); }
-  &.bg-tertiary { background: linear-gradient(135deg, variables.$tertiary-color, #b48a5c); color: variables.$primary-color; }
+  &.bg-tertiary { background: linear-gradient(135deg, variables.$tertiary-color, #b48a5c); color: #ffffff; }
   &.bg-success { background: linear-gradient(135deg, variables.$success-color, #2d6a4f); }
 }
 
@@ -224,7 +224,7 @@
 
 /* ION-CARD GLOBAL STANDARDIZATION */
 ion-card {
-  --background: #{variables.$white};
+  --background: var(--ion-card-background);
   border-radius: 20px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   border: 1px solid rgba(88, 47, 14, 0.08) !important;
@@ -262,7 +262,7 @@ ion-card {
 
 /* RUSTIC CARD - The definitive Vacapp standard */
 .rustic-card {
-  background: variables.$white;
+  background: var(--ion-card-background);
   border-radius: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(88, 47, 14, 0.08);

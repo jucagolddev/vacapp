@@ -5,10 +5,10 @@
     </ion-buttons>
     <ion-title class="ion-text-center">Salud y Medicinas</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" color="primary">
+      <ion-button (click)="exportarPDF()" fill="clear">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -24,6 +24,59 @@
   </ion-refresher>
 
   <div class="vac-container animate-fade-in">
+
+    <!-- CONTROL MANDO COLECTIVO -->
+    <div class="vac-master-filter-bar mb-6 animate-fade-in">
+       <div class="flex items-center gap-3">
+          <ion-icon name="stats-chart-outline" class="color-primary text-xl"></ion-icon>
+          <div class="vac-text-stack">
+             <span class="text-xs uppercase tracking-widest color-medium font-bold">Mando Colectivo</span>
+             <strong class="text-lg">Periodo de Análisis</strong>
+          </div>
+       </div>
+       <ion-segment [value]="filterGlobal()" (ionChange)="applyGlobalFilter($any($event).detail.value)" mode="ios" class="vac-segment-earth mt-4">
+          <ion-segment-button value="3m">
+            <ion-label>3 Meses</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="6m">
+            <ion-label>6 Meses</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="12m">
+            <ion-label>12 Meses</ion-label>
+          </ion-segment-button>
+       </ion-segment>
+    </div>
+
+    <!-- GRÁFICO DE DISTRIBUCIÓN -->
+    <div class="vac-main-card animate-slide-up mb-8" *ngIf="!isLoading()">
+      <div class="vac-card-header">
+        <div class="vac-card-header-flex">
+          <div class="vac-card-title-group">
+            <span>DIAGNÓSTICO GRUPAL</span>
+            <strong>Distribución de Tratamientos</strong>
+          </div>
+          <!-- CONTROL INDIVIDUAL -->
+          <div class="flex items-center gap-2">
+             <ion-segment [value]="chartPeriodo()" (ionChange)="chartPeriodo.set($any($event).detail.value)" mode="ios" class="vac-segment-mini">
+                <ion-segment-button value="3m">
+                  <ion-label>3M</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="6m">
+                  <ion-label>6M</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="12m">
+                  <ion-label>12M</ion-label>
+                </ion-segment-button>
+             </ion-segment>
+          </div>
+        </div>
+      </div>
+      <div class="vac-card-content">
+        <div class="vac-chart-container chart-250px">
+          <canvas baseChart [data]="chartSanidad()" [options]="chartOptions" [type]="'bar'"></canvas>
+        </div>
+      </div>
+    </div>
 
     <!-- Buscador Premium -->
     <div class="vac-searchbar-container">
@@ -212,4 +265,70 @@
       </ion-content>
     </ng-template>
   </ion-modal>
+  <!-- POPOVER DE FILTROS (RUSTIC-LUXE) -->
+  <ion-popover [isOpen]="isFilterPopoverOpen" [event]="filterEvent" (didDismiss)="isFilterPopoverOpen = false" class="vac-popover">
+    <ng-template>
+      <div class="vac-filter-panel ion-padding">
+        <div class="vac-filter-header mb-4">
+          <ion-icon name="filter-outline" class="color-primary align-middle"></ion-icon>
+          <span class="ml-2 font-bold color-primary">Filtrar Sanidad</span>
+        </div>
+
+        <!-- SECCIÓN: TIPO -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Tipo de Intervención</ion-label>
+          <ion-segment [value]="filterTipo()" (ionChange)="filterTipo.set($any($event).detail.value)" mode="ios" class="vac-segment-earth">
+            <ion-segment-button value="Todos">
+              <ion-label>Todos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Vacunación">
+              <ion-label>Vac.</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Desparasitación">
+              <ion-label>Desp.</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Saneamiento">
+              <ion-label>San.</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- SECCIÓN: LOTE -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Filtro por Recinto</ion-label>
+          <ion-item lines="none" class="vac-input-select-mini">
+            <ion-select [value]="filterLote()" (ionChange)="filterLote.set($event.detail.value)" interface="popover" placeholder="Seleccionar recinto">
+              <ion-select-option value="Todos">Toda la Finca</ion-select-option>
+              <ion-select-option *ngFor="let l of ganadoService.distLotes() | keyvalue" [value]="l.key">
+                {{ l.key }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <!-- SECCIÓN: TIEMPO GRÁFICO (Sincronizado) -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Recorte Temporal Gráfico</ion-label>
+          <ion-segment [value]="chartPeriodo()" (ionChange)="chartPeriodo.set($any($event).detail.value)" mode="ios" class="vac-segment-earth">
+            <ion-segment-button value="3m">
+              <ion-label>3M</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="6m">
+              <ion-label>6M</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="12m">
+              <ion-label>12M</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="vac-filter-footer pt-2 border-top-soft">
+           <ion-button expand="block" fill="clear" color="danger" (click)="clearFilters()">
+             Limpiar Filtros
+           </ion-button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-popover>
 </ion-content>

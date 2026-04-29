@@ -4,9 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, 
   IonBackButton, IonGrid, IonRow, IonCol, IonIcon, 
-  IonSegment, IonSegmentButton, IonLabel, IonBadge,
-  IonList, IonItem, IonSkeletonText, IonButton,
-  IonRefresher, IonRefresherContent
+  IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -33,16 +31,18 @@ interface TimelineEvent {
   imports: [
     CommonModule, FormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonButtons, IonBackButton, IonGrid, IonRow, IonCol, IonIcon,
-    IonSegment, IonSegmentButton, IonLabel, IonBadge, IonList, 
-    IonItem, IonSkeletonText, IonButton, IonRefresher, IonRefresherContent
+    IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText
   ],
   template: `
     <ion-header class="ion-no-border">
-      <ion-toolbar color="primary">
+      <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button defaultHref="/manejo"></ion-back-button>
         </ion-buttons>
-        <ion-title>Inteligencia Animal</ion-title>
+        <ion-title class="ion-text-center">Inteligencia Animal</ion-title>
+        <ion-buttons slot="end">
+           <div style="width: 48px"></div> <!-- Spacer for balance -->
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -67,7 +67,7 @@ interface TimelineEvent {
         </div>
 
         <!-- KPI SUMMARY GRID (4 Cards) -->
-        <ion-grid class="ion-no-padding mt-4">
+        <ion-grid fixed class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
               <div class="vac-kpi-card-square">

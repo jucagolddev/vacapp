@@ -1463,8 +1463,8 @@ ARCHIVO: .\frontend\angular.json
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "15kB",
+                  "maximumError": "20kB"
                 }
               ],
               "outputHashing": "all",
@@ -2705,7 +2705,9 @@ import { AuthService } from '../../services/auth.service';
 
         </ion-menu>
         
-        <ion-router-outlet id="main-content" class="content-canvas"></ion-router-outlet>
+        <div class="main-container" id="main-content">
+          <ion-router-outlet class="content-canvas"></ion-router-outlet>
+        </div>
         
       </ion-split-pane>
   `
@@ -3217,7 +3219,7 @@ ARCHIVO: .\frontend\src\app\core\services\finca.service.ts
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
-import { Finca, Empresa } from '../models/vacapp.models';
+import { Finca, Empresa, Lote } from '../models/vacapp.models';
 
 @Injectable({
   providedIn: 'root'
@@ -3229,10 +3231,12 @@ export class FincaService {
   // Estado reactivo (Signals)
   private fincasSignal = signal<Finca[]>([]);
   private selectedFincaIdSignal = signal<string | null>(null);
+  private lotesSignal = signal<Lote[]>([]);
 
   // Selectores computados listos para usarse en componentes
   readonly fincas = computed(() => this.fincasSignal());
   readonly selectedFincaId = computed(() => this.selectedFincaIdSignal());
+  readonly lotes = computed(() => this.lotesSignal());
   
   readonly currentFinca = computed(() => {
     const fincas = this.fincasSignal();
@@ -3250,6 +3254,17 @@ export class FincaService {
       } else {
         this.fincasSignal.set([]);
         this.selectedFincaIdSignal.set(null);
+        this.lotesSignal.set([]);
+      }
+    });
+
+    // Reaccionar a cambios de Finca para cargar Lotes
+    effect(() => {
+      const fincaId = this.selectedFincaId();
+      if (fincaId) {
+        this.loadLotes(fincaId);
+      } else {
+        this.lotesSignal.set([]);
       }
     });
   }
@@ -3271,9 +3286,18 @@ export class FincaService {
     }
   }
 
-  selectFinca(fincaId: string) {
+  async selectFinca(fincaId: string) {
     this.selectedFincaIdSignal.set(fincaId);
     localStorage.setItem('vacapp_current_finca', fincaId);
+  }
+
+  async loadLotes(fincaId: string) {
+    let { data, error } = await this.supabase.getAll<Lote>('lotes');
+    if (data && !error) {
+      // Filtrar por finca
+      data = data.filter(l => l.finca_id === fincaId);
+      this.lotesSignal.set(data);
+    }
   }
 
   // Futuras implementaciones (Crear Finca, Editar Finca)
@@ -3759,6 +3783,23 @@ import { Injectable } from '@angular/core';
 export class PdfService {
 
   /**
+   * Helper para obtener el constructor de jsPDF de forma resiliente.
+   */
+  private async getJsPDFConstructor() {
+    const jsPDFModule = await import('jspdf');
+    // En entornos Vite/ESM, jsPDF puede estar en .jsPDF o en .default
+    return jsPDFModule.jsPDF || jsPDFModule.default || jsPDFModule;
+  }
+
+  /**
+   * Helper para obtener la función autoTable de forma resiliente.
+   */
+  private async getAutoTableFunction() {
+    const autoTableModule = await import('jspdf-autotable');
+    return autoTableModule.default || autoTableModule;
+  }
+
+  /**
    * Genera un PDF profesional con una tabla de datos de forma asíncrona.
    */
   async generateTablePDF(
@@ -3768,9 +3809,11 @@ export class PdfService {
     fileName: string,
     options: any = {}
   ) {
-    const jsPDF = (await import('jspdf')).default;
+    const jsPDF = await this.getJsPDFConstructor();
     const doc = new jsPDF();
+    
     await this.addTableToDoc(doc, title, headers, body, options);
+    
     doc.save(`${fileName}_${new Date().getTime()}.pdf`);
   }
 
@@ -3784,14 +3827,16 @@ export class PdfService {
     body: any[],
     options: any = {}
   ) {
-    const autoTable = (await import('jspdf-autotable')).default;
-    const forestGreen: [number, number, number] = [43, 83, 41];
-    const wheatBackground: [number, number, number] = [245, 245, 245];
+    const autoTable = await this.getAutoTableFunction();
+    const forestGreen: [number, number, number] = [27, 67, 50]; // Sincronizado con variables.scss (#1b4332)
+    const earthBrown: [number, number, number] = [88, 47, 14]; // Sincronizado con variables.scss (#582f0e)
+    const wheatBg: [number, number, number] = [254, 250, 224]; // Sincronizado con variables.scss (#fefae0)
 
     if (title) {
-      doc.setFontSize(14);
+      doc.setFontSize(16);
       doc.setTextColor(forestGreen[0], forestGreen[1], forestGreen[2]);
-      doc.text(title, options.margin?.toString().includes('left') ? 14 : 14, (options.startY as number || 20) - 5);
+      const startY = options.startY || 20;
+      doc.text(title, 14, startY - 5);
     }
 
     try {
@@ -3801,18 +3846,20 @@ export class PdfService {
         theme: 'striped',
         headStyles: { 
           fillColor: forestGreen,
-          textColor: [255, 255, 255] as [number, number, number],
+          textColor: [255, 255, 255],
           fontSize: 10,
+          fontStyle: 'bold',
           halign: 'center'
         },
         styles: { 
           fontSize: 9, 
-          cellPadding: 3,
+          cellPadding: 4,
           font: 'helvetica'
         },
         alternateRowStyles: { 
-          fillColor: wheatBackground 
+          fillColor: [250, 248, 235] // Un beige muy claro
         },
+        margin: { top: 25 },
         ...options
       });
     } catch (error) {
@@ -3824,7 +3871,7 @@ export class PdfService {
    * Permite obtener el objeto doc de forma asíncrona para casos complejos.
    */
   async getNewDoc(): Promise<any> {
-    const jsPDF = (await import('jspdf')).default;
+    const jsPDF = await this.getJsPDFConstructor();
     return new jsPDF();
   }
 
@@ -4705,24 +4752,44 @@ export class SupabaseService {
   }
 
   /**
-   * Genera un set de datos masivo y realista para demostración.
+   * Genera un set de datos masivo, relacional y coherente para demostración.
    */
   private seedTestData() {
-    if (localStorage.getItem('vacapp_seeded') === 'true') return;
+    // Si ya existe la versión 2, no re-sembramos
+    if (localStorage.getItem('vacapp_seeded_v2') === 'true') return;
+
+    const now = new Date();
+    const daysAgo = (d: number) => {
+      const date = new Date(now);
+      date.setDate(date.getDate() - d);
+      return date.toISOString();
+    };
+    const monthsAgo = (m: number) => {
+      const date = new Date(now);
+      const days = Math.floor(m * 30);
+      date.setDate(date.getDate() - days);
+      return date.toISOString();
+    };
+    const yearsAgo = (y: number) => {
+      const date = new Date(now);
+      date.setFullYear(date.getFullYear() - y);
+      return date.toISOString();
+    };
 
     const mockData: any = {
       empresas: [
-        { id: 'emp-1', nombre: 'Ganadería Luxe Forest SL', nif: 'B12345678', created_at: new Date().toISOString() }
+        { id: 'emp-1', nombre: 'Ganadería La Excelencia', nif: 'B12345678', created_at: yearsAgo(5) }
       ],
       fincas: [
-        { id: 'finca-1', empresa_id: 'emp-1', nombre: 'Hacienda Los Alcornocales', ubicacion: 'Sierra Gaditana', created_at: new Date().toISOString() },
-        { id: 'finca-2', empresa_id: 'emp-1', nombre: 'Dehesa El Robledo', ubicacion: 'Valle Norte', created_at: new Date().toISOString() }
+        { id: 'finca-1', empresa_id: 'emp-1', nombre: 'Hacienda Los Alcornocales', ubicacion: 'Sierra Gaditana', created_at: yearsAgo(5) }
       ],
       lotes: [
-        { id: 'lote-1', finca_id: 'finca-1', nombre: 'Prado de Engorde', ubicacion: 'Zona Sur', capacidad: 50 },
-        { id: 'lote-2', finca_id: 'finca-1', nombre: 'Recría Hembras', ubicacion: 'Cercado Norte', capacidad: 30 },
-        { id: 'lote-3', finca_id: 'finca-2', nombre: 'Maternidad', ubicacion: 'Corrales Centrales', capacidad: 20 },
-        { id: 'lote-4', finca_id: 'finca-2', nombre: 'Sementales', ubicacion: 'Paddock A', capacidad: 5 }
+        { id: 'lote-repro', finca_id: 'finca-1', nombre: 'Lote de Cría', ubicacion: 'Zona Norte', capacidad: 50 },
+        { id: 'lote-engorde', finca_id: 'finca-1', nombre: 'Prado de Engorde', ubicacion: 'Zona Sur', capacidad: 50 },
+        { id: 'lote-maternidad', finca_id: 'finca-1', nombre: 'Corral Maternidad', ubicacion: 'Centro', capacidad: 20 }
+      ],
+      sementales: [
+        { id: 'sem-1', nombre: 'Titán', raza: 'Limousin', finca_id: 'finca-1' }
       ],
       bovinos: [],
       recria_pesajes: [],
@@ -4732,77 +4799,278 @@ export class SupabaseService {
       tareas: []
     };
 
-    // Generar 20 Bovinos
-    const razas = ['Limousin', 'Charolais', 'Angus', 'Retinta'];
-    for (let i = 1; i <= 20; i++) {
-        const id = `bov-${i}`;
-        const sexo = i % 2 === 0 ? 'Hembra' : 'Macho';
-        const raza = razas[Math.floor(Math.random() * razas.length)];
-        const lote_id = i <= 5 ? 'lote-1' : (i <= 10 ? 'lote-2' : (i <= 15 ? 'lote-3' : 'lote-4'));
-        const finca_id = i <= 10 ? 'finca-1' : 'finca-2';
-        
-        mockData.bovinos.push({
-            id,
-            crotal: `ES0${i}98765432${i}`,
-            nombre: `${sexo === 'Hembra' ? 'Vaca' : 'Toro'} ${i}`,
-            raza,
-            sexo,
-            finca_id,
-            lote_id,
-            estado_productivo: 'Alta',
-            estado_reproductivo: sexo === 'Hembra' ? 'Vacía' : null,
-            fecha_nacimiento: new Date(2022, Math.floor(Math.random() * 12), 1).toISOString(),
-            created_at: new Date().toISOString()
-        });
-
-        // Generar historial de pesajes para cada bovino (6 pesajes por animal)
-        let pesoBase = 45; // Nacimiento
-        for (let j = 0; j < 6; j++) {
-            const fecha = new Date();
-            fecha.setMonth(fecha.getMonth() - (6 - j));
-            pesoBase += 25 + Math.random() * 10;
-            mockData.recria_pesajes.push({
-                id: `pes-${id}-${j}`,
-                bovino_id: id,
-                fecha_pesaje: fecha.toISOString().split('T')[0],
-                peso_kg: Math.round(pesoBase),
-                tipo_pesaje: j === 0 ? 'Nacimiento' : 'Control'
-            });
-        }
-    }
-
-    // Generar Finanzas (12 meses)
-    for (let i = 0; i < 12; i++) {
-        const fecha = new Date();
-        fecha.setMonth(fecha.getMonth() - i);
-        const label = `${fecha.toLocaleString('default', { month: 'short' })} ${fecha.getFullYear()}`;
-        
-        mockData.finanzas.push({
-            id: `fin-i-${i}`,
-            tipo: 'Ingreso',
-            categoria: 'Venta',
-            monto: 5000 + Math.random() * 2000,
-            fecha: fecha.toISOString().split('T')[0],
-            descripcion: `Venta mensual ${label}`
-        });
-        mockData.finanzas.push({
-            id: `fin-g-${i}`,
-            tipo: 'Gasto',
-            categoria: 'Alimentación',
-            monto: 2500 + Math.random() * 1000,
-            fecha: fecha.toISOString().split('T')[0],
-            descripcion: `Gasto pienso ${label}`
-        });
-    }
-
-    // Guardar todo en LocalStorage
-    Object.keys(mockData).forEach(table => {
-        localStorage.setItem(`mock_${table}`, JSON.stringify(mockData[table]));
+    // 1. MARGARITA (La Productora Estrella)
+    const idMargarita = 'bov-margarita';
+    mockData.bovinos.push({
+      id: idMargarita,
+      crotal: 'ES123456789',
+      nombre: 'Margarita',
+      raza: 'Limousin',
+      sexo: 'Hembra',
+      finca_id: 'finca-1',
+      lote_id: 'lote-maternidad',
+      estado_productivo: 'Alta',
+      estado_reproductivo: 'Lactante',
+      fecha_nacimiento: yearsAgo(4),
+      created_at: yearsAgo(4)
     });
 
+    // Pesajes Margarita (500kg -> 620kg)
+    [
+      { d: 365, p: 500, t: 'Control Anual' },
+      { d: 270, p: 530, t: 'Control Trimestral' },
+      { d: 180, p: 560, t: 'Control Trimestral' },
+      { d: 90, p: 590, t: 'Control Pre-parto' },
+      { d: 30, p: 610, t: 'Control Post-parto' },
+      { d: 0, p: 620, t: 'Actual' }
+    ].forEach((w, i) => {
+      mockData.recria_pesajes.push({
+        id: `pes-marg-${i}`,
+        bovino_id: idMargarita,
+        fecha_pesaje: daysAgo(w.d).split('T')[0],
+        peso_kg: w.p,
+        tipo_pesaje: w.t
+      });
+    });
+
+    // Reproducción Margarita
+    mockData.reproduccion.push({
+      id: 'rep-marg-1',
+      bovino_id: idMargarita,
+      tipo_cubricion: 'Monta Natural',
+      fecha_parto_prevista: daysAgo(365).split('T')[0], 
+      estado_gestacion: 'Parido',
+      created_at: yearsAgo(1)
+    });
+    mockData.reproduccion.push({
+      id: 'rep-marg-2',
+      bovino_id: idMargarita,
+      fecha_cubricion: monthsAgo(8).split('T')[0],
+      tipo_cubricion: 'Inseminación Artificial',
+      semental_id: 'sem-1',
+      estado_gestacion: 'Confirmada',
+      created_at: monthsAgo(8)
+    });
+    // Record de confirmación de preñez (6 meses hace)
+    mockData.tareas.push({
+      id: 'tar-marg-1',
+      finca_id: 'finca-1',
+      bovino_id: idMargarita,
+      titulo: 'Confirmación Preñez (Eco)',
+      fecha_vencimiento: monthsAgo(6).split('T')[0],
+      estado: 'Completada',
+      creada_por_sistema: true
+    });
+    // Parto reciente (hace 1 semana)
+    mockData.reproduccion.push({
+      id: 'rep-marg-3',
+      bovino_id: idMargarita,
+      fecha_cubricion: monthsAgo(9.5).split('T')[0],
+      estado_gestacion: 'Parido',
+      observaciones_parto: 'Parto natural sin complicaciones. Ternero sano.',
+      created_at: daysAgo(7)
+    });
+
+    // Sanidad Margarita
+    mockData.sanidad.push({
+      id: 'san-marg-1',
+      bovino_id: idMargarita,
+      fecha: monthsAgo(11).split('T')[0],
+      tipo: 'Vacunación',
+      producto: 'Vacuna BVD/IBR',
+      costo_aplicacion: 25,
+      observaciones: 'Anual obligatoria'
+    });
+    mockData.sanidad.push({
+      id: 'san-marg-2',
+      bovino_id: idMargarita,
+      fecha: daysAgo(4).split('T')[0],
+      tipo: 'Test/Diagnóstico',
+      producto: 'Revisión Post-parto',
+      costo_aplicacion: 45,
+      observaciones: 'Estado uterino perfecto'
+    });
+
+    // Finanzas Margarita
+    mockData.finanzas.push({
+      id: 'fin-marg-1',
+      tipo: 'Gasto',
+      categoria: 'Genética',
+      monto: 60,
+      fecha: monthsAgo(8).split('T')[0],
+      descripcion: 'Pajuela Semen Limousin (Titán)',
+      bovino_id: idMargarita
+    });
+    mockData.finanzas.push({
+      id: 'fin-marg-2',
+      tipo: 'Gasto',
+      categoria: 'Veterinaria',
+      monto: 45,
+      fecha: daysAgo(4).split('T')[0],
+      descripcion: 'Revisión Post-parto Margarita',
+      bovino_id: idMargarita
+    });
+
+    // 2. TORO (El Ternero de Engorde)
+    const idToro = 'bov-toro';
+    mockData.bovinos.push({
+      id: idToro,
+      crotal: 'ES987654321',
+      nombre: 'Toro',
+      raza: 'Charolais',
+      sexo: 'Macho',
+      finca_id: 'finca-1',
+      lote_id: 'lote-engorde',
+      estado_productivo: 'Alta',
+      aptitud: 'Carne',
+      fecha_nacimiento: monthsAgo(8),
+      created_at: monthsAgo(8)
+    });
+
+    // Pesajes Toro (Curva exponencial: 40 -> 120 -> 250)
+    [
+        { d: 240, p: 40, t: 'Nacimiento' },
+        { d: 120, p: 135, t: 'Destete' },
+        { d: 60, p: 190, t: 'Control Engorde' },
+        { d: 0, p: 250, t: 'Actual' }
+    ].forEach((w, i) => {
+        mockData.recria_pesajes.push({
+            id: `pes-toro-${i}`,
+            bovino_id: idToro,
+            fecha_pesaje: daysAgo(w.d).split('T')[0],
+            peso_kg: w.p,
+            tipo_pesaje: w.t
+        });
+    });
+
+    // Sanidad Toro
+    mockData.sanidad.push({
+        id: 'san-toro-1',
+        bovino_id: idToro,
+        fecha: monthsAgo(7).split('T')[0],
+        tipo: 'Desparasitación',
+        producto: 'Ivermectina',
+        costo_aplicacion: 12
+    });
+    mockData.sanidad.push({
+        id: 'san-toro-2',
+        bovino_id: idToro,
+        fecha: monthsAgo(6).split('T')[0],
+        tipo: 'Vacunación',
+        producto: 'Clostridiosis Initial',
+        costo_aplicacion: 15
+    });
+
+    // 3. PINTA (Vaca en Tratamiento)
+    const idPinta = 'bov-pinta';
+    mockData.bovinos.push({
+        id: idPinta,
+        crotal: 'ES555444333',
+        nombre: 'Pinta',
+        raza: 'Frisona',
+        sexo: 'Hembra',
+        finca_id: 'finca-1',
+        lote_id: 'lote-maternidad',
+        estado_productivo: 'Alta',
+        estado_reproductivo: 'Gestante',
+        fecha_nacimiento: yearsAgo(3),
+        created_at: yearsAgo(3)
+    });
+
+    // Sanidad Pinta (Mastitis Cycle)
+    mockData.sanidad.push({
+        id: 'san-pinta-1',
+        bovino_id: idPinta,
+        fecha: daysAgo(60).split('T')[0],
+        tipo: 'Test/Diagnóstico',
+        producto: 'Test Mastitis California',
+        costo_aplicacion: 10,
+        observaciones: 'Positivo en cuarto posterior derecho'
+    });
+    mockData.sanidad.push({
+        id: 'san-pinta-2',
+        bovino_id: idPinta,
+        fecha: daysAgo(58).split('T')[0],
+        tipo: 'Tratamiento',
+        producto: 'Cobactan Antibiótico',
+        costo_aplicacion: 85,
+        dias_retiro_leche: 5,
+        observaciones: 'Tratamiento agresivo para salvar el cuarto'
+    });
+    mockData.sanidad.push({
+        id: 'san-pinta-3',
+        bovino_id: idPinta,
+        fecha: daysAgo(50).split('T')[0],
+        tipo: 'Test/Diagnóstico',
+        producto: 'Alta Médica',
+        costo_aplicacion: 20,
+        observaciones: 'Animal recuperado completamente'
+    });
+
+    // Finanzas Pinta
+    mockData.finanzas.push({
+        id: 'fin-pinta-1',
+        tipo: 'Gasto',
+        categoria: 'Veterinaria',
+        monto: 115,
+        fecha: daysAgo(58).split('T')[0],
+        descripcion: 'Tratamiento Mastitis Aguda Pinta',
+        bovino_id: idPinta
+    });
+
+    // 4. DATOS GENERALES (Dashboard)
+    const razasExtras = ['Limousin', 'Charolais', 'Angus', 'Retinta'];
+    for (let i = 1; i <= 17; i++) {
+        const id = `bov-extra-${i}`;
+        const sexo = i % 2 === 0 ? 'Hembra' : 'Macho';
+        mockData.bovinos.push({
+            id,
+            crotal: `ES000${100+i}98765`,
+            nombre: `Res ${i}`,
+            raza: razasExtras[i % 4],
+            sexo,
+            finca_id: 'finca-1',
+            lote_id: i < 8 ? 'lote-repro' : 'lote-engorde',
+            estado_productivo: 'Alta',
+            fecha_nacimiento: yearsAgo(2 + (i % 3)),
+            created_at: yearsAgo(2)
+        });
+    }
+
+    // Finanzas Dashboard (15+ registros últimos 6 meses)
+    const financialEvents = [
+        { cat: 'Venta', tipo: 'Ingreso', min: 2000, max: 3000, desc: 'Liquidación mensual leche' },
+        { cat: 'Alimentación', tipo: 'Gasto', min: 800, max: 1500, desc: 'Compra pienso concentrado' },
+        { cat: 'Venta', tipo: 'Ingreso', min: 4000, max: 6000, desc: 'Venta lote destete' },
+        { cat: 'Veterinaria', tipo: 'Gasto', min: 100, max: 300, desc: 'Suministros botiquín' },
+        { cat: 'Otros', tipo: 'Gasto', min: 50, max: 200, desc: 'Reparación vallado' }
+    ];
+
+    for (let m = 0; m < 6; m++) {
+        financialEvents.forEach((ev, i) => {
+            if (Math.random() > 0.3) {
+                mockData.finanzas.push({
+                    id: `fin-gen-${m}-${i}`,
+                    tipo: ev.tipo as 'Ingreso' | 'Gasto',
+                    categoria: ev.cat,
+                    monto: Math.round(ev.min + Math.random() * (ev.max - ev.min)),
+                    fecha: monthsAgo(m).split('T')[0],
+                    descripcion: `${ev.desc} - ${monthsAgo(m).split('T')[0]}`
+                });
+            }
+        });
+    }
+
+    // Persistencia
+    Object.keys(mockData).forEach(table => {
+      localStorage.setItem(`mock_${table}`, JSON.stringify(mockData[table]));
+    });
+
+    localStorage.setItem('vacapp_seeded_v2', 'true');
     localStorage.setItem('vacapp_seeded', 'true');
-    console.log('✅ Base de datos simulada poblada correctamente con éxito.');
+    console.log('%c💎 Vacapp: Base de Datos Relacional inyectada con éxito.', 'color: #38b000; font-weight: bold;');
   }
+
 }
 
 
@@ -5017,9 +5285,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, 
   IonBackButton, IonGrid, IonRow, IonCol, IonIcon, 
-  IonSegment, IonSegmentButton, IonLabel, IonBadge,
-  IonList, IonItem, IonSkeletonText, IonButton,
-  IonRefresher, IonRefresherContent
+  IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText
 } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -5046,16 +5312,18 @@ interface TimelineEvent {
   imports: [
     CommonModule, FormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonButtons, IonBackButton, IonGrid, IonRow, IonCol, IonIcon,
-    IonSegment, IonSegmentButton, IonLabel, IonBadge, IonList, 
-    IonItem, IonSkeletonText, IonButton, IonRefresher, IonRefresherContent
+    IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText
   ],
   template: `
     <ion-header class="ion-no-border">
-      <ion-toolbar color="primary">
+      <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button defaultHref="/manejo"></ion-back-button>
         </ion-buttons>
-        <ion-title>Inteligencia Animal</ion-title>
+        <ion-title class="ion-text-center">Inteligencia Animal</ion-title>
+        <ion-buttons slot="end">
+           <div style="width: 48px"></div> <!-- Spacer for balance -->
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -5080,7 +5348,7 @@ interface TimelineEvent {
         </div>
 
         <!-- KPI SUMMARY GRID (4 Cards) -->
-        <ion-grid class="ion-no-padding mt-4">
+        <ion-grid fixed class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
               <div class="vac-kpi-card-square">
@@ -5435,7 +5703,7 @@ import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonButton,
   IonButtons, IonMenuButton, IonGrid, IonRow, IonCol,
-  IonIcon, IonSkeletonText
+  IonIcon, IonSkeletonText, IonSegment, IonSegmentButton, IonLabel
 } from '@ionic/angular/standalone';
 import { GanadoService } from '../../core/services/ganado.service';
 import { FincaService } from '../../core/services/finca.service';
@@ -5463,7 +5731,7 @@ Chart.register(...registerables);
   imports: [
     CommonModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonButtons, IonMenuButton, IonGrid, IonRow, IonCol,
-    IonIcon, IonSkeletonText, IonButton
+    IonIcon, IonSkeletonText, IonButton, IonSegment, IonSegmentButton, IonLabel
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -5473,7 +5741,7 @@ Chart.register(...registerables);
         </ion-buttons>
         <ion-title class="ion-text-center">Centro de Inteligencia</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" color="primary">
+          <ion-button (click)="exportarPDF()" fill="clear">
             <ion-icon name="document-text-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -5502,8 +5770,27 @@ Chart.register(...registerables);
           </div>
         </div>
 
+        <!-- CONTROL MANDO COLECTIVO (NUEVO) -->
+        <div class="vac-master-filter-bar mb-6 animate-fade-in no-margin-sm">
+           <div class="flex items-center gap-3">
+              <ion-icon name="stats-chart-outline" class="color-primary text-xl"></ion-icon>
+              <div class="vac-text-stack text-left">
+                 <span class="text-xs uppercase tracking-widest color-medium font-bold">Resumen Global</span>
+                 <strong class="text-lg">Periodo de Análisis</strong>
+              </div>
+           </div>
+           <ion-segment [value]="masterPeriod()" (ionChange)="applyMasterFilter($any($event).detail.value)" mode="ios" class="vac-segment-earth mt-4">
+              <ion-segment-button value="Mensual">
+                <ion-label>Mensual</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="Anual">
+                <ion-label>Anual</ion-label>
+              </ion-segment-button>
+           </ion-segment>
+        </div>
+
         <!-- KPI GRID PRINCIPAL -->
-        <ion-grid class="ion-no-padding mt-4">
+        <ion-grid fixed class="ion-no-padding mt-4">
           <ion-row>
             <ion-col size="6" size-md="3">
               <div class="vac-kpi-card glass animate-slide-up m-0 shadow-none border-none">
@@ -5557,31 +5844,40 @@ Chart.register(...registerables);
         </ion-grid>
 
         <!-- DASHBOARD DE GRÁFICOS -->
-        <ion-grid class="ion-no-padding mt-4">
+        <ion-grid fixed class="ion-no-padding mt-4">
           <ion-row>
             <!-- ÁREA CHART: EVOLUCIÓN PESO -->
             <ion-col size="12" size-lg="8">
               <div class="vac-main-card animate-slide-up delay-400">
                 <div class="vac-card-header">
-                  <div class="vac-card-header-flex">
                     <div class="vac-card-title-group">
                       <span>EVOLUCIÓN PONDERADA</span>
                       <strong>Control de Masa Total</strong>
                     </div>
-                    <div class="vac-mini-stat bg-primary-soft">
-                      <ion-icon name="trending-up-outline"></ion-icon>
-                      <span>+8.2% este mes</span>
+                    <!-- CONTROL INDIVIDUAL -->
+                    <div class="flex items-center gap-2">
+                       <ion-segment [value]="weightPeriod()" (ionChange)="weightPeriod.set($any($event).detail.value)" mode="ios" class="vac-segment-mini">
+                          <ion-segment-button value="Mensual">
+                            <ion-label>M</ion-label>
+                          </ion-segment-button>
+                          <ion-segment-button value="Anual">
+                            <ion-label>A</ion-label>
+                          </ion-segment-button>
+                       </ion-segment>
+                       <div class="vac-mini-stat bg-primary-soft hidden-sm">
+                         <ion-icon name="scale-outline"></ion-icon>
+                         <span>+8.2%</span>
+                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="vac-card-content relative">
-                  <div *ngIf="cargando()" class="vac-chart-skeleton">
-                    <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
+                  <div class="vac-card-content relative">
+                    <div *ngIf="cargando()" class="vac-chart-skeleton">
+                      <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
+                    </div>
+                    <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
                   </div>
-                  <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
                 </div>
-              </div>
-            </ion-col>
+              </ion-col>
  
             <!-- DONUT CHART: DISTRIBUCIÓN -->
             <ion-col size="12" size-lg="4">
@@ -5605,9 +5901,22 @@ Chart.register(...registerables);
             <ion-col size="12">
               <div class="vac-main-card animate-slide-up delay-600">
                 <div class="vac-card-header">
-                  <div class="vac-card-title-group">
-                    <span>GESTIÓN ECONÓMICA</span>
-                    <strong>Balance Mensual Comparativo</strong>
+                  <div class="vac-card-header-flex">
+                    <div class="vac-card-title-group">
+                      <span>GESTIÓN ECONÓMICA</span>
+                      <strong>Balance Comparativo</strong>
+                    </div>
+                    <!-- CONTROL INDIVIDUAL -->
+                    <div class="flex items-center gap-2">
+                       <ion-segment [value]="financePeriod()" (ionChange)="financePeriod.set($any($event).detail.value)" mode="ios" class="vac-segment-mini">
+                          <ion-segment-button value="Mensual">
+                            <ion-label>M</ion-label>
+                          </ion-segment-button>
+                          <ion-segment-button value="Anual">
+                            <ion-label>A</ion-label>
+                          </ion-segment-button>
+                       </ion-segment>
+                    </div>
                   </div>
                 </div>
                 <div class="vac-card-content">
@@ -5662,6 +5971,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return Math.round(sum / weights.length);
   });
 
+  // Filtros de Gráficos (Dual-Layer)
+  masterPeriod = signal<'Mensual' | 'Anual'>('Mensual');
+  weightPeriod = signal<'Mensual' | 'Anual'>('Mensual');
+  financePeriod = signal<'Mensual' | 'Anual'>('Mensual');
+
   @ViewChild('weightChart') weightCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('lotesChart') lotesCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('financeChart') financeCanvas!: ElementRef<HTMLCanvasElement>;
@@ -5687,12 +6001,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     Chart.defaults.plugins.legend.labels.usePointStyle = true;
     Chart.defaults.plugins.legend.labels.padding = 20;
 
-    // Reactividad a datos
+    // Reactividad a datos y filtros
     effect(() => {
       if (!this.cargando()) {
+        // Al interactuar con estos signals, el effect se redispara
+        const _wp = this.weightPeriod();
+        const _fp = this.financePeriod();
         setTimeout(() => this.updateCharts(), 300);
       }
     });
+  }
+
+  applyMasterFilter(period: 'Mensual' | 'Anual') {
+    this.masterPeriod.set(period);
+    this.weightPeriod.set(period);
+    this.financePeriod.set(period);
   }
 
   ngOnInit() {}
@@ -5785,7 +6108,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const ctx = this.weightCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const stats = this.pesajeService.getEvolucionMensualHerd();
+    // Usar la evolución según el periodo seleccionado
+    const stats = this.weightPeriod() === 'Mensual' 
+        ? this.pesajeService.getEvolucionMensualHerd()
+        : { labels: ['2023', '2024', '2025'], data: [450, 480, 510] }; // Fallback anual simple si no hay un agrupador anual en servicio
     
     // Degradado Espectacular
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -5890,7 +6216,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const ctx = this.financeCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const finData = this.finanzasService.getDatosFinancierosPorPeriodo('Mensual');
+    const finData = this.finanzasService.getDatosFinancierosPorPeriodo(this.financePeriod());
     const labels = finData.map(d => d.label);
     const ingresos = finData.map(d => d.ingresos);
     const gastos = finData.map(d => d.gastos);
@@ -5967,21 +6293,21 @@ ARCHIVO: .\frontend\src\app\features\finanzas\finanzas.component.ts
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle,
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
   IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
-  IonGrid, IonRow, IonCol
+  IonGrid, IonRow, IonCol, IonPopover, IonSegment, IonSegmentButton,
+  ToastController, AlertController
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { PdfService } from '../../core/services/pdf.service';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { FinanzasService } from '../../core/services/finanzas.service';
 import { Finanzas } from '../../core/models/vacapp.models';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AlertController, ToastController } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { PdfService } from '../../core/services/pdf.service';
-import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline } from 'ionicons/icons';
+import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-finanzas',
@@ -5991,6 +6317,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
     IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
     IonGrid, IonRow, IonCol,
+    IonPopover, IonSegment, IonSegmentButton,
     BaseChartDirective
   ],
   template: `
@@ -6001,8 +6328,8 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </ion-buttons>
         <ion-title class="ion-text-center">Gastos y Ganancias</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" color="primary">
-            <ion-icon name="document-text-outline"></ion-icon>
+          <ion-button (click)="presentFilter($event)" fill="clear">
+            <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -6011,17 +6338,46 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     <ion-content class="ion-padding-vertical">
       <div class="vac-container animate-fade-in pb-12">
         
+        <!-- CONTROL MANDO COLECTIVO (NUEVO) -->
+        <div class="vac-master-filter-bar mb-6 animate-fade-in">
+           <div class="flex items-center gap-3">
+              <ion-icon name="stats-chart-outline" class="color-primary text-xl"></ion-icon>
+              <div class="vac-text-stack">
+                 <span class="text-xs uppercase tracking-widest color-medium font-bold">Mando Colectivo</span>
+                 <strong class="text-lg">Periodo de Análisis</strong>
+              </div>
+           </div>
+           <ion-segment [value]="filterGlobal()" (ionChange)="applyGlobalFilter($any($event).detail.value)" mode="ios" class="vac-segment-earth mt-4">
+              <ion-segment-button value="Mensual">
+                <ion-label>Mensual</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="Anual">
+                <ion-label>Anual</ion-label>
+              </ion-segment-button>
+           </ion-segment>
+        </div>
 
         <!-- GRÁFICO DE ROI (Relocado) -->
         <div class="vac-main-card animate-slide-up mb-8">
           <div class="vac-card-header-flex">
             <div class="vac-card-title-group">
               <span>ESTADO DE CUENTAS</span>
-              <strong>Ingresos vs Gastos Mensuales</strong>
+              <strong>Ingresos vs Gastos</strong>
             </div>
-            <div class="vac-mini-stat bg-primary-soft">
-              <ion-icon name="trending-up-outline"></ion-icon>
-              <span>ROI en Crecimiento</span>
+            <!-- CONTROL INDIVIDUAL (NUEVO) -->
+            <div class="flex items-center gap-2">
+               <ion-segment [value]="chartPeriodo()" (ionChange)="chartPeriodo.set($any($event).detail.value)" mode="ios" class="vac-segment-mini">
+                  <ion-segment-button value="Mensual">
+                    <ion-label>M</ion-label>
+                  </ion-segment-button>
+                  <ion-segment-button value="Anual">
+                    <ion-label>A</ion-label>
+                  </ion-segment-button>
+               </ion-segment>
+               <div class="vac-mini-stat bg-primary-soft hidden-sm">
+                 <ion-icon name="trending-up-outline"></ion-icon>
+                 <span>ROI Dinámico</span>
+               </div>
             </div>
           </div>
           <div class="p-4">
@@ -6030,10 +6386,10 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </div>
 
         <!-- Listado de Movimientos Recientes -->
-        <h2 class="vac-section-title">Últimos Movimientos</h2>
-        <ion-grid class="ion-no-padding">
+        <h2 class="vac-section-title">Movimientos Filtrados</h2>
+        <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of finanzasService.records().slice(0, 20)">
+            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredRecords()">
               <div class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
                 <div class="vac-card-header-flex">
                   <div class="vac-icon-circle" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
@@ -6064,15 +6420,58 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
           </ion-row>
         </ion-grid>
         
-        <div *ngIf="finanzasService.records().length === 0" class="vac-empty-state">
+        <div *ngIf="filteredRecords().length === 0" class="vac-empty-state">
            <div class="empty-icon-ring">
               <ion-icon name="cash-outline"></ion-icon>
            </div>
            <h2>Cero Movimientos</h2>
-           <p>Aún no has registrado ningún gasto o beneficio en tu cuenta.</p>
+           <p>No se encontraron registros para los filtros aplicados.</p>
         </div>
 
       </div>
+
+      <!-- POPOVER DE FILTROS (RUSTIC-LUXE) -->
+      <ion-popover [isOpen]="isFilterPopoverOpen" [event]="filterEvent" (didDismiss)="isFilterPopoverOpen = false" class="vac-popover">
+        <ng-template>
+          <div class="vac-filter-panel ion-padding">
+            <div class="vac-filter-header mb-4">
+              <ion-icon name="filter-outline" class="color-primary align-middle"></ion-icon>
+              <span class="ml-2 font-bold color-primary">Filtrar Finanzas</span>
+            </div>
+
+            <div class="filter-section mb-6">
+              <ion-label class="vac-filter-label">Naturaleza</ion-label>
+              <ion-segment [value]="filterTipo()" (ionChange)="filterTipo.set($any($event).detail.value)" mode="ios" class="vac-segment-earth">
+                <ion-segment-button value="Todos">
+                  <ion-label>Todos</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="Ingreso">
+                  <ion-label>Ingresos</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="Gasto">
+                  <ion-label>Gastos</ion-label>
+                </ion-segment-button>
+              </ion-segment>
+            </div>
+
+            <div class="filter-section mb-6">
+              <ion-label class="vac-filter-label">Categoría Específica</ion-label>
+              <ion-item lines="none" class="vac-input-select-mini">
+                <ion-select [value]="filterCategoria()" (ionChange)="filterCategoria.set($event.detail.value)" interface="popover">
+                  <ion-select-option value="Todos">Todas las categorías</ion-select-option>
+                  <ion-select-option *ngFor="let c of todasLasCategorias" [value]="c">{{ c }}</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <div class="vac-filter-footer pt-2 border-top-soft">
+               <ion-button expand="block" fill="clear" color="danger" (click)="clearFilters()">
+                 Limpiar Filtros
+               </ion-button>
+            </div>
+          </div>
+        </ng-template>
+      </ion-popover>
 
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
         <ion-fab-button (click)="openAddModal()" color="primary">
@@ -6156,13 +6555,42 @@ export class FinanzasComponent {
   editingItem: Finanzas | null = null;
   finanzasForm: FormGroup;
 
+  // Filtros Avanzados
+  filterTipo = signal<string>('Todos');
+  filterCategoria = signal<string>('Todos');
+  isFilterPopoverOpen = false;
+  filterEvent: any = null;
+
+  todasLasCategorias = [
+    'Venta Leche', 'Venta Carne', 'Venta Genética', 'Ayudas Gubernamentales', 'Otros Ingresos',
+    'Alimentación y Pastos', 'Veterinaria y Semen', 'Mantenimiento y Equipos', 'Sueldos', 'Otros Gastos'
+  ];
+
+  filteredRecords = computed(() => {
+    const tipo = this.filterTipo();
+    const cat = this.filterCategoria();
+    let list = this.finanzasService.records();
+
+    if (tipo !== 'Todos') {
+      list = list.filter(r => r.tipo === tipo);
+    }
+    if (cat !== 'Todos') {
+      list = list.filter(r => r.categoria === cat);
+    }
+
+    return list.slice(0, 50); // Mostrar top 50 filtrados
+  });
+
   categoriasIngreso = ['Venta Leche', 'Venta Carne', 'Venta Genética', 'Ayudas Gubernamentales', 'Otros Ingresos'];
   categoriasGasto = ['Alimentación y Pastos', 'Veterinaria y Semen', 'Mantenimiento y Equipos', 'Sueldos', 'Otros Gastos'];
   categoriasDisponibles: string[] = [];
   
   // Gráfico de Finanzas (ROI) - Agrupado Mensual por defecto
+  chartPeriodo = signal<'Mensual' | 'Anual'>('Mensual');
+  filterGlobal = signal<'Mensual' | 'Anual'>('Mensual');
+
   chartFinanzas = computed<ChartConfiguration<'bar'>['data']>(() => {
-    const data = this.finanzasService.getDatosFinancierosPorPeriodo('Mensual');
+    const data = this.finanzasService.getDatosFinancierosPorPeriodo(this.chartPeriodo());
     return {
       labels: data.map(d => d.label),
       datasets: [
@@ -6172,15 +6600,15 @@ export class FinanzasComponent {
           backgroundColor: '#1b4332', 
           borderColor: '#1b4332',
           borderWidth: 0,
-          borderRadius: 4 
+          borderRadius: 8 
         },
         { 
           label: 'Gastos (€)', 
           data: data.map(d => -d.gastos), 
-          backgroundColor: '#bc8a5f', 
-          borderColor: '#bc8a5f',
+          backgroundColor: '#bc4749', // Rojo Ladrillo ($danger-color)
+          borderColor: '#bc4749',
           borderWidth: 0,
-          borderRadius: 4 
+          borderRadius: 8 
         }
       ]
     };
@@ -6206,7 +6634,7 @@ export class FinanzasComponent {
   }
 
   constructor() {
-    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline });
+    addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline });
     this.finanzasForm = this.fb.group({
       tipo: ['Gasto', Validators.required],
       categoria: ['Alimentación y Pastos', Validators.required],
@@ -6355,6 +6783,25 @@ export class FinanzasComponent {
     });
     toast.present();
   }
+
+  // --- LÓGICA DE FILTROS ---
+  applyGlobalFilter(periodo: 'Mensual' | 'Anual') {
+    this.filterGlobal.set(periodo);
+    this.chartPeriodo.set(periodo);
+    // Aquí se podrían sincronizar otros gráficos si los hubiera en esta vista
+  }
+
+  // --- LÓGICA DE FILTROS ---
+  presentFilter(event: any) {
+    this.filterEvent = event;
+    this.isFilterPopoverOpen = true;
+  }
+
+  clearFilters() {
+    this.filterTipo.set('Todos');
+    this.filterCategoria.set('Todos');
+    this.isFilterPopoverOpen = false;
+  }
 }
 
 
@@ -6396,17 +6843,17 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
     IonGrid, IonRow, IonCol
   ],
   template: `
-    <ion-header class="ion-no-border vac-header">
+    <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button class="color-forest"></ion-menu-button>
+          <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Potreros y Recintos</ion-title>
+        <ion-title class="ion-text-center">Potreros y Recintos</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" color="primary">
+          <ion-button (click)="exportarPDF()" fill="clear">
             <ion-icon name="document-text-outline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear" class="color-forest">
+          <ion-button fill="clear">
             <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -6421,9 +6868,9 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           <p class="vac-page-subtitle">Organiza y monitorea la carga animal por recinto</p>
         </div>
 
-        <ion-grid class="ion-no-padding">
+        <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-xl="4" *ngFor="let lote of lotes">
+            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let lote of lotes">
               <div class="uniform-card">
                 <div class="vac-card-header-flex">
                   <div class="vac-card-title-group">
@@ -6666,10 +7113,10 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     </ion-buttons>
     <ion-title class="ion-text-center">Inventario Ganadero</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" color="primary">
+      <ion-button (click)="exportarPDF()" fill="clear">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -6717,9 +7164,9 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
 
     <!-- SKELETON LOADER -->
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
-    <ion-grid class="ion-no-padding" *ngIf="isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
           <div class="uniform-card">
             <ion-item lines="none" class="vac-card-header ion-margin-bottom">
               <div class="vac-avatar ion-margin-end" slot="start">
@@ -6750,9 +7197,9 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     </ion-grid>
 
     <!-- ANIMAL LIST -->
-    <ion-grid class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos()">
           <div class="uniform-card clickable-card" (click)="goToDetail(b.id)">
             <ion-item lines="none" class="vac-card-header">
               <div class="ion-margin-end" slot="start">
@@ -6975,6 +7422,57 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
       </ion-content>
     </ng-template>
   </ion-modal>
+  <!-- POPOVER DE FILTROS (RUSTIC-LUXE) -->
+  <ion-popover [isOpen]="isFilterPopoverOpen" [event]="filterEvent" (didDismiss)="isFilterPopoverOpen = false" class="vac-popover">
+    <ng-template>
+      <div class="vac-filter-panel ion-padding">
+        <div class="vac-filter-header mb-4">
+          <ion-icon name="filter-outline" class="color-primary align-middle"></ion-icon>
+          <span class="ml-2 font-bold color-primary">Filtrar Inventario</span>
+        </div>
+
+        <!-- SECCIÓN: ESTADO -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Estado de Producción</ion-label>
+          <ion-segment [value]="filterEstado()" (ionChange)="filterEstado.set($any($event).detail.value)" mode="ios" class="vac-segment-earth">
+            <ion-segment-button value="Todos">
+              <ion-label>Todos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Producción">
+              <ion-label>Prod.</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Gestación">
+              <ion-label>Gest.</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Seca">
+              <ion-label>Seca</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Engorde">
+              <ion-label>Engor.</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- SECCIÓN: LOTE -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Ubicación / Lote</ion-label>
+          <ion-item lines="none" class="vac-input-select-mini">
+            <ion-select [value]="filterLote()" (ionChange)="filterLote.set($event.detail.value)" interface="popover" placeholder="Seleccionar recinto">
+              <ion-select-option value="Todos">Cualquier Recinto</ion-select-option>
+              <ion-select-option *ngFor="let l of lotes()" [value]="l.id">{{ l.nombre }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="vac-filter-footer pt-2 border-top-soft">
+           <ion-button expand="block" fill="clear" color="danger" (click)="clearFilters()">
+             Limpiar Todos los Filtros
+           </ion-button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-popover>
 </ion-content>
 
 
@@ -6999,7 +7497,8 @@ import {
   IonRow, IonCol, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
   IonBadge,
-  IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText
+  IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText,
+  IonPopover, IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Bovino, Lote } from '../../core/models/vacapp.models';
@@ -7036,6 +7535,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
     IonBadge,
     IonSearchbar, IonRefresher, IonRefresherContent, IonSkeletonText,
+    IonPopover, IonSegment, IonSegmentButton,
     BaseChartDirective
   ],
   templateUrl: './manejo.component.html',
@@ -7054,22 +7554,50 @@ export class ManejoComponent implements OnInit {
   private router = inject(Router);
   
   bovinos = this.ganadoService.bovinos;
-  lotesArr: Lote[] = []; // Opcional, dependiendo de si quieres rellenarlo aquí.
-  lotes = this.fincaService.fincas;
+  lotes = this.fincaService.lotes;
   
   // Estados de interfaz y búsqueda
   isLoading = signal<boolean>(true);
   searchTerm = signal<string>('');
+  
+  // Filtros Avanzados
+  filterEstado = signal<string>('Todos');
+  filterLote = signal<string>('Todos');
+  isFilterPopoverOpen = false;
+  filterEvent: any = null;
 
-  // Computado que retorna la lista filtrada de bovinos basada en el searchbar
+  // Computado que retorna la lista filtrada de bovinos basada en el searchbar y filtros
   filteredBovinos = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
-    const list = this.bovinos();
-    if (!term) return list;
-    return list.filter(b => 
-      (b.nombre?.toLowerCase() || '').includes(term) || 
-      (b.crotal?.toLowerCase() || '').includes(term)
-    );
+    const estado = this.filterEstado();
+    const loteId = this.filterLote();
+    let list = this.bovinos();
+
+    // 1. Filtro por búsqueda
+    if (term) {
+      list = list.filter(b => 
+        (b.nombre?.toLowerCase() || '').includes(term) || 
+        (b.crotal?.toLowerCase() || '').includes(term)
+      );
+    }
+
+    // 2. Filtro por Estado (Mapeo a datos reales)
+    if (estado !== 'Todos') {
+      list = list.filter(b => {
+        if (estado === 'Producción') return b.estado_reproductivo === 'Lactante';
+        if (estado === 'Gestación') return b.estado_reproductivo === 'Gestante';
+        if (estado === 'Seca') return b.estado_reproductivo === 'Seca';
+        if (estado === 'Engorde') return b.aptitud === 'Carne';
+        return true;
+      });
+    }
+
+    // 3. Filtro por Lote
+    if (loteId !== 'Todos') {
+      list = list.filter(b => b.lote_id === loteId);
+    }
+
+    return list;
   });
 
   // Gráfico de Pesos
@@ -7098,7 +7626,7 @@ export class ManejoComponent implements OnInit {
   bovinoForm: FormGroup;
 
   constructor() {
-    addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, filterOutline: 'filter-outline', searchOutline, documentTextOutline });
+    addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline });
     this.bovinoForm = this.fb.group({
       nombre: ['', Validators.required],
       crotal: ['', Validators.required],
@@ -7124,7 +7652,7 @@ export class ManejoComponent implements OnInit {
   }
 
   async loadData() {
-    this.lotesArr = []; 
+    // Los lotes se cargan vía FincaService automáticamente
   }
 
   handleSearch(event: any) {
@@ -7135,6 +7663,19 @@ export class ManejoComponent implements OnInit {
     if (id) {
       this.router.navigate(['/animal-detail', id]);
     }
+  }
+
+  // --- LÓGICA DE FILTROS ---
+  presentFilter(event: any) {
+    this.filterEvent = event;
+    this.isFilterPopoverOpen = true;
+  }
+
+  clearFilters() {
+    this.filterEstado.set('Todos');
+    this.filterLote.set('Todos');
+    this.searchTerm.set('');
+    this.isFilterPopoverOpen = false;
   }
 
   async handleRefresh(event: any) {
@@ -7290,7 +7831,7 @@ export class ManejoComponent implements OnInit {
 ARCHIVO: .\frontend\src\app\features\recria\recria.component.ts
 ==================================================
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -7298,7 +7839,7 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
   IonIcon, IonButton, IonGrid, IonRow, IonCol, IonItem, 
   IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
-  IonSelect, IonSelectOption, IonLabel
+  IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
 import { 
   AlertController, 
@@ -7332,20 +7873,20 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonMenuButton, 
     IonIcon, IonButton, IonGrid, IonRow, IonCol, IonItem, 
     IonBadge, IonFab, IonFabButton, IonModal, IonInput, 
-    IonSelect, IonSelectOption, IonLabel
+    IonSelect, IonSelectOption, IonLabel, IonPopover, IonSegment, IonSegmentButton
   ],
   template: `
-    <ion-header class="ion-no-border vac-header">
+    <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button class="color-forest"></ion-menu-button>
+          <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Recría & Rendimiento</ion-title>
+        <ion-title class="ion-text-center">Recría & Rendimiento</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" color="primary">
+          <ion-button (click)="exportarPDF()" fill="clear">
             <ion-icon name="document-text-outline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear" class="color-forest">
+          <ion-button (click)="presentFilter($event)" fill="clear">
             <ion-icon name="filter-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -7379,13 +7920,14 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
                 type="text" 
                 placeholder="Buscar por crotal o nombre..." 
                 class="vac-search-input-field"
-                [(ngModel)]="searchTerm">
+                [ngModel]="searchTerm()"
+                (ngModelChange)="searchTerm.set($event)">
            </div>
 
            <!-- LISTA ESTANDARIZADA -->
-           <ion-grid class="ion-no-padding">
+           <ion-grid fixed class="ion-no-padding">
              <ion-row>
-                <ion-col size="12" size-md="6" size-xl="4" *ngFor="let b of filteredBovinos()">
+                <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos()">
                   <div class="uniform-card clickable-card" (click)="selectBovino(b)">
                    <div class="vac-card-header-flex">
                       <div class="ion-margin-end">
@@ -7467,9 +8009,9 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
              <span class="vac-badge-count">{{ pesajesFiltrados.length }} Registros</span>
            </div>
            
-           <ion-grid class="ion-no-padding">
+           <ion-grid fixed class="ion-no-padding">
              <ion-row>
-               <ion-col size="12" size-md="6" size-xl="4" *ngFor="let p of pesajesFiltrados">
+               <ion-col size="12" size-md="6" size-lg="4" *ngFor="let p of pesajesFiltrados">
                  <div class="uniform-card">
                    <div class="vac-card-header-flex">
                      <div class="vac-icon-avatar bg-light">
@@ -7579,6 +8121,56 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
         </ng-template>
       </ion-modal>
     </ion-fab>
+
+    <!-- POPOVER DE FILTROS (RUSTIC-LUXE) -->
+    <ion-popover [isOpen]="isFilterPopoverOpen" [event]="filterEvent" (didDismiss)="isFilterPopoverOpen = false" class="vac-popover">
+      <ng-template>
+        <div class="vac-filter-panel ion-padding">
+          <div class="vac-filter-header mb-4">
+            <ion-icon name="filter-outline" class="color-primary align-middle"></ion-icon>
+            <span class="ml-2 font-bold color-primary">Filtrar Selección</span>
+          </div>
+
+          <!-- SECCIÓN: CATEGORÍA -->
+          <div class="filter-section mb-6">
+            <ion-label class="vac-filter-label">Categoría Zootécnica</ion-label>
+            <ion-item lines="none" class="vac-input-select-mini">
+              <ion-select [value]="filterCategoria()" (ionChange)="filterCategoria.set($event.detail.value)" interface="popover">
+                <ion-select-option value="Todos">Todas las edades</ion-select-option>
+                <ion-select-option value="Ternero/a">Terneros</ion-select-option>
+                <ion-select-option value="Añojo/a">Añojos</ion-select-option>
+                <ion-select-option value="Novillo/a">Novillos</ion-select-option>
+                <ion-select-option value="Vaca">Vacas Adultas</ion-select-option>
+                <ion-select-option value="Toro">Toros</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+
+          <!-- SECCIÓN: SEXO -->
+          <div class="filter-section mb-6">
+            <ion-label class="vac-filter-label">Género</ion-label>
+            <ion-segment [value]="filterSexo()" (ionChange)="filterSexo.set($any($event).detail.value)" mode="ios" class="vac-segment-earth">
+              <ion-segment-button value="Todos">
+                <ion-label>Ambos</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="Macho">
+                <ion-label>Machos</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="Hembra">
+                <ion-label>Hembras</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+          </div>
+
+          <!-- ACCIONES -->
+          <div class="vac-filter-footer pt-2 border-top-soft">
+             <ion-button expand="block" fill="clear" color="danger" (click)="clearFilters()">
+               Limpiar Filtros
+             </ion-button>
+          </div>
+        </div>
+      </ng-template>
+    </ion-popover>
     </ion-content>
   `
 })
@@ -7593,9 +8185,39 @@ export class RecriaComponent implements OnInit {
   private router = inject(Router);
 
   selectedBovino: Bovino | null = null;
-  searchTerm: string = '';
+  searchTerm = signal<string>('');
   
   pesajesFiltrados: any[] = [];
+  
+  // Filtros Avanzados
+  filterCategoria = signal<string>('Todos');
+  filterSexo = signal<string>('Todos');
+  isFilterPopoverOpen = false;
+  filterEvent: any = null;
+
+  filteredBovinos = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const cat = this.filterCategoria();
+    const sexo = this.filterSexo();
+    let list = this.ganadoService.bovinosAlta();
+
+    if (term) {
+      list = list.filter(b => 
+        b.nombre?.toLowerCase().includes(term) || 
+        b.crotal?.toLowerCase().includes(term)
+      );
+    }
+
+    if (sexo !== 'Todos') {
+      list = list.filter(b => b.sexo === sexo);
+    }
+
+    if (cat !== 'Todos') {
+      list = list.filter(b => this.ganadoService.calculateCategoria(b) === cat);
+    }
+
+    return list;
+  });
   loading = false;
   isModalOpen = false;
   pesajeForm: FormGroup;
@@ -7684,12 +8306,17 @@ export class RecriaComponent implements OnInit {
     }
   }
 
-  filteredBovinos() {
-    const term = this.searchTerm.toLowerCase();
-    return this.ganadoService.bovinosAlta().filter(b => 
-      b.nombre?.toLowerCase().includes(term) || 
-      b.crotal?.toLowerCase().includes(term)
-    );
+  // --- LÓGICA DE FILTROS ---
+  presentFilter(event: any) {
+    this.filterEvent = event;
+    this.isFilterPopoverOpen = true;
+  }
+
+  clearFilters() {
+    this.filterCategoria.set('Todos');
+    this.filterSexo.set('Todos');
+    this.searchTerm.set('');
+    this.isFilterPopoverOpen = false;
   }
 
   selectBovino(b: Bovino) {
@@ -7836,10 +8463,10 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     </ion-buttons>
     <ion-title class="ion-text-center">Montas y Cría</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" color="primary">
+      <ion-button (click)="exportarPDF()" fill="clear">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -7854,6 +8481,25 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
   </ion-refresher>
 
   <div class="vac-container animate-fade-in">
+    
+    <!-- CONTROL MANDO COLECTIVO -->
+    <div class="vac-master-filter-bar mb-6 animate-fade-in">
+       <div class="flex items-center gap-3">
+          <ion-icon name="stats-chart-outline" class="color-primary text-xl"></ion-icon>
+          <div class="vac-text-stack">
+             <span class="text-xs uppercase tracking-widest color-medium font-bold">Mando Colectivo</span>
+             <strong class="text-lg">Periodo de Análisis</strong>
+          </div>
+       </div>
+       <ion-segment [value]="filterGlobal()" (ionChange)="applyGlobalFilter($any($event).detail.value)" mode="ios" class="vac-segment-earth mt-4">
+          <ion-segment-button value="Mensual">
+            <ion-label>Mensual</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="Anual">
+            <ion-label>Anual</ion-label>
+          </ion-segment-button>
+       </ion-segment>
+    </div>
 
     <!-- Buscador Premium -->
     <ion-searchbar
@@ -7872,9 +8518,20 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
             <span>EFICIENCIA REPRODUCTIVA</span>
             <strong>Preñeces con éxito</strong>
           </div>
-          <div class="vac-mini-stat bg-danger-soft">
-            <ion-icon name="heart-outline"></ion-icon>
-            <span>Tasa de éxito: 82%</span>
+          <!-- CONTROL INDIVIDUAL (NUEVO) -->
+          <div class="flex items-center gap-2">
+             <ion-segment [value]="chartPeriodo()" (ionChange)="chartPeriodo.set($any($event).detail.value)" mode="ios" class="vac-segment-mini">
+                <ion-segment-button value="Mensual">
+                  <ion-label>M</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="Anual">
+                  <ion-label>A</ion-label>
+                </ion-segment-button>
+             </ion-segment>
+             <div class="vac-mini-stat bg-danger-soft hidden-sm">
+               <ion-icon name="heart-outline"></ion-icon>
+               <span>82%</span>
+             </div>
           </div>
         </div>
       </div>
@@ -7888,9 +8545,9 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <h2 class="vac-section-title" *ngIf="!isLoading()">Próximos Partos</h2>
 
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
-    <ion-grid class="ion-no-padding mt-4" *ngIf="isLoading()">
+    <ion-grid fixed class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
           <div class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
@@ -7927,9 +8584,9 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     </div>
 
     <!-- Gestaciones confirmadas (Próximos Partos) -->
-    <ion-grid class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredGestaciones()">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredGestaciones()">
           <div class="uniform-card">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-danger-soft" slot="start">
@@ -7970,9 +8627,9 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <h2 class="vac-section-title mt-8" *ngIf="!isLoading()">Historial Reproductivo</h2>
     
     <!-- Historial en Tarjetas Pro -->
-    <ion-grid class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let r of filteredReproducciones()">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredReproducciones()">
           <div class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-primary-soft" slot="start">
@@ -8099,6 +8756,53 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
       </ion-content>
     </ng-template>
   </ion-modal>
+  <!-- POPOVER DE FILTROS (RUSTIC-LUXE) -->
+  <ion-popover [isOpen]="isFilterPopoverOpen" [event]="filterEvent" (didDismiss)="isFilterPopoverOpen = false" class="vac-popover">
+    <ng-template>
+      <div class="vac-filter-panel ion-padding">
+        <div class="vac-filter-header mb-4">
+          <ion-icon name="filter-outline" class="color-primary align-middle"></ion-icon>
+          <span class="ml-2 font-bold color-primary">Filtrar Reproducción</span>
+        </div>
+
+        <!-- SECCIÓN: ESTADO GESTACIÓN -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Estado de Gestación</ion-label>
+          <ion-segment [value]="filterEstado()" (ionChange)="filterEstado.set($any($event).detail.value)" mode="ios" class="vac-segment-earth">
+            <ion-segment-button value="Todos">
+              <ion-label>Todos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Confirmada">
+              <ion-label>Preñez</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Fallida">
+              <ion-label>Fallo</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- SECCIÓN: MÉTODO -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Metodología de Cubrición</ion-label>
+          <ion-item lines="none" class="vac-input-select-mini">
+            <ion-select [value]="filterMetodo()" (ionChange)="filterMetodo.set($event.detail.value)" interface="popover" placeholder="Seleccionar método">
+              <ion-select-option value="Todos">Todos los métodos</ion-select-option>
+              <ion-select-option *ngFor="let m of METODOS" [value]="m">
+                {{ m }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="vac-filter-footer pt-2 border-top-soft">
+           <ion-button expand="block" fill="clear" color="danger" (click)="clearFilters()">
+             Limpiar Filtros
+           </ion-button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-popover>
 </ion-content>
 
 
@@ -8116,7 +8820,8 @@ import {
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
   IonButton, IonInput, IonSelect, IonSelectOption,
   IonGrid, IonRow, IonCol,
-  IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
+  IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
+  IonPopover, IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
 import { BaseChartDirective } from 'ng2-charts';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -8147,6 +8852,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal, IonButton,
     IonInput, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol,
     IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
+    IonPopover, IonSegment, IonSegmentButton,
     BaseChartDirective
   ],
   templateUrl: './reproduccion.component.html'
@@ -8164,9 +8870,12 @@ export class ReproduccionComponent implements OnInit {
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
   
+  chartPeriodo = signal<'Mensual' | 'Anual'>('Mensual');
+  filterGlobal = signal<'Mensual' | 'Anual'>('Mensual');
+
   // Gráfico de Fertilidad
   chartFertilidad = computed<ChartConfiguration<'bar'>['data']>(() => {
-    const data = this.reproService.getEstadisticasConcepcion('Mensual');
+    const data = this.reproService.getEstadisticasConcepcion(this.chartPeriodo());
     return {
       labels: data.map(d => d.label),
       datasets: [
@@ -8185,12 +8894,63 @@ export class ReproduccionComponent implements OnInit {
     }
   };
   
-  reproducciones: Reproduccion[] = [];
-  gestacionesActivas: Reproduccion[] = [];
+  reproducciones = signal<Reproduccion[]>([]);
+  gestacionesActivas = signal<Reproduccion[]>([]);
   
-  filteredReproducciones = signal<Reproduccion[]>([]);
-  filteredGestaciones = signal<Reproduccion[]>([]);
   isLoading = signal<boolean>(true);
+  searchTerm = signal<string>('');
+
+  // Filtros Avanzados
+  filterEstado = signal<string>('Todos');
+  filterMetodo = signal<string>('Todos');
+  isFilterPopoverOpen = false;
+  filterEvent: any = null;
+
+  // Computado para Historial Completo
+  filteredReproducciones = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const estado = this.filterEstado();
+    const metodo = this.filterMetodo();
+    let list = this.reproducciones();
+
+    if (term) {
+      list = list.filter(r => 
+        r.bovino?.nombre?.toLowerCase().includes(term) ||
+        r.bovino?.crotal?.toLowerCase().includes(term) ||
+        r.tipo_cubricion?.toLowerCase().includes(term)
+      );
+    }
+
+    if (estado !== 'Todos') {
+      list = list.filter(r => r.estado_gestacion === estado);
+    }
+
+    if (metodo !== 'Todos') {
+      list = list.filter(r => r.tipo_cubricion === metodo);
+    }
+
+    return list;
+  });
+
+  // Computado para Gestaciones Activas (Solo 'Confirmada')
+  filteredGestaciones = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const metodo = this.filterMetodo();
+    let list = this.gestacionesActivas();
+
+    if (term) {
+      list = list.filter(r => 
+        r.bovino?.nombre?.toLowerCase().includes(term) ||
+        r.bovino?.crotal?.toLowerCase().includes(term)
+      );
+    }
+
+    if (metodo !== 'Todos') {
+      list = list.filter(r => r.tipo_cubricion === metodo);
+    }
+
+    return list;
+  });
 
   isModalOpen = false;
   editingItem: Reproduccion | null = null;
@@ -8221,11 +8981,8 @@ export class ReproduccionComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const { data: repros } = await this.supa.getReproduccion();
-      this.reproducciones = repros || [];
-      this.gestacionesActivas = this.reproducciones.filter(r => r.estado_gestacion === 'Confirmada');
-      
-      this.filteredReproducciones.set([...this.reproducciones]);
-      this.filteredGestaciones.set([...this.gestacionesActivas]);
+      this.reproducciones.set(repros || []);
+      this.gestacionesActivas.set((repros || []).filter(r => r.estado_gestacion === 'Confirmada'));
     } catch (e) {
       console.error('Error cargando datos reproductivos:', e);
     } finally {
@@ -8266,26 +9023,25 @@ export class ReproduccionComponent implements OnInit {
   }
 
   onSearch(event: any) {
-    const term = event.target.value.toLowerCase();
-    if (!term) {
-      this.filteredReproducciones.set([...this.reproducciones]);
-      this.filteredGestaciones.set([...this.gestacionesActivas]);
-      return;
-    }
-    
-    const reproFilter = this.reproducciones.filter(r => 
-      r.bovino?.nombre?.toLowerCase().includes(term) ||
-      r.bovino?.crotal?.toLowerCase().includes(term) ||
-      r.tipo_cubricion?.toLowerCase().includes(term)
-    );
-    this.filteredReproducciones.set(reproFilter);
+    this.searchTerm.set(event.target.value);
+  }
 
-    const gestFilter = this.gestacionesActivas.filter(r => 
-      r.bovino?.nombre?.toLowerCase().includes(term) ||
-      r.bovino?.crotal?.toLowerCase().includes(term) ||
-      r.tipo_cubricion?.toLowerCase().includes(term)
-    );
-    this.filteredGestaciones.set(gestFilter);
+  // --- LÓGICA DE FILTROS ---
+  applyGlobalFilter(periodo: 'Mensual' | 'Anual') {
+    this.filterGlobal.set(periodo);
+    this.chartPeriodo.set(periodo);
+  }
+
+  presentFilter(event: any) {
+    this.filterEvent = event;
+    this.isFilterPopoverOpen = true;
+  }
+
+  clearFilters() {
+    this.filterEstado.set('Todos');
+    this.filterMetodo.set('Todos');
+    this.searchTerm.set('');
+    this.isFilterPopoverOpen = false;
   }
 
   private calculateParto(fechaCubricion: string) {
@@ -8401,10 +9157,10 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     </ion-buttons>
     <ion-title class="ion-text-center">Salud y Medicinas</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="exportarPDF()" color="primary">
+      <ion-button (click)="exportarPDF()" fill="clear">
         <ion-icon name="document-text-outline"></ion-icon>
       </ion-button>
-      <ion-button fill="clear">
+      <ion-button (click)="presentFilter($event)" fill="clear">
         <ion-icon name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -8421,6 +9177,59 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
 
   <div class="vac-container animate-fade-in">
 
+    <!-- CONTROL MANDO COLECTIVO -->
+    <div class="vac-master-filter-bar mb-6 animate-fade-in">
+       <div class="flex items-center gap-3">
+          <ion-icon name="stats-chart-outline" class="color-primary text-xl"></ion-icon>
+          <div class="vac-text-stack">
+             <span class="text-xs uppercase tracking-widest color-medium font-bold">Mando Colectivo</span>
+             <strong class="text-lg">Periodo de Análisis</strong>
+          </div>
+       </div>
+       <ion-segment [value]="filterGlobal()" (ionChange)="applyGlobalFilter($any($event).detail.value)" mode="ios" class="vac-segment-earth mt-4">
+          <ion-segment-button value="3m">
+            <ion-label>3 Meses</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="6m">
+            <ion-label>6 Meses</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="12m">
+            <ion-label>12 Meses</ion-label>
+          </ion-segment-button>
+       </ion-segment>
+    </div>
+
+    <!-- GRÁFICO DE DISTRIBUCIÓN -->
+    <div class="vac-main-card animate-slide-up mb-8" *ngIf="!isLoading()">
+      <div class="vac-card-header">
+        <div class="vac-card-header-flex">
+          <div class="vac-card-title-group">
+            <span>DIAGNÓSTICO GRUPAL</span>
+            <strong>Distribución de Tratamientos</strong>
+          </div>
+          <!-- CONTROL INDIVIDUAL -->
+          <div class="flex items-center gap-2">
+             <ion-segment [value]="chartPeriodo()" (ionChange)="chartPeriodo.set($any($event).detail.value)" mode="ios" class="vac-segment-mini">
+                <ion-segment-button value="3m">
+                  <ion-label>3M</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="6m">
+                  <ion-label>6M</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="12m">
+                  <ion-label>12M</ion-label>
+                </ion-segment-button>
+             </ion-segment>
+          </div>
+        </div>
+      </div>
+      <div class="vac-card-content">
+        <div class="vac-chart-container chart-250px">
+          <canvas baseChart [data]="chartSanidad()" [options]="chartOptions" [type]="'bar'"></canvas>
+        </div>
+      </div>
+    </div>
+
     <!-- Buscador Premium -->
     <div class="vac-searchbar-container">
       <ion-searchbar
@@ -8432,9 +9241,9 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     </div>
 
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
-    <ion-grid class="ion-no-padding" *ngIf="isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of [1,2,3,4]">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
           <div class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
@@ -8456,9 +9265,9 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     </ion-grid>
 
     <!-- LISTA ESTANDARIZADA -->
-    <ion-grid class="ion-no-padding" *ngIf="filteredSanidad().length > 0 && !isLoading()">
+    <ion-grid fixed class="ion-no-padding" *ngIf="filteredSanidad().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-xl="4" *ngFor="let s of filteredSanidad()">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of filteredSanidad()">
           <div class="uniform-card clickable-card" (click)="goToDetail(s.bovino_id)">
             <div class="vac-card-header">
                <div class="vac-card-icon" [ngClass]="getBadgeColor(s.tipo)" slot="start">
@@ -8608,6 +9417,72 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
       </ion-content>
     </ng-template>
   </ion-modal>
+  <!-- POPOVER DE FILTROS (RUSTIC-LUXE) -->
+  <ion-popover [isOpen]="isFilterPopoverOpen" [event]="filterEvent" (didDismiss)="isFilterPopoverOpen = false" class="vac-popover">
+    <ng-template>
+      <div class="vac-filter-panel ion-padding">
+        <div class="vac-filter-header mb-4">
+          <ion-icon name="filter-outline" class="color-primary align-middle"></ion-icon>
+          <span class="ml-2 font-bold color-primary">Filtrar Sanidad</span>
+        </div>
+
+        <!-- SECCIÓN: TIPO -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Tipo de Intervención</ion-label>
+          <ion-segment [value]="filterTipo()" (ionChange)="filterTipo.set($any($event).detail.value)" mode="ios" class="vac-segment-earth">
+            <ion-segment-button value="Todos">
+              <ion-label>Todos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Vacunación">
+              <ion-label>Vac.</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Desparasitación">
+              <ion-label>Desp.</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Saneamiento">
+              <ion-label>San.</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- SECCIÓN: LOTE -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Filtro por Recinto</ion-label>
+          <ion-item lines="none" class="vac-input-select-mini">
+            <ion-select [value]="filterLote()" (ionChange)="filterLote.set($event.detail.value)" interface="popover" placeholder="Seleccionar recinto">
+              <ion-select-option value="Todos">Toda la Finca</ion-select-option>
+              <ion-select-option *ngFor="let l of ganadoService.distLotes() | keyvalue" [value]="l.key">
+                {{ l.key }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <!-- SECCIÓN: TIEMPO GRÁFICO (Sincronizado) -->
+        <div class="filter-section mb-6">
+          <ion-label class="vac-filter-label">Recorte Temporal Gráfico</ion-label>
+          <ion-segment [value]="chartPeriodo()" (ionChange)="chartPeriodo.set($any($event).detail.value)" mode="ios" class="vac-segment-earth">
+            <ion-segment-button value="3m">
+              <ion-label>3M</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="6m">
+              <ion-label>6M</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="12m">
+              <ion-label>12M</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="vac-filter-footer pt-2 border-top-soft">
+           <ion-button expand="block" fill="clear" color="danger" (click)="clearFilters()">
+             Limpiar Filtros
+           </ion-button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-popover>
 </ion-content>
 
 
@@ -8615,25 +9490,26 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
 ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.ts
 ==================================================
 
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem,
   IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
   IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
   IonGrid, IonRow, IonCol,
-  IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
+  IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
+  IonPopover, IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Sanidad, Bovino } from '../../core/models/vacapp.models';
 import { addIcons } from 'ionicons';
 import { 
   medkitOutline, flaskOutline, medicalOutline, addCircle, closeOutline, saveOutline, searchOutline, 
   calendarOutline, personOutline, createOutline, trashOutline, leafOutline, pulseOutline, waterOutline, 
-  thermometerOutline, bandageOutline, warningOutline, filterOutline, arrowDownOutline, documentTextOutline
+  thermometerOutline, bandageOutline, warningOutline, filterOutline, arrowDownOutline, documentTextOutline, statsChartOutline
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PdfService } from '../../core/services/pdf.service';
@@ -8653,7 +9529,9 @@ import { GanadoService } from '../../core/services/ganado.service';
     IonItem, IonLabel, IonBadge, IonIcon, IonButtons, IonMenuButton, 
     IonFab, IonFabButton, IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
     IonGrid, IonRow, IonCol,
-    IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText
+    IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText,
+    IonPopover, IonSegment, IonSegmentButton,
+    BaseChartDirective
   ],
   templateUrl: './sanidad.component.html'
 })
@@ -8666,19 +9544,96 @@ export class SanidadComponent implements OnInit {
   private pdfService = inject(PdfService);
   private router = inject(Router);
   
-  sanidadRecords: Sanidad[] = [];
-  filteredSanidad = signal<Sanidad[]>([]);
+  sanidadRecords = signal<Sanidad[]>([]);
   isLoading = signal<boolean>(true);
+  searchTerm = signal<string>('');
+  
+  // Filtros Avanzados
+  filterTipo = signal<string>('Todos');
+  filterLote = signal<string>('Todos');
+  isFilterPopoverOpen = false;
+  filterEvent: any = null;
+
+  // Computado Reactivo para Filtrado Multidimensional
+  filteredSanidad = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const tipo = this.filterTipo();
+    const loteId = this.filterLote();
+    let list = this.sanidadRecords();
+
+    // 1. Texto (Animal, Crotal, Producto, Tipo)
+    if (term) {
+      list = list.filter(s => 
+        s.bovino?.nombre?.toLowerCase().includes(term) ||
+        s.bovino?.crotal?.toLowerCase().includes(term) ||
+        s.producto?.toLowerCase().includes(term) ||
+        s.tipo?.toLowerCase().includes(term)
+      );
+    }
+
+    // 2. Tipo de intervención
+    if (tipo !== 'Todos') {
+      list = list.filter(s => s.tipo === tipo);
+    }
+
+    // 3. Lote (Recinto)
+    if (loteId !== 'Todos') {
+      list = list.filter(s => s.bovino?.lote_id === loteId);
+    }
+
+    return list;
+  });
   
   isModalOpen = false;
   editingItem: Sanidad | null = null;
   healthForm: FormGroup;
 
+  chartPeriodo = signal<'3m' | '6m' | '12m'>('6m');
+  filterGlobal = signal<'3m' | '6m' | '12m'>('6m');
+
+  // Gráfico de Distribución Sanitaria
+  chartSanidad = computed<ChartConfiguration<'bar'>['data']>(() => {
+    const list = this.filteredSanidad();
+    const period = this.chartPeriodo();
+    
+    // Filtro temporal real
+    const months = period === '3m' ? 3 : period === '6m' ? 6 : 12;
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - months);
+    
+    const recs = list.filter(s => s.fecha && new Date(s.fecha) >= cutoff);
+    
+    const stats: Record<string, number> = {};
+    recs.forEach(r => {
+      stats[r.tipo] = (stats[r.tipo] || 0) + 1;
+    });
+
+    return {
+      labels: Object.keys(stats),
+      datasets: [{
+        label: 'Nº Intervenciones',
+        data: Object.values(stats),
+        backgroundColor: ['#1b4332', '#52b788', '#d4a373', '#bc4749', '#582f0e'],
+        borderRadius: 8
+      }]
+    };
+  });
+
+  chartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#6c757d' } },
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#6c757d', stepSize: 1 } }
+    }
+  };
+
   constructor() {
     addIcons({ 
       medkitOutline, flaskOutline, medicalOutline, addCircle, closeOutline, saveOutline, searchOutline, calendarOutline, 
       personOutline, createOutline, trashOutline, leafOutline, pulseOutline, waterOutline, thermometerOutline, bandageOutline, warningOutline, filterOutline, arrowDownOutline,
-      documentTextOutline
+      documentTextOutline, statsChartOutline
     });
     
     this.healthForm = this.fb.group({
@@ -8702,8 +9657,7 @@ export class SanidadComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const { data: records } = await this.supa.getSanidad();
-      this.sanidadRecords = records || [];
-      this.filteredSanidad.set([...this.sanidadRecords]);
+      this.sanidadRecords.set(records || []);
     } catch (e) {
       console.error('Error cargando datos sanitarios:', e);
     } finally {
@@ -8724,51 +9678,43 @@ export class SanidadComponent implements OnInit {
     }
   }
 
-  exportarPDF() {
-    const doc = new jsPDF();
-    
-    // Título del PDF
-    doc.setFontSize(18);
-    doc.text('Registro Oficial de Sanidad - Vacapp', 14, 22);
-    
-    doc.setFontSize(11);
-    doc.text(`Fecha de exportación: ${new Date().toLocaleDateString()}`, 14, 30);
-
-    // Mapeamos los datos
-    const data = this.filteredSanidad().map(item => [
+  async exportarPDF() {
+    const headers = [['Fecha', 'Crotal', 'Tratamiento', 'Producto']];
+    const data = this.filteredSanidad().map((item: Sanidad) => [
       item.fecha ? new Date(item.fecha).toLocaleDateString() : 'N/A',
       item.bovino?.crotal || 'S/N',
       item.tipo || '-',
       item.producto || '-'
     ]);
 
-    // Generar la tabla
-    autoTable(doc, {
-      startY: 35,
-      head: [['Fecha', 'Crotal', 'Tratamiento', 'Producto']],
-      body: data,
-      headStyles: { fillColor: [92, 131, 116] }, // Color primario de tu app en RGB
-      alternateRowStyles: { fillColor: [245, 245, 245] }
-    });
-
-    // Descargar el archivo
-    doc.save('registro_sanidad.pdf');
+    await this.pdfService.generateTablePDF(
+      'Registro Oficial de Sanidad - Vacapp',
+      headers,
+      data,
+      'registro_sanidad_vacapp'
+    );
   }
 
   onSearch(event: any) {
-    const term = event.target.value.toLowerCase();
-    if (!term) {
-      this.filteredSanidad.set([...this.sanidadRecords]);
-      return;
-    }
-    
-    const filtered = this.sanidadRecords.filter(s => 
-      s.bovino?.nombre?.toLowerCase().includes(term) ||
-      s.bovino?.crotal?.toLowerCase().includes(term) ||
-      s.producto.toLowerCase().includes(term) ||
-      s.tipo.toLowerCase().includes(term)
-    );
-    this.filteredSanidad.set(filtered);
+    this.searchTerm.set(event.target.value);
+  }
+
+  // --- LÓGICA DE FILTROS ---
+  applyGlobalFilter(periodo: '3m' | '6m' | '12m') {
+    this.filterGlobal.set(periodo);
+    this.chartPeriodo.set(periodo);
+  }
+
+  presentFilter(event: any) {
+    this.filterEvent = event;
+    this.isFilterPopoverOpen = true;
+  }
+
+  clearFilters() {
+    this.filterTipo.set('Todos');
+    this.filterLote.set('Todos');
+    this.searchTerm.set('');
+    this.isFilterPopoverOpen = false;
   }
 
   getHealthIcon(tipo: string): string {
@@ -8941,10 +9887,12 @@ ARCHIVO: .\frontend\src\styles\main.scss
 @use 'layout/sidebar';
 @use 'layout/containers';
 @use 'components/cards';
+@use 'components/buttons';
 @use 'components/forms';
 @use 'components/animations';
 @use 'components/icons';
 @use 'components/utilities';
+@use 'components/popovers';
 @use 'components/component_overrides';
 
 
@@ -9365,6 +10313,30 @@ ARCHIVO: .\frontend\src\styles\components\_animations.scss
 
 
 ==================================================
+ARCHIVO: .\frontend\src\styles\components\_buttons.scss
+==================================================
+
+@use "../abstracts/variables";
+
+/**
+ * CUSTOM BUTTONS - Rustic-Luxe v2 (FINAL STABLE VERSION)
+ * High-visibility and premium feel for specific actions.
+ */
+
+
+/* Secondary Actions */
+.vac-btn-icon-soft {
+  --background: rgba(108, 117, 125, 0.1);
+  --color: #6c757d;
+  --border-radius: 10px;
+  
+  &:hover {
+    --background: rgba(108, 117, 125, 0.15);
+  }
+}
+
+
+==================================================
 ARCHIVO: .\frontend\src\styles\components\_cards.scss
 ==================================================
 
@@ -9372,7 +10344,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 
 /* BASE CARD - Standard Vacapp Floating Card */
 .vac-base-card {
-  background: variables.$white;
+  background: var(--ion-card-background);
   border-radius: 20px;
   padding: 1.25rem;
   box-shadow: variables.$vac-shadow;
@@ -9510,7 +10482,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
   
   &.bg-primary { background: linear-gradient(135deg, variables.$primary-color, variables.$dark-color); }
   &.bg-secondary { background: linear-gradient(135deg, variables.$secondary-color, #8b5a2b); }
-  &.bg-tertiary { background: linear-gradient(135deg, variables.$tertiary-color, #b48a5c); color: variables.$primary-color; }
+  &.bg-tertiary { background: linear-gradient(135deg, variables.$tertiary-color, #b48a5c); color: #ffffff; }
   &.bg-success { background: linear-gradient(135deg, variables.$success-color, #2d6a4f); }
 }
 
@@ -9594,7 +10566,7 @@ ARCHIVO: .\frontend\src\styles\components\_cards.scss
 
 /* ION-CARD GLOBAL STANDARDIZATION */
 ion-card {
-  --background: #{variables.$white};
+  --background: var(--ion-card-background);
   border-radius: 20px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   border: 1px solid rgba(88, 47, 14, 0.08) !important;
@@ -9632,7 +10604,7 @@ ion-card {
 
 /* RUSTIC CARD - The definitive Vacapp standard */
 .rustic-card {
-  background: variables.$white;
+  background: var(--ion-card-background);
   border-radius: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(88, 47, 14, 0.08);
@@ -9915,7 +10887,7 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
 
 /* 10. ELEMENTOS DE FORMULARIO LUXE */
 .vac-input {
-  --background: #{variables.$white};
+  --background: var(--ion-item-background);
   --border-radius: 16px;
   margin-bottom: 1.5rem;
   --padding-start: 1.2rem;
@@ -9923,12 +10895,12 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
   --padding-top: 10px;
   --padding-bottom: 10px;
   --inner-padding-end: 0;
-  box-shadow: 0 4px 10px rgba(variables.$black, 0.03);
-  border: 1px solid rgba(variables.$primary-color, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
   transition: all 0.3s ease;
 
   &.item-has-focus {
-    --background: #{variables.$white};
+    --background: var(--ion-item-background);
     border-color: var(--ion-color-tertiary);
     box-shadow: variables.$shadow-focus;
   }
@@ -9990,7 +10962,7 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
 /* 11. Buscador */
 .vac-search-wrapper { 
   margin: 10px 12px 25px; 
-  background: variables.$white; 
+  background: var(--ion-item-background); 
   border-radius: 20px; 
   display: flex; 
   align-items: center; 
@@ -10027,7 +10999,7 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
   padding: 18px 0;
   font-size: 1rem;
   font-weight: 600;
-  color: variables.$black;
+  color: var(--ion-text-color);
   transition: all 0.3s ease;
 }
 
@@ -10036,19 +11008,25 @@ ARCHIVO: .\frontend\src\styles\components\_forms.scss
   font-weight: 500;
 }
 
-/* ION-SEARCHBAR LUXE RESET */
+/* ION-SEARCHBAR LUXE RESET (v2) */
 ion-searchbar {
-  --border-radius: 12px !important;
-  --background: #fdfaf7 !important;
+  --border-radius: 24px !important;
+  --background: var(--ion-color-step-50) !important;
   --box-shadow: none !important;
   --placeholder-color: #{variables.$gray-600};
   --placeholder-font-weight: 600;
-  --color: #{variables.$black};
-  border: 1px solid rgba(88, 47, 14, 0.08);
-  border-radius: 12px;
+  --color: var(--ion-text-color);
+  border: 1px solid rgba(188, 138, 95, 0.12); /* Subtle Tierra border */
+  border-radius: 24px;
   margin: 10px 0;
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-left: 12px;
+  padding-right: 12px;
+  transition: all 0.3s ease;
+
+  &:focus-within {
+     border-color: var(--ion-color-tertiary);
+     transform: translateY(-1px);
+  }
 }
 /* 12. Estilos para Desplegables (Selects) y Calendarios (Dates) */
 ion-input[type="date"] {
@@ -10127,6 +11105,144 @@ ARCHIVO: .\frontend\src\styles\components\_icons.scss
 
 
 ==================================================
+ARCHIVO: .\frontend\src\styles\components\_popovers.scss
+==================================================
+
+@use "../abstracts/variables" as v;
+
+/**
+ * POPOVER DESIGN - Rustic-Luxe v2
+ */
+
+.vac-popover {
+  --width: 320px;
+  --border-radius: 20px;
+  --box-shadow: 0 10px 40px rgba(27, 67, 50, 0.15);
+  
+  &::part(content) {
+    border: 1px solid rgba(27, 67, 50, 0.08);
+  }
+}
+
+.vac-filter-panel {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  
+  .vac-filter-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #f1f1f1;
+    padding-bottom: 12px;
+    
+    ion-icon {
+      font-size: 20px;
+    }
+    
+    span {
+      font-size: 1.1rem;
+      font-family: 'Outfit', sans-serif;
+    }
+  }
+
+  .vac-filter-label {
+    display: block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #8d7b68;
+    font-weight: 700;
+    margin-bottom: 8px;
+    margin-left: 4px;
+  }
+
+  /* Segmented Control - Earthy Look */
+  .vac-segment-earth {
+    background: #fdfaf7;
+    border-radius: 12px;
+    padding: 3px;
+    --background: #fdfaf7;
+    
+    ion-segment-button {
+      --color: #8d7b68;
+      --color-checked: #ffffff;
+      --indicator-color: #1b4332;
+      --indicator-box-shadow: 0 4px 10px rgba(27, 67, 50, 0.2);
+      font-size: 0.85rem;
+      min-height: 40px;
+      font-weight: 600;
+      
+      &::part(native) {
+        border-radius: 9px;
+      }
+    }
+  }
+
+  .vac-input-select-mini {
+    --background: #fdfaf7;
+    --border-radius: 12px;
+    --padding-start: 12px;
+    font-size: 0.95rem;
+    border: 1px solid rgba(27, 67, 50, 0.05);
+    margin: 4px 0;
+    
+    ion-select {
+      width: 100%;
+      --placeholder-color: #8d7b68;
+      --placeholder-opacity: 0.6;
+    }
+  }
+
+  .vac-filter-footer {
+    border-top: 1px solid #f1f1f1;
+    
+    ion-button {
+      --color: #bc4749;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: none;
+    }
+  }
+}
+
+/* Adaptación para Modo Oscuro */
+body.dark-theme {
+  .vac-filter-panel {
+    background: #1a1a1a;
+    
+    .vac-filter-header {
+      border-bottom-color: #333;
+      .color-primary { color: #ffffff !important; }
+    }
+    
+    .vac-segment-earth {
+      background: #2a2a2a;
+      --background: #2a2a2a;
+      
+      ion-segment-button {
+        --color: #aaa;
+        --indicator-color: #2d6a4f;
+      }
+    }
+    
+    .vac-input-select-mini {
+      background: #2a2a2a;
+      --background: #2a2a2a;
+      border-color: #444;
+      
+      ion-select {
+        color: white;
+      }
+    }
+    
+    .vac-filter-footer {
+       border-top-color: #333;
+    }
+  }
+}
+
+
+==================================================
 ARCHIVO: .\frontend\src\styles\components\_utilities.scss
 ==================================================
 
@@ -10148,14 +11264,14 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
 }
 
 .vac-details-panel { 
-  background: rgba(variables.$white, 0.5); border-radius: 20px; padding: 15px; 
-  margin-bottom: 15px; border: 1px solid rgba(variables.$black, 0.01); 
+  background: rgba(var(--ion-card-background-rgb), 0.5); border-radius: 20px; padding: 15px; 
+  margin-bottom: 15px; border: 1px solid rgba(var(--ion-text-color-rgb), 0.05); 
 }
 
-.detail-lbl { font-size: 0.65rem; font-weight: 800; color: variables.$gray-600; text-transform: uppercase; }
-.detail-val { font-size: 0.9rem; font-weight: 800; color: variables.$black; }
-.vac-detail-notes { margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(variables.$black, 0.1); }
-.vac-notes-txt { font-size: 0.85rem; color: variables.$gray-600; font-weight: 600; font-style: italic; margin-top: 4px; }
+.detail-lbl { font-size: 0.65rem; font-weight: 800; color: var(--ion-color-medium); text-transform: uppercase; }
+.detail-val { font-size: 0.9rem; font-weight: 800; color: var(--ion-text-color); }
+.vac-detail-notes { margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(var(--ion-text-color-rgb), 0.1); }
+.vac-notes-txt { font-size: 0.85rem; color: var(--ion-color-medium); font-weight: 600; font-style: italic; margin-top: 4px; }
 
 .vac-card-footer { 
   display: flex; justify-content: space-between; align-items: center; 
@@ -10190,14 +11306,14 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
   justify-content: center; font-size: 20px; background: rgba(variables.$primary-color, 0.05); 
   color: var(--ion-color-primary); 
 }
-.vac-history-data p { font-size: 0.8rem; color: variables.$gray-600; margin-top: 2px; font-weight: 600; }
+.vac-history-data p { font-size: 0.8rem; color: var(--ion-color-medium); margin-top: 2px; font-weight: 600; }
 
 .vac-graph-bar { flex: 1; background: variables.$gray-100; border-radius: 8px; transition: variables.$transition-base; }
 .vac-bar-accent { background: variables.$tertiary-color; }
 .vac-icon-indicator { font-size: 24px; background: rgba(variables.$white, 0.1); padding: 12px; border-radius: 16px; min-width: 48px; }
 .vac-progress-track { height: 8px; background: rgba(variables.$white, 0.1); border-radius: 10px; overflow: hidden; }
 .vac-progress-fill { height: 100%; background: variables.$white; border-radius: 10px; }
-.vac-panel-footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid variables.$gray-100; font-size: 0.8rem; color: variables.$gray-600; font-weight: 600; }
+.vac-panel-footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--ion-color-light); font-size: 0.8rem; color: var(--ion-color-medium); font-weight: 600; }
 
 
 
@@ -10388,7 +11504,7 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
   }
 
   p {
-    color: variables.$gray-600;
+    color: var(--ion-color-medium);
     max-width: 280px;
     margin-bottom: 2rem;
     font-weight: 600;
@@ -10402,8 +11518,8 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
   justify-content: center;
   gap: 1rem;
   padding: 1.5rem 1rem;
-  background: variables.$white;
-  border-bottom: 1px solid rgba(0,0,0,0.03);
+  background: var(--ion-card-background);
+  border-bottom: 1px solid rgba(var(--ion-text-color-rgb), 0.05);
 
   .wizard-step {
     display: flex;
@@ -10509,6 +11625,87 @@ ARCHIVO: .\frontend\src\styles\components\_utilities.scss
   margin: 2.25rem 0 1.25rem !important;
   padding-left: 8px;
   letter-spacing: -0.2px;
+}
+/* CHART FILTERS SYSTEM (RUSTIC-LUXE) */
+.vac-master-filter-bar {
+  display: flex;
+  flex-direction: column;
+  background: rgba(var(--ion-card-background-rgb), 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(var(--ion-text-color-rgb), 0.05);
+  padding: 18px;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.03);
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+  }
+}
+
+.vac-segment-earth {
+  --background: rgba(var(--ion-color-secondary-rgb), 0.05);
+  border-radius: 16px !important;
+  padding: 4px;
+  min-height: 48px;
+
+  ion-segment-button {
+    --indicator-color: var(--ion-color-secondary);
+    --color: var(--ion-color-medium);
+    --color-checked: #ffffff;
+    --border-radius: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    
+    &::part(indicator-background) {
+      box-shadow: 0 4px 12px rgba(var(--ion-color-secondary-rgb), 0.3);
+    }
+  }
+}
+
+.vac-segment-mini {
+  --background: rgba(var(--ion-text-color-rgb), 0.04);
+  border-radius: 12px !important;
+  padding: 2px;
+  min-height: 32px;
+  width: auto;
+  max-width: 140px;
+
+  ion-segment-button {
+    --indicator-color: var(--ion-color-primary);
+    --color: var(--ion-color-medium);
+    --color-checked: #ffffff;
+    --border-radius: 10px;
+    font-weight: 900;
+    font-size: 10px;
+    min-height: 28px;
+    
+    &::part(indicator-background) {
+      box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.2);
+    }
+  }
+}
+
+.vac-text-stack {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.chart-250px {
+  height: 250px;
+  position: relative;
+}
+
+.hidden-sm {
+  @media (max-width: 576px) {
+    display: none !important;
+  }
 }
 
 
@@ -11241,6 +12438,15 @@ ARCHIVO: .\frontend\src\styles\layout\_containers.scss
   padding: 0 1.5rem 100px; // More room for FABs and scrolling
 }
 
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .vac-welcome-section {
   margin-bottom: 2.5rem;
   padding-top: 1rem;
@@ -11513,58 +12719,69 @@ ARCHIVO: .\frontend\src\theme\variables.scss
   --ion-text-color-rgb: 33, 37, 41;
 
   --ion-item-background: #ffffff;
+  --ion-item-background-rgb: 255, 255, 255;
   --ion-card-background: #ffffff;
+  --ion-card-background-rgb: 255, 255, 255;
 }
 
-/* Modo Oscuro Manual (Escogido por el usuario o sistema) */
+/* Modo Oscuro Manual (Rustic-Dark v2) */
 body.dark-theme {
-  --ion-color-primary: #3b634b;
-  --ion-color-primary-rgb: 59, 99, 75;
-  --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-shade: #345742;
-  --ion-color-primary-tint: #4f735d;
+  --ion-color-primary: #95D5B2;
+  --ion-color-primary-rgb: 149, 213, 178;
+  --ion-color-primary-contrast: #121212;
+  --ion-color-primary-shade: #83bc9d;
+  --ion-color-primary-tint: #a0d9ba;
 
-  --ion-color-secondary: #a36d4f;
-  --ion-color-secondary-rgb: 163, 109, 79;
+  --ion-color-secondary: #BC8A5F;
+  --ion-color-secondary-rgb: 188, 138, 95;
   --ion-color-secondary-contrast: #ffffff;
 
-  --ion-color-tertiary: #b08960;
+  --ion-color-tertiary: #804E32;
   --ion-color-tertiary-contrast: #ffffff;
 
   --ion-background-color: #121212;
   --ion-background-color-rgb: 18, 18, 18;
 
-  --ion-text-color: #ffffff;
-  --ion-text-color-rgb: 255, 255, 255;
+  --ion-text-color: #e0e0e0;
+  --ion-text-color-rgb: 224, 224, 224;
 
   --ion-item-background: #1e1e1e;
+  --ion-item-background-rgb: 30, 30, 30;
   --ion-card-background: #1e1e1e;
+  --ion-card-background-rgb: 30, 30, 30;
   
   --ion-color-step-50: #1e1e1e;
   --ion-color-step-100: #2a2a2a;
   --ion-color-step-150: #363636;
   --ion-color-step-200: #414141;
-}
 
-body, * {
-  --ion-font-family: 'Outfit', sans-serif !important;
-  font-family: var(--ion-font-family) !important;
+  ion-card {
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
 }
 
 body {
+  --ion-font-family: 'Outfit', sans-serif;
+  font-family: var(--ion-font-family);
   background-color: var(--ion-background-color);
 }
 
-/* Base Component Standardization (Rustic-Luxe) */
+/* Base Component Standardization (Rustic-Luxe v2) */
 ion-card {
-  --border-radius: 16px !important;
-  border-radius: 16px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04) !important;
+  --border-radius: 24px !important;
+  border-radius: 24px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
   margin-inline: 16px;
   margin-block: 12px;
-  border: 1px solid rgba(88, 47, 14, 0.05); /* Soft Earth border */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(188, 138, 95, 0.15); /* Subtle Tierra border */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
+    background: linear-gradient(135deg, var(--ion-card-background) 0%, var(--ion-color-step-50) 100%);
+  }
 }
 
 ion-button {
@@ -11606,4 +12823,5 @@ ion-badge {
 ::-webkit-scrollbar-track { background: #f8f9fa; }
 ::-webkit-scrollbar-thumb { background: #d4a373; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #ba8f65; }
+
 

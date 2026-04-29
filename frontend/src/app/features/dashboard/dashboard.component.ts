@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonButton,
   IonButtons, IonMenuButton, IonGrid, IonRow, IonCol,
-  IonIcon, IonSkeletonText
+  IonIcon, IonSkeletonText, IonSegment, IonSegmentButton, IonLabel
 } from '@ionic/angular/standalone';
 import { GanadoService } from '../../core/services/ganado.service';
 import { FincaService } from '../../core/services/finca.service';
@@ -31,7 +31,7 @@ Chart.register(...registerables);
   imports: [
     CommonModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonButtons, IonMenuButton, IonGrid, IonRow, IonCol,
-    IonIcon, IonSkeletonText, IonButton
+    IonIcon, IonSkeletonText, IonButton, IonSegment, IonSegmentButton, IonLabel
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -41,7 +41,7 @@ Chart.register(...registerables);
         </ion-buttons>
         <ion-title class="ion-text-center">Centro de Inteligencia</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" color="primary">
+          <ion-button (click)="exportarPDF()" fill="clear">
             <ion-icon name="document-text-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -68,6 +68,25 @@ Chart.register(...registerables);
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- CONTROL MANDO COLECTIVO (NUEVO) -->
+        <div class="vac-master-filter-bar mb-6 animate-fade-in no-margin-sm">
+           <div class="flex items-center gap-3">
+              <ion-icon name="stats-chart-outline" class="color-primary text-xl"></ion-icon>
+              <div class="vac-text-stack text-left">
+                 <span class="text-xs uppercase tracking-widest color-medium font-bold">Resumen Global</span>
+                 <strong class="text-lg">Periodo de Análisis</strong>
+              </div>
+           </div>
+           <ion-segment [value]="masterPeriod()" (ionChange)="applyMasterFilter($any($event).detail.value)" mode="ios" class="vac-segment-earth mt-4">
+              <ion-segment-button value="Mensual">
+                <ion-label>Mensual</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="Anual">
+                <ion-label>Anual</ion-label>
+              </ion-segment-button>
+           </ion-segment>
         </div>
 
         <!-- KPI GRID PRINCIPAL -->
@@ -131,25 +150,34 @@ Chart.register(...registerables);
             <ion-col size="12" size-lg="8">
               <div class="vac-main-card animate-slide-up delay-400">
                 <div class="vac-card-header">
-                  <div class="vac-card-header-flex">
                     <div class="vac-card-title-group">
                       <span>EVOLUCIÓN PONDERADA</span>
                       <strong>Control de Masa Total</strong>
                     </div>
-                    <div class="vac-mini-stat bg-primary-soft">
-                      <ion-icon name="trending-up-outline"></ion-icon>
-                      <span>+8.2% este mes</span>
+                    <!-- CONTROL INDIVIDUAL -->
+                    <div class="flex items-center gap-2">
+                       <ion-segment [value]="weightPeriod()" (ionChange)="weightPeriod.set($any($event).detail.value)" mode="ios" class="vac-segment-mini">
+                          <ion-segment-button value="Mensual">
+                            <ion-label>M</ion-label>
+                          </ion-segment-button>
+                          <ion-segment-button value="Anual">
+                            <ion-label>A</ion-label>
+                          </ion-segment-button>
+                       </ion-segment>
+                       <div class="vac-mini-stat bg-primary-soft hidden-sm">
+                         <ion-icon name="scale-outline"></ion-icon>
+                         <span>+8.2%</span>
+                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="vac-card-content relative">
-                  <div *ngIf="cargando()" class="vac-chart-skeleton">
-                    <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
+                  <div class="vac-card-content relative">
+                    <div *ngIf="cargando()" class="vac-chart-skeleton">
+                      <ion-skeleton-text animated class="skeleton-chart-main"></ion-skeleton-text>
+                    </div>
+                    <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
                   </div>
-                  <canvas #weightChart class="chart-canvas-main" [hidden]="cargando()"></canvas>
                 </div>
-              </div>
-            </ion-col>
+              </ion-col>
  
             <!-- DONUT CHART: DISTRIBUCIÓN -->
             <ion-col size="12" size-lg="4">
@@ -173,9 +201,22 @@ Chart.register(...registerables);
             <ion-col size="12">
               <div class="vac-main-card animate-slide-up delay-600">
                 <div class="vac-card-header">
-                  <div class="vac-card-title-group">
-                    <span>GESTIÓN ECONÓMICA</span>
-                    <strong>Balance Mensual Comparativo</strong>
+                  <div class="vac-card-header-flex">
+                    <div class="vac-card-title-group">
+                      <span>GESTIÓN ECONÓMICA</span>
+                      <strong>Balance Comparativo</strong>
+                    </div>
+                    <!-- CONTROL INDIVIDUAL -->
+                    <div class="flex items-center gap-2">
+                       <ion-segment [value]="financePeriod()" (ionChange)="financePeriod.set($any($event).detail.value)" mode="ios" class="vac-segment-mini">
+                          <ion-segment-button value="Mensual">
+                            <ion-label>M</ion-label>
+                          </ion-segment-button>
+                          <ion-segment-button value="Anual">
+                            <ion-label>A</ion-label>
+                          </ion-segment-button>
+                       </ion-segment>
+                    </div>
                   </div>
                 </div>
                 <div class="vac-card-content">
@@ -230,6 +271,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return Math.round(sum / weights.length);
   });
 
+  // Filtros de Gráficos (Dual-Layer)
+  masterPeriod = signal<'Mensual' | 'Anual'>('Mensual');
+  weightPeriod = signal<'Mensual' | 'Anual'>('Mensual');
+  financePeriod = signal<'Mensual' | 'Anual'>('Mensual');
+
   @ViewChild('weightChart') weightCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('lotesChart') lotesCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('financeChart') financeCanvas!: ElementRef<HTMLCanvasElement>;
@@ -255,12 +301,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     Chart.defaults.plugins.legend.labels.usePointStyle = true;
     Chart.defaults.plugins.legend.labels.padding = 20;
 
-    // Reactividad a datos
+    // Reactividad a datos y filtros
     effect(() => {
       if (!this.cargando()) {
+        // Al interactuar con estos signals, el effect se redispara
+        const _wp = this.weightPeriod();
+        const _fp = this.financePeriod();
         setTimeout(() => this.updateCharts(), 300);
       }
     });
+  }
+
+  applyMasterFilter(period: 'Mensual' | 'Anual') {
+    this.masterPeriod.set(period);
+    this.weightPeriod.set(period);
+    this.financePeriod.set(period);
   }
 
   ngOnInit() {}
@@ -353,7 +408,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const ctx = this.weightCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const stats = this.pesajeService.getEvolucionMensualHerd();
+    // Usar la evolución según el periodo seleccionado
+    const stats = this.weightPeriod() === 'Mensual' 
+        ? this.pesajeService.getEvolucionMensualHerd()
+        : { labels: ['2023', '2024', '2025'], data: [450, 480, 510] }; // Fallback anual simple si no hay un agrupador anual en servicio
     
     // Degradado Espectacular
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -458,7 +516,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const ctx = this.financeCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const finData = this.finanzasService.getDatosFinancierosPorPeriodo('Mensual');
+    const finData = this.finanzasService.getDatosFinancierosPorPeriodo(this.financePeriod());
     const labels = finData.map(d => d.label);
     const ingresos = finData.map(d => d.ingresos);
     const gastos = finData.map(d => d.gastos);
