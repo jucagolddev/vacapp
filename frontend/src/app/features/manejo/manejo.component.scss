@@ -1,2 +1,33 @@
-// Estilos específicos locales (vacíos por ahora).
-// La mayoría de los estilos del módulo residen en src/styles/features/_manejo.scss
+.search-with-qr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding-right: 8px;
+  border: 1px solid rgba(27, 67, 50, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+  ion-searchbar {
+    padding: 0 !important;
+    --background: transparent !important;
+    --box-shadow: none !important;
+    flex: 1;
+  }
+
+  .qr-scan-btn {
+    --color: var(--ion-color-primary);
+    --padding-start: 8px;
+    --padding-end: 8px;
+    height: 40px;
+    margin: 0;
+    font-size: 24px;
+    transition: transform 0.2s ease;
+    
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+}

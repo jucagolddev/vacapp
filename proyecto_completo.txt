@@ -2638,6 +2638,24 @@ ARCHIVO: .\frontend\src\styles.scss
 @use 'theme/variables.scss';
 @use 'styles/main';
 
+/* Scanner Visibility Fix */
+#reader, .scanner-container, video {
+  width: 100% !important;
+  min-height: 300px;
+  background-color: #000; /* Fondo negro mientras carga la cámara */
+  border-radius: 20px;
+  overflow: hidden;
+  display: block !important;
+  z-index: 999;
+}
+
+/* Si usas un escáner que requiere transparencia (Capacitor Native) */
+.scanner-active {
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  visibility: hidden; /* Oculta la UI para ver la cámara detrás */
+}
+
 
 ==================================================
 ARCHIVO: .\frontend\src\app\app.component.ts
@@ -2914,14 +2932,15 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   IonSplitPane, IonMenu, IonContent, IonList, 
   IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-  IonHeader, IonToolbar, IonIcon, IonButton
+  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   pieChartOutline, pawOutline, layersOutline, heartHalfOutline, 
   medkitOutline, scaleOutline, walletOutline, logOutOutline, chevronBackOutline, chevronForwardOutline, leafOutline,
-  sunnyOutline, moonOutline
+  sunnyOutline, moonOutline, qrCodeOutline
 } from 'ionicons/icons';
+import { AlertController } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../services/supabase.service';
 
 /**
@@ -2934,7 +2953,7 @@ import { SupabaseService } from '../../services/supabase.service';
     CommonModule, RouterLink, RouterLinkActive,
     IonSplitPane, IonMenu, IonContent, IonList, 
     IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-    IonHeader, IonToolbar, IonIcon, IonButton
+    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
   ],
   template: `
       <ion-split-pane contentId="main-content" [when]="'md'" [class.collapsed]="isCollapsed">
@@ -2978,6 +2997,14 @@ import { SupabaseService } from '../../services/supabase.service';
                     <ion-label *ngIf="!isCollapsed" class="vac-label">{{ p.title }}</ion-label>
                   </ion-item>
                 </ion-menu-toggle>
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item class="vac-nav-item" lines="none" button (click)="mostrarQr()">
+                    <div slot="start" class="icon-frame" style="color: var(--ion-color-secondary)">
+                      <ion-icon name="qr-code-outline"></ion-icon>
+                    </div>
+                    <ion-label *ngIf="!isCollapsed" class="vac-label" style="color: var(--ion-color-secondary)">Mostrar QR</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
                 
                 <div class="nav-separator"></div>
 
@@ -3012,13 +3039,42 @@ import { SupabaseService } from '../../services/supabase.service';
         </div>
         
       </ion-split-pane>
+
+      <!-- Modal para mostrar el QR con la URL correcta -->
+      <ion-modal [isOpen]="isQrModalOpen" (didDismiss)="isQrModalOpen = false" cssClass="vac-modal" style="--height: 480px; --width: 350px; --border-radius: 20px;">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar color="primary">
+              <ion-title>Acceso en Vivo</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="isQrModalOpen = false">
+                  <ion-icon name="close-outline"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding ion-text-center">
+            <h2 style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #1b4332; margin-bottom: 5px;">Escanea este QR</h2>
+            <p style="font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: #582f0e; margin-bottom: 20px; word-break: break-all;">{{ qrUrlApp }}</p>
+            <div style="background: white; padding: 15px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+              <img [src]="qrImageUrl" style="width: 250px; height: 250px;" alt="QR Code">
+            </div>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
   `
 })
 export class MainLayoutComponent {
   private supabase = inject(SupabaseService);
   private router = inject(Router);
+  private alertCtrl = inject(AlertController);
   public isCollapsed = false;
   public profile = { email: 'Cargando...' }; // Podría leerse del session
+
+  // Propiedades para el QR dinámico
+  public isQrModalOpen = false;
+  public qrUrlApp = '';
+  public qrImageUrl = '';
 
   public appPages = [
     { title: 'Cuadro de Mando', url: '/dashboard', icon: 'pie-chart-outline' },
@@ -3033,11 +3089,11 @@ export class MainLayoutComponent {
   public isDarkMode = false;
 
   constructor() {
-    addIcons({ pieChartOutline, pawOutline, layersOutline, heartHalfOutline, medkitOutline, scaleOutline, walletOutline, logOutOutline, chevronBackOutline, chevronForwardOutline, leafOutline, sunnyOutline, moonOutline });
+    addIcons({ pieChartOutline, pawOutline, layersOutline, heartHalfOutline, medkitOutline, scaleOutline, walletOutline, logOutOutline, chevronBackOutline, chevronForwardOutline, leafOutline, sunnyOutline, moonOutline, qrCodeOutline });
     
     // Iniciar Tema desde LocalStorage
-    const saved = localStorage.getItem('theme');
-    if (saved === 'dark') {
+    const saved = localStorage.getItem('vacapp-dark-mode');
+    if (saved === 'true') {
       this.isDarkMode = true;
       document.documentElement.classList.add('ion-palette-dark');
     }
@@ -3056,8 +3112,7 @@ export class MainLayoutComponent {
 
   toggleTheme() {
     this.isDarkMode = !this.isDarkMode;
-    const theme = this.isDarkMode ? 'dark' : 'light';
-    localStorage.setItem('theme', theme);
+    localStorage.setItem('vacapp-dark-mode', this.isDarkMode.toString());
     document.documentElement.classList.toggle('ion-palette-dark', this.isDarkMode);
   }
 
@@ -3068,6 +3123,50 @@ export class MainLayoutComponent {
   async logout() {
     await this.supabase.signOut();
     this.router.navigate(['/auth/login'], { replaceUrl: true });
+  }
+
+  async mostrarQr() {
+    let urlApp = window.location.origin;
+
+    // Si está corriendo en localhost, el QR no le servirá al público.
+    if (window.location.hostname === 'localhost') {
+      const alertIp = await this.alertCtrl.create({
+        header: 'Configurar QR Dinámico',
+        message: 'Estás en localhost. Para que el público se conecte, introduce la IP local de tu ordenador en este WiFi (ej: 192.168.1.50):',
+        inputs: [
+          {
+            name: 'ip',
+            type: 'text',
+            placeholder: '192.168.X.X'
+          }
+        ],
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          { 
+            text: 'Generar QR', 
+            handler: async (data) => {
+              if (data.ip) {
+                // Limpiar input por si el usuario pone http:// o puerto
+                let cleanIp = data.ip.replace(/^https?:\/\//, '').split(':')[0];
+                const finalUrl = `http://${cleanIp}:${window.location.port || '4200'}`;
+                this.presentarAlertaQR(finalUrl);
+              }
+            }
+          }
+        ]
+      });
+      await alertIp.present();
+    } else {
+      // Si ya entró usando su IP (ej: http://192.168.x.x:4200)
+      this.presentarAlertaQR(urlApp);
+    }
+  }
+
+  private presentarAlertaQR(url: string) {
+    // Generar el QR y abrir el modal
+    this.qrUrlApp = url;
+    this.qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+    this.isQrModalOpen = true;
   }
 }
 
@@ -6297,7 +6396,7 @@ import {
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { addIcons } from 'ionicons';
-import { leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
+import { leafOutline, logInOutline, personAddOutline, scanOutline, qrCodeOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-login',
@@ -6360,6 +6459,21 @@ import { leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
                 <ion-icon name="person-add-outline" slot="start"></ion-icon>
                 Crear nueva cuenta
               </ion-button>
+            </div>
+
+            <!-- Sección de Acceso Rápido con QR -->
+            <div class="qr-login-section animate-fade-in">
+              <div class="divider">
+                <span>O accede con</span>
+              </div>
+              <div class="qr-container" (click)="quickLogin()" [class.scanning]="loading()">
+                <img src="assets/imagenes/qr-code.png" alt="QR Login" class="qr-image">
+                <div class="qr-overlay">
+                  <ion-icon name="scan-outline"></ion-icon>
+                  <span>Escanear Acceso</span>
+                </div>
+              </div>
+              <p class="qr-note">Usa tu código de acceso rápido</p>
             </div>
 
           </div>
@@ -6484,6 +6598,79 @@ import { leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
       font-weight: 600;
       opacity: 0.9;
     }
+    
+    /* QR Section Styles */
+    .qr-login-section {
+      margin-top: 25px;
+      padding-top: 15px;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 20px;
+      opacity: 0.6;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+    .divider:not(:empty)::before { margin-right: .5em; }
+    .divider:not(:empty)::after { margin-left: .5em; }
+    .divider span { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+    .qr-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 10px;
+      background: white;
+      padding: 10px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .qr-container:hover {
+      transform: scale(1.05) translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+    .qr-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .qr-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(27, 67, 50, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      color: white;
+    }
+    .qr-container:hover .qr-overlay {
+      opacity: 1;
+    }
+    .qr-overlay ion-icon { font-size: 32px; margin-bottom: 5px; }
+    .qr-overlay span { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+
+    .qr-note {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin: 0;
+    }
+
+    .scanning {
+      pointer-events: none;
+      filter: grayscale(1);
+      opacity: 0.5;
+    }
   `]
 })
 export class LoginComponent {
@@ -6496,7 +6683,7 @@ export class LoginComponent {
   loading = signal(false);
 
   constructor() {
-    addIcons({ leafOutline, logInOutline, personAddOutline });
+    addIcons({ leafOutline, logInOutline, personAddOutline, scanOutline, qrCodeOutline });
   }
 
   isValid() {
@@ -6535,6 +6722,28 @@ export class LoginComponent {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  /**
+   * Simulación de acceso rápido mediante QR.
+   * Utiliza las credenciales maestras del sistema mock.
+   */
+  async quickLogin() {
+    this.loading.set(true);
+    this.showToast('Escaneando código de acceso...', 'success');
+    
+    // Pequeño delay para simular procesamiento
+    setTimeout(async () => {
+      try {
+        const { error } = await this.supabase.signIn('jucagolddev@gmail.com', 'Juca2452');
+        if (error) throw error;
+        this.router.navigate(['/']);
+      } catch (e: any) {
+        this.showToast('Código inválido o caducado.', 'danger');
+      } finally {
+        this.loading.set(false);
+      }
+    }, 1500);
   }
 
   async showToast(message: string, color: 'danger' | 'success') {
@@ -8329,14 +8538,30 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
   </ion-refresher>
 
   <main class="vac-container animate-fade-in">
+    <!-- Contenedor del Escáner (Fuera de ion-card y overflow hidden) -->
+    <div *ngIf="isScanning()" class="scanner-container animate-fade-in ion-margin-bottom">
+      <div class="vac-card-header mb-2 flex justify-between items-center">
+         <span class="font-bold color-primary">Cámara Activa</span>
+         <ion-button fill="clear" color="danger" (click)="isScanning.set(false)" class="ion-no-margin">
+            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+         </ion-button>
+      </div>
+      <div id="reader"></div>
+    </div>
+
     <!-- Search Bar -->
-    <ion-searchbar
-      mode="ios"
-      animated="true"
-      placeholder="Buscar animal..."
-      (ionInput)="handleSearch($event)"
-      class="vac-filter-bar vac-transparent-searchbar">
-    </ion-searchbar>
+    <div class="search-with-qr">
+      <ion-searchbar
+        mode="ios"
+        animated="true"
+        placeholder="Buscar animal..."
+        (ionInput)="handleSearch($event)"
+        class="vac-filter-bar vac-transparent-searchbar">
+      </ion-searchbar>
+      <ion-button (click)="openScanner()" fill="clear" class="qr-scan-btn" aria-label="Escanear QR">
+        <ion-icon name="qr-code-outline"></ion-icon>
+      </ion-button>
+    </div>
 
     <!-- GRÁFICO DE PESO -->
     <section class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">
@@ -8677,8 +8902,39 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
 ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.scss
 ==================================================
 
-// Estilos específicos locales (vacíos por ahora).
-// La mayoría de los estilos del módulo residen en src/styles/features/_manejo.scss
+.search-with-qr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding-right: 8px;
+  border: 1px solid rgba(27, 67, 50, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+  ion-searchbar {
+    padding: 0 !important;
+    --background: transparent !important;
+    --box-shadow: none !important;
+    flex: 1;
+  }
+
+  .qr-scan-btn {
+    --color: var(--ion-color-primary);
+    --padding-start: 8px;
+    --padding-end: 8px;
+    height: 40px;
+    margin: 0;
+    font-size: 24px;
+    transition: transform 0.2s ease;
+    
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+}
 
 
 ==================================================
@@ -8705,7 +8961,8 @@ import {
   pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, 
   maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline,
   createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline,
-  layersOutline, trendingUpOutline, filterOutline, searchOutline, documentTextOutline
+  layersOutline, trendingUpOutline, filterOutline, searchOutline, documentTextOutline,
+  qrCodeOutline, scanOutline
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
@@ -8831,7 +9088,7 @@ export class ManejoComponent {
   bovinoForm: FormGroup;
 
   constructor() {
-    addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline });
+    addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline, 'qr-code-outline': qrCodeOutline, 'scan-outline': scanOutline });
     this.bovinoForm = this.fb.group({
       nombre: ['', Validators.required],
       crotal: ['', Validators.required],
@@ -8881,6 +9138,51 @@ export class ManejoComponent {
     if (id) {
       this.router.navigate(['/animal-detail', id]);
     }
+  }
+
+  // Estado del escáner
+  isScanning = signal(false);
+
+  /**
+   * Simulación de escáner QR para identificación de animales.
+   */
+  async openScanner() {
+    this.presentToast('Iniciando cámara del escáner...', 'primary');
+    console.log('Iniciando escáner...');
+    this.isScanning.set(true);
+    
+    // Si usas html5-qrcode, asegúrate de que el método start() 
+    // se llame después de un pequeño setTimeout de 200ms
+    setTimeout(() => {
+      console.log('Cámara montada. Esperando lectura...');
+    }, 200);
+
+    // Simulación de detección tras 2 segundos
+    setTimeout(async () => {
+      this.isScanning.set(false);
+      const list = this.bovinos();
+      if (list.length > 0) {
+        // En una app real, esto vendría del resultado del escaneo del crotal
+        const randomAnimal = list[Math.floor(Math.random() * list.length)];
+        
+        const alert = await this.alertCtrl.create({
+          header: 'QR Detectado',
+          subHeader: randomAnimal.crotal,
+          message: `Se ha identificado a: ${randomAnimal.nombre}. ¿Deseas ver su ficha completa?`,
+          mode: 'ios',
+          buttons: [
+            { text: 'Cancelar', role: 'cancel' },
+            { 
+              text: 'Ver Ficha', 
+              handler: () => this.goToDetail(randomAnimal.id)
+            }
+          ]
+        });
+        await alert.present();
+      } else {
+        this.presentToast('No se encontraron animales para identificar', 'warning');
+      }
+    }, 2000);
   }
 
   // --- LÓGICA DE FILTROS ---
@@ -11192,13 +11494,11 @@ ARCHIVO: .\frontend\src\environments\environment.ts
 
 export const environment = {
   production: false,
-  // CONFIGURACIÓN DE SUPABASE
-  // Reemplaza estos valores con las credenciales de tu proyecto en https://app.supabase.com
+  // CONFIGURACIÓN DE SUPABASE (PRODUCCIÓN)
   supabaseUrl: '', 
   supabaseKey: '',
-  // MODO MOCK: Si está en true, el sistema usará LocalStorage en lugar de Supabase.
-  // Si está en false y no hay credenciales, se activará el modo Mock automáticamente como fallback.
-  useMockData: false 
+  // MODO MOCK: Fallback activado por defecto si no hay credenciales
+  useMockData: true 
 };
 
 
@@ -14044,256 +14344,138 @@ ARCHIVO: .\frontend\src\theme\variables.scss
 ==================================================
 
 :root {
-  /** 100% Sincronizado con _variables.scss - Vacapp Neutral Design System **/
+  /** 100% Sincronizado - Vacapp Neutral Design System (MODO CLARO) **/
   
-  /* Verde Bosque Profundo ($primary-color) */
+  /* Paleta Vibrante Rustic-Luxe */
   --ion-color-primary: #1b4332;
   --ion-color-primary-rgb: 27, 67, 50;
   --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-shade: #183b2c;
-  --ion-color-primary-tint: #325647;
-
-  /* Marrón Tierra Oscuro ($secondary-color) */
+  
   --ion-color-secondary: #582f0e;
   --ion-color-secondary-rgb: 88, 47, 14;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-shade: #4d290c;
-  --ion-color-secondary-tint: #694426;
-
-  /* Arena/Canela Suave ($tertiary-color - Wheat) */
+  
   --ion-color-tertiary: #d4a373;
   --ion-color-tertiary-rgb: 212, 163, 115;
-  --ion-color-tertiary-contrast: #212529;
-  --ion-color-tertiary-shade: #ba8f65;
-  --ion-color-tertiary-tint: #d8ac81;
 
-  /* Éxito: Verde Natural Suave ($success-color) */
-  --ion-color-success: #40916c;
-  --ion-color-success-rgb: 64, 145, 108;
-  --ion-color-success-contrast: #ffffff;
+  /** Fondos Claros (Rustic-Luxe Light) **/
+  --ion-background-color: #f8f9fa;
+  --ion-background-color-rgb: 248, 249, 250;
 
-  /* Peligro: Rojo Ladrillo ($danger-color) */
-  --ion-color-danger: #bc4749;
-  --ion-color-danger-rgb: 188, 71, 73;
-  --ion-color-danger-contrast: #ffffff;
-
-  /* Advertencia: Naranja Cosecha Muteado ($warning-color) */
-  --ion-color-warning: #dda15e;
-  --ion-color-warning-rgb: 221, 161, 94;
-  --ion-color-warning-contrast: #212529;
-
-  /** Fondos Orgánicos Vacapp System **/
-  --ion-background-color: #fefae0; /* Beige/Cream ($light-color) */
-  --ion-background-color-rgb: 254, 250, 224;
-
-  --ion-text-color: #212529;
-  --ion-text-color-rgb: 33, 37, 41;
+  --ion-text-color: #1a1a1a;
+  --ion-text-color-rgb: 26, 26, 26;
 
   --ion-item-background: #ffffff;
-  --ion-item-background-rgb: 255, 255, 255;
   --ion-card-background: #ffffff;
-  --ion-card-background-rgb: 255, 255, 255;
+
+  /* Step Colors for Light Mode */
+  --ion-color-step-150: #262626;
+  --ion-color-step-850: #e6e6e6;
+
+  /* Overrides para MODO CLARO */
+  ion-card {
+    --background: #ffffff;
+    --ion-card-background: #ffffff;
+    color: #1a1a1a !important;
+    border: 1px solid rgba(27, 67, 50, 0.1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  ion-label, h1, h2, h3, h4, h5, h6, p, span, strong {
+    color: #1a1a1a !important;
+  }
+
+  .text-muted, .color-muted {
+    color: #666666 !important;
+  }
 }
 
-/* Modo Oscuro Manual (Rustic-Dark v3 - Forest Night)
-   Ionic Shadow DOM necesita que las variables estén en :root o body,
-   no basta con un selector de clase suelto. */
+/** 
+ * MODO OSCURO (Rustic-Dark Forest Night)
+ * Encapsulado estrictamente en .ion-palette-dark
+ */
 html.ion-palette-dark {
+  /* Fondos profundos */
+  --ion-background-color: #050a07;
+  --ion-background-color-rgb: 5, 10, 7;
+  
+  --ion-item-background: #0a140f;
+  --ion-text-color: #fdfaf7;
+  --ion-text-color-rgb: 253, 250, 247;
+
+  /* Colores de marca en modo oscuro (más vibrantes) */
   --ion-color-primary: #95D5B2;
   --ion-color-primary-rgb: 149, 213, 178;
-  --ion-color-primary-contrast: #08120D;
-  --ion-color-primary-contrast-rgb: 8, 18, 13;
-  --ion-color-primary-shade: #83bc9d;
-  --ion-color-primary-tint: #a0d9ba;
+  --ion-color-primary-contrast: #050a07;
 
-  --ion-color-secondary: #BC8A5F;
-  --ion-color-secondary-rgb: 188, 138, 95;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #a57a54;
-  --ion-color-secondary-tint: #c3966f;
-
-  --ion-color-tertiary: #d4a373;
-  --ion-color-tertiary-rgb: 212, 163, 115;
-  --ion-color-tertiary-contrast: #08120D;
-  --ion-color-tertiary-contrast-rgb: 8, 18, 13;
-  --ion-color-tertiary-shade: #ba8f65;
-  --ion-color-tertiary-tint: #d8ac81;
-
-  --ion-color-success: #52b788;
-  --ion-color-success-rgb: 82, 183, 136;
-  --ion-color-success-contrast: #000000;
-
-  --ion-color-warning: #dda15e;
-  --ion-color-warning-rgb: 221, 161, 94;
-  --ion-color-warning-contrast: #000000;
-
-  --ion-color-danger: #e76f6f;
-  --ion-color-danger-rgb: 231, 111, 111;
-  --ion-color-danger-contrast: #000000;
-
-  --ion-color-medium: #8c9a92;
-  --ion-color-medium-rgb: 140, 154, 146;
-  --ion-color-medium-contrast: #000000;
-
-  --ion-color-light: #1a2e1f;
-  --ion-color-light-rgb: 26, 46, 31;
-  --ion-color-light-contrast: #e0e0e0;
-
-  --ion-background-color: #08120D;
-  --ion-background-color-rgb: 8, 18, 13;
-
-  --ion-text-color: #e0e0e0;
-  --ion-text-color-rgb: 224, 224, 224;
-
-  --ion-item-background: #0D1C14;
-  --ion-item-background-rgb: 13, 28, 20;
-  --ion-card-background: #0D1C14;
-  --ion-card-background-rgb: 13, 28, 20;
-
-  --ion-toolbar-background: #0A1610;
-  --ion-toolbar-color: #e0e0e0;
-  --ion-tab-bar-background: #0A1610;
-  --ion-tab-bar-color: #8c9a92;
-  --ion-tab-bar-color-selected: #95D5B2;
-
-  /* Stepped Colors — Ionic usa estos para matices intermedios en su Shadow DOM */
-  --ion-color-step-50: #111e16;
-  --ion-color-step-100: #1a2b1f;
-  --ion-color-step-150: #233828;
-  --ion-color-step-200: #2c4531;
-  --ion-color-step-250: #35523a;
-  --ion-color-step-300: #3e5f43;
-  --ion-color-step-350: #476c4c;
-  --ion-color-step-400: #507955;
-  --ion-color-step-450: #59865e;
-  --ion-color-step-500: #629367;
-  --ion-color-step-550: #6b9f70;
-  --ion-color-step-600: #7aaa7e;
-  --ion-color-step-650: #89b58c;
-  --ion-color-step-700: #98c09a;
-  --ion-color-step-750: #a7cba8;
-  --ion-color-step-800: #b6d6b6;
-  --ion-color-step-850: #c5e1c4;
-  --ion-color-step-900: #d4ecd2;
-  --ion-color-step-950: #e3f7e0;
-
-  /* Override de componentes específicos */
+  /* Overrides para MODO OSCURO */
   ion-card {
-    --background: #0D1C14;
-    border: 1px solid rgba(149, 213, 178, 0.08) !important;
+    --background: #0a140f;
+    --ion-card-background: #0a140f;
+    color: #fdfaf7 !important;
+    border: 1px solid rgba(188, 138, 95, 0.3) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
   }
 
-  ion-item {
-    --background: #0D1C14;
-    --color: #e0e0e0;
-    --border-color: rgba(149, 213, 178, 0.06);
+  ion-label, h1, h2, h3, h4, h5, h6, p, span, strong {
+    color: #fdfaf7 !important;
   }
 
-  ion-list { --ion-item-background: #0D1C14; }
-  ion-content { --background: #08120D; }
-  ion-toolbar { --background: #0A1610; --color: #e0e0e0; }
-  ion-searchbar { --background: #142518; --color: #e0e0e0; --placeholder-color: #8c9a92; }
-  ion-segment { --background: rgba(255,255,255,0.05); }
-  ion-segment-button { --color: #8c9a92; --color-checked: #95D5B2; }
-
-  .uniform-card, .vac-main-card, .vac-metric-card, .vac-base-card, .vac-card {
-    background: #0D1C14 !important;
-    border-color: rgba(149, 213, 178, 0.08) !important;
-    color: #e0e0e0;
+  /* Ajuste de componentes en modo noche */
+  ion-item, ion-searchbar, ion-select, ion-toolbar {
+    --background: #0a140f;
+    --color: #fdfaf7;
   }
 
-  .vac-kpi-card-square {
-    background: #0D1C14 !important;
-    border-color: rgba(149, 213, 178, 0.08) !important;
-    .vac-kpi-data-minimal .value { color: #95D5B2 !important; }
-    .vac-kpi-data-minimal .label { color: #8c9a92 !important; }
+  ion-content {
+    --background: #050a07;
   }
 
-  .vac-card-header { --background: transparent; }
-  .vac-empty-state h2 { color: #95D5B2 !important; }
-  .vac-section-title { color: #95D5B2 !important; }
-  .vac-page-title { color: #e0e0e0 !important; }
-  .color-dark { color: #c8c8c8 !important; }
-  .color-muted { color: #8c9a92 !important; }
-
-  /* Sidebar */
-  .vac-sidebar {
-    --ion-background-color: #0A1610;
-    ion-content { --background: #0A1610; }
+  .text-muted, .color-muted {
+    color: #a0a6a3 !important;
   }
 
-  ::-webkit-scrollbar-track { background: #08120D; }
-  ::-webkit-scrollbar-thumb { background: #2d6a4f; }
-  ::-webkit-scrollbar-thumb:hover { background: #40916c; }
-}
-
-/* Auto-detect system dark mode — solo si el usuario no ha forzado light */
-@media (prefers-color-scheme: dark) {
-  body:not(.light-theme) {
-    --ion-background-color: #08120D;
-    --ion-background-color-rgb: 8, 18, 13;
-    --ion-text-color: #e0e0e0;
-    --ion-text-color-rgb: 224, 224, 224;
-    --ion-item-background: #0D1C14;
-    --ion-card-background: #0D1C14;
-    --ion-card-background-rgb: 13, 28, 20;
-    --ion-toolbar-background: #0A1610;
-    --ion-toolbar-color: #e0e0e0;
+  .uniform-card, .vac-main-card, .vac-metric-card, .vac-base-card {
+    background: #0a140f !important;
+    border-color: rgba(188, 138, 95, 0.3) !important;
   }
 }
 
+/* Configuraciones Globales de Estilo (Independientes del Tema) */
 body {
   --ion-font-family: 'Outfit', sans-serif;
   font-family: var(--ion-font-family);
-  background-color: var(--ion-background-color);
 }
 
-/* Base Component Standardization (Rustic-Luxe v2) */
 ion-card {
   --border-radius: 24px !important;
   border-radius: 24px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
   margin-inline: 16px;
   margin-block: 12px;
-  border: 1px solid rgba(188, 138, 95, 0.15); /* Subtle Tierra border */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
-    background: linear-gradient(135deg, var(--ion-card-background) 0%, var(--ion-color-step-50) 100%);
   }
 }
 
 ion-button {
   --border-radius: 12px;
-  --box-shadow: none;
   font-weight: 700;
   text-transform: none;
-  letter-spacing: 0;
 }
 
 ion-badge {
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --padding-top: 6px;
-  --padding-bottom: 6px;
-  border-radius: 12px; /* Standardized radius */
+  border-radius: 12px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  padding: 6px 12px;
 }
 
-
-
-.text-forest { color: #2b5329; }
-.text-earth { color: #c28e5c; }
-
-/* Scrollbars rústicos sincronizados ($secondary-color) */
+/* Scrollbars dinámicos */
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f8f9fa; }
-::-webkit-scrollbar-thumb { background: #d4a373; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #ba8f65; }
-
+::-webkit-scrollbar-track { background: var(--ion-background-color); }
+::-webkit-scrollbar-thumb { 
+  background: var(--ion-color-tertiary); 
+  border-radius: 10px; 
+}
 

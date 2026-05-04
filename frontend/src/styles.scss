@@ -1,2 +1,189 @@
 @use 'theme/variables.scss';
 @use 'styles/main';
+
+/* Scanner Visibility Fix */
+#reader, .scanner-container, video {
+  width: 100% !important;
+  min-height: 300px;
+  background-color: #000; /* Fondo negro mientras carga la cámara */
+  border-radius: 20px;
+  overflow: hidden;
+  display: block !important;
+  z-index: 999;
+}
+
+/* Si usas un escáner que requiere transparencia (Capacitor Native) */
+.scanner-active {
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  visibility: hidden; /* Oculta la UI para ver la cámara detrás */
+}
+
+/* ----------------------------------------------------
+   ENCAPSULACIÓN FORZADA DE TIPOGRAFÍA (UI/UX)
+   ---------------------------------------------------- */
+
+:root {
+  /* --- MODO CLARO (Sol Directo / Legibilidad Máxima) --- */
+  --vac-bg-main: #FDFBF7;
+  --vac-bg-card: #FFFFFF;
+  --vac-text-primary: #1A211E; /* Negro bosque profundo */
+  --vac-text-secondary: #4B5563; /* Gris oscuro para subtítulos */
+  --vac-primary: #1B4332;
+  --vac-accent: #BC8A5F;
+  
+  /* Variables de Ionic para Modo Claro */
+  --ion-background-color: var(--vac-bg-main);
+  --ion-text-color: var(--vac-text-primary);
+  --ion-item-background: var(--vac-bg-card);
+}
+
+html.ion-palette-dark {
+  /* --- MODO NOCHE (Bajo Brillo / Premium) --- */
+  --vac-bg-main: #050A07; /* Fondo casi negro */
+  --vac-bg-card: #0A140F; /* Tarjetas ligeramente más claras */
+  --vac-text-primary: #FDFAF7; /* Blanco hueso (máximo contraste) */
+  --vac-text-secondary: #A0A6A3; /* Gris verdoso claro */
+  
+  /* Variables de Ionic para Modo Noche */
+  --ion-background-color: var(--vac-bg-main);
+  --ion-text-color: var(--vac-text-primary);
+  --ion-item-background: var(--vac-bg-card);
+}
+
+/* Tipografía global y suavizado de fuentes */
+* {
+  font-family: 'Outfit', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Forzar contraste en contenido principal (excluyendo la sidebar que tiene su propio esquema) */
+ion-router-outlet h1, ion-router-outlet h2, ion-router-outlet h3,
+ion-router-outlet h4, ion-router-outlet h5, ion-router-outlet h6,
+ion-router-outlet ion-title {
+  color: var(--vac-text-primary) !important;
+  font-weight: 700 !important;
+}
+
+ion-router-outlet p, ion-router-outlet ion-note {
+  color: var(--vac-text-primary);
+}
+
+ion-router-outlet .text-muted {
+  color: var(--vac-text-secondary) !important;
+}
+
+/* ----------------------------------------------------
+   QR DINÁMICO - Estilos Premium para Alert y Modal
+   ---------------------------------------------------- */
+
+/* Alert de entrada de IP - Compatible con Shadow DOM de Ionic */
+ion-alert {
+  --background: #FDFBF7;
+  --max-width: 380px;
+  --backdrop-opacity: 0.45;
+}
+
+ion-alert::part(header) {
+  padding: 24px 24px 8px;
+  background: linear-gradient(135deg, #1B4332 0%, #0A140F 100%);
+}
+
+ion-alert::part(head) {
+  padding: 24px 24px 8px;
+  background: linear-gradient(135deg, #1B4332 0%, #0A140F 100%);
+}
+
+ion-alert::part(message) {
+  color: #4B5563;
+  font-size: 0.9rem;
+  padding: 16px 24px;
+  line-height: 1.5;
+}
+
+ion-alert .alert-head {
+  background: linear-gradient(135deg, #1B4332 0%, #0A140F 100%) !important;
+  padding: 24px 24px 12px !important;
+}
+
+ion-alert .alert-title {
+  color: #FDFAF7 !important;
+  font-weight: 800 !important;
+  font-size: 1.15rem !important;
+}
+
+ion-alert .alert-message {
+  color: #4B5563 !important;
+  font-size: 0.9rem !important;
+  padding: 16px 24px !important;
+  line-height: 1.5 !important;
+  background: #FDFBF7 !important;
+}
+
+ion-alert .alert-input-wrapper {
+  background: #FDFBF7 !important;
+}
+
+ion-alert .alert-input {
+  border: 2px solid rgba(27, 67, 50, 0.2) !important;
+  border-radius: 12px !important;
+  padding: 14px 16px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #1A211E !important;
+  background: #F5F0EA !important;
+  margin: 8px 24px !important;
+}
+
+ion-alert .alert-button-group {
+  padding: 8px 16px 16px !important;
+  background: #FDFBF7 !important;
+}
+
+ion-alert .alert-button {
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  min-height: 44px !important;
+}
+
+ion-alert .alert-button:last-child {
+  background: linear-gradient(135deg, #1B4332, #2D6A4F) !important;
+  color: #FDFAF7 !important;
+}
+
+ion-alert .alert-wrapper {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  background: #FDFBF7 !important;
+}
+
+/* Modal del QR generado */
+ion-modal.vac-modal {
+  --border-radius: 24px;
+  --box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  
+  ion-toolbar {
+    --background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);
+    --color: #FDFAF7;
+    --border-width: 0;
+    
+    ion-title {
+      color: #FDFAF7 !important;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+  }
+  
+  ion-content {
+    --background: var(--vac-bg-card);
+    
+    h2 {
+      color: #1B4332 !important;
+    }
+    
+    p {
+      color: #582f0e !important;
+    }
+  }
+}

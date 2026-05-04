@@ -18,7 +18,8 @@ import {
   pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, 
   maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline,
   createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline,
-  layersOutline, trendingUpOutline, filterOutline, searchOutline, documentTextOutline
+  layersOutline, trendingUpOutline, filterOutline, searchOutline, documentTextOutline,
+  qrCodeOutline, scanOutline
 } from 'ionicons/icons';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
@@ -144,7 +145,7 @@ export class ManejoComponent {
   bovinoForm: FormGroup;
 
   constructor() {
-    addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline });
+    addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline, 'qr-code-outline': qrCodeOutline, 'scan-outline': scanOutline });
     this.bovinoForm = this.fb.group({
       nombre: ['', Validators.required],
       crotal: ['', Validators.required],
@@ -194,6 +195,51 @@ export class ManejoComponent {
     if (id) {
       this.router.navigate(['/animal-detail', id]);
     }
+  }
+
+  // Estado del escáner
+  isScanning = signal(false);
+
+  /**
+   * Simulación de escáner QR para identificación de animales.
+   */
+  async openScanner() {
+    this.presentToast('Iniciando cámara del escáner...', 'primary');
+    console.log('Iniciando escáner...');
+    this.isScanning.set(true);
+    
+    // Si usas html5-qrcode, asegúrate de que el método start() 
+    // se llame después de un pequeño setTimeout de 200ms
+    setTimeout(() => {
+      console.log('Cámara montada. Esperando lectura...');
+    }, 200);
+
+    // Simulación de detección tras 2 segundos
+    setTimeout(async () => {
+      this.isScanning.set(false);
+      const list = this.bovinos();
+      if (list.length > 0) {
+        // En una app real, esto vendría del resultado del escaneo del crotal
+        const randomAnimal = list[Math.floor(Math.random() * list.length)];
+        
+        const alert = await this.alertCtrl.create({
+          header: 'QR Detectado',
+          subHeader: randomAnimal.crotal,
+          message: `Se ha identificado a: ${randomAnimal.nombre}. ¿Deseas ver su ficha completa?`,
+          mode: 'ios',
+          buttons: [
+            { text: 'Cancelar', role: 'cancel' },
+            { 
+              text: 'Ver Ficha', 
+              handler: () => this.goToDetail(randomAnimal.id)
+            }
+          ]
+        });
+        await alert.present();
+      } else {
+        this.presentToast('No se encontraron animales para identificar', 'warning');
+      }
+    }, 2000);
   }
 
   // --- LÓGICA DE FILTROS ---

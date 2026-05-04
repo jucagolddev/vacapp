@@ -4,14 +4,15 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   IonSplitPane, IonMenu, IonContent, IonList, 
   IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-  IonHeader, IonToolbar, IonIcon, IonButton
+  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   pieChartOutline, pawOutline, layersOutline, heartHalfOutline, 
   medkitOutline, scaleOutline, walletOutline, logOutOutline, chevronBackOutline, chevronForwardOutline, leafOutline,
-  sunnyOutline, moonOutline
+  sunnyOutline, moonOutline, qrCodeOutline
 } from 'ionicons/icons';
+import { AlertController } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../services/supabase.service';
 
 /**
@@ -24,7 +25,7 @@ import { SupabaseService } from '../../services/supabase.service';
     CommonModule, RouterLink, RouterLinkActive,
     IonSplitPane, IonMenu, IonContent, IonList, 
     IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-    IonHeader, IonToolbar, IonIcon, IonButton
+    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
   ],
   template: `
       <ion-split-pane contentId="main-content" [when]="'md'" [class.collapsed]="isCollapsed">
@@ -68,6 +69,14 @@ import { SupabaseService } from '../../services/supabase.service';
                     <ion-label *ngIf="!isCollapsed" class="vac-label">{{ p.title }}</ion-label>
                   </ion-item>
                 </ion-menu-toggle>
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item class="vac-nav-item" lines="none" button (click)="mostrarQr()">
+                    <div slot="start" class="icon-frame" style="color: var(--ion-color-secondary)">
+                      <ion-icon name="qr-code-outline"></ion-icon>
+                    </div>
+                    <ion-label *ngIf="!isCollapsed" class="vac-label" style="color: var(--ion-color-secondary)">Mostrar QR</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
                 
                 <div class="nav-separator"></div>
 
@@ -102,13 +111,42 @@ import { SupabaseService } from '../../services/supabase.service';
         </div>
         
       </ion-split-pane>
+
+      <!-- Modal para mostrar el QR con la URL correcta -->
+      <ion-modal [isOpen]="isQrModalOpen" (didDismiss)="isQrModalOpen = false" cssClass="vac-modal" style="--height: 480px; --width: 350px; --border-radius: 20px;">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar color="primary">
+              <ion-title>Acceso en Vivo</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="isQrModalOpen = false">
+                  <ion-icon name="close-outline"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding ion-text-center">
+            <h2 style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #1b4332; margin-bottom: 5px;">Escanea este QR</h2>
+            <p style="font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: #582f0e; margin-bottom: 20px; word-break: break-all;">{{ qrUrlApp }}</p>
+            <div style="background: white; padding: 15px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+              <img [src]="qrImageUrl" style="width: 250px; height: 250px;" alt="QR Code">
+            </div>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
   `
 })
 export class MainLayoutComponent {
   private supabase = inject(SupabaseService);
   private router = inject(Router);
+  private alertCtrl = inject(AlertController);
   public isCollapsed = false;
   public profile = { email: 'Cargando...' }; // Podría leerse del session
+
+  // Propiedades para el QR dinámico
+  public isQrModalOpen = false;
+  public qrUrlApp = '';
+  public qrImageUrl = '';
 
   public appPages = [
     { title: 'Cuadro de Mando', url: '/dashboard', icon: 'pie-chart-outline' },
@@ -123,7 +161,7 @@ export class MainLayoutComponent {
   public isDarkMode = false;
 
   constructor() {
-    addIcons({ pieChartOutline, pawOutline, layersOutline, heartHalfOutline, medkitOutline, scaleOutline, walletOutline, logOutOutline, chevronBackOutline, chevronForwardOutline, leafOutline, sunnyOutline, moonOutline });
+    addIcons({ pieChartOutline, pawOutline, layersOutline, heartHalfOutline, medkitOutline, scaleOutline, walletOutline, logOutOutline, chevronBackOutline, chevronForwardOutline, leafOutline, sunnyOutline, moonOutline, qrCodeOutline });
     
     // Iniciar Tema desde LocalStorage
     const saved = localStorage.getItem('vacapp-dark-mode');
@@ -157,5 +195,49 @@ export class MainLayoutComponent {
   async logout() {
     await this.supabase.signOut();
     this.router.navigate(['/auth/login'], { replaceUrl: true });
+  }
+
+  async mostrarQr() {
+    let urlApp = window.location.origin;
+
+    // Si está corriendo en localhost, el QR no le servirá al público.
+    if (window.location.hostname === 'localhost') {
+      const alertIp = await this.alertCtrl.create({
+        header: 'Configurar QR Dinámico',
+        message: 'Estás en localhost. Para que el público se conecte, introduce la IP local de tu ordenador en este WiFi (ej: 192.168.1.50):',
+        inputs: [
+          {
+            name: 'ip',
+            type: 'text',
+            placeholder: '192.168.X.X'
+          }
+        ],
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          { 
+            text: 'Generar QR', 
+            handler: async (data) => {
+              if (data.ip) {
+                // Limpiar input por si el usuario pone http:// o puerto
+                let cleanIp = data.ip.replace(/^https?:\/\//, '').split(':')[0];
+                const finalUrl = `http://${cleanIp}:${window.location.port || '4200'}`;
+                this.presentarAlertaQR(finalUrl);
+              }
+            }
+          }
+        ]
+      });
+      await alertIp.present();
+    } else {
+      // Si ya entró usando su IP (ej: http://192.168.x.x:4200)
+      this.presentarAlertaQR(urlApp);
+    }
+  }
+
+  private presentarAlertaQR(url: string) {
+    // Generar el QR y abrir el modal
+    this.qrUrlApp = url;
+    this.qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+    this.isQrModalOpen = true;
   }
 }

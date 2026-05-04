@@ -24,14 +24,30 @@
   </ion-refresher>
 
   <main class="vac-container animate-fade-in">
+    <!-- Contenedor del Escáner (Fuera de ion-card y overflow hidden) -->
+    <div *ngIf="isScanning()" class="scanner-container animate-fade-in ion-margin-bottom">
+      <div class="vac-card-header mb-2 flex justify-between items-center">
+         <span class="font-bold color-primary">Cámara Activa</span>
+         <ion-button fill="clear" color="danger" (click)="isScanning.set(false)" class="ion-no-margin">
+            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+         </ion-button>
+      </div>
+      <div id="reader"></div>
+    </div>
+
     <!-- Search Bar -->
-    <ion-searchbar
-      mode="ios"
-      animated="true"
-      placeholder="Buscar animal..."
-      (ionInput)="handleSearch($event)"
-      class="vac-filter-bar vac-transparent-searchbar">
-    </ion-searchbar>
+    <div class="search-with-qr">
+      <ion-searchbar
+        mode="ios"
+        animated="true"
+        placeholder="Buscar animal..."
+        (ionInput)="handleSearch($event)"
+        class="vac-filter-bar vac-transparent-searchbar">
+      </ion-searchbar>
+      <ion-button (click)="openScanner()" fill="clear" class="qr-scan-btn" aria-label="Escanear QR">
+        <ion-icon name="qr-code-outline"></ion-icon>
+      </ion-button>
+    </div>
 
     <!-- GRÁFICO DE PESO -->
     <section class="vac-main-card animate-slide-up mb-8" *ngIf="filteredBovinos().length > 0 && !isLoading()">

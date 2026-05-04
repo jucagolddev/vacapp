@@ -7,7 +7,7 @@ import {
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { addIcons } from 'ionicons';
-import { leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
+import { leafOutline, logInOutline, personAddOutline, scanOutline, qrCodeOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-login',
@@ -70,6 +70,21 @@ import { leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
                 <ion-icon name="person-add-outline" slot="start"></ion-icon>
                 Crear nueva cuenta
               </ion-button>
+            </div>
+
+            <!-- Sección de Acceso Rápido con QR -->
+            <div class="qr-login-section animate-fade-in">
+              <div class="divider">
+                <span>O accede con</span>
+              </div>
+              <div class="qr-container" (click)="quickLogin()" [class.scanning]="loading()">
+                <img src="assets/imagenes/qr-code.png" alt="QR Login" class="qr-image">
+                <div class="qr-overlay">
+                  <ion-icon name="scan-outline"></ion-icon>
+                  <span>Escanear Acceso</span>
+                </div>
+              </div>
+              <p class="qr-note">Usa tu código de acceso rápido</p>
             </div>
 
           </div>
@@ -194,6 +209,79 @@ import { leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
       font-weight: 600;
       opacity: 0.9;
     }
+    
+    /* QR Section Styles */
+    .qr-login-section {
+      margin-top: 25px;
+      padding-top: 15px;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 20px;
+      opacity: 0.6;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+    .divider:not(:empty)::before { margin-right: .5em; }
+    .divider:not(:empty)::after { margin-left: .5em; }
+    .divider span { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+    .qr-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 10px;
+      background: white;
+      padding: 10px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .qr-container:hover {
+      transform: scale(1.05) translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+    .qr-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .qr-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(27, 67, 50, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      color: white;
+    }
+    .qr-container:hover .qr-overlay {
+      opacity: 1;
+    }
+    .qr-overlay ion-icon { font-size: 32px; margin-bottom: 5px; }
+    .qr-overlay span { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+
+    .qr-note {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin: 0;
+    }
+
+    .scanning {
+      pointer-events: none;
+      filter: grayscale(1);
+      opacity: 0.5;
+    }
   `]
 })
 export class LoginComponent {
@@ -206,7 +294,7 @@ export class LoginComponent {
   loading = signal(false);
 
   constructor() {
-    addIcons({ leafOutline, logInOutline, personAddOutline });
+    addIcons({ leafOutline, logInOutline, personAddOutline, scanOutline, qrCodeOutline });
   }
 
   isValid() {
@@ -245,6 +333,28 @@ export class LoginComponent {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  /**
+   * Simulación de acceso rápido mediante QR.
+   * Utiliza las credenciales maestras del sistema mock.
+   */
+  async quickLogin() {
+    this.loading.set(true);
+    this.showToast('Escaneando código de acceso...', 'success');
+    
+    // Pequeño delay para simular procesamiento
+    setTimeout(async () => {
+      try {
+        const { error } = await this.supabase.signIn('jucagolddev@gmail.com', 'Juca2452');
+        if (error) throw error;
+        this.router.navigate(['/']);
+      } catch (e: any) {
+        this.showToast('Código inválido o caducado.', 'danger');
+      } finally {
+        this.loading.set(false);
+      }
+    }, 1500);
   }
 
   async showToast(message: string, color: 'danger' | 'success') {
