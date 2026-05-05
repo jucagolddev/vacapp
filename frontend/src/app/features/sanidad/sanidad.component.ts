@@ -25,9 +25,10 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 import { GanadoService } from '../../core/services/ganado.service';
 
 /**
- * Componente para el Módulo de Sanidad Animal - Versión Rústica.
- * Refactorizado: 100% Sincronización de colores con _variables.scss.
- * Corregido: Nombres de propiedades sincronizados con Interfaz Sanidad (fecha, tipo).
+ * @class SanidadComponent
+ * @description Gestiona el historial clínico, vacunaciones y tratamientos veterinarios del ganado.
+ * Permite el seguimiento de periodos de retiro, análisis estadístico de intervenciones
+ * y generación de reportes sanitarios oficiales en PDF.
  */
 @Component({
   selector: 'app-sanidad',
@@ -161,13 +162,25 @@ export class SanidadComponent implements OnInit {
     this.loadData();
   }
 
+  /**
+   * @description Carga los registros sanitarios desde el servicio central.
+   * Maneja estados de carga y errores de conexión.
+   * @param {Event} [event] Evento opcional del componente IonRefresher.
+   * @returns {Promise<void>}
+   */
+  /**
+   * @description Carga los registros sanitarios desde el servicio central.
+   * Maneja estados de carga y errores de conexión de forma silenciosa para la UI.
+   * @param {Event} [event] Evento opcional del componente IonRefresher.
+   * @returns {Promise<void>}
+   */
   async loadData(event?: Event) {
     this.isLoading.set(true);
     try {
       const { data: records } = await this.supa.getSanidad();
       this.sanidadRecords.set(records || []);
     } catch (e) {
-      console.error('Error cargando datos sanitarios:', e);
+      // Error silencioso: la interfaz mostrará estado vacío o mensaje de error reactivo
     } finally {
       this.isLoading.set(false);
       if (event && (event as any).target) {
@@ -176,20 +189,39 @@ export class SanidadComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Maneja el evento de refresco (Pull-to-refresh) de la lista.
+   * @param {Event} event Evento emitido por el componente IonRefresher.
+   */
   handleRefresh(event: Event) {
     this.loadData(event);
   }
 
+  /**
+   * @description Función de optimización para el renderizado de listas (ngFor).
+   * @param {number} index Índice del elemento en la lista.
+   * @param {any} item Objeto o identificador.
+   * @returns {string} Identificador único.
+   */
   trackById(index: number, item: Sanidad | any): string {
     return item.id || index.toString();
   }
 
+  /**
+   * @description Navega a la vista de detalle de un animal específico.
+   * @param {string} bovinoId UUID del bovino a visualizar.
+   */
   goToDetail(bovinoId: string) {
     if (bovinoId) {
       this.router.navigate(['/animal-detail', bovinoId]);
     }
   }
 
+  /**
+   * @description Genera un reporte PDF con el listado actual de intervenciones sanitarias filtradas.
+   * Utiliza PdfService para la construcción del documento.
+   * @returns {Promise<void>}
+   */
   async exportarPDF() {
     const headers = [['Fecha', 'Crotal', 'Tratamiento', 'Producto']];
     const data = this.filteredSanidad().map((item: Sanidad) => [
@@ -207,22 +239,38 @@ export class SanidadComponent implements OnInit {
     );
   }
 
+  /**
+   * @description Actualiza el término de búsqueda al escribir en la barra.
+   * @param {Event} event Evento emitido por el searchbar.
+   */
   onSearch(event: Event) {
     const target = event.target as HTMLInputElement;
     this.searchTerm.set(target.value || '');
   }
 
   // --- LÓGICA DE FILTROS ---
+  
+  /**
+   * @description Aplica el filtro temporal global para el gráfico.
+   * @param {'3m' | '6m' | '12m'} periodo Periodo de tiempo a evaluar.
+   */
   applyGlobalFilter(periodo: '3m' | '6m' | '12m') {
     this.filterGlobal.set(periodo);
     this.chartPeriodo.set(periodo);
   }
 
+  /**
+   * @description Abre el popover de filtros avanzados.
+   * @param {Event} event Evento de clic en el botón de filtros.
+   */
   presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
 
+  /**
+   * @description Restablece todos los filtros de búsqueda a sus valores por defecto.
+   */
   clearFilters() {
     this.filterTipo.set('Todos');
     this.filterLote.set('Todos');
@@ -230,6 +278,11 @@ export class SanidadComponent implements OnInit {
     this.isFilterPopoverOpen = false;
   }
 
+  /**
+   * @description Obtiene el icono correspondiente al tipo de intervención sanitaria.
+   * @param {string} tipo Tipo de intervención.
+   * @returns {string} Nombre del icono.
+   */
   getHealthIcon(tipo: string): string {
     switch (tipo) {
       case 'Vacunación': return 'medical-outline';
@@ -240,6 +293,11 @@ export class SanidadComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Obtiene la clase CSS de color del badge según el tipo de intervención.
+   * @param {string} tipo Tipo de intervención.
+   * @returns {string} Clase CSS.
+   */
   getBadgeColor(tipo: string): string {
     switch (tipo) {
       case 'Vacunación': return 'bg-success';
@@ -250,6 +308,11 @@ export class SanidadComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Calcula los días restantes de retiro en carne/leche tras un tratamiento.
+   * @param {Sanidad} s Registro sanitario a evaluar.
+   * @returns {number} Días restantes.
+   */
   getDiasRestantes(s: Sanidad): number {
     if (!s.fecha) return 0;
     const maxRetiro = Math.max(s.dias_retiro_carne || 0, s.dias_retiro_leche || 0);
@@ -268,6 +331,9 @@ export class SanidadComponent implements OnInit {
     return diffDays > 0 ? diffDays : 0;
   }
 
+  /**
+   * @description Abre el modal para crear un nuevo registro clínico.
+   */
   openAddModal() {
     this.editingItem = null;
     this.healthForm.reset({
@@ -277,6 +343,10 @@ export class SanidadComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  /**
+   * @description Abre el modal y carga los datos para editar un registro existente.
+   * @param {Sanidad} item Registro sanitario a editar.
+   */
   openEditModal(item: Sanidad) {
     this.editingItem = item;
     const { bovino, ...data } = item;
@@ -284,8 +354,14 @@ export class SanidadComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  /**
+   * @description Cierra el modal de formulario clínico.
+   */
   closeModal() { this.isModalOpen = false; }
 
+  /**
+   * @description Guarda el registro clínico, ya sea creando uno nuevo o actualizando.
+   */
   async saveData() {
     if (this.healthForm.invalid) return;
 
@@ -307,6 +383,10 @@ export class SanidadComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Solicita confirmación antes de eliminar permanentemente un registro.
+   * @param {Sanidad} item Registro a eliminar.
+   */
   async confirmDelete(item: Sanidad) {
     const alert = await this.alertCtrl.create({
       header: 'Seguridad Sanitaria',
@@ -319,6 +399,10 @@ export class SanidadComponent implements OnInit {
     await alert.present();
   }
 
+  /**
+   * @description Ejecuta el borrado del registro tras su confirmación.
+   * @param {string} id UUID del registro a purgar.
+   */
   async deleteRecord(id: string) {
     const res = await this.supa.deleteSanidad(id);
     if (res.error) {

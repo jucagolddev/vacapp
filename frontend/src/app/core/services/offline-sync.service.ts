@@ -225,13 +225,17 @@ export class OfflineSyncService {
       const { data, error } = await this.supa.client.from('bovinos').select('*');
       if (data && !error) {
         await localforage.setItem('vacapp_bovinos_offline_cache', data);
-        console.log('[OfflineSync] Caché de catálogo primario Bovinos actualizado en IndexedDB.');
       }
     } catch(e: unknown) {
       console.error('[OfflineSync] Error al cachear background dataset', e);
     }
   }
 
+  /**
+   * @description Limpia por completo la cola de sincronización pendiente.
+   * Utilizar con precaución, ya que elimina cambios no guardados en el servidor.
+   * @returns {Promise<void>}
+   */
   async clearQueue() {
     await this.saveQueue([]);
   }

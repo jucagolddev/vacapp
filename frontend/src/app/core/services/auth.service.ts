@@ -4,6 +4,12 @@ import { SupabaseService } from './supabase.service';
 import { UserProfile } from '../models/vacapp.models';
 import { User } from '@supabase/supabase-js';
 
+/**
+ * @class AuthService
+ * @description Guardián de identidad y control de acceso.
+ * Gestiona el ciclo de vida de la sesión del usuario, la recuperación de perfiles
+ * y proporciona un modo de emulación (Mock) para entornos de demostración sin backend.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -69,12 +75,20 @@ export class AuthService {
     }
   }
 
-  // Métodos expuestos para UI de Login
+  /**
+   * @description Inicia el proceso de autenticación mediante Magic Link (OTP).
+   * @param {string} email Correo electrónico del usuario.
+   * @returns {Promise<any>}
+   */
   async signInWithOtp(email: string) {
     if (!this.supabase.client) return { error: { message: 'Mock mode no soporta OTP real' } };
     return await this.supabase.client.auth.signInWithOtp({ email });
   }
 
+  /**
+   * @description Finaliza la sesión activa y redirige al usuario al portal de acceso.
+   * @returns {Promise<void>}
+   */
   async signOut() {
     if (this.supabase.client) {
       await this.supabase.client.auth.signOut();

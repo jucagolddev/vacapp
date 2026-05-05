@@ -9,8 +9,13 @@ ion-split-pane {
 }
 
 ion-split-pane.collapsed {
-  --side-width: 80px;
-  --side-min-width: 80px;
+  --side-width: 0px !important;
+  --side-min-width: 0px !important;
+  --side-max-width: 0px !important;
+  
+  ion-menu {
+    display: none !important;
+  }
 }
 
 .vac-sidebar {

@@ -4,6 +4,12 @@ import { FincaService } from './finca.service';
 import { OfflineSyncService } from './offline-sync.service';
 import { Finanzas } from '../models/vacapp.models';
 
+/**
+ * @class FinanzasService
+ * @description Servicio de dominio encargado de la gestión contable y financiera.
+ * Centraliza el registro de flujos de caja, orquesta la persistencia (Supabase/Mock)
+ * y proporciona motores de agregación para análisis estadístico de rentabilidad.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -14,7 +20,9 @@ export class FinanzasService {
   private finanzasSignal = signal<Finanzas[]>([]);
   private loadingSignal = signal<boolean>(false);
 
+  /** Listado reactivo de todos los registros financieros filtrados por finca. */
   readonly records = computed(() => this.finanzasSignal());
+  /** Indica si hay una operación de carga en curso. */
   readonly isLoading = computed(() => this.loadingSignal());
 
   constructor() {
@@ -28,6 +36,11 @@ export class FinanzasService {
     });
   }
 
+  /**
+   * @description Carga la colección completa de movimientos financieros.
+   * Si la colección está vacía, activa el motor de generación de datos mock para fines demostrativos.
+   * @returns {Promise<void>}
+   */
   async loadFinanzas() {
     this.loadingSignal.set(true);
     try {
@@ -58,6 +71,11 @@ export class FinanzasService {
 
   // Operaciones CRUD Sincrónicas con Reactividad Inmediata
 
+  /**
+   * @description Registra un nuevo movimiento financiero asociado a la finca activa.
+   * @param {Partial<Finanzas>} payload Datos del movimiento (tipo, categoría, monto, fecha).
+   * @returns {Promise<{data: Finanzas | null, error: any}>}
+   */
   async createFinanza(payload: Partial<Finanzas>) {
     payload.finca_id = this.fincaService.selectedFincaId() || undefined;
     
@@ -77,6 +95,12 @@ export class FinanzasService {
     return { data, error };
   }
 
+  /**
+   * @description Actualiza un registro contable existente.
+   * @param {string} id Identificador del registro.
+   * @param {Partial<Finanzas>} payload Campos modificados.
+   * @returns {Promise<{data: Finanzas | null, error: any}>}
+   */
   async updateFinanza(id: string, payload: Partial<Finanzas>) {
     let { data, error } = await this.supabase.update('finanzas', id, payload);
     
@@ -95,6 +119,11 @@ export class FinanzasService {
     return { data, error };
   }
 
+  /**
+   * @description Elimina permanentemente un registro financiero.
+   * @param {string} id Identificador único.
+   * @returns {Promise<{data: null, error: any}>}
+   */
   async deleteFinanza(id: string) {
     let { error } = await this.supabase.delete('finanzas', id);
     
@@ -111,6 +140,12 @@ export class FinanzasService {
   }
 
   // Motor para graficar: Agrupar por periodo
+  /**
+   * @description Agrega los flujos de caja agrupándolos por un periodo temporal específico.
+   * Utilizado para alimentar gráficos de barras e indicadores de rendimiento (ROI).
+   * @param {'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total'} periodo Granularidad del agrupamiento.
+   * @returns {Array<{label: string, ingresos: number, gastos: number}>} Datos agregados listos para visualización.
+   */
   getDatosFinancierosPorPeriodo(periodo: 'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total') {
     const records = this.finanzasSignal();
     const map = new Map<string, { ingresos: number, gastos: number }>();

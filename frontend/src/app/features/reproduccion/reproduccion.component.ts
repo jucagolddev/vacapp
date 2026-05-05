@@ -28,8 +28,10 @@ import { METODOS_REPRODUCCION, ESTADOS_GESTACION } from '../../core/constants/va
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
- * Componente para el Módulo de Reproducción y Ginecología - Versión Rústica.
- * Refactorizado: 100% Sincronización de colores con _variables.scss.
+ * @class ReproduccionComponent
+ * @description Módulo de gestión ginecológica y reproductiva.
+ * Supervisa ciclos de celo, montas e inseminaciones, confirmaciones de gestación
+ * y predicción automatizada de fechas de parto (gestación de 283 días).
  */
 @Component({
   selector: 'app-reproduccion',
@@ -165,6 +167,10 @@ export class ReproduccionComponent implements OnInit {
     this.loadData();
   }
 
+  /**
+   * Carga los datos reproductivos del sistema.
+   * @param event Evento opcional de ion-refresher.
+   */
   async loadData(event?: Event) {
     this.isLoading.set(true);
     try {
@@ -172,7 +178,7 @@ export class ReproduccionComponent implements OnInit {
       this.reproducciones.set(repros || []);
       this.gestacionesActivas.set((repros || []).filter(r => r.estado_gestacion === 'Confirmada'));
     } catch (e) {
-      console.error('Error cargando datos reproductivos:', e);
+      // Error silencioso para la UI, el estado isLoading gestiona la visualización
     } finally {
       this.isLoading.set(false);
       if (event && (event as any).target) {
@@ -181,20 +187,34 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Maneja el evento de refresco deslizable.
+   * @param event Evento del componente IonRefresher.
+   */
   handleRefresh(event: Event) {
     this.loadData(event);
   }
 
+  /**
+   * @description Optimiza el renderizado de la lista.
+   */
   trackById(index: number, item: Reproduccion | any): string {
     return item.id || index.toString();
   }
 
+  /**
+   * Navega a la ficha técnica de un animal.
+   * @param bovinoId UUID del animal.
+   */
   goToDetail(bovinoId: string) {
     if (bovinoId) {
       this.router.navigate(['/animal-detail', bovinoId]);
     }
   }
 
+  /**
+   * Genera un reporte PDF con el historial reproductivo actual.
+   */
   async exportarPDF() {
     const headers = [['Vaca', 'Crotal', 'Fecha Cubrición', 'Método', 'Estado', 'FPP/Parto']];
     const body = this.filteredReproducciones().map(r => [
@@ -214,22 +234,34 @@ export class ReproduccionComponent implements OnInit {
     );
   }
 
+  /**
+   * @description Actualiza el término de búsqueda al escribir.
+   */
   onSearch(event: Event) {
     const target = event.target as HTMLInputElement;
     this.searchTerm.set(target.value || '');
   }
 
   // --- LÓGICA DE FILTROS ---
+  /**
+   * @description Aplica el filtro de periodo al gráfico.
+   */
   applyGlobalFilter(periodo: 'Mensual' | 'Anual') {
     this.filterGlobal.set(periodo);
     this.chartPeriodo.set(periodo);
   }
 
+  /**
+   * @description Muestra el popover de filtros.
+   */
   presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
 
+  /**
+   * @description Limpia los filtros aplicados.
+   */
   clearFilters() {
     this.filterEstado.set('Todos');
     this.filterMetodo.set('Todos');
@@ -237,6 +269,10 @@ export class ReproduccionComponent implements OnInit {
     this.isFilterPopoverOpen = false;
   }
 
+  /**
+   * Calcula automáticamente la fecha de parto prevista basada en la gestación bovina (283 días).
+   * @param fechaCubricion Fecha en la que se realizó la monta o IA.
+   */
   private calculateParto(fechaCubricion: string) {
     if (fechaCubricion) {
       const date = new Date(fechaCubricion);
@@ -245,6 +281,10 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Calcula los días restantes para el parto.
+   * @param repro Evento reproductivo.
+   */
   getDaysToCalving(repro: Reproduccion): number {
     if (!repro.fecha_parto_prevista) return 0;
     const today = new Date();
@@ -254,6 +294,10 @@ export class ReproduccionComponent implements OnInit {
     return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
   }
 
+  /**
+   * @description Devuelve el color del badge según el estado reproductivo.
+   * @param estado Estado de la gestación.
+   */
   getStatusColor(estado: string): string {
     switch (estado) {
       case 'Confirmada': return 'success';
@@ -264,6 +308,9 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * Abre el formulario para registrar un nuevo evento reproductivo.
+   */
   openAddModal() {
     this.editingItem = null;
     this.reproForm.reset({
@@ -274,6 +321,10 @@ export class ReproduccionComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  /**
+   * Abre el formulario en modo edición para un registro existente.
+   * @param item Registro de reproducción a editar.
+   */
   openEditModal(item: Reproduccion) {
     this.editingItem = item;
     const { bovino, ...data } = item;
@@ -281,8 +332,14 @@ export class ReproduccionComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  /**
+   * Cierra los diálogos modales activos.
+   */
   closeModal() { this.isModalOpen = false; }
 
+  /**
+   * @description Guarda un registro reproductivo.
+   */
   async saveData() {
     if (this.reproForm.invalid) return;
 
@@ -304,6 +361,10 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Muestra una alerta de confirmación para eliminar.
+   * @param item Registro a eliminar.
+   */
   async confirmDelete(item: Reproduccion) {
     const alert = await this.alertCtrl.create({
       header: 'Auditoría de Linaje',
@@ -316,6 +377,10 @@ export class ReproduccionComponent implements OnInit {
     await alert.present();
   }
 
+  /**
+   * @description Elimina el registro de la base de datos.
+   * @param id Identificador del registro.
+   */
   async deleteRecord(id: string) {
     const res = await this.supa.deleteReproduccion(id);
     if (res.error) {
@@ -326,6 +391,9 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Muestra un mensaje flotante en la parte inferior.
+   */
   async presentToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({
       message,

@@ -29,8 +29,10 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
- * Componente para el Módulo de Recría y Control de Pesaje - Versión Estándar.
- * Refactorizado: 100% Sincronización de colores y nombres vac-.
+ * @class RecriaComponent
+ * @description Módulo estratégico para el seguimiento del crecimiento y engorde.
+ * Analiza la Ganancia Media Diaria (GMD), visualiza curvas de maduración individual
+ * y genera reportes de rendimiento zootécnico para la toma de decisiones.
  */
 @Component({
   selector: 'app-recria',
@@ -92,7 +94,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <!-- LISTA ESTANDARIZADA -->
            <ion-grid fixed class="ion-no-padding">
              <ion-row>
-                <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos(); trackBy: trackById">
+                <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let b of filteredBovinos(); trackBy: trackById">
                   <article class="uniform-card clickable-card" [ngClass]="getStatusBorderClass(b)" (click)="selectBovino(b)">
                    <div class="vac-card-header-flex">
                       <div class="ion-margin-end">
@@ -176,7 +178,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            
            <ion-grid fixed class="ion-no-padding">
              <ion-row>
-               <ion-col size="12" size-md="6" size-lg="4" *ngFor="let p of pesajesFiltrados; trackBy: trackById">
+               <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let p of pesajesFiltrados; trackBy: trackById">
                  <article class="uniform-card">
                    <div class="vac-card-header-flex">
                      <div class="vac-icon-avatar bg-light">

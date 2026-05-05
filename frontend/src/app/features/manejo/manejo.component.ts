@@ -33,9 +33,9 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
  * @class ManejoComponent
- * @description Componente principal para el Módulo de Manejo (Inventario y Censo Ganadero).
- * Implementa una interfaz "Rustic-Luxe" con capacidades de búsqueda en tiempo real (Signals),
- * filtros avanzados, carga perezosa de imágenes (Skeletons) y soporte de sincronización Offline-First.
+ * @description Gestiona el inventario principal y el censo ganadero de la finca.
+ * Proporciona herramientas de búsqueda avanzada, filtros por estado productivo/lote,
+ * y acceso rápido a la ficha técnica individual de cada animal.
  */
 @Component({
   selector: 'app-manejo',
@@ -138,12 +138,19 @@ export class ManejoComponent {
   };
 
   isModalOpen = false;
+  isScannerOpen = false;
   editingItem: Bovino | null = null;
   currentStep = 1;
   isUploadingFile = false;
 
   bovinoForm: FormGroup;
 
+  /**
+   * @constructor
+   * @description Inicializa el componente de gestión ganadera.
+   * Configura los iconos de sistema y el formulario reactivo de alta/edición.
+   * Establece observadores reactivos para el estado de carga del servicio.
+   */
   constructor() {
     addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline, 'qr-code-outline': qrCodeOutline, 'scan-outline': scanOutline });
     this.bovinoForm = this.fb.group({
@@ -166,6 +173,12 @@ export class ManejoComponent {
     }, { allowSignalWrites: true });
   }
 
+  /**
+   * @description Función de optimización para el renderizado de listas (ngFor).
+   * @param {number} index Índice del elemento en la lista.
+   * @param {any} item Objeto bovino o identificador.
+   * @returns {string} Identificador único para el seguimiento de cambios.
+   */
   trackById(index: number, item: any): string {
     return item?.id || item || index.toString();
   }
@@ -197,49 +210,54 @@ export class ManejoComponent {
     }
   }
 
-  // Estado del escáner
-  isScanning = signal(false);
+  // --- LÓGICA DEL ESCÁNER QR ---
 
   /**
-   * Simulación de escáner QR para identificación de animales.
+   * Abre el modal del escáner e inicializa la cámara tras un breve retardo
+   * para asegurar que el elemento DOM #reader esté disponible.
    */
-  async openScanner() {
-    this.presentToast('Iniciando cámara del escáner...', 'primary');
-    console.log('Iniciando escáner...');
-    this.isScanning.set(true);
-    
-    // Si usas html5-qrcode, asegúrate de que el método start() 
-    // se llame después de un pequeño setTimeout de 200ms
+  async abrirScanner() {
+    this.isScannerOpen = true;
+    // Retardo para asegurar que el modal se ha renderizado y el div #reader existe
     setTimeout(() => {
-      console.log('Cámara montada. Esperando lectura...');
+      this.iniciarCamara();
     }, 200);
+  }
 
-    // Simulación de detección tras 2 segundos
-    setTimeout(async () => {
-      this.isScanning.set(false);
+  /**
+   * Inicializa la librería de escaneo (html5-qrcode).
+   * En un entorno real, aquí se instanciaría el escáner.
+   */
+  private iniciarCamara() {
+    this.presentToast('Cámara inicializada', 'primary');
+    
+    // Simulación de detección exitosa para demostración
+    setTimeout(() => {
+      // Supongamos que detectamos un ID de animal
       const list = this.bovinos();
       if (list.length > 0) {
-        // En una app real, esto vendría del resultado del escaneo del crotal
         const randomAnimal = list[Math.floor(Math.random() * list.length)];
-        
-        const alert = await this.alertCtrl.create({
-          header: 'QR Detectado',
-          subHeader: randomAnimal.crotal,
-          message: `Se ha identificado a: ${randomAnimal.nombre}. ¿Deseas ver su ficha completa?`,
-          mode: 'ios',
-          buttons: [
-            { text: 'Cancelar', role: 'cancel' },
-            { 
-              text: 'Ver Ficha', 
-              handler: () => this.goToDetail(randomAnimal.id)
-            }
-          ]
-        });
-        await alert.present();
-      } else {
-        this.presentToast('No se encontraron animales para identificar', 'warning');
+        this.handleQrSuccess(randomAnimal.id);
       }
-    }, 2000);
+    }, 3000);
+  }
+
+  /**
+   * Detiene la cámara y cierra el modal.
+   */
+  cerrarScanner() {
+    this.isScannerOpen = false;
+    // Aquí se llamaría a qrScanner.stop() si se usara la librería
+  }
+
+  /**
+   * Procesa el resultado del escaneo, cierra el visor y navega al detalle.
+   * @param animalId ID del animal detectado.
+   */
+  private handleQrSuccess(animalId: string) {
+    this.cerrarScanner();
+    this.presentToast('Animal identificado correctamente');
+    this.goToDetail(animalId);
   }
 
   // --- LÓGICA DE FILTROS ---
@@ -338,8 +356,8 @@ export class ManejoComponent {
   }
 
   /**
-   * @description Persiste la ficha del animal (Creación o Actualización).
-   * Tiene conciencia de red (Offline-First): si no hay conexión, delega en `OfflineSyncService`.
+   * @description Persiste los cambios de la ficha del animal (Creación o Edición).
+   * Gestiona automáticamente el modo offline delegando en OfflineSyncService si es necesario.
    */
   async saveData() {
     if (this.bovinoForm.invalid) return;
@@ -403,6 +421,11 @@ export class ManejoComponent {
     await alert.present();
   }
 
+  /**
+   * Muestra un mensaje flotante (Toast) al usuario.
+   * @param message Texto a mostrar.
+   * @param color Tono visual (success, danger, warning, primary).
+   */
   async presentToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({
       message,

@@ -13,8 +13,8 @@
   --ion-color-tertiary-rgb: 212, 163, 115;
 
   /** Fondos Claros (Rustic-Luxe Light) **/
-  --ion-background-color: #f8f9fa;
-  --ion-background-color-rgb: 248, 249, 250;
+  --ion-background-color: #FDFBF7;
+  --ion-background-color-rgb: 253, 251, 247;
 
   --ion-text-color: #1a1a1a;
   --ion-text-color-rgb: 26, 26, 26;
@@ -35,7 +35,11 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
   }
 
-  ion-label, h1, h2, h3, h4, h5, h6, p, span, strong {
+  /* Texto en contenido principal (NO sidebar, que usa blanco sobre verde) */
+  ion-router-outlet ion-label, ion-router-outlet h1, ion-router-outlet h2,
+  ion-router-outlet h3, ion-router-outlet h4, ion-router-outlet h5,
+  ion-router-outlet h6, ion-router-outlet p, ion-router-outlet span,
+  ion-router-outlet strong {
     color: #1a1a1a !important;
   }
 
@@ -71,7 +75,11 @@ html.ion-palette-dark {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
   }
 
-  ion-label, h1, h2, h3, h4, h5, h6, p, span, strong {
+  /* Texto en contenido principal modo noche */
+  ion-router-outlet ion-label, ion-router-outlet h1, ion-router-outlet h2,
+  ion-router-outlet h3, ion-router-outlet h4, ion-router-outlet h5,
+  ion-router-outlet h6, ion-router-outlet p, ion-router-outlet span,
+  ion-router-outlet strong {
     color: #fdfaf7 !important;
   }
 

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 
 /**
- * Servicio centralizado para la generación de reportes PDF.
- * Utiliza Carga Dinámica (Lazy Loading) para evitar bloqueos en el arranque de la aplicación 
- * y resolver conflictos de pre-bundado de Vite.
+ * @class PdfService
+ * @description Motor de generación de reportes documentales.
+ * Implementa carga perezosa de jsPDF y autoTable para optimizar el bundle.
+ * Configura plantillas visuales alineadas con la identidad "Forest & Earth".
  */
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,13 @@ export class PdfService {
   }
 
   /**
-   * Genera un PDF profesional con una tabla de datos de forma asíncrona.
+   * @description Orquesta la creación y descarga automática de un archivo PDF.
+   * @param {string} title Título principal del documento.
+   * @param {string[][]} headers Cabeceras de la tabla.
+   * @param {any[]} body Filas de datos.
+   * @param {string} fileName Nombre del archivo resultante (sin extensión).
+   * @param {any} [options] Configuraciones adicionales para autoTable.
+   * @returns {Promise<void>}
    */
   async generateTablePDF(
     title: string, 
@@ -46,7 +53,14 @@ export class PdfService {
   }
 
   /**
-   * Agrega una tabla a un documento existente de forma asíncrona.
+   * @description Inserta una tabla estilizada en un documento jsPDF activo.
+   * Aplica automáticamente la paleta de colores corporativa.
+   * @param {any} doc Instancia de jsPDF.
+   * @param {string} title Título de la sección.
+   * @param {string[][]} headers Cabeceras.
+   * @param {any[]} body Datos.
+   * @param {any} [options] Overrides de estilo.
+   * @returns {Promise<void>}
    */
   async addTableToDoc(
     doc: any,

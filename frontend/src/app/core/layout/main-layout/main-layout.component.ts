@@ -4,7 +4,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   IonSplitPane, IonMenu, IonContent, IonList, 
   IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
+  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons, IonFooter
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -16,7 +16,10 @@ import { AlertController } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../services/supabase.service';
 
 /**
- * Componente de Diseño Principal (Layout) - UI Profesional.
+ * @class MainLayoutComponent
+ * @description Estructura base de la interfaz de usuario.
+ * Proporciona la navegación lateral (Sidebar), el sistema de menús responsivo
+ * y el contenedor principal (RouterOutlet) para todos los módulos del ERP.
  */
 @Component({
   selector: 'app-main-layout',
@@ -25,7 +28,7 @@ import { SupabaseService } from '../../services/supabase.service';
     CommonModule, RouterLink, RouterLinkActive,
     IonSplitPane, IonMenu, IonContent, IonList, 
     IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
+    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons, IonFooter
   ],
   template: `
       <ion-split-pane contentId="main-content" [when]="'md'" [class.collapsed]="isCollapsed">
@@ -52,58 +55,67 @@ import { SupabaseService } from '../../services/supabase.service';
           </ion-header>
 
           <ion-content class="ion-no-padding">
-            <div class="vac-nav-container">
-              <ion-list lines="none" class="ion-no-padding vac-nav-list">
-                <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
-                  <ion-item 
-                    button
-                    lines="none"
-                    routerDirection="root" 
-                    [routerLink]="p.url" 
-                    routerLinkActive="active-link"
-                    [title]="p.title"
-                    class="vac-nav-item">
-                    <div slot="start" class="icon-frame">
-                      <ion-icon [name]="p.icon"></ion-icon>
-                    </div>
-                    <ion-label *ngIf="!isCollapsed" class="vac-label">{{ p.title }}</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item class="vac-nav-item" lines="none" button (click)="mostrarQr()">
-                    <div slot="start" class="icon-frame" style="color: var(--ion-color-secondary)">
-                      <ion-icon name="qr-code-outline"></ion-icon>
-                    </div>
-                    <ion-label *ngIf="!isCollapsed" class="vac-label" style="color: var(--ion-color-secondary)">Mostrar QR</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-                
-                <div class="nav-separator"></div>
-
-                <ion-item class="vac-nav-item logout-item" lines="none" button (click)="logout()">
-                  <div slot="start" class="icon-frame danger">
-                    <ion-icon name="log-out-outline"></ion-icon>
-                  </div>
-                  <ion-label *ngIf="!isCollapsed" class="vac-label">Cerrar Sesión</ion-label>
-                </ion-item>
-              </ion-list>
-            </div>
-
-            <div class="sidebar-bottom-badge flex-col items-center justify-center pb-lg gap-2" *ngIf="!isCollapsed">
-              <div class="flex-row items-center gap-2">
-                <ion-icon name="leaf-outline" size="small" class="color-medium"></ion-icon>
-                <span class="color-medium text-sm font-semibold">Gestión Ganadera</span>
-              </div>
-              <span class="color-medium opacity-80 text-xs mb-2">{{ profile.email }}</span>
+            <div style="display: flex; flex-direction: column; min-height: 100%;">
               
-              <!-- THEME TOGGLE BUTTON -->
-              <ion-button fill="clear" color="medium" (click)="toggleTheme()" class="theme-toggle-btn">
-                <ion-icon [name]="isDarkMode ? 'sunny-outline' : 'moon-outline'" slot="start"></ion-icon>
-                <span class="text-xs font-bold">{{ isDarkMode ? 'MODO CLARO' : 'MODO OSCURO' }}</span>
-              </ion-button>
+              <!-- Menú (Crece para ocupar espacio) -->
+              <div class="vac-nav-container" style="flex: 1;">
+                <ion-list lines="none" class="ion-no-padding vac-nav-list">
+                  <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
+                    <ion-item 
+                      button
+                      lines="none"
+                      routerDirection="root" 
+                      [routerLink]="p.url" 
+                      routerLinkActive="active-link"
+                      [title]="p.title"
+                      class="vac-nav-item">
+                      <div slot="start" class="icon-frame">
+                        <ion-icon [name]="p.icon"></ion-icon>
+                      </div>
+                      <ion-label *ngIf="!isCollapsed" class="vac-label">{{ p.title }}</ion-label>
+                    </ion-item>
+                  </ion-menu-toggle>
+                  <ion-menu-toggle auto-hide="false">
+                    <ion-item class="vac-nav-item" lines="none" button (click)="mostrarQr()">
+                      <div slot="start" class="icon-frame" style="color: var(--ion-color-secondary)">
+                        <ion-icon name="qr-code-outline"></ion-icon>
+                      </div>
+                      <ion-label *ngIf="!isCollapsed" class="vac-label" style="color: var(--ion-color-secondary)">Mostrar QR</ion-label>
+                    </ion-item>
+                  </ion-menu-toggle>
+                  
+                  <div class="nav-separator"></div>
+
+                  <ion-item class="vac-nav-item logout-item" lines="none" button (click)="logout()">
+                    <div slot="start" class="icon-frame danger">
+                      <ion-icon name="log-out-outline"></ion-icon>
+                    </div>
+                    <ion-label *ngIf="!isCollapsed" class="vac-label">Cerrar Sesión</ion-label>
+                  </ion-item>
+                </ion-list>
+              </div>
+
+              <!-- Footer integrado al final del scroll -->
+              <div class="sidebar-bottom-badge flex-col items-center justify-center pb-lg gap-2" *ngIf="!isCollapsed" style="margin-top: auto; padding-bottom: 30px;">
+                <div class="flex-row items-center gap-2" style="display: flex; justify-content: center;">
+                  <ion-icon name="leaf-outline" size="small" class="color-medium"></ion-icon>
+                  <span class="color-medium text-sm font-semibold">Gestión Ganadera</span>
+                </div>
+                <div style="text-align: center; margin-bottom: 10px;">
+                  <span class="color-medium opacity-80 text-xs">{{ profile.email }}</span>
+                </div>
+                
+                <!-- THEME TOGGLE BUTTON -->
+                <div style="text-align: center;">
+                  <ion-button fill="clear" color="medium" (click)="toggleTheme()" class="theme-toggle-btn">
+                    <ion-icon [name]="isDarkMode ? 'sunny-outline' : 'moon-outline'" slot="start"></ion-icon>
+                    <span class="text-xs font-bold">{{ isDarkMode ? 'MODO CLARO' : 'MODO OSCURO' }}</span>
+                  </ion-button>
+                </div>
+              </div>
+
             </div>
           </ion-content>
-
         </ion-menu>
         
         <div class="main-container" id="main-content">

@@ -1,87 +1,46 @@
-# 🐄 Vacapp: Gestión Ganadera Profesional (AgriTech ERP)
+# 🐮 Vacapp: Gestión Inteligente
 
-[![Angular](https://img.shields.io/badge/Angular-21+-DD0031?style=flat-square&logo=angular)](https://angular.dev/)
-[![Ionic](https://img.shields.io/badge/Ionic-8+-3880FF?style=flat-square&logo=ionic)](https://ionicframework.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-
-**Vacapp** es un sistema ERP (Enterprise Resource Planning) de vanguardia, diseñado específicamente para la gestión profesional, eficiente y basada en datos de explotaciones ganaderas bovinas. Nuestra plataforma facilita un control exhaustivo de todo el ciclo de vida del animal, optimizando la toma de decisiones mediante analítica avanzada y una interfaz de usuario premium.
+**Vacapp** es el compañero digital que todo ganadero necesita. Una herramienta robusta y de **alta densidad de información** diseñada específicamente para optimizar la gestión de tu explotación ganadera. Funciona rápido, sin interrupciones, y se adapta tanto al trabajo duro en el campo como a la gestión detallada desde tu oficina.
 
 ---
 
-## 🎯 Misión y Visión
+## 🌟 Optimizada para el Campo y la Oficina
 
-Nuestra misión es democratizar el acceso a herramientas tecnológicas de alto nivel para el sector agropecuario, permitiendo a los ganaderos modernizar sus operaciones sin fricciones. Aspiramos a ser el estándar de oro en software de gestión ganadera, combinando una experiencia de usuario excepcional (diseño *Rustic-Luxe*) con una arquitectura técnica robusta y escalable.
+Vacapp no es una app convencional. Su interfaz está diseñada bajo el sistema *Rustic-Luxe*, garantizando máxima legibilidad bajo la luz del sol (con un excelente contraste) y mostrando toda la información de manera compacta para que puedas consultar decenas de animales en un solo vistazo desde cualquier pantalla.
 
----
+### 📱 Funciona en el Campo (PWA)
+Sabemos que en las zonas de pastoreo la cobertura es intermitente o nula. Vacapp guarda todos tus registros (partos, ventas, vacunas, pesajes) directamente en la memoria de tu teléfono. Al recuperar la señal, sincronizará todo de manera automática y 100% segura.
 
-## ✨ Características Principales
+### 🔍 Escaneo de Códigos QR
+Identifica a tus animales en un segundo. 
+- Cada res tiene un código QR único asignado.
+- Escanea con la cámara del móvil y accede a su ficha técnica completa al instante.
 
-- **📊 Panel de Control Inteligente (Dashboard)**: Visualización panorámica del estado de la explotación con métricas clave, alertas sanitarias tempranas y resúmenes de rendimiento en tiempo real.
-- **🐂 Gestión Integral de Ganado**: Registro detallado y trazabilidad de bovinos (identificación electrónica, genealogía profunda, genética) y organización estandarizada por lotes dinámicos.
-- **❤️ Control Reproductivo Avanzado**: Seguimiento preciso de celos, cubriciones (monta natural o IA) e inseminaciones. Cálculo predictivo automático de la fecha prevista de parto basado en parámetros zootécnicos.
-- **⚖️ Monitorización de Recría y Rendimiento**: Seguimiento del crecimiento con cálculo automático de Ganancia Media Diaria (GMD) y proyecciones de peso al destete/venta.
-- **💉 Historial Clínico y Sanidad**: Registro médico inmutable, control de protocolos de vacunación, desparasitaciones y seguimiento de tratamientos específicos por animal, garantizando la seguridad alimentaria.
-- **📶 Arquitectura Offline-First**: Operatividad garantizada en zonas de baja cobertura mediante persistencia de datos local avanzada (`localStorage` + `Signal` sync) con sincronización transparente en la nube.
+### 📊 Control de Pesos y Sanidad
+No pierdas dinero con animales que no ganan peso o enferman. 
+- Registra pesajes y comprueba las gráficas evolutivas en el momento.
+- Controla tratamientos veterinarios, vacunas y días de retiro.
+- Visualiza el impacto económico y de salud de forma precisa.
 
----
+### 📸 Registro Fotográfico y Trazabilidad
+El "Libro de Explotación" evoluciona. Adjunta fotos reales para evitar errores de identificación y mantén documentado el progreso de tus lotes y crías con total fidelidad.
 
-## 📚 Índice de Documentación Técnica
-
-Para garantizar una adopción exitosa y facilitar el desarrollo continuo, hemos estructurado una documentación exhaustiva:
-
-1. **[Manual de Usuario](documentation/user_manual.md)**: Guía detallada para el usuario final sobre el uso diario de la plataforma y mejores prácticas.
-2. **[Guía de Configuración Backend (Supabase)](documentation/supabase_setup.md)**: Instrucciones para desplegar y conectar la base de datos PostgreSQL y configurar las políticas de seguridad.
-3. **[Arquitectura de Software](documentation/architecture.md)**: Detalles sobre los patrones de diseño, gestión de estado con Angular Signals y el ecosistema *Rustic-Luxe*.
-4. **[Referencia de la API Interna](documentation/api_reference.md)**: Documentación de los servicios core y modelos de datos principales.
-5. **[Estructura del Proyecto](documentation/tree.md)**: Mapa detallado del repositorio y organización del código fuente.
-6. **[Guía de Control de Versiones (GitHub)](documentation/github_guide.md)**: Protocolos para contribución, ramas y despliegue continuo.
+### 💰 Gestión Financiera "Cuentas Claras"
+El control que necesitas en la oficina. Anota compras de alimento, gastos veterinarios y facturación por ventas. Analiza tu rentabilidad general por periodos y optimiza tus inversiones.
 
 ---
 
-## 🚀 Despliegue Rápido (Quick Start)
+## 📲 Guía de Instalación Rápida
 
-### Requisitos del Entorno
+No busques en la App Store o Google Play. Vacapp se instala directamente desde tu navegador web como una **Aplicación Web Progresiva (PWA)** en menos de 10 segundos:
 
-- [Node.js](https://nodejs.org/) (v18.x LTS o superior recomendado)
-- [Angular CLI](https://angular.dev/tools/cli) (`npm install -g @angular/cli`)
+1. **Abre el enlace** de Vacapp en Chrome (Android) o Safari (iPhone).
+2. Pulsa el botón de **"Opciones"** (los tres puntos en Android o el botón de compartir ⬆️ en iPhone).
+3. Selecciona la opción **"Añadir a la pantalla de inicio"**.
+4. Pulsa **"Añadir"**.
 
-### Instalación Local
-
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/TU_USUARIO/vacapp.git
-   cd vacapp/frontend
-   ```
-2. Instalar el árbol de dependencias:
-   ```bash
-   npm install
-   ```
-3. Iniciar el servidor de desarrollo (Hot Module Replacement activado):
-   ```bash
-   npm start
-   ```
-4. Acceder al entorno de desarrollo en: [http://localhost:4200](http://localhost:4200)
+¡Listo! Disfruta de la experiencia nativa de Vacapp con un solo toque desde tu escritorio, estés donde estés.
 
 ---
+*Vacapp: Tecnología de élite, diseñada por y para la gente del campo.*
 
-## 🛠️ Stack Tecnológico (Tech Ecosystem)
-
-Vacapp está construido sobre un stack tecnológico moderno y altamente eficiente:
-- **Frontend Core**: Angular 17+ (Standalone Components, Signals para reactividad fina).
-- **UI/UX Framework**: Ionic Framework 8+ (Componentes nativos, soporte PWA e iOS/Android out-of-the-box).
-- **Backend & BaaS**: Supabase (PostgreSQL, Realtime subscriptions, Storage).
-- **Estilos**: SASS modular con arquitectura BEM adaptada y tokens de diseño personalizados.
-
----
-
-## 📄 Licencia y Aspectos Legales
-
-Este proyecto es de uso libre para fines educativos y de gestión ganadera personal bajo la licencia MIT.
-
----
-
-<p align="center">
-  <i>Diseñado y desarrollado con precisión para impulsar el futuro del sector ganadero.</i><br>
-  <b>Riverside, CA. 2026.</b>
-</p>

@@ -3,6 +3,12 @@ import { SupabaseService } from './supabase.service';
 import { FincaService } from './finca.service';
 import { Reproduccion } from '../models/vacapp.models';
 
+/**
+ * @class ReproduccionService
+ * @description Motor lógico para la gestión del ciclo de vida reproductivo del ganado.
+ * Calcula métricas críticas como "Días Abiertos", predice fechas de parto
+ * y orquesta el seguimiento de gestaciones confirmadas y fallidas.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -12,7 +18,9 @@ export class ReproduccionService {
 
   private reproduccionSignal = signal<Reproduccion[]>([]);
 
+  /** Historial completo de eventos reproductivos. */
   readonly gestaciones = computed(() => this.reproduccionSignal());
+  /** Subconjunto de gestaciones en curso (Estado: Confirmada). */
   readonly gestacionesActivas = computed(() => 
     this.reproduccionSignal().filter(r => r.estado_gestacion === 'Confirmada')
   );
@@ -84,6 +92,11 @@ export class ReproduccionService {
     });
   }
 
+  /**
+   * @description Carga el historial reproductivo global. Sincroniza con el servicio
+   * de Supabase e inyecta datos mock si la base de datos está vacía.
+   * @returns {Promise<void>}
+   */
   async loadReproduccion() {
     const { data, error } = await this.supabase.getReproduccion();
     
@@ -96,6 +109,12 @@ export class ReproduccionService {
     }
   }
 
+  /**
+   * @description Genera estadísticas de éxito de concepción (Tasa de preñez).
+   * Clasifica los eventos por periodo para análisis de eficiencia reproductiva temporal.
+   * @param {'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total'} periodo Granularidad temporal.
+   * @returns {Array<{label: string, exitos: number, fallos: number}>} Datos para visualización.
+   */
   getEstadisticasConcepcion(periodo: 'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total') {
     const records = this.reproduccionSignal();
     const map = new Map<string, { exitos: number, fallos: number }>();

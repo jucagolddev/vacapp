@@ -19,8 +19,11 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 
 /**
- * Componente para el Módulo de Lotes/Recintos - Versión Estándar.
- * Refactorizado: 100% Sincronización de colores y nombres vac-.
+ * @class LotesComponent
+ * @description Módulo de gestión territorial y división del hato.
+ * Permite organizar los animales en potreros o recintos específicos,
+ * calculando automáticamente la carga animal (UGB) por unidad de superficie
+ * para optimizar el pastoreo rotacional.
  */
 @Component({
   selector: 'app-lotes',
@@ -59,7 +62,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let lote of lotes; trackBy: trackById">
+            <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let lote of lotes; trackBy: trackById">
               <article class="uniform-card">
                 <div class="vac-card-header-flex">
                   <div class="vac-card-title-group">

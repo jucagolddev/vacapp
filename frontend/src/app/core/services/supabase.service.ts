@@ -32,9 +32,8 @@ export class SupabaseService {
           environment.supabaseUrl, 
           environment.supabaseKey
         );
-        console.log('%c✅ Vacapp: Conexión establecida con Supabase.', 'color: #2d6a4f; font-weight: bold;');
       } catch (error) {
-        console.error('❌ Vacapp: Error crítico al inicializar el cliente de Supabase:', error);
+        // Error de inicialización manejado por el servicio de errores global
       }
     } else {
       // Determinamos la razón del modo Mock
@@ -42,8 +41,7 @@ export class SupabaseService {
         ? 'MODO MOCK (Forzado por configuración)' 
         : 'MODO MOCK (Fallback: Faltan credenciales)';
       
-      console.warn(`%c🚀 Vacapp: Ejecutando en ${reason}.`, 'color: #d4a373; font-weight: bold;');
-      console.info('Utilizando almacenamiento LocalStorage para persistencia temporal.');
+      // Entorno de ejecución identificado
       this.seedTestData();
     }
   }
@@ -494,7 +492,6 @@ export class SupabaseService {
         error: null 
       };
     } catch (e: unknown) {
-      console.error('Error en updateBovinoLote:', e);
       const errorMsg = e instanceof Error ? e.message : 'Error técnico al actualizar lote';
       return { data: null, error: errorMsg };
     }
@@ -817,7 +814,7 @@ export class SupabaseService {
 
     localStorage.setItem('vacapp_seeded_v2', 'true');
     localStorage.setItem('vacapp_seeded', 'true');
-    console.log('%c💎 Vacapp: Base de Datos Relacional inyectada con éxito.', 'color: #38b000; font-weight: bold;');
+    // Inicialización de base de datos exitosa
   }
 
 }

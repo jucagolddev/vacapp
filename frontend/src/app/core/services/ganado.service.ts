@@ -167,12 +167,15 @@ export class GanadoService {
     } catch (e: unknown) {
       const errorMsg = e instanceof Error ? e.message : 'Error cargando bovinos';
       this.errorSignal.set(errorMsg);
-      console.error(e);
     } finally {
       this.loadingSignal.set(false);
     }
   }
 
+  /**
+   * Obtiene los datos desde el servidor remoto Supabase.
+   * @param fincaId ID de la finca.
+   */
   private async fetchRemote(fincaId: string) {
     return await this.supabase.client!
       .from('bovinos')
@@ -182,6 +185,10 @@ export class GanadoService {
       .order('created_at', { ascending: false });
   }
 
+  /**
+   * Obtiene los datos del almacenamiento local (Mock/Offline).
+   * @param fincaId ID de la finca.
+   */
   private async fetchMock(fincaId: string) {
     const { data, error } = await this.supabase.getAll<Bovino>('bovinos');
     if (data) {

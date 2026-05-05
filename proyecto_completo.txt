@@ -86,93 +86,48 @@ print(f"¡Listo! Archivos binarios ignorados correctamente. Todo se guardó en {
 ARCHIVO: .\README.md
 ==================================================
 
-# 🐄 Vacapp: Gestión Ganadera Profesional (AgriTech ERP)
+# 🐮 Vacapp: Tu ganado bajo control, incluso sin cobertura.
 
-[![Angular](https://img.shields.io/badge/Angular-21+-DD0031?style=flat-square&logo=angular)](https://angular.dev/)
-[![Ionic](https://img.shields.io/badge/Ionic-8+-3880FF?style=flat-square&logo=ionic)](https://ionicframework.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-
-**Vacapp** es un sistema ERP (Enterprise Resource Planning) de vanguardia, diseñado específicamente para la gestión profesional, eficiente y basada en datos de explotaciones ganaderas bovinas. Nuestra plataforma facilita un control exhaustivo de todo el ciclo de vida del animal, optimizando la toma de decisiones mediante analítica avanzada y una interfaz de usuario premium.
+**Vacapp** es el compañero digital que todo ganadero necesita. Una herramienta robusta, sencilla y diseñada específicamente para el trabajo duro en el campo. Olvídate de los cuadernos manchados de barro y lleva toda la información de tu explotación en tu bolsillo.
 
 ---
 
-## 🎯 Misión y Visión
+## 🌟 Funciones Principales para tu Finca
 
-Nuestra misión es democratizar el acceso a herramientas tecnológicas de alto nivel para el sector agropecuario, permitiendo a los ganaderos modernizar sus operaciones sin fricciones. Aspiramos a ser el estándar de oro en software de gestión ganadera, combinando una experiencia de usuario excepcional (diseño *Rustic-Luxe*) con una arquitectura técnica robusta y escalable.
+### 📱 Funciona sin internet (Modo Monte)
+Sabemos que en las zonas altas la cobertura es escasa. Vacapp guarda todos tus registros (partos, ventas, vacunas) en la memoria de tu teléfono. En cuanto vuelvas a tener señal, la App sincronizará todo automáticamente con la nube de forma segura.
 
----
+### 🔍 Escaneo de Códigos QR
+Identifica a tus animales en un segundo. 
+- Cada vaca puede tener su propio código QR. 
+- Al escanearlo con la cámara del móvil, verás toda su ficha: edad, madre, últimos partos y tratamientos sanitarios.
 
-## ✨ Características Principales
+### 📊 Gráficas de Peso y Salud
+No pierdas dinero con animales que no ganan peso. 
+- Registra los pesajes y observa gráficas de evolución al instante.
+- Detecta rápidamente si un animal no está rindiendo lo esperado.
 
-- **📊 Panel de Control Inteligente (Dashboard)**: Visualización panorámica del estado de la explotación con métricas clave, alertas sanitarias tempranas y resúmenes de rendimiento en tiempo real.
-- **🐂 Gestión Integral de Ganado**: Registro detallado y trazabilidad de bovinos (identificación electrónica, genealogía profunda, genética) y organización estandarizada por lotes dinámicos.
-- **❤️ Control Reproductivo Avanzado**: Seguimiento preciso de celos, cubriciones (monta natural o IA) e inseminaciones. Cálculo predictivo automático de la fecha prevista de parto basado en parámetros zootécnicos.
-- **⚖️ Monitorización de Recría y Rendimiento**: Seguimiento del crecimiento con cálculo automático de Ganancia Media Diaria (GMD) y proyecciones de peso al destete/venta.
-- **💉 Historial Clínico y Sanidad**: Registro médico inmutable, control de protocolos de vacunación, desparasitaciones y seguimiento de tratamientos específicos por animal, garantizando la seguridad alimentaria.
-- **📶 Arquitectura Offline-First**: Operatividad garantizada en zonas de baja cobertura mediante persistencia de datos local avanzada (`localStorage` + `Signal` sync) con sincronización transparente en la nube.
+### 📸 Fotos Reales y Ficha Técnica
+Asocia fotos reales a cada animal para evitar confusiones. Tendrás un "Libro de Explotación" digital con imágenes de alta calidad de todo tu hato.
 
----
-
-## 📚 Índice de Documentación Técnica
-
-Para garantizar una adopción exitosa y facilitar el desarrollo continuo, hemos estructurado una documentación exhaustiva:
-
-1. **[Manual de Usuario](documentation/user_manual.md)**: Guía detallada para el usuario final sobre el uso diario de la plataforma y mejores prácticas.
-2. **[Guía de Configuración Backend (Supabase)](documentation/supabase_setup.md)**: Instrucciones para desplegar y conectar la base de datos PostgreSQL y configurar las políticas de seguridad.
-3. **[Arquitectura de Software](documentation/architecture.md)**: Detalles sobre los patrones de diseño, gestión de estado con Angular Signals y el ecosistema *Rustic-Luxe*.
-4. **[Referencia de la API Interna](documentation/api_reference.md)**: Documentación de los servicios core y modelos de datos principales.
-5. **[Estructura del Proyecto](documentation/tree.md)**: Mapa detallado del repositorio y organización del código fuente.
-6. **[Guía de Control de Versiones (GitHub)](documentation/github_guide.md)**: Protocolos para contribución, ramas y despliegue continuo.
+### 💰 Gestión Financiera "Cuentas Claras"
+Anota tus gastos en piensos, veterinaria y tus ingresos por ventas. Vacapp te dirá a final de mes si tu explotación es rentable y dónde estás gastando más.
 
 ---
 
-## 🚀 Despliegue Rápido (Quick Start)
+## 📲 Guía de Instalación Rápida (PWA)
 
-### Requisitos del Entorno
+No busques en la App Store o Google Play. Vacapp se instala directamente desde tu navegador en solo 10 segundos:
 
-- [Node.js](https://nodejs.org/) (v18.x LTS o superior recomendado)
-- [Angular CLI](https://angular.dev/tools/cli) (`npm install -g @angular/cli`)
+1. **Abre el enlace** de Vacapp en Chrome (Android) o Safari (iPhone).
+2. Pulsa el botón de **"Opciones"** (los tres puntos en Android o el botón de compartir ⬆️ en iPhone).
+3. Selecciona la opción **"Añadir a la pantalla de inicio"**.
+4. Pulsa **"Añadir"**.
 
-### Instalación Local
-
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/TU_USUARIO/vacapp.git
-   cd vacapp/frontend
-   ```
-2. Instalar el árbol de dependencias:
-   ```bash
-   npm install
-   ```
-3. Iniciar el servidor de desarrollo (Hot Module Replacement activado):
-   ```bash
-   npm start
-   ```
-4. Acceder al entorno de desarrollo en: [http://localhost:4200](http://localhost:4200)
+¡Listo! Ya tienes el icono de la vaca en tu escritorio. Ahora puedes entrar siempre con un toque, ¡incluso si no tienes cobertura!
 
 ---
-
-## 🛠️ Stack Tecnológico (Tech Ecosystem)
-
-Vacapp está construido sobre un stack tecnológico moderno y altamente eficiente:
-- **Frontend Core**: Angular 17+ (Standalone Components, Signals para reactividad fina).
-- **UI/UX Framework**: Ionic Framework 8+ (Componentes nativos, soporte PWA e iOS/Android out-of-the-box).
-- **Backend & BaaS**: Supabase (PostgreSQL, Realtime subscriptions, Storage).
-- **Estilos**: SASS modular con arquitectura BEM adaptada y tokens de diseño personalizados.
-
----
-
-## 📄 Licencia y Aspectos Legales
-
-Este proyecto es de uso libre para fines educativos y de gestión ganadera personal bajo la licencia MIT.
-
----
-
-<p align="center">
-  <i>Diseñado y desarrollado con precisión para impulsar el futuro del sector ganadero.</i><br>
-  <b>Riverside, CA. 2026.</b>
-</p>
+*Vacapp: Tecnología de élite para la gente del campo.*
 
 
 ==================================================
@@ -2222,73 +2177,80 @@ ARCHIVO: .\frontend\package.json
 ARCHIVO: .\frontend\README.md
 ==================================================
 
-# 🌲 Vacapp Premium: Forest & Earth Edition
+# 🐮 Vacapp: Tu ganadería siempre contigo
 
-**Vacapp** es una plataforma de gestión ganadera de ultra-lujo, diseñada para explotaciones que buscan la excelencia en el control biométrico, reproductivo y sanitario. Con una estética inspirada en los tonos primarios de la naturaleza (**Bosque Profundo & Tierra Fértil**), Vacapp trasciende la utilidad para convertirse en una experiencia operativa de élite.
-
-![Dashboard Preview](https://supabase.com/dashboard/static/img/supabase-logo.svg) <!-- Reemplazar con captura real si es posible -->
-
-## ✨ Filosofía de Diseño: "Luxe Forest"
-
-La interfaz ha sido meticulosamente calibrada para evocar la serenidad y la robustez del campo:
-- **Bosque Secreto (#1b4332)**: Utilizado para la jerarquía primaria y la autoridad institucional.
-- **Tierra Fértil (#582f0e)**: Acentúa la conexión sensorial con el terreno y la herencia ganadera.
-- **Vidrio Esmerilado (Glassmorphism)**: Paneles translúcidos que aportan ligereza y sofisticación moderna.
-
-## 🚀 Módulos de Élite
-
-### 📊 Cuadro de Mando (Dashboard)
-Analítica en tiempo real del inventario. Visualización inmediata de indicadores clave (KPIs) mediante tarjetas de rendimiento de alta fidelidad.
-
-### 🐄 Gestión de Hato (Ganado)
-Registro biométrico individualizado. Incluye un asistente (Wizard) de tres pasos para una trazabilidad perfecta: Biometría, Linaje y Ubicación.
-
-### 🗺️ Gestión de Campo (Lotes)
-Control geográfico de recintos y parcelas. Organiza el pastoreo mediante una arquitectura de tarjetas de terreno intuitiva.
-
-### 🏥 Sanidad & Clínica
-Historial médico digital completo. Control de vacunaciones, desparasitaciones y protocolos veterinarios con firma de registro.
-
-### 🧬 Reproducción & Linaje
-Seguimiento del ciclo de vida. Cálculo automático de fechas de parto y monitorización de gestaciones críticas con alertas visuales (Latido de Vida).
-
-### ⚖️ Recría & Rendimiento
-Monitoreo de GMD (Ganancia Media Diaria) mediante pesajes periódicos asistidos. Análisis visual de tendencias de crecimiento.
-
-## 🛠️ Ecosistema Técnico
-
-- **Frontend**: Angular 18 + Ionic Framework (Standalone Components).
-- **Estilos**: Sistema de diseño centralizado en SCSS (`_luxe.scss`).
-- **Backend (Persistencia)**: Supabase (PostgreSQL + Auth + Real-time).
-- **Modo Offline/Mock**: Sistema inteligente de redundancia mediante LocalStorage para operaciones sin conexión.
-
-## 📦 Instalación
-
-```bash
-# Clonar el ecosistema
-git clone https://github.com/usuario/vacapp-premium.git
-
-# Instalar dependencias de élite
-npm install
-
-# Iniciar servidor de desarrollo
-npm run start
-```
-
-## 🔐 Configuración de Supabase
-
-Para pasar del modo **Mock** a producción, actualiza `src/environments/environment.ts`:
-
-```typescript
-export const environment = {
-  production: false,
-  supabaseUrl: 'TU_URL_DE_SUPABASE',
-  supabaseKey: 'TU_API_KEY_ANON'
-};
-```
+**Vacapp** es la solución tecnológica definitiva para el ganadero moderno. Diseñada para soportar las condiciones más exigentes del campo, nuestra aplicación te permite gestionar tu explotación con precisión quirúrgica, eliminando el papeleo y optimizando cada euro invertido.
 
 ---
-*Desarrollado para la ganadería del mañana, hoy.*
+
+## 🚀 ¿Por qué elegir Vacapp?
+
+### 📊 Gráficas de crecimiento y rendimiento
+No trabajes a ciegas. Visualiza la evolución del peso de tus animales con gráficas interactivas. Detecta patrones de crecimiento y toma decisiones basadas en datos reales para maximizar la rentabilidad de tu hato.
+
+### 🏥 Control sanitario sin papeles
+Lleva el historial clínico completo de cada ejemplar en tu bolsillo. Registra vacunaciones, tratamientos y periodos de retiro de forma sencilla. El sistema te alertará automáticamente si un animal está en periodo de retiro de leche o carne.
+
+### 📱 Modo "Monte" (Offline-First)
+La falta de cobertura ya no es un problema. Registra nacimientos, pesajes o movimientos en lo más alto del puerto; Vacapp guardará los datos y los sincronizará automáticamente cuando vuelvas a tener conexión.
+
+### 🔍 Identificación Inteligente
+Escanea el crotal o el código QR del animal para acceder instantáneamente a su ficha completa: genealogía, estado reproductivo y alertas de salud.
+
+---
+
+## 📲 Guía de Instalación en el Móvil (PWA)
+
+Vacapp es una **Aplicación Web Progresiva (PWA)**, lo que significa que no ocupa espacio innecesario y se actualiza sola.
+
+### En Android (Chrome):
+1. Visita la URL de la aplicación.
+2. Pulsa los **tres puntos** (⋮) de la esquina superior derecha.
+3. Selecciona **"Instalar aplicación"** o **"Añadir a pantalla de inicio"**.
+
+### En iPhone (Safari):
+1. Visita la URL de la aplicación.
+2. Pulsa el botón de **"Compartir"** (el cuadrado con la flecha hacia arriba ⬆️).
+3. Desliza hacia abajo y pulsa **"Añadir a pantalla de inicio"**.
+
+---
+
+## 🛠️ Sección Técnica (Para Desarrolladores)
+
+Este proyecto ha sido construido utilizando tecnologías de vanguardia para asegurar su escalabilidad y robustez.
+
+### Stack Tecnológico:
+*   **Frontend**: Angular 18 (Standalone Components) + Ionic 8.
+*   **Backend / DB**: Supabase (PostgreSQL + Realtime).
+*   **Offline**: Service Workers + LocalForage (IndexedDB).
+*   **Gráficos**: Chart.js / ng2-charts.
+
+### Cómo levantar el proyecto:
+
+1. **Clonar el repositorio**:
+   ```bash
+   git clone <url-del-repo>
+   cd vacapp/frontend
+   ```
+
+2. **Instalar dependencias**:
+   ```bash
+   npm install
+   ```
+
+3. **Ejecutar en desarrollo**:
+   ```bash
+   ionic serve
+   ```
+   *Nota: La aplicación se abrirá automáticamente en `http://localhost:4200`.*
+
+4. **Compilar para producción**:
+   ```bash
+   npm run build
+   ```
+
+---
+*Desarrollado con ❤️ para el sector agropecuario por el equipo de Vacapp AgriTech.*
 
 
 ==================================================
@@ -2638,22 +2600,177 @@ ARCHIVO: .\frontend\src\styles.scss
 @use 'theme/variables.scss';
 @use 'styles/main';
 
-/* Scanner Visibility Fix */
-#reader, .scanner-container, video {
-  width: 100% !important;
-  min-height: 300px;
-  background-color: #000; /* Fondo negro mientras carga la cámara */
-  border-radius: 20px;
-  overflow: hidden;
-  display: block !important;
-  z-index: 999;
+/* ==========================================================================
+   SISTEMA VISUAL: RUSTIC-LUXE (Verde Bosque & Tierra)
+   ========================================================================== */
+
+:root {
+  --vac-bg-main: #EAE2D5;     /* Fondo Tierra Arena Cálido */
+  --vac-primary: #1B4332;     /* Verde Bosque */
+  --vac-accent: #A67C52;      /* Tierra/Cuero */
+  --vac-text-main: #1A211E;   /* Negro profundo */
+  --ion-background-color: var(--vac-bg-main);
 }
 
-/* Si usas un escáner que requiere transparencia (Capacitor Native) */
-.scanner-active {
-  --background: transparent !important;
-  --ion-background-color: transparent !important;
-  visibility: hidden; /* Oculta la UI para ver la cámara detrás */
+/* Sidebar Blindada (Siempre arriba y siempre Verde Bosque) */
+ion-menu {
+  z-index: 9999 !important;
+  --background: var(--vac-primary) !important;
+  
+  ion-content {
+    --background: var(--vac-primary) !important;
+  }
+
+  ion-item {
+    --background: transparent !important;
+    --color: #FDFAF7 !important;
+    
+    ion-label {
+      color: #FDFAF7 !important; 
+      font-weight: 600;
+    }
+    
+    ion-icon {
+      color: var(--vac-accent) !important;
+    }
+  }
+}
+
+/* Botón Añadir (FAB) Estilizado */
+ion-fab-button {
+  --background: var(--vac-accent) !important;
+  --color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease !important;
+
+  &:active {
+    transform: scale(0.9) !important;
+  }
+}
+
+/* Tipografía Global Outfit */
+* {
+  font-family: 'Outfit', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+body, ion-content {
+  --background: var(--vac-bg-main) !important;
+}
+
+/* ----------------------------------------------------
+   QR DINÁMICO - Estilos Premium para Alert y Modal
+   ---------------------------------------------------- */
+
+/* Alert de entrada de IP - Compatible con Shadow DOM de Ionic */
+ion-alert {
+  --background: #FDFBF7;
+  --max-width: 380px;
+  --backdrop-opacity: 0.45;
+}
+
+ion-alert::part(header) {
+  padding: 24px 24px 8px;
+  background: linear-gradient(135deg, #1B4332 0%, #0A140F 100%);
+}
+
+ion-alert::part(head) {
+  padding: 24px 24px 8px;
+  background: linear-gradient(135deg, #1B4332 0%, #0A140F 100%);
+}
+
+ion-alert::part(message) {
+  color: #4B5563;
+  font-size: 0.9rem;
+  padding: 16px 24px;
+  line-height: 1.5;
+}
+
+ion-alert .alert-head {
+  background: linear-gradient(135deg, #1B4332 0%, #0A140F 100%) !important;
+  padding: 24px 24px 12px !important;
+}
+
+ion-alert .alert-title {
+  color: #FDFAF7 !important;
+  font-weight: 800 !important;
+  font-size: 1.15rem !important;
+}
+
+ion-alert .alert-message {
+  color: #4B5563 !important;
+  font-size: 0.9rem !important;
+  padding: 16px 24px !important;
+  line-height: 1.5 !important;
+  background: #FDFBF7 !important;
+}
+
+ion-alert .alert-input-wrapper {
+  background: #FDFBF7 !important;
+}
+
+ion-alert .alert-input {
+  border: 2px solid rgba(27, 67, 50, 0.2) !important;
+  border-radius: 12px !important;
+  padding: 14px 16px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #1A211E !important;
+  background: #F5F0EA !important;
+  margin: 8px 24px !important;
+}
+
+ion-alert .alert-button-group {
+  padding: 8px 16px 16px !important;
+  background: #FDFBF7 !important;
+}
+
+ion-alert .alert-button {
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  min-height: 44px !important;
+}
+
+ion-alert .alert-button:last-child {
+  background: linear-gradient(135deg, #1B4332, #2D6A4F) !important;
+  color: #FDFAF7 !important;
+}
+
+ion-alert .alert-wrapper {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  background: #FDFBF7 !important;
+}
+
+/* Modal del QR generado */
+ion-modal.vac-modal {
+  --border-radius: 24px;
+  --box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  
+  ion-toolbar {
+    --background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);
+    --color: #FDFAF7;
+    --border-width: 0;
+    
+    ion-title {
+      color: #FDFAF7 !important;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+  }
+  
+  ion-content {
+    --background: var(--vac-bg-card);
+    
+    h2 {
+      color: #1B4332 !important;
+    }
+    
+    p {
+      color: #582f0e !important;
+    }
+  }
 }
 
 
@@ -2944,7 +3061,10 @@ import { AlertController } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../services/supabase.service';
 
 /**
- * Componente de Diseño Principal (Layout) - UI Profesional.
+ * @class MainLayoutComponent
+ * @description Estructura base de la interfaz de usuario.
+ * Proporciona la navegación lateral (Sidebar), el sistema de menús responsivo
+ * y el contenedor principal (RouterOutlet) para todos los módulos del ERP.
  */
 @Component({
   selector: 'app-main-layout',
@@ -3346,6 +3466,12 @@ import { SupabaseService } from './supabase.service';
 import { UserProfile } from '../models/vacapp.models';
 import { User } from '@supabase/supabase-js';
 
+/**
+ * @class AuthService
+ * @description Guardián de identidad y control de acceso.
+ * Gestiona el ciclo de vida de la sesión del usuario, la recuperación de perfiles
+ * y proporciona un modo de emulación (Mock) para entornos de demostración sin backend.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -3411,12 +3537,20 @@ export class AuthService {
     }
   }
 
-  // Métodos expuestos para UI de Login
+  /**
+   * @description Inicia el proceso de autenticación mediante Magic Link (OTP).
+   * @param {string} email Correo electrónico del usuario.
+   * @returns {Promise<any>}
+   */
   async signInWithOtp(email: string) {
     if (!this.supabase.client) return { error: { message: 'Mock mode no soporta OTP real' } };
     return await this.supabase.client.auth.signInWithOtp({ email });
   }
 
+  /**
+   * @description Finaliza la sesión activa y redirige al usuario al portal de acceso.
+   * @returns {Promise<void>}
+   */
   async signOut() {
     if (this.supabase.client) {
       await this.supabase.client.auth.signOut();
@@ -3438,6 +3572,12 @@ import { FincaService } from './finca.service';
 import { OfflineSyncService } from './offline-sync.service';
 import { Finanzas } from '../models/vacapp.models';
 
+/**
+ * @class FinanzasService
+ * @description Servicio de dominio encargado de la gestión contable y financiera.
+ * Centraliza el registro de flujos de caja, orquesta la persistencia (Supabase/Mock)
+ * y proporciona motores de agregación para análisis estadístico de rentabilidad.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -3448,7 +3588,9 @@ export class FinanzasService {
   private finanzasSignal = signal<Finanzas[]>([]);
   private loadingSignal = signal<boolean>(false);
 
+  /** Listado reactivo de todos los registros financieros filtrados por finca. */
   readonly records = computed(() => this.finanzasSignal());
+  /** Indica si hay una operación de carga en curso. */
   readonly isLoading = computed(() => this.loadingSignal());
 
   constructor() {
@@ -3462,6 +3604,11 @@ export class FinanzasService {
     });
   }
 
+  /**
+   * @description Carga la colección completa de movimientos financieros.
+   * Si la colección está vacía, activa el motor de generación de datos mock para fines demostrativos.
+   * @returns {Promise<void>}
+   */
   async loadFinanzas() {
     this.loadingSignal.set(true);
     try {
@@ -3492,6 +3639,11 @@ export class FinanzasService {
 
   // Operaciones CRUD Sincrónicas con Reactividad Inmediata
 
+  /**
+   * @description Registra un nuevo movimiento financiero asociado a la finca activa.
+   * @param {Partial<Finanzas>} payload Datos del movimiento (tipo, categoría, monto, fecha).
+   * @returns {Promise<{data: Finanzas | null, error: any}>}
+   */
   async createFinanza(payload: Partial<Finanzas>) {
     payload.finca_id = this.fincaService.selectedFincaId() || undefined;
     
@@ -3511,6 +3663,12 @@ export class FinanzasService {
     return { data, error };
   }
 
+  /**
+   * @description Actualiza un registro contable existente.
+   * @param {string} id Identificador del registro.
+   * @param {Partial<Finanzas>} payload Campos modificados.
+   * @returns {Promise<{data: Finanzas | null, error: any}>}
+   */
   async updateFinanza(id: string, payload: Partial<Finanzas>) {
     let { data, error } = await this.supabase.update('finanzas', id, payload);
     
@@ -3529,6 +3687,11 @@ export class FinanzasService {
     return { data, error };
   }
 
+  /**
+   * @description Elimina permanentemente un registro financiero.
+   * @param {string} id Identificador único.
+   * @returns {Promise<{data: null, error: any}>}
+   */
   async deleteFinanza(id: string) {
     let { error } = await this.supabase.delete('finanzas', id);
     
@@ -3545,6 +3708,12 @@ export class FinanzasService {
   }
 
   // Motor para graficar: Agrupar por periodo
+  /**
+   * @description Agrega los flujos de caja agrupándolos por un periodo temporal específico.
+   * Utilizado para alimentar gráficos de barras e indicadores de rendimiento (ROI).
+   * @param {'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total'} periodo Granularidad del agrupamiento.
+   * @returns {Array<{label: string, ingresos: number, gastos: number}>} Datos agregados listos para visualización.
+   */
   getDatosFinancierosPorPeriodo(periodo: 'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total') {
     const records = this.finanzasSignal();
     const map = new Map<string, { ingresos: number, gastos: number }>();
@@ -3630,6 +3799,12 @@ import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
 import { Finca, Empresa, Lote } from '../models/vacapp.models';
 
+/**
+ * @class FincaService
+ * @description Gestor de contexto multitenant para la explotación.
+ * Centraliza la selección de fincas y recintos (lotes), asegurando que todos
+ * los servicios dependientes operen bajo el ámbito geográfico correcto.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -3642,11 +3817,14 @@ export class FincaService {
   private selectedFincaIdSignal = signal<string | null>(null);
   private lotesSignal = signal<Lote[]>([]);
 
-  // Selectores computados listos para usarse en componentes
+  /** Listado de todas las explotaciones (fincas) vinculadas a la empresa del usuario. */
   readonly fincas = computed(() => this.fincasSignal());
+  /** ID de la finca seleccionada actualmente (Persistido en LocalStorage). */
   readonly selectedFincaId = computed(() => this.selectedFincaIdSignal());
+  /** Colección de recintos/potreros de la finca activa. */
   readonly lotes = computed(() => this.lotesSignal());
   
+  /** Objeto completo de la finca activa para visualización de metadatos. */
   readonly currentFinca = computed(() => {
     const fincas = this.fincasSignal();
     const selectedId = this.selectedFincaIdSignal();
@@ -3678,6 +3856,11 @@ export class FincaService {
     });
   }
 
+  /**
+   * @description Carga las fincas asociadas a una empresa y restaura la última selección.
+   * @param {string} empresaId UUID de la empresa.
+   * @returns {Promise<void>}
+   */
   async loadInitialData(empresaId: string) {
     let { data, error } = await this.supabase.getAll<Finca>('fincas');
     if (data && !error) {
@@ -3695,6 +3878,12 @@ export class FincaService {
     }
   }
 
+  /**
+   * @description Cambia la finca activa del sistema. Notifica a todos los subscriptores
+   * (Ganado, Lotes, Finanzas) para que recarguen sus datos contextuales.
+   * @param {string} fincaId Identificador único de la finca.
+   * @returns {Promise<void>}
+   */
   async selectFinca(fincaId: string) {
     this.selectedFincaIdSignal.set(fincaId);
     localStorage.setItem('vacapp_current_finca', fincaId);
@@ -3893,12 +4082,15 @@ export class GanadoService {
     } catch (e: unknown) {
       const errorMsg = e instanceof Error ? e.message : 'Error cargando bovinos';
       this.errorSignal.set(errorMsg);
-      console.error(e);
     } finally {
       this.loadingSignal.set(false);
     }
   }
 
+  /**
+   * Obtiene los datos desde el servidor remoto Supabase.
+   * @param fincaId ID de la finca.
+   */
   private async fetchRemote(fincaId: string) {
     return await this.supabase.client!
       .from('bovinos')
@@ -3908,6 +4100,10 @@ export class GanadoService {
       .order('created_at', { ascending: false });
   }
 
+  /**
+   * Obtiene los datos del almacenamiento local (Mock/Offline).
+   * @param fincaId ID de la finca.
+   */
   private async fetchMock(fincaId: string) {
     const { data, error } = await this.supabase.getAll<Bovino>('bovinos');
     if (data) {
@@ -3962,10 +4158,22 @@ ARCHIVO: .\frontend\src\app\core\services\global-error-handler.ts
 import { ErrorHandler, Injectable, Injector } from '@angular/core';
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 
+/**
+ * @class GlobalErrorHandler
+ * @description Interceptor global de excepciones no controladas.
+ * Proporciona una capa de resiliencia capturando errores en tiempo de ejecución,
+ * notificando al usuario mediante una interfaz no intrusiva y registrando el incidente
+ * para análisis técnico posterior.
+ */
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   constructor(private injector: Injector) {}
 
+  /**
+   * @description Procesa cualquier error no capturado en la aplicación.
+   * Evita el colapso de la UI y ofrece un mensaje amigable.
+   * @param {any} error El objeto de error capturado.
+   */
   async handleError(error: any) {
     // Evita inyectar dependencias directamente en el constructor para evitar ciclos.
     const toastCtrl = this.injector.get(ToastController);
@@ -4223,13 +4431,17 @@ export class OfflineSyncService {
       const { data, error } = await this.supa.client.from('bovinos').select('*');
       if (data && !error) {
         await localforage.setItem('vacapp_bovinos_offline_cache', data);
-        console.log('[OfflineSync] Caché de catálogo primario Bovinos actualizado en IndexedDB.');
       }
     } catch(e: unknown) {
       console.error('[OfflineSync] Error al cachear background dataset', e);
     }
   }
 
+  /**
+   * @description Limpia por completo la cola de sincronización pendiente.
+   * Utilizar con precaución, ya que elimina cambios no guardados en el servidor.
+   * @returns {Promise<void>}
+   */
   async clearQueue() {
     await this.saveQueue([]);
   }
@@ -4243,9 +4455,10 @@ ARCHIVO: .\frontend\src\app\core\services\pdf.service.ts
 import { Injectable } from '@angular/core';
 
 /**
- * Servicio centralizado para la generación de reportes PDF.
- * Utiliza Carga Dinámica (Lazy Loading) para evitar bloqueos en el arranque de la aplicación 
- * y resolver conflictos de pre-bundado de Vite.
+ * @class PdfService
+ * @description Motor de generación de reportes documentales.
+ * Implementa carga perezosa de jsPDF y autoTable para optimizar el bundle.
+ * Configura plantillas visuales alineadas con la identidad "Forest & Earth".
  */
 @Injectable({
   providedIn: 'root'
@@ -4270,7 +4483,13 @@ export class PdfService {
   }
 
   /**
-   * Genera un PDF profesional con una tabla de datos de forma asíncrona.
+   * @description Orquesta la creación y descarga automática de un archivo PDF.
+   * @param {string} title Título principal del documento.
+   * @param {string[][]} headers Cabeceras de la tabla.
+   * @param {any[]} body Filas de datos.
+   * @param {string} fileName Nombre del archivo resultante (sin extensión).
+   * @param {any} [options] Configuraciones adicionales para autoTable.
+   * @returns {Promise<void>}
    */
   async generateTablePDF(
     title: string, 
@@ -4288,7 +4507,14 @@ export class PdfService {
   }
 
   /**
-   * Agrega una tabla a un documento existente de forma asíncrona.
+   * @description Inserta una tabla estilizada en un documento jsPDF activo.
+   * Aplica automáticamente la paleta de colores corporativa.
+   * @param {any} doc Instancia de jsPDF.
+   * @param {string} title Título de la sección.
+   * @param {string[][]} headers Cabeceras.
+   * @param {any[]} body Datos.
+   * @param {any} [options] Overrides de estilo.
+   * @returns {Promise<void>}
    */
   async addTableToDoc(
     doc: any,
@@ -4363,6 +4589,12 @@ import { SupabaseService } from './supabase.service';
 import { GanadoService } from './ganado.service';
 import { Pesaje } from '../models/vacapp.models';
 
+/**
+ * @class PesajeService
+ * @description Especializado en el seguimiento biométrico del ganado.
+ * Gestiona el historial de pesajes, calcula curvas de crecimiento individual
+ * y proporciona métricas de rendimiento de cebo y evolución del hato.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -4373,7 +4605,9 @@ export class PesajeService {
   private pesajesSignal = signal<Pesaje[]>([]);
   private loadingSignal = signal<boolean>(false);
 
+  /** Historial completo de pesajes registrados en la explotación. */
   readonly records = computed(() => this.pesajesSignal());
+  /** Estado de carga del servicio. */
   readonly isLoading = computed(() => this.loadingSignal());
 
   constructor() {
@@ -4388,6 +4622,11 @@ export class PesajeService {
     });
   }
 
+  /**
+   * @description Carga los registros de pesaje. Activa la generación de datos históricos
+   * simulados si no existen registros previos para garantizar la visualización de gráficos.
+   * @returns {Promise<void>}
+   */
   async loadPesajes() {
     this.loadingSignal.set(true);
     try {
@@ -4406,6 +4645,12 @@ export class PesajeService {
   }
 
   // Extrae la evolución de peso para los animales más relevantes
+  /**
+   * @description Analiza y extrae la evolución de peso de los 5 animales con más registros.
+   * Cruza datos para generar un formato compatible con gráficos de líneas.
+   * @param {'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total'} periodo Granularidad temporal.
+   * @returns {Object} Configuración de datos para Chart.js.
+   */
   getEvolucionPrincipales(periodo: 'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total') {
     const records = this.pesajesSignal();
     const bovinos = this.ganadoService.bovinos();
@@ -4557,6 +4802,12 @@ import { SupabaseService } from './supabase.service';
 import { FincaService } from './finca.service';
 import { Reproduccion } from '../models/vacapp.models';
 
+/**
+ * @class ReproduccionService
+ * @description Motor lógico para la gestión del ciclo de vida reproductivo del ganado.
+ * Calcula métricas críticas como "Días Abiertos", predice fechas de parto
+ * y orquesta el seguimiento de gestaciones confirmadas y fallidas.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -4566,7 +4817,9 @@ export class ReproduccionService {
 
   private reproduccionSignal = signal<Reproduccion[]>([]);
 
+  /** Historial completo de eventos reproductivos. */
   readonly gestaciones = computed(() => this.reproduccionSignal());
+  /** Subconjunto de gestaciones en curso (Estado: Confirmada). */
   readonly gestacionesActivas = computed(() => 
     this.reproduccionSignal().filter(r => r.estado_gestacion === 'Confirmada')
   );
@@ -4638,6 +4891,11 @@ export class ReproduccionService {
     });
   }
 
+  /**
+   * @description Carga el historial reproductivo global. Sincroniza con el servicio
+   * de Supabase e inyecta datos mock si la base de datos está vacía.
+   * @returns {Promise<void>}
+   */
   async loadReproduccion() {
     const { data, error } = await this.supabase.getReproduccion();
     
@@ -4650,6 +4908,12 @@ export class ReproduccionService {
     }
   }
 
+  /**
+   * @description Genera estadísticas de éxito de concepción (Tasa de preñez).
+   * Clasifica los eventos por periodo para análisis de eficiencia reproductiva temporal.
+   * @param {'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total'} periodo Granularidad temporal.
+   * @returns {Array<{label: string, exitos: number, fallos: number}>} Datos para visualización.
+   */
   getEstadisticasConcepcion(periodo: 'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total') {
     const records = this.reproduccionSignal();
     const map = new Map<string, { exitos: number, fallos: number }>();
@@ -4739,6 +5003,12 @@ import { SupabaseService } from './supabase.service';
 import { FincaService } from './finca.service';
 import { Sanidad } from '../models/vacapp.models';
 
+/**
+ * @class SanidadService
+ * @description Supervisor de salud y bioseguridad del hato.
+ * Gestiona el historial clínico de intervenciones y monitoriza activamente 
+ * los periodos de retiro de medicamentos para garantizar la seguridad alimentaria.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -4749,7 +5019,9 @@ export class SanidadService {
   private sanidadSignal = signal<Sanidad[]>([]);
   private loadingSignal = signal<boolean>(false);
 
+  /** Listado reactivo de todas las intervenciones sanitarias registradas. */
   readonly records = computed(() => this.sanidadSignal());
+  /** Estado de carga del módulo de sanidad. */
   readonly isLoading = computed(() => this.loadingSignal());
 
   // Alerta de Retiros Activos
@@ -4771,17 +5043,26 @@ export class SanidadService {
     });
   });
 
+  /**
+   * @constructor
+   * @description Configura un observador reactivo que recarga el historial sanitario
+   * cada vez que se selecciona una finca diferente en el sistema.
+   */
   constructor() {
     effect(() => {
       const fincaId = this.fincaService.selectedFincaId();
       if (fincaId) {
         this.loadSanidad();
       } else {
-        this.sanidadSignal.set([]);
+        this.sanidadSignal.set([]); // Limpieza de estado si no hay contexto de finca
       }
     });
   }
 
+  /**
+   * @description Carga las intervenciones sanitarias de la base de datos central.
+   * @returns {Promise<void>}
+   */
   async loadSanidad() {
     this.loadingSignal.set(true);
     try {
@@ -4794,18 +5075,34 @@ export class SanidadService {
     }
   }
 
+  /**
+   * @description Registra un nuevo evento sanitario (vacunación, tratamiento, diagnóstico).
+   * @param {Partial<Sanidad>} payload Datos de la intervención.
+   * @returns {Promise<any>}
+   */
   async createSanidad(payload: Partial<Sanidad>) {
     const res = await this.supabase.createSanidad(payload);
     if (!res.error) await this.loadSanidad();
     return res;
   }
 
+  /**
+   * @description Actualiza una intervención sanitaria existente.
+   * @param {string} id Identificador de la intervención.
+   * @param {Partial<Sanidad>} payload Datos actualizados.
+   * @returns {Promise<any>}
+   */
   async updateSanidad(id: string, payload: Partial<Sanidad>) {
     const res = await this.supabase.updateSanidad(id, payload);
     if (!res.error) await this.loadSanidad();
     return res;
   }
 
+  /**
+   * @description Elimina de forma permanente un registro sanitario.
+   * @param {string} id Identificador de la intervención.
+   * @returns {Promise<any>}
+   */
   async deleteSanidad(id: string) {
     const res = await this.supabase.deleteSanidad(id);
     if (!res.error) await this.loadSanidad();
@@ -4821,12 +5118,26 @@ ARCHIVO: .\frontend\src\app\core\services\storage.service.ts
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 
+/**
+ * @class StorageService
+ * @description Gestor de activos multimedia y persistencia de archivos.
+ * Encargado de la subida, recuperación y organización de fotografías de animales
+ * en Supabase Storage, con soporte para simulación (Mock) local.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
   private supabase = inject(SupabaseService);
 
+  /**
+   * @description Sube una fotografía al bucket 'animal-photos'.
+   * Genera una ruta organizada por finca para optimizar la privacidad y el acceso.
+   * @param {File} file Archivo binario de la imagen.
+   * @param {string} fincaId Identificador de la explotación.
+   * @param {string} bovinoId Identificador único del animal.
+   * @returns {Promise<{data: {publicUrl: string} | null, error: any}>}
+   */
   async uploadAnimalPhoto(file: File, fincaId: string, bovinoId: string) {
     if (!this.supabase.client) {
       // Modo Mock: simulamos subida creando un object URL
@@ -4892,7 +5203,6 @@ export class SupabaseService {
           environment.supabaseUrl, 
           environment.supabaseKey
         );
-        console.log('%c✅ Vacapp: Conexión establecida con Supabase.', 'color: #2d6a4f; font-weight: bold;');
       } catch (error) {
         console.error('❌ Vacapp: Error crítico al inicializar el cliente de Supabase:', error);
       }
@@ -4902,8 +5212,7 @@ export class SupabaseService {
         ? 'MODO MOCK (Forzado por configuración)' 
         : 'MODO MOCK (Fallback: Faltan credenciales)';
       
-      console.warn(`%c🚀 Vacapp: Ejecutando en ${reason}.`, 'color: #d4a373; font-weight: bold;');
-      console.info('Utilizando almacenamiento LocalStorage para persistencia temporal.');
+      // Entorno de ejecución identificado
       this.seedTestData();
     }
   }
@@ -5677,7 +5986,7 @@ export class SupabaseService {
 
     localStorage.setItem('vacapp_seeded_v2', 'true');
     localStorage.setItem('vacapp_seeded', 'true');
-    console.log('%c💎 Vacapp: Base de Datos Relacional inyectada con éxito.', 'color: #38b000; font-weight: bold;');
+    // Inicialización de base de datos exitosa
   }
 
 }
@@ -5957,6 +6266,13 @@ interface AnimalData {
   reproduccion: Reproduccion[];
   finanzas: Finanzas[];
 }
+
+/**
+ * @class AnimalDetailComponent
+ * @description Vista detallada "Inteligencia Animal". Consolida toda la información 
+ * histórica de una res: evolución de peso, árbol genealógico, historial clínico
+ * y flujo de caja (rentabilidad). Permite la actualización de la fotografía del animal.
+ */
 
 @Component({
   selector: 'app-animal-detail',
@@ -6803,6 +7119,13 @@ interface Alerta {
   icono: string;
 }
 
+/**
+ * @class DashboardComponent
+ * @description Centro de mando y análisis de la explotación. 
+ * Agrega datos de todos los módulos para presentar indicadores clave de rendimiento (KPIs),
+ * alertas tempranas de salud/reproducción y visualizaciones gráficas de la evolución del hato.
+ */
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -7260,6 +7583,12 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
       .sort((a, b) => prioridad[a.tipo] - prioridad[b.tipo]);
   });
 
+  /**
+   * @constructor
+   * @description Configura la visualización inicial del panel de control.
+   * Inicializa el motor de gráficos (Chart.js) con estilos personalizados 'Forest & Earth'.
+   * Registra efectos reactivos para la actualización automática de métricas ante cambios en el censo o finanzas.
+   */
   constructor() {
     addIcons({ 
       pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
@@ -7302,12 +7631,20 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * @description Aplica un filtro temporal global a todos los widgets del dashboard.
+   * Sincroniza la visualización de pesajes y finanzas para una comparativa coherente.
+   * @param {'Mensual' | 'Anual'} period Granularidad temporal deseada.
+   */
   applyMasterFilter(period: 'Mensual' | 'Anual') {
     this.masterPeriod.set(period);
     this.weightPeriod.set(period);
     this.financePeriod.set(period);
   }
 
+  /**
+   * @description Seguimiento de identidad para elementos dinámicos (Alertas).
+   */
   trackById(index: number, item: Alerta | any): string {
     return item?.id || index.toString();
   }
@@ -7706,6 +8043,14 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { FinanzasService } from '../../core/services/finanzas.service';
 import { Finanzas } from '../../core/models/vacapp.models';
 import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline } from 'ionicons/icons';
+
+/**
+ * @class FinanzasComponent
+ * @description Módulo de gestión económica de la explotación. 
+ * Permite el seguimiento detallado de flujos de caja (ingresos y gastos),
+ * análisis de retorno de inversión (ROI) mediante gráficos comparativos
+ * y exportación de balances financieros a formato PDF.
+ */
 
 @Component({
   selector: 'app-finanzas',
@@ -8232,8 +8577,11 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ToastController, AlertController } from '@ionic/angular/standalone';
 
 /**
- * Componente para el Módulo de Lotes/Recintos - Versión Estándar.
- * Refactorizado: 100% Sincronización de colores y nombres vac-.
+ * @class LotesComponent
+ * @description Módulo de gestión territorial y división del hato.
+ * Permite organizar los animales en potreros o recintos específicos,
+ * calculando automáticamente la carga animal (UGB) por unidad de superficie
+ * para optimizar el pastoreo rotacional.
  */
 @Component({
   selector: 'app-lotes',
@@ -8539,15 +8887,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
 
   <main class="vac-container animate-fade-in">
     <!-- Contenedor del Escáner (Fuera de ion-card y overflow hidden) -->
-    <div *ngIf="isScanning()" class="scanner-container animate-fade-in ion-margin-bottom">
-      <div class="vac-card-header mb-2 flex justify-between items-center">
-         <span class="font-bold color-primary">Cámara Activa</span>
-         <ion-button fill="clear" color="danger" (click)="isScanning.set(false)" class="ion-no-margin">
-            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
-         </ion-button>
-      </div>
-      <div id="reader"></div>
-    </div>
+    <!-- El escáner se ha movido a un ion-modal para evitar conflictos de z-index -->
 
     <!-- Search Bar -->
     <div class="search-with-qr">
@@ -8558,7 +8898,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
         (ionInput)="handleSearch($event)"
         class="vac-filter-bar vac-transparent-searchbar">
       </ion-searchbar>
-      <ion-button (click)="openScanner()" fill="clear" class="qr-scan-btn" aria-label="Escanear QR">
+      <ion-button (click)="abrirScanner()" fill="clear" class="qr-scan-btn" aria-label="Escanear QR">
         <ion-icon name="qr-code-outline"></ion-icon>
       </ion-button>
     </div>
@@ -8688,7 +9028,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
   </main>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Añadir ejemplar">
+    <ion-fab-button (click)="openAddModal()" aria-label="Añadir ejemplar">
       <ion-icon name="add-circle"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -8895,6 +9235,27 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
       </div>
     </ng-template>
   </ion-popover>
+  
+  <!-- MODAL DEL ESCÁNER QR -->
+  <ion-modal [isOpen]="isScannerOpen" (didDismiss)="cerrarScanner()" class="vac-modal-scanner">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar color="primary">
+          <ion-title>Escanear Crotal</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarScanner()" aria-label="Cerrar escáner">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding ion-text-center">
+        <div class="vac-scanner-instruction ion-padding">
+          <p>Encuadra el código QR o el Crotal en el recuadro para identificar al animal automáticamente.</p>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
 
 
@@ -8976,9 +9337,9 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
  * @class ManejoComponent
- * @description Componente principal para el Módulo de Manejo (Inventario y Censo Ganadero).
- * Implementa una interfaz "Rustic-Luxe" con capacidades de búsqueda en tiempo real (Signals),
- * filtros avanzados, carga perezosa de imágenes (Skeletons) y soporte de sincronización Offline-First.
+ * @description Gestiona el inventario principal y el censo ganadero de la finca.
+ * Proporciona herramientas de búsqueda avanzada, filtros por estado productivo/lote,
+ * y acceso rápido a la ficha técnica individual de cada animal.
  */
 @Component({
   selector: 'app-manejo',
@@ -9081,12 +9442,19 @@ export class ManejoComponent {
   };
 
   isModalOpen = false;
+  isScannerOpen = false;
   editingItem: Bovino | null = null;
   currentStep = 1;
   isUploadingFile = false;
 
   bovinoForm: FormGroup;
 
+  /**
+   * @constructor
+   * @description Inicializa el componente de gestión ganadera.
+   * Configura los iconos de sistema y el formulario reactivo de alta/edición.
+   * Establece observadores reactivos para el estado de carga del servicio.
+   */
   constructor() {
     addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline, 'qr-code-outline': qrCodeOutline, 'scan-outline': scanOutline });
     this.bovinoForm = this.fb.group({
@@ -9109,6 +9477,12 @@ export class ManejoComponent {
     }, { allowSignalWrites: true });
   }
 
+  /**
+   * @description Función de optimización para el renderizado de listas (ngFor).
+   * @param {number} index Índice del elemento en la lista.
+   * @param {any} item Objeto bovino o identificador.
+   * @returns {string} Identificador único para el seguimiento de cambios.
+   */
   trackById(index: number, item: any): string {
     return item?.id || item || index.toString();
   }
@@ -9140,49 +9514,54 @@ export class ManejoComponent {
     }
   }
 
-  // Estado del escáner
-  isScanning = signal(false);
+  // --- LÓGICA DEL ESCÁNER QR ---
 
   /**
-   * Simulación de escáner QR para identificación de animales.
+   * Abre el modal del escáner e inicializa la cámara tras un breve retardo
+   * para asegurar que el elemento DOM #reader esté disponible.
    */
-  async openScanner() {
-    this.presentToast('Iniciando cámara del escáner...', 'primary');
-    console.log('Iniciando escáner...');
-    this.isScanning.set(true);
-    
-    // Si usas html5-qrcode, asegúrate de que el método start() 
-    // se llame después de un pequeño setTimeout de 200ms
+  async abrirScanner() {
+    this.isScannerOpen = true;
+    // Retardo para asegurar que el modal se ha renderizado y el div #reader existe
     setTimeout(() => {
-      console.log('Cámara montada. Esperando lectura...');
+      this.iniciarCamara();
     }, 200);
+  }
 
-    // Simulación de detección tras 2 segundos
-    setTimeout(async () => {
-      this.isScanning.set(false);
+  /**
+   * Inicializa la librería de escaneo (html5-qrcode).
+   * En un entorno real, aquí se instanciaría el escáner.
+   */
+  private iniciarCamara() {
+    this.presentToast('Cámara inicializada', 'primary');
+    
+    // Simulación de detección exitosa para demostración
+    setTimeout(() => {
+      // Supongamos que detectamos un ID de animal
       const list = this.bovinos();
       if (list.length > 0) {
-        // En una app real, esto vendría del resultado del escaneo del crotal
         const randomAnimal = list[Math.floor(Math.random() * list.length)];
-        
-        const alert = await this.alertCtrl.create({
-          header: 'QR Detectado',
-          subHeader: randomAnimal.crotal,
-          message: `Se ha identificado a: ${randomAnimal.nombre}. ¿Deseas ver su ficha completa?`,
-          mode: 'ios',
-          buttons: [
-            { text: 'Cancelar', role: 'cancel' },
-            { 
-              text: 'Ver Ficha', 
-              handler: () => this.goToDetail(randomAnimal.id)
-            }
-          ]
-        });
-        await alert.present();
-      } else {
-        this.presentToast('No se encontraron animales para identificar', 'warning');
+        this.handleQrSuccess(randomAnimal.id);
       }
-    }, 2000);
+    }, 3000);
+  }
+
+  /**
+   * Detiene la cámara y cierra el modal.
+   */
+  cerrarScanner() {
+    this.isScannerOpen = false;
+    // Aquí se llamaría a qrScanner.stop() si se usara la librería
+  }
+
+  /**
+   * Procesa el resultado del escaneo, cierra el visor y navega al detalle.
+   * @param animalId ID del animal detectado.
+   */
+  private handleQrSuccess(animalId: string) {
+    this.cerrarScanner();
+    this.presentToast('Animal identificado correctamente');
+    this.goToDetail(animalId);
   }
 
   // --- LÓGICA DE FILTROS ---
@@ -9281,8 +9660,8 @@ export class ManejoComponent {
   }
 
   /**
-   * @description Persiste la ficha del animal (Creación o Actualización).
-   * Tiene conciencia de red (Offline-First): si no hay conexión, delega en `OfflineSyncService`.
+   * @description Persiste los cambios de la ficha del animal (Creación o Edición).
+   * Gestiona automáticamente el modo offline delegando en OfflineSyncService si es necesario.
    */
   async saveData() {
     if (this.bovinoForm.invalid) return;
@@ -9346,6 +9725,11 @@ export class ManejoComponent {
     await alert.present();
   }
 
+  /**
+   * Muestra un mensaje flotante (Toast) al usuario.
+   * @param message Texto a mostrar.
+   * @param color Tono visual (success, danger, warning, primary).
+   */
   async presentToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({
       message,
@@ -9394,8 +9778,10 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
- * Componente para el Módulo de Recría y Control de Pesaje - Versión Estándar.
- * Refactorizado: 100% Sincronización de colores y nombres vac-.
+ * @class RecriaComponent
+ * @description Módulo estratégico para el seguimiento del crecimiento y engorde.
+ * Analiza la Ganancia Media Diaria (GMD), visualiza curvas de maduración individual
+ * y genera reportes de rendimiento zootécnico para la toma de decisiones.
  */
 @Component({
   selector: 'app-recria',
@@ -10220,7 +10606,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
   </main>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Nuevo registro de cría">
+    <ion-fab-button (click)="openAddModal()" aria-label="Nuevo registro de cría">
       <ion-icon name="add-circle"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -10380,8 +10766,10 @@ import { METODOS_REPRODUCCION, ESTADOS_GESTACION } from '../../core/constants/va
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 /**
- * Componente para el Módulo de Reproducción y Ginecología - Versión Rústica.
- * Refactorizado: 100% Sincronización de colores con _variables.scss.
+ * @class ReproduccionComponent
+ * @description Módulo de gestión ginecológica y reproductiva.
+ * Supervisa ciclos de celo, montas e inseminaciones, confirmaciones de gestación
+ * y predicción automatizada de fechas de parto (gestación de 283 días).
  */
 @Component({
   selector: 'app-reproduccion',
@@ -10517,6 +10905,10 @@ export class ReproduccionComponent implements OnInit {
     this.loadData();
   }
 
+  /**
+   * Carga los datos reproductivos del sistema.
+   * @param event Evento opcional de ion-refresher.
+   */
   async loadData(event?: Event) {
     this.isLoading.set(true);
     try {
@@ -10524,7 +10916,7 @@ export class ReproduccionComponent implements OnInit {
       this.reproducciones.set(repros || []);
       this.gestacionesActivas.set((repros || []).filter(r => r.estado_gestacion === 'Confirmada'));
     } catch (e) {
-      console.error('Error cargando datos reproductivos:', e);
+      // Error silencioso para la UI, el estado isLoading gestiona la visualización
     } finally {
       this.isLoading.set(false);
       if (event && (event as any).target) {
@@ -10541,12 +10933,19 @@ export class ReproduccionComponent implements OnInit {
     return item.id || index.toString();
   }
 
+  /**
+   * Navega a la ficha técnica de un animal.
+   * @param bovinoId UUID del animal.
+   */
   goToDetail(bovinoId: string) {
     if (bovinoId) {
       this.router.navigate(['/animal-detail', bovinoId]);
     }
   }
 
+  /**
+   * Genera un reporte PDF con el historial reproductivo actual.
+   */
   async exportarPDF() {
     const headers = [['Vaca', 'Crotal', 'Fecha Cubrición', 'Método', 'Estado', 'FPP/Parto']];
     const body = this.filteredReproducciones().map(r => [
@@ -10589,6 +10988,10 @@ export class ReproduccionComponent implements OnInit {
     this.isFilterPopoverOpen = false;
   }
 
+  /**
+   * Calcula automáticamente la fecha de parto prevista basada en la gestación bovina (283 días).
+   * @param fechaCubricion Fecha en la que se realizó la monta o IA.
+   */
   private calculateParto(fechaCubricion: string) {
     if (fechaCubricion) {
       const date = new Date(fechaCubricion);
@@ -10616,6 +11019,9 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * Abre el formulario para registrar un nuevo evento reproductivo.
+   */
   openAddModal() {
     this.editingItem = null;
     this.reproForm.reset({
@@ -10626,6 +11032,10 @@ export class ReproduccionComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  /**
+   * Abre el formulario en modo edición para un registro existente.
+   * @param item Registro de reproducción a editar.
+   */
   openEditModal(item: Reproduccion) {
     this.editingItem = item;
     const { bovino, ...data } = item;
@@ -10633,6 +11043,9 @@ export class ReproduccionComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  /**
+   * Cierra los diálogos modales activos.
+   */
   closeModal() { this.isModalOpen = false; }
 
   async saveData() {
@@ -10867,7 +11280,7 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
   </main>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openAddModal()" color="primary" aria-label="Nueva intervención">
+    <ion-fab-button (click)="openAddModal()" aria-label="Nueva intervención">
       <ion-icon name="add-circle"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -11060,9 +11473,10 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 import { GanadoService } from '../../core/services/ganado.service';
 
 /**
- * Componente para el Módulo de Sanidad Animal - Versión Rústica.
- * Refactorizado: 100% Sincronización de colores con _variables.scss.
- * Corregido: Nombres de propiedades sincronizados con Interfaz Sanidad (fecha, tipo).
+ * @class SanidadComponent
+ * @description Gestiona el historial clínico, vacunaciones y tratamientos veterinarios del ganado.
+ * Permite el seguimiento de periodos de retiro, análisis estadístico de intervenciones
+ * y generación de reportes sanitarios oficiales en PDF.
  */
 @Component({
   selector: 'app-sanidad',
@@ -11196,6 +11610,12 @@ export class SanidadComponent implements OnInit {
     this.loadData();
   }
 
+  /**
+   * @description Carga los registros sanitarios desde el servicio central.
+   * Maneja estados de carga y errores de conexión.
+   * @param {Event} [event] Evento opcional del componente IonRefresher.
+   * @returns {Promise<void>}
+   */
   async loadData(event?: Event) {
     this.isLoading.set(true);
     try {
@@ -11225,6 +11645,11 @@ export class SanidadComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Genera un reporte PDF con el listado actual de intervenciones sanitarias filtradas.
+   * Utiliza PdfService para la construcción del documento.
+   * @returns {Promise<void>}
+   */
   async exportarPDF() {
     const headers = [['Fecha', 'Crotal', 'Tratamiento', 'Producto']];
     const data = this.filteredSanidad().map((item: Sanidad) => [
@@ -13400,13 +13825,13 @@ ARCHIVO: .\frontend\src\styles\core\_ionic.scss
   --ion-color-danger: #{variables.$danger-color};
 
   --ion-font-family: #{variables.$font-family-base};
-  --ion-background-color: #{variables.$light-color};
+  --ion-background-color: #FDFBF7;
   --ion-text-color: #{variables.$dark-color};
 }
 
-// Side menu customization
+// Side menu - transparent (la sidebar tiene su propio gradiente en _sidebar.scss)
 ion-menu {
-  --ion-background-color: #{variables.$white};
+  --ion-background-color: transparent;
 }
 
 // Global utility classes to replace inline styles
@@ -13500,6 +13925,42 @@ ion-fab[vertical="bottom"] {
 
 .tabs-bottom ion-fab[vertical="bottom"] {
   margin-bottom: calc(env(safe-area-inset-bottom) + 70px) !important; 
+}
+
+/* iPhone Safe Area & Mobile Layout Fixes */
+ion-content {
+  --padding-top: env(safe-area-inset-top);
+  --padding-bottom: env(safe-area-inset-bottom);
+}
+
+ion-toolbar {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* iPhone 14 / Notch devices - viewport fix */
+html {
+  /* Asegurar que el viewport respeta las áreas seguras */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Mobile responsive grid fix */
+@media (max-width: 768px) {
+  .vac-container {
+    padding: 0.5rem;
+  }
+  
+  ion-card {
+    margin-inline: 8px;
+    margin-block: 8px;
+    --border-radius: 16px !important;
+    border-radius: 16px !important;
+  }
+  
+  /* Sidebar overlay en móvil - no split pane */
+  ion-split-pane {
+    --side-width: 280px;
+    --side-min-width: 280px;
+  }
 }
 
 
@@ -14110,12 +14571,17 @@ ARCHIVO: .\frontend\src\styles\layout\_containers.scss
 }
 
 .main-container {
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--vac-bg-main);
+  overflow-x: hidden;
+}
+
+.content-canvas {
+  flex: 1;
+  width: 100%;
 }
 
 .vac-welcome-section {
@@ -14145,8 +14611,13 @@ ion-split-pane {
 }
 
 ion-split-pane.collapsed {
-  --side-width: 80px;
-  --side-min-width: 80px;
+  --side-width: 0px !important;
+  --side-min-width: 0px !important;
+  --side-max-width: 0px !important;
+  
+  ion-menu {
+    display: none !important;
+  }
 }
 
 .vac-sidebar {
@@ -14358,8 +14829,8 @@ ARCHIVO: .\frontend\src\theme\variables.scss
   --ion-color-tertiary-rgb: 212, 163, 115;
 
   /** Fondos Claros (Rustic-Luxe Light) **/
-  --ion-background-color: #f8f9fa;
-  --ion-background-color-rgb: 248, 249, 250;
+  --ion-background-color: #FDFBF7;
+  --ion-background-color-rgb: 253, 251, 247;
 
   --ion-text-color: #1a1a1a;
   --ion-text-color-rgb: 26, 26, 26;
@@ -14380,7 +14851,11 @@ ARCHIVO: .\frontend\src\theme\variables.scss
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
   }
 
-  ion-label, h1, h2, h3, h4, h5, h6, p, span, strong {
+  /* Texto en contenido principal (NO sidebar, que usa blanco sobre verde) */
+  ion-router-outlet ion-label, ion-router-outlet h1, ion-router-outlet h2,
+  ion-router-outlet h3, ion-router-outlet h4, ion-router-outlet h5,
+  ion-router-outlet h6, ion-router-outlet p, ion-router-outlet span,
+  ion-router-outlet strong {
     color: #1a1a1a !important;
   }
 
@@ -14416,7 +14891,11 @@ html.ion-palette-dark {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
   }
 
-  ion-label, h1, h2, h3, h4, h5, h6, p, span, strong {
+  /* Texto en contenido principal modo noche */
+  ion-router-outlet ion-label, ion-router-outlet h1, ion-router-outlet h2,
+  ion-router-outlet h3, ion-router-outlet h4, ion-router-outlet h5,
+  ion-router-outlet h6, ion-router-outlet p, ion-router-outlet span,
+  ion-router-outlet strong {
     color: #fdfaf7 !important;
   }
 

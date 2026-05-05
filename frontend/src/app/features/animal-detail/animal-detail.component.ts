@@ -37,6 +37,13 @@ interface AnimalData {
   finanzas: Finanzas[];
 }
 
+/**
+ * @class AnimalDetailComponent
+ * @description Vista detallada "Inteligencia Animal". Consolida toda la información 
+ * histórica de una res: evolución de peso, árbol genealógico, historial clínico
+ * y flujo de caja (rentabilidad). Permite la actualización de la fotografía del animal.
+ */
+
 @Component({
   selector: 'app-animal-detail',
   standalone: true,
@@ -263,6 +270,9 @@ export class AnimalDetailComponent implements OnInit {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
+  /**
+   * @description Función para seguimiento de elementos en bucles ngFor.
+   */
   trackById(index: number, item: any): string {
     return item?.id || index.toString();
   }
@@ -283,12 +293,19 @@ export class AnimalDetailComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Carga la información completa del animal desde Supabase.
+   * @param {string} id Identificador del bovino.
+   */
   async loadData(id: string) {
     const res = await this.supabase.getAnimalCompleteData(id);
     this.data.set(res.data);
   }
 
-  /** Selección y subida de foto del animal */
+  /**
+   * @description Selección y subida de foto del animal a almacenamiento y base de datos.
+   * @param {Event} event Evento de cambio de archivo.
+   */
   async onPhotoSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input?.files?.[0];
@@ -309,7 +326,6 @@ export class AnimalDetailComponent implements OnInit {
 
       await this.showToast('📷 Foto actualizada correctamente', 'success');
     } catch (err) {
-      console.error('Error subiendo foto:', err);
       await this.showToast('❌ Error al subir la foto', 'danger');
     } finally {
       this.isUploading.set(false);
@@ -318,6 +334,11 @@ export class AnimalDetailComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Muestra una notificación al usuario.
+   * @param {string} message Mensaje a mostrar.
+   * @param {string} color Color de la notificación.
+   */
   private async showToast(message: string, color: string) {
     const toast = await this.toastCtrl.create({
       message,
@@ -330,6 +351,11 @@ export class AnimalDetailComponent implements OnInit {
     await toast.present();
   }
 
+  /**
+   * @description Obtiene el color de badge según el estado reproductivo.
+   * @param {string} [status] Estado actual del animal.
+   * @returns {string} Color de Ionic.
+   */
   getStatusColor(status?: string) {
     switch (status) {
       case 'Gestante': return 'tertiary';

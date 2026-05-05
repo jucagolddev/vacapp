@@ -37,6 +37,13 @@ interface Alerta {
   icono: string;
 }
 
+/**
+ * @class DashboardComponent
+ * @description Centro de mando y análisis de la explotación. 
+ * Agrega datos de todos los módulos para presentar indicadores clave de rendimiento (KPIs),
+ * alertas tempranas de salud/reproducción y visualizaciones gráficas de la evolución del hato.
+ */
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -494,6 +501,12 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
       .sort((a, b) => prioridad[a.tipo] - prioridad[b.tipo]);
   });
 
+  /**
+   * @constructor
+   * @description Configura la visualización inicial del panel de control.
+   * Inicializa el motor de gráficos (Chart.js) con estilos personalizados 'Forest & Earth'.
+   * Registra efectos reactivos para la actualización automática de métricas ante cambios en el censo o finanzas.
+   */
   constructor() {
     addIcons({ 
       pawOutline, heartOutline, calendarOutline, statsChartOutline, alertCircleOutline, 
@@ -536,12 +549,20 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * @description Aplica un filtro temporal global a todos los widgets del dashboard.
+   * Sincroniza la visualización de pesajes y finanzas para una comparativa coherente.
+   * @param {'Mensual' | 'Anual'} period Granularidad temporal deseada.
+   */
   applyMasterFilter(period: 'Mensual' | 'Anual') {
     this.masterPeriod.set(period);
     this.weightPeriod.set(period);
     this.financePeriod.set(period);
   }
 
+  /**
+   * @description Seguimiento de identidad para elementos dinámicos (Alertas).
+   */
   trackById(index: number, item: Alerta | any): string {
     return item?.id || index.toString();
   }

@@ -1,76 +1,80 @@
 @use 'theme/variables.scss';
 @use 'styles/main';
 
-/* Scanner Visibility Fix */
-#reader, .scanner-container, video {
-  width: 100% !important;
-  min-height: 300px;
-  background-color: #000; /* Fondo negro mientras carga la cámara */
-  border-radius: 20px;
-  overflow: hidden;
-  display: block !important;
-  z-index: 999;
-}
-
-/* Si usas un escáner que requiere transparencia (Capacitor Native) */
-.scanner-active {
-  --background: transparent !important;
-  --ion-background-color: transparent !important;
-  visibility: hidden; /* Oculta la UI para ver la cámara detrás */
-}
-
-/* ----------------------------------------------------
-   ENCAPSULACIÓN FORZADA DE TIPOGRAFÍA (UI/UX)
-   ---------------------------------------------------- */
+/* ==========================================================================
+   SISTEMA VISUAL: RUSTIC-LUXE (Verde Bosque & Tierra)
+   ========================================================================== */
 
 :root {
-  /* --- MODO CLARO (Sol Directo / Legibilidad Máxima) --- */
-  --vac-bg-main: #FDFBF7;
-  --vac-bg-card: #FFFFFF;
-  --vac-text-primary: #1A211E; /* Negro bosque profundo */
-  --vac-text-secondary: #4B5563; /* Gris oscuro para subtítulos */
-  --vac-primary: #1B4332;
-  --vac-accent: #BC8A5F;
-  
-  /* Variables de Ionic para Modo Claro */
+  --vac-bg-main: #EAE2D5;     /* Fondo Tierra Arena Cálido */
+  --vac-primary: #1B4332;     /* Verde Bosque */
+  --vac-accent: #A67C52;      /* Tierra/Cuero */
+  --vac-text-main: #1A211E;   /* Negro profundo */
   --ion-background-color: var(--vac-bg-main);
-  --ion-text-color: var(--vac-text-primary);
-  --ion-item-background: var(--vac-bg-card);
 }
 
-html.ion-palette-dark {
-  /* --- MODO NOCHE (Bajo Brillo / Premium) --- */
-  --vac-bg-main: #050A07; /* Fondo casi negro */
-  --vac-bg-card: #0A140F; /* Tarjetas ligeramente más claras */
-  --vac-text-primary: #FDFAF7; /* Blanco hueso (máximo contraste) */
-  --vac-text-secondary: #A0A6A3; /* Gris verdoso claro */
+/* Sidebar Blindada (Siempre arriba y siempre Verde Bosque) */
+ion-menu {
+  --background: #1B4332 !important; /* Verde Bosque */
+  ion-content { --background: #1B4332 !important; }
   
-  /* Variables de Ionic para Modo Noche */
-  --ion-background-color: var(--vac-bg-main);
-  --ion-text-color: var(--vac-text-primary);
-  --ion-item-background: var(--vac-bg-card);
+  /* Texto siempre blanco hueso, incluso en modo día */
+  ion-item, ion-label, ion-list-header {
+    --color: #FDFAF7 !important;
+    color: #FDFAF7 !important;
+    --background: transparent !important;
+  }
+  ion-icon { color: #A67C52 !important; } /* Iconos Tierra */
 }
 
-/* Tipografía global y suavizado de fuentes */
+/* Botón Añadir (FAB) Estilizado */
+ion-fab-button {
+  --background: var(--vac-accent) !important;
+  --color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease !important;
+
+  &:active {
+    transform: scale(0.9) !important;
+  }
+}
+
+/* Tipografía Global Outfit */
 * {
   font-family: 'Outfit', sans-serif !important;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Forzar contraste en contenido principal (excluyendo la sidebar que tiene su propio esquema) */
-ion-router-outlet h1, ion-router-outlet h2, ion-router-outlet h3,
-ion-router-outlet h4, ion-router-outlet h5, ion-router-outlet h6,
-ion-router-outlet ion-title {
-  color: var(--vac-text-primary) !important;
-  font-weight: 700 !important;
+body, ion-content {
+  --background: var(--vac-bg-main) !important;
 }
 
-ion-router-outlet p, ion-router-outlet ion-note {
-  color: var(--vac-text-primary);
+/* Contenedor scrolleable con margen para el botón de abajo */
+ion-content {
+  --padding-bottom: 80px; /* Deja espacio para el botón FAB */
 }
 
-ion-router-outlet .text-muted {
-  color: var(--vac-text-secondary) !important;
+/* Ajuste de tarjetas para que no se peguen */
+ion-grid {
+  display: block !important;
+  width: 100%;
+  --ion-grid-column-padding: 8px;
+}
+
+/* Forzar que en pantallas medianas/grandes las tarjetas sean más pequeñas */
+ion-col {
+  padding: 4px !important;
+}
+
+/* Reducir escala general para simular el 75% */
+ion-card {
+  margin: 8px !important; /* Menos margen entre tarjetas */
+  --border-radius: 16px !important;
+  min-height: 120px; /* Asegura un tamaño mínimo para que el texto respire */
+}
+
+ion-card-title {
+  font-size: 1.1rem !important; /* Títulos algo más pequeños */
 }
 
 /* ----------------------------------------------------

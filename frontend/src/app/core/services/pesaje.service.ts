@@ -3,6 +3,12 @@ import { SupabaseService } from './supabase.service';
 import { GanadoService } from './ganado.service';
 import { Pesaje } from '../models/vacapp.models';
 
+/**
+ * @class PesajeService
+ * @description Especializado en el seguimiento biométrico del ganado.
+ * Gestiona el historial de pesajes, calcula curvas de crecimiento individual
+ * y proporciona métricas de rendimiento de cebo y evolución del hato.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -13,7 +19,9 @@ export class PesajeService {
   private pesajesSignal = signal<Pesaje[]>([]);
   private loadingSignal = signal<boolean>(false);
 
+  /** Historial completo de pesajes registrados en la explotación. */
   readonly records = computed(() => this.pesajesSignal());
+  /** Estado de carga del servicio. */
   readonly isLoading = computed(() => this.loadingSignal());
 
   constructor() {
@@ -28,6 +36,11 @@ export class PesajeService {
     });
   }
 
+  /**
+   * @description Carga los registros de pesaje. Activa la generación de datos históricos
+   * simulados si no existen registros previos para garantizar la visualización de gráficos.
+   * @returns {Promise<void>}
+   */
   async loadPesajes() {
     this.loadingSignal.set(true);
     try {
@@ -46,6 +59,12 @@ export class PesajeService {
   }
 
   // Extrae la evolución de peso para los animales más relevantes
+  /**
+   * @description Analiza y extrae la evolución de peso de los 5 animales con más registros.
+   * Cruza datos para generar un formato compatible con gráficos de líneas.
+   * @param {'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total'} periodo Granularidad temporal.
+   * @returns {Object} Configuración de datos para Chart.js.
+   */
   getEvolucionPrincipales(periodo: 'Diario' | 'Semanal' | 'Mensual' | 'Anual' | 'Total') {
     const records = this.pesajesSignal();
     const bovinos = this.ganadoService.bovinos();

@@ -27,13 +27,13 @@
   --ion-color-danger: #{variables.$danger-color};
 
   --ion-font-family: #{variables.$font-family-base};
-  --ion-background-color: #{variables.$light-color};
+  --ion-background-color: #FDFBF7;
   --ion-text-color: #{variables.$dark-color};
 }
 
-// Side menu customization
+// Side menu - transparent (la sidebar tiene su propio gradiente en _sidebar.scss)
 ion-menu {
-  --ion-background-color: #{variables.$white};
+  --ion-background-color: transparent;
 }
 
 // Global utility classes to replace inline styles
@@ -127,4 +127,40 @@ ion-fab[vertical="bottom"] {
 
 .tabs-bottom ion-fab[vertical="bottom"] {
   margin-bottom: calc(env(safe-area-inset-bottom) + 70px) !important; 
+}
+
+/* iPhone Safe Area & Mobile Layout Fixes */
+ion-content {
+  --padding-top: env(safe-area-inset-top);
+  --padding-bottom: env(safe-area-inset-bottom);
+}
+
+ion-toolbar {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* iPhone 14 / Notch devices - viewport fix */
+html {
+  /* Asegurar que el viewport respeta las áreas seguras */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Mobile responsive grid fix */
+@media (max-width: 768px) {
+  .vac-container {
+    padding: 0.5rem;
+  }
+  
+  ion-card {
+    margin-inline: 8px;
+    margin-block: 8px;
+    --border-radius: 16px !important;
+    border-radius: 16px !important;
+  }
+  
+  /* Sidebar overlay en móvil - no split pane */
+  ion-split-pane {
+    --side-width: 280px;
+    --side-min-width: 280px;
+  }
 }

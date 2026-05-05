@@ -17,6 +17,14 @@ import { FinanzasService } from '../../core/services/finanzas.service';
 import { Finanzas } from '../../core/models/vacapp.models';
 import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline } from 'ionicons/icons';
 
+/**
+ * @class FinanzasComponent
+ * @description Módulo de gestión económica de la explotación. 
+ * Permite el seguimiento detallado de flujos de caja (ingresos y gastos),
+ * análisis de retorno de inversión (ROI) mediante gráficos comparativos
+ * y exportación de balances financieros a formato PDF.
+ */
+
 @Component({
   selector: 'app-finanzas',
   standalone: true,
@@ -97,7 +105,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         <h2 class="vac-section-title">Movimientos Filtrados</h2>
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredRecords(); trackBy: trackById">
+            <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let r of filteredRecords(); trackBy: trackById">
               <article class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
                 <div class="vac-card-header-flex">
                   <div class="vac-icon-circle" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
