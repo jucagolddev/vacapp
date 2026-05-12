@@ -186,4 +186,48 @@ ion-modal.vac-modal {
   }
 }
 
+/* ==========================================================================
+   MODO COMPACTO Y SIDEBAR
+   ========================================================================== */
 
+/* RESET DE ESCALA GLOBAL */
+:root {
+  font-size: 14px !important; /* Esto encoge todo proporcionalmente */
+}
+
+/* SIDEBAR COMPACTA Y ALINEADA */
+ion-menu {
+  --width: 250px !important;
+
+  .vac-nav-item {
+    --min-height: 40px !important; /* Items mas finos */
+    --padding-start: 12px !important;
+    margin: 2px 8px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .icon-frame {
+    flex-shrink: 0 !important; /* Evita que el icono se aplaste */
+    min-width: 28px !important;
+    margin-right: 10px !important;
+    display: flex;
+    justify-content: center;
+    ion-icon { font-size: 18px !important; }
+  }
+
+  .vac-label {
+    font-size: 0.9rem !important;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 !important;
+    flex-grow: 1;
+  }
+}
+
+/* TARJETAS ELEGANTES */
+ion-card {
+  margin: 8px !important;
+  --border-radius: 12px !important;
+}

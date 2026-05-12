@@ -497,12 +497,316 @@ export class SupabaseService {
     }
   }
 
+  // =========================================================================
+  // GESTIÓN DE LOTES Y TRAZABILIDAD SANITARIA (Cumplimiento Normativa REGA)
+  // =========================================================================
+
+  /**
+   * @description Obtiene todos los lotes activos de la explotación.
+   * La gestión por lotes es fundamental para el cumplimiento de la normativa REGA 
+   * (Registro General de Explotaciones Ganaderas), permitiendo una trazabilidad 
+   * agrupada y precisa de los animales.
+   * @returns {Promise<{data: any[] | null, error: any}>} Lista de lotes activos.
+   */
+  async getBatches(): Promise<{ data: any[] | null; error: any }> {
+    try {
+      if (!this.supabase || environment.useMockData) {
+        const { data, error } = await this.getRawMock('lotes');
+        const activos = (data || []).filter((l: any) => l.estado === 'Activo' || !l.estado);
+        return { data: activos, error };
+      }
+
+      const { data, error } = await this.supabase
+        .from('lotes')
+        .select('*')
+        .eq('estado', 'Activo')
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al obtener lotes:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * @description Crea un nuevo lote (Batch) en el sistema.
+   * Cumple con los requerimientos REGA para la clasificación y separación epidemiológica.
+   * @param {string} name Nombre descriptivo del lote.
+   * @param {string} type Tipo de lote ('Cebo', 'Reposición', 'Venta', 'Sanitario').
+   * @returns {Promise<{data: any | null, error: any}>} Lote recién creado.
+   */
+  async createBatch(name: string, type: string): Promise<{ data: any | null; error: any }> {
+    try {
+      const payload = {
+        nombre: name,
+        tipo: type,
+        estado: 'Activo',
+        finca_id: 'finca-1' // Idealmente dinámico según el contexto del usuario
+      };
+
+      if (!this.supabase || environment.useMockData) {
+        return await this.create('lotes', payload);
+      }
+
+      const { data, error } = await this.supabase
+        .from('lotes')
+        .insert(payload)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al crear lote:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * @description Asigna múltiples animales a un lote específico mediante un update masivo.
+   * Vital para documentar movimientos internos según exigencias de trazabilidad REGA.
+   * @param {string[]} animalIds Array de identificadores UUID de los animales.
+   * @param {string} batchId Identificador UUID del lote destino.
+   * @returns {Promise<{error: any}>} Promesa de completitud.
+   */
+  async assignAnimalsToBatch(animalIds: string[], batchId: string): Promise<{ error: any }> {
+    try {
+      if (!this.supabase || environment.useMockData) {
+        const { data: bovinos } = await this.getRawMock('bovinos');
+        const updated = bovinos.map((b: any) => {
+          if (animalIds.includes(b.id)) {
+            return { ...b, lote_id: batchId };
+          }
+          return b;
+        });
+        localStorage.setItem('mock_bovinos', JSON.stringify(updated));
+        return { error: null };
+      }
+
+      const { error } = await this.supabase
+        .from('bovinos')
+        .update({ lote_id: batchId } as any)
+        .in('id', animalIds);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      console.error('Error al asignar animales a lote:', error);
+      return { error };
+    }
+  }
+
+  /**
+   * @description Aplica un tratamiento médico a todos los animales de un lote.
+   * Calcula automáticamente el tiempo de retiro del medicamento para asegurar 
+   * que los productos derivados cumplan con la seguridad alimentaria (REGA/Sanidad).
+   * @param {string} batchId UUID del lote a tratar.
+   * @param {any} treatmentData Datos base del tratamiento (producto, dosis, tipo, etc.).
+   * @param {number} withdrawalDays Días de retiro/espera estipulados por el fabricante.
+   * @returns {Promise<{error: any}>}
+   */
+  async applyMassTreatment(batchId: string, treatmentData: any, withdrawalDays: number): Promise<{ error: any }> {
+    try {
+      // 1. Calcular fecha de retiro
+      const today = new Date();
+      const withdrawalDate = new Date(today.getTime() + (withdrawalDays * 24 * 60 * 60 * 1000));
+      const fechaRetiroStr = withdrawalDate.toISOString().split('T')[0];
+
+      if (!this.supabase || environment.useMockData) {
+        // Lógica Mock
+        const { data: bovinos } = await this.getRawMock('bovinos');
+        const animalesEnLote = bovinos.filter((b: any) => b.lote_id === batchId);
+        
+        for (const animal of animalesEnLote) {
+          const sanidadRecord = {
+            ...treatmentData,
+            bovino_id: animal.id,
+            lote_id: batchId,
+            fecha_retiro: fechaRetiroStr,
+            fecha: today.toISOString().split('T')[0]
+          };
+          await this.create('sanidad', sanidadRecord);
+        }
+        return { error: null };
+      }
+
+      // 2. Obtener animales del lote real
+      const { data: animals, error: fetchError } = await this.supabase
+        .from('bovinos')
+        .select('id')
+        .eq('lote_id', batchId);
+
+      if (fetchError) throw fetchError;
+      if (!animals || animals.length === 0) return { error: new Error('El lote está vacío.') };
+
+      // 3. Preparar inserción masiva
+      const treatments = animals.map(animal => ({
+        ...treatmentData,
+        bovino_id: animal.id,
+        lote_id: batchId,
+        fecha_retiro: fechaRetiroStr,
+        fecha: today.toISOString().split('T')[0]
+      }));
+
+      // 4. Insertar en sanidad
+      const { error: insertError } = await this.supabase
+        .from('sanidad')
+        .insert(treatments);
+
+      if (insertError) throw insertError;
+      return { error: null };
+
+    } catch (error) {
+      console.error('Error al aplicar tratamiento masivo:', error);
+      return { error };
+    }
+  }
+
+  /**
+   * @description Verifica si un animal se encuentra en periodo de retiro farmacológico.
+   * Es una medida de bioseguridad obligatoria (REGA) antes del envío a matadero o 
+   * consumo lácteo (COVAP/Central lechera).
+   * @param {string} animalId Identificador UUID del bovino.
+   * @returns {Promise<{ isSafe: boolean; activeTreatments: any[] | null; error: any }>}
+   */
+  async checkWithdrawalStatus(animalId: string): Promise<{ isSafe: boolean; activeTreatments: any[] | null; error: any }> {
+    try {
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      if (!this.supabase || environment.useMockData) {
+        const { data: sanidad } = await this.getRawMock('sanidad');
+        const activeTreatments = sanidad.filter((s: any) => 
+          s.bovino_id === animalId && 
+          s.fecha_retiro && 
+          s.fecha_retiro >= todayStr
+        );
+        return { isSafe: activeTreatments.length === 0, activeTreatments, error: null };
+      }
+
+      const { data, error } = await this.supabase
+        .from('sanidad')
+        .select('*')
+        .eq('bovino_id', animalId)
+        .gte('fecha_retiro', todayStr);
+
+      if (error) throw error;
+
+      return { 
+        isSafe: !data || data.length === 0, 
+        activeTreatments: data, 
+        error: null 
+      };
+    } catch (error) {
+      console.error('Error al comprobar estatus de retiro farmacológico:', error);
+      return { isSafe: false, activeTreatments: null, error };
+    }
+  }
+
+  // =========================================================================
+  // GESTIÓN DE RECURSOS HÍDRICOS (Abrevaderos / Sequía)
+  // =========================================================================
+
+  /**
+   * @description Obtiene todos los abrevaderos y sus niveles actuales.
+   * @returns {Promise<{data: any[] | null, error: any}>}
+   */
+  async getWaterTroughs(): Promise<{ data: any[] | null; error: any }> {
+    try {
+      if (!this.supabase || environment.useMockData) {
+        const { data, error } = await this.getRawMock('abrevaderos');
+        return { data: data || [], error };
+      }
+
+      const { data, error } = await this.supabase
+        .from('abrevaderos')
+        .select('*')
+        .order('nombre', { ascending: true });
+        
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al obtener abrevaderos:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * @description Actualiza el porcentaje de agua (fill_level / nivel_llenado).
+   * Si el nivel baja del 20%, actualiza el status a 'Vacío'.
+   * @param {string} troughId UUID del abrevadero.
+   * @param {number} level Porcentaje de 0 a 100.
+   * @returns {Promise<{data: any | null, error: any}>}
+   */
+  async updateWaterLevel(troughId: string, level: number): Promise<{ data: any | null; error: any }> {
+    try {
+      const clampedLevel = Math.max(0, Math.min(100, level));
+      const status = clampedLevel <= 20 ? 'Vacío' : 'Operativo';
+
+      const payload = {
+        nivel_llenado: clampedLevel,
+        estado: status
+      };
+
+      if (!this.supabase || environment.useMockData) {
+        return await this.update('abrevaderos', troughId, payload);
+      }
+
+      const { data, error } = await this.supabase
+        .from('abrevaderos')
+        .update(payload)
+        .eq('id', troughId)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al actualizar nivel de agua:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * @description Actualiza la fecha last_cleaned_at a hoy.
+   * Vital para la prevención de enfermedades y bioseguridad.
+   * @param {string} troughId UUID del abrevadero.
+   * @returns {Promise<{data: any | null, error: any}>}
+   */
+  async registerTroughCleaning(troughId: string): Promise<{ data: any | null; error: any }> {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const payload = {
+        ultima_limpieza: today,
+        estado: 'Operativo' // Restauramos a operativo tras limpieza si estaba en mantenimiento
+      };
+
+      if (!this.supabase || environment.useMockData) {
+        return await this.update('abrevaderos', troughId, payload);
+      }
+
+      const { data, error } = await this.supabase
+        .from('abrevaderos')
+        .update(payload)
+        .eq('id', troughId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al registrar limpieza del abrevadero:', error);
+      return { data: null, error };
+    }
+  }
+
   /**
    * Genera un set de datos masivo, relacional y coherente para demostración.
    */
   private seedTestData() {
-    // Si ya existe la versión 2, no re-sembramos
-    if (localStorage.getItem('vacapp_seeded_v2') === 'true') return;
+    // Si ya existe la versión 3, no re-sembramos
+    if (localStorage.getItem('vacapp_seeded_v3') === 'true') return;
 
     const now = new Date();
     const daysAgo = (d: number) => {
@@ -536,6 +840,11 @@ export class SupabaseService {
       ],
       sementales: [
         { id: 'sem-1', nombre: 'Titán', raza: 'Limousin', finca_id: 'finca-1' }
+      ],
+      abrevaderos: [
+        { id: 'abr-1', nombre: 'Abrevadero Norte', lote_id: 'lote-engorde', capacidad_litros: 500, estado: 'Operativo', ultima_limpieza: daysAgo(2), nivel_llenado: 85 },
+        { id: 'abr-2', nombre: 'Pilón Central', lote_id: 'lote-repro', capacidad_litros: 1000, estado: 'Operativo', ultima_limpieza: daysAgo(5), nivel_llenado: 45 },
+        { id: 'abr-3', nombre: 'Depósito Parideras', lote_id: 'lote-maternidad', capacidad_litros: 300, estado: 'Vacío', ultima_limpieza: daysAgo(15), nivel_llenado: 10 }
       ],
       bovinos: [],
       recria_pesajes: [],
@@ -812,7 +1121,7 @@ export class SupabaseService {
       localStorage.setItem(`mock_${table}`, JSON.stringify(mockData[table]));
     });
 
-    localStorage.setItem('vacapp_seeded_v2', 'true');
+    localStorage.setItem('vacapp_seeded_v3', 'true');
     localStorage.setItem('vacapp_seeded', 'true');
     // Inicialización de base de datos exitosa
   }

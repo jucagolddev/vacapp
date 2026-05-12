@@ -4,7 +4,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   IonSplitPane, IonMenu, IonContent, IonList, 
   IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons, IonFooter
+  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -28,7 +28,7 @@ import { SupabaseService } from '../../services/supabase.service';
     CommonModule, RouterLink, RouterLinkActive,
     IonSplitPane, IonMenu, IonContent, IonList, 
     IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons, IonFooter
+    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
   ],
   template: `
       <ion-split-pane contentId="main-content" [when]="'md'" [class.collapsed]="isCollapsed">

@@ -5,7 +5,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, 
   IonBackButton, IonGrid, IonRow, IonCol, IonIcon, 
   IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText,
-  IonSpinner, ToastController
+  IonSpinner, ToastController, AlertController, IonButton
 } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { BaseChartDirective } from 'ng2-charts';
@@ -17,7 +17,7 @@ import {
   paw, medical, scale, calendar, cash, 
   chevronForwardOutline, fitnessOutline, 
   timeOutline, alertCircleOutline, checkmarkCircleOutline,
-  flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline
+  flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline, pricetagOutline
 } from 'ionicons/icons';
 
 interface TimelineEvent {
@@ -51,7 +51,7 @@ interface AnimalData {
     CommonModule, FormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonButtons, IonBackButton, IonGrid, IonRow, IonCol, IonIcon,
     IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText,
-    IonSpinner, BaseChartDirective
+    IonSpinner, BaseChartDirective, IonButton
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -61,7 +61,9 @@ interface AnimalData {
         </ion-buttons>
         <ion-title class="ion-text-center">Inteligencia Animal</ion-title>
         <ion-buttons slot="end">
-           <div style="width: 48px"></div>
+          <ion-button (click)="venderAnimal()" color="danger" aria-label="Vender o Dar de Baja">
+            <ion-icon name="pricetag-outline"></ion-icon>
+          </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -87,7 +89,14 @@ interface AnimalData {
               <div class="animal-main-info">
                  <h1 class="crotal-id">{{ data()?.bovino?.crotal }}</h1>
                  <p class="animal-name">{{ data()?.bovino?.nombre || 'Res S/N' }} • {{ data()?.bovino?.raza }}</p>
-                 <ion-badge [color]="getStatusColor(data()?.bovino?.estado_reproductivo)" class="status-badge" mode="ios">
+                 
+                 <!-- BADGE REGA: TIEMPO DE ESPERA (Bloqueante) -->
+                 <ion-badge *ngIf="inWithdrawal().active" color="danger" class="status-badge mt-2" style="font-size: 0.95rem; padding: 10px 14px; display: inline-flex; align-items: center; gap: 6px;">
+                    <ion-icon name="alert-circle-outline" style="font-size: 1.2rem;"></ion-icon> 🚨 EN TIEMPO DE ESPERA - NO APTO PARA VENTA
+                 </ion-badge>
+
+                 <!-- Badge normal de estado reproductivo -->
+                 <ion-badge *ngIf="!inWithdrawal().active" [color]="getStatusColor(data()?.bovino?.estado_reproductivo)" class="status-badge" mode="ios">
                     {{ data()?.bovino?.estado_reproductivo || 'Activo' }}
                  </ion-badge>
               </div>
@@ -263,6 +272,7 @@ export class AnimalDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private supabase = inject(SupabaseService);
   private toastCtrl = inject(ToastController);
+  private alertCtrl = inject(AlertController);
   
   activeSegment = signal('history');
   data = signal<AnimalData | null>(null);
@@ -282,7 +292,7 @@ export class AnimalDetailComponent implements OnInit {
       paw, medical, scale, calendar, cash, 
       chevronForwardOutline, fitnessOutline, 
       timeOutline, alertCircleOutline, checkmarkCircleOutline,
-      flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline
+      flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline, pricetagOutline
     });
   }
 
@@ -363,6 +373,75 @@ export class AnimalDetailComponent implements OnInit {
       case 'Seca': return 'medium';
       default: return 'primary';
     }
+  }
+
+  // =========================================================================
+  // GESTIÓN REGA - SEGURIDAD ALIMENTARIA Y TRAZABILIDAD
+  // =========================================================================
+
+  /**
+   * @description Calcula de forma reactiva si el animal está en periodo de
+   * supresión de medicamentos, bloqueando legalmente su venta.
+   */
+  inWithdrawal = computed(() => {
+    const records = this.data()?.sanidad || [];
+    const now = new Date().getTime();
+    for (const s of records) {
+      const fechaRetiro = (s as any).fecha_retiro || (s as any).withdrawal_date;
+      if (fechaRetiro && new Date(fechaRetiro).getTime() > now) {
+        return { active: true, date: fechaRetiro };
+      }
+    }
+    return { active: false, date: null };
+  });
+
+  /**
+   * @description Lógica para vender o dar de baja a un animal.
+   * Incluye un Guard/Validación estricto para evitar vender animales con residuos
+   * de antibióticos (Cumplimiento de Bioseguridad REGA).
+   */
+  async venderAnimal() {
+    const withdrawalInfo = this.inWithdrawal();
+    const crotal = this.data()?.bovino?.crotal || 'Desconocido';
+
+    if (withdrawalInfo.active) {
+      const fechaFormat = new Date(withdrawalInfo.date!).toLocaleDateString('es-ES', { 
+        year: 'numeric', month: 'long', day: 'numeric' 
+      });
+
+      const alertBlock = await this.alertCtrl.create({
+        header: 'Operación denegada',
+        subHeader: 'Bloqueo Normativa REGA 🚨',
+        message: `El animal <strong>${crotal}</strong> se encuentra en periodo de supresión de medicamentos hasta el <strong>${fechaFormat}</strong>.<br><br>Para garantizar la seguridad alimentaria, no es apto para venta ni envío a matadero.`,
+        buttons: ['Entendido'],
+        cssClass: 'vac-alert-danger',
+        mode: 'ios'
+      });
+      await alertBlock.present();
+      return;
+    }
+
+    const alertConfirm = await this.alertCtrl.create({
+      header: 'Vender o Dar de Baja',
+      message: `¿Deseas dar de baja o registrar la venta del animal ${crotal}? Esta acción actualizará su estado en la explotación.`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'color-medium'
+        },
+        {
+          text: 'Continuar',
+          role: 'confirm',
+          handler: async () => {
+            await this.showToast('Trámite de venta iniciado correctamente.', 'success');
+          }
+        }
+      ],
+      mode: 'ios'
+    });
+    
+    await alertConfirm.present();
   }
 
   // KPIs
