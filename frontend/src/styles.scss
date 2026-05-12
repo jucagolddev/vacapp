@@ -11,32 +11,18 @@
   --vac-accent: #A67C52;      /* Tierra/Cuero */
   --vac-text-main: #1A211E;   /* Negro profundo */
   --ion-background-color: var(--vac-bg-main);
+  /* Reducimos el tamaño de fuente base de Ionic */
+  --ion-font-family: 'Outfit', sans-serif;
+  font-size: 14px; /* Bajamos de los 16px por defecto a 14px */
 }
 
-/* Sidebar Blindada (Siempre arriba y siempre Verde Bosque) */
-ion-menu {
-  --background: #1B4332 !important; /* Verde Bosque */
-  ion-content { --background: #1B4332 !important; }
-  
-  /* Texto siempre blanco hueso, incluso en modo día */
-  ion-item, ion-label, ion-list-header {
-    --color: #FDFAF7 !important;
-    color: #FDFAF7 !important;
-    --background: transparent !important;
-  }
-  ion-icon { color: #A67C52 !important; } /* Iconos Tierra */
-}
+
 
 /* Botón Añadir (FAB) Estilizado */
 ion-fab-button {
   --background: var(--vac-accent) !important;
   --color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease !important;
-
-  &:active {
-    transform: scale(0.9) !important;
-  }
 }
 
 /* Tipografía Global Outfit */
@@ -61,21 +47,29 @@ ion-grid {
   --ion-grid-column-padding: 8px;
 }
 
-/* Forzar que en pantallas medianas/grandes las tarjetas sean más pequeñas */
+/* Ajuste del Grid para que no se pisen */
 ion-col {
-  padding: 4px !important;
+  padding: 4px !important; /* Menos espacio muerto entre columnas */
 }
 
 /* Reducir escala general para simular el 75% */
 ion-card {
-  margin: 8px !important; /* Menos margen entre tarjetas */
+  margin: 8px 12px !important;
   --border-radius: 16px !important;
-  min-height: 120px; /* Asegura un tamaño mínimo para que el texto respire */
+  min-height: 120px;
+}
+
+ion-card-header {
+  padding: 12px !important;
 }
 
 ion-card-title {
-  font-size: 1.1rem !important; /* Títulos algo más pequeños */
+  font-size: 1rem !important; /* Títulos más elegantes, no gigantes */
+  font-weight: 700;
 }
+
+/* Ionic maneja el alineamiento de ion-item internamente via Shadow DOM.
+   No forzar align-items globalmente para evitar conflictos. */
 
 /* ----------------------------------------------------
    QR DINÁMICO - Estilos Premium para Alert y Modal
@@ -191,3 +185,5 @@ ion-modal.vac-modal {
     }
   }
 }
+
+

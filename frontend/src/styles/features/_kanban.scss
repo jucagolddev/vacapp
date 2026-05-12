@@ -1,0 +1,36 @@
+// _kanban.scss
+// Kanban Board Features
+
+@use '../abstracts/variables' as v;
+@use '../abstracts/mixins' as m;
+
+// Component-specific variables
+$kanban-col-bg: rgba(255, 255, 255, 0.4);
+$kanban-col-radius: 20px;
+$kanban-card-radius: 16px;
+
+// Dark mode overrides
+html.ion-palette-dark {
+  .kanban-column {
+    background: rgba(10, 20, 15, 0.6) !important;
+    border: 1px solid rgba(188, 138, 95, 0.1) !important;
+  }
+  .kanban-card {
+    background: #0a140f !important;
+    border-color: rgba(188, 138, 95, 0.2) !important;
+  }
+  .kanban-column__title,
+  .kanban-card__title,
+  .ctx-item {
+    color: v.$white !important;
+  }
+  .kanban-card__desc,
+  .kanban-card__due,
+  .kanban-card__subtask-count {
+    color: v.$gray-400 !important;
+  }
+  .kanban-context-menu {
+    background: #0a140f !important;
+    border-color: rgba(188, 138, 95, 0.2) !important;
+  }
+}

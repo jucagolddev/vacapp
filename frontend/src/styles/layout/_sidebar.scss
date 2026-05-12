@@ -1,10 +1,15 @@
 @use "../abstracts/variables";
 
-/* 1. LAYOUT PRINCIPAL & SIDEBAR */
+/* ==========================================================================
+   SIDEBAR NAVIGATION — Single Source of Truth
+   All sidebar styles are consolidated here. No other file should style
+   ion-menu items, icons, or labels to avoid specificity conflicts.
+   ========================================================================== */
+
+/* 1. SPLIT PANE LAYOUT */
 ion-split-pane {
-  --side-width: 280px;
-  --side-min-width: 280px;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --side-width: 260px;
+  --side-min-width: 260px;
   background: var(--ion-background-color);
 }
 
@@ -12,33 +17,37 @@ ion-split-pane.collapsed {
   --side-width: 0px !important;
   --side-min-width: 0px !important;
   --side-max-width: 0px !important;
-  
+
   ion-menu {
     display: none !important;
   }
 }
 
+/* 2. SIDEBAR CONTAINER */
 .vac-sidebar {
   --background: transparent !important;
   --ion-background-color: transparent !important;
   --ion-item-background: transparent !important;
-  background: transparent;
+  --width: 260px;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
-  transition: variables.$transition-base;
 }
 
 .vac-sidebar::part(container) {
-  background: linear-gradient(180deg, #{variables.$primary-color} 0%, #{variables.$dark-color} 100%) !important;
+  background: linear-gradient(
+    180deg,
+    #{variables.$primary-color} 0%,
+    #{variables.$dark-color} 100%
+  ) !important;
   box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2);
 }
 
 .vac-sidebar ion-content {
   --background: transparent !important;
-  --padding-bottom: 20px;
 }
 
+/* 3. SIDEBAR HEADER (Brand) */
 .vac-sidebar-header {
-  height: 100px;
+  height: 80px;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -49,20 +58,25 @@ ion-split-pane.collapsed {
 .brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
 .logo-circle {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #{variables.$tertiary-color}, #{variables.$success-color});
-  border-radius: 16px;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(
+    135deg,
+    #{variables.$tertiary-color},
+    #{variables.$success-color}
+  );
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 22px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   transform: rotate(-5deg);
+  flex-shrink: 0;
 }
 
 .brand-text {
@@ -73,7 +87,7 @@ ion-split-pane.collapsed {
 .main-brand {
   color: variables.$white;
   font-weight: 900;
-  font-size: 22px;
+  font-size: 20px;
   letter-spacing: 2px;
   line-height: 1;
 }
@@ -87,70 +101,83 @@ ion-split-pane.collapsed {
   opacity: 0.8;
 }
 
+/* 4. NAV CONTAINER */
 .vac-nav-container {
-  padding: 20px 10px;
+  padding: 12px 8px;
 }
 
 .vac-nav-list {
   background: transparent;
 }
 
+/* 5. NAV ITEMS — The core fix
+   We use Ionic CSS custom properties (--min-height, --padding-start, etc.)
+   instead of overriding display/flex on the host element, which breaks
+   Ionic's internal shadow DOM layout and causes overlapping/unclickable items. */
 .vac-nav-item {
   --background: transparent;
   --background-focused: rgba(255, 255, 255, 0.05);
   --background-hover: rgba(255, 255, 255, 0.08);
-  --border-radius: 16px;
-  margin-bottom: 8px;
-  height: 56px;
-  transition: variables.$transition-base;
-  --color: rgba(255, 255, 255, 0.6);
-  
-  &::part(native) {
-    padding-inline-start: 12px;
-  }
+  --border-radius: 10px;
+  --min-height: 44px;
+  --padding-start: 12px;
+  --inner-padding-end: 8px;
+  --color: rgba(255, 255, 255, 0.65);
+  --transition: background 0.2s ease, transform 0.2s ease;
+  margin: 3px 8px;
+  cursor: pointer;
 
+  /* Active state */
   &.active-link {
     --color: #{variables.$white};
-    --background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    
+    --background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
     .icon-frame {
-      background: variables.$tertiary-color;
-      color: variables.$primary-color;
-      box-shadow: 0 4px 12px rgba(variables.$tertiary-color, 0.3);
+      background: #{variables.$tertiary-color};
+      color: #{variables.$primary-color};
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    
-  .vac-label {
-      font-weight: 800;
-      letter-spacing: 0.5px;
+
+    .vac-label {
+      font-weight: 700;
+      letter-spacing: 0.3px;
     }
   }
 
+  /* Hover state */
   &:hover:not(.active-link) {
-    --background: rgba(255, 255, 255, 0.05);
-    transform: translateX(5px);
-    
+    --background: rgba(255, 255, 255, 0.06);
+    transform: translateX(3px);
+
     .icon-frame {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
       color: variables.$white;
     }
   }
 }
 
+/* 6. ICON FRAME — Properly sized and centered via flexbox.
+   Uses slot="start" so Ionic places it before the label automatically. */
 .icon-frame {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  margin-right: 15px;
-  font-size: 20px;
-  transition: variables.$transition-fast;
+  background: rgba(255, 255, 255, 0.06);
+  margin-right: 12px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
   color: rgba(255, 255, 255, 0.5);
+
+  ion-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
 
   &.danger {
     color: variables.$danger-color;
@@ -158,51 +185,74 @@ ion-split-pane.collapsed {
   }
 }
 
+/* 7. NAV LABEL */
 .vac-label {
-  font-size: 14px;
-  font-weight: 600;
-  transition: variables.$transition-fast;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s ease;
 }
 
+/* 8. NAV SEPARATOR */
 .nav-separator {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  margin: 20px 15px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  margin: 12px 15px;
 }
 
+/* 9. LOGOUT ITEM */
 .logout-item {
   &:hover {
-    --background: rgba(variables.$danger-color, 0.05) !important;
+    --background: rgba(variables.$danger-color, 0.08) !important;
+
     .icon-frame.danger {
       background: variables.$danger-color;
       color: white;
       box-shadow: 0 4px 12px rgba(variables.$danger-color, 0.3);
     }
+
     .vac-label {
       color: variables.$danger-color;
     }
   }
 }
 
-/* Theme Toggle Refined */
+/* 10. THEME TOGGLE BUTTON */
 .theme-toggle-btn {
   --background: rgba(255, 255, 255, 0.05);
-  --border-radius: 14px;
+  --border-radius: 10px;
   --color: rgba(255, 255, 255, 0.7);
   font-weight: 700;
-  margin: 20px 15px;
-  width: calc(100% - 30px);
+  margin: 12px 12px;
+  width: calc(100% - 24px);
   text-transform: uppercase;
   letter-spacing: 1.5px;
   font-size: 10px;
-  
+
   &:hover {
     --background: rgba(255, 255, 255, 0.1);
     --color: white;
   }
 }
 
+/* 11. SIDEBAR FOOTER BADGE */
 .sidebar-bottom-badge {
-  padding: 20px;
+  padding: 16px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  ion-icon {
+    font-size: 16px;
+  }
+
+  .text-sm {
+    font-size: 12px;
+  }
 }

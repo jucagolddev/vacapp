@@ -45,6 +45,8 @@ with open(OUTPUT_FILE, 'w', encoding='utf-8') as outfile:
     for root, dirs, files in os.walk('.'):
         # Filtrar carpetas excluidas (modifica la lista in-place)
         dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS]
+        dirs.sort()
+        files.sort()
         
         for file in files:
             if file in EXCLUDE_FILES:

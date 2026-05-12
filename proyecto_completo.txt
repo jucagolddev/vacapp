@@ -86,48 +86,52 @@ print(f"¡Listo! Archivos binarios ignorados correctamente. Todo se guardó en {
 ARCHIVO: .\README.md
 ==================================================
 
-# 🐮 Vacapp: Tu ganado bajo control, incluso sin cobertura.
+# 🐮 Vacapp: Gestión Inteligente
 
-**Vacapp** es el compañero digital que todo ganadero necesita. Una herramienta robusta, sencilla y diseñada específicamente para el trabajo duro en el campo. Olvídate de los cuadernos manchados de barro y lleva toda la información de tu explotación en tu bolsillo.
+**Vacapp** es el compañero digital que todo ganadero necesita. Una herramienta robusta y de **alta densidad de información** diseñada específicamente para optimizar la gestión de tu explotación ganadera. Funciona rápido, sin interrupciones, y se adapta tanto al trabajo duro en el campo como a la gestión detallada desde tu oficina.
 
 ---
 
-## 🌟 Funciones Principales para tu Finca
+## 🌟 Optimizada para el Campo y la Oficina
 
-### 📱 Funciona sin internet (Modo Monte)
-Sabemos que en las zonas altas la cobertura es escasa. Vacapp guarda todos tus registros (partos, ventas, vacunas) en la memoria de tu teléfono. En cuanto vuelvas a tener señal, la App sincronizará todo automáticamente con la nube de forma segura.
+Vacapp no es una app convencional. Su interfaz está diseñada bajo el sistema *Rustic-Luxe*, garantizando máxima legibilidad bajo la luz del sol (con un excelente contraste) y mostrando toda la información de manera compacta para que puedas consultar decenas de animales en un solo vistazo desde cualquier pantalla.
+
+### 📱 Funciona en el Campo (PWA)
+Sabemos que en las zonas de pastoreo la cobertura es intermitente o nula. Vacapp guarda todos tus registros (partos, ventas, vacunas, pesajes) directamente en la memoria de tu teléfono. Al recuperar la señal, sincronizará todo de manera automática y 100% segura.
 
 ### 🔍 Escaneo de Códigos QR
 Identifica a tus animales en un segundo. 
-- Cada vaca puede tener su propio código QR. 
-- Al escanearlo con la cámara del móvil, verás toda su ficha: edad, madre, últimos partos y tratamientos sanitarios.
+- Cada res tiene un código QR único asignado.
+- Escanea con la cámara del móvil y accede a su ficha técnica completa al instante.
 
-### 📊 Gráficas de Peso y Salud
-No pierdas dinero con animales que no ganan peso. 
-- Registra los pesajes y observa gráficas de evolución al instante.
-- Detecta rápidamente si un animal no está rindiendo lo esperado.
+### 📊 Control de Pesos y Sanidad
+No pierdas dinero con animales que no ganan peso o enferman. 
+- Registra pesajes y comprueba las gráficas evolutivas en el momento.
+- Controla tratamientos veterinarios, vacunas y días de retiro.
+- Visualiza el impacto económico y de salud de forma precisa.
 
-### 📸 Fotos Reales y Ficha Técnica
-Asocia fotos reales a cada animal para evitar confusiones. Tendrás un "Libro de Explotación" digital con imágenes de alta calidad de todo tu hato.
+### 📸 Registro Fotográfico y Trazabilidad
+El "Libro de Explotación" evoluciona. Adjunta fotos reales para evitar errores de identificación y mantén documentado el progreso de tus lotes y crías con total fidelidad.
 
 ### 💰 Gestión Financiera "Cuentas Claras"
-Anota tus gastos en piensos, veterinaria y tus ingresos por ventas. Vacapp te dirá a final de mes si tu explotación es rentable y dónde estás gastando más.
+El control que necesitas en la oficina. Anota compras de alimento, gastos veterinarios y facturación por ventas. Analiza tu rentabilidad general por periodos y optimiza tus inversiones.
 
 ---
 
-## 📲 Guía de Instalación Rápida (PWA)
+## 📲 Guía de Instalación Rápida
 
-No busques en la App Store o Google Play. Vacapp se instala directamente desde tu navegador en solo 10 segundos:
+No busques en la App Store o Google Play. Vacapp se instala directamente desde tu navegador web como una **Aplicación Web Progresiva (PWA)** en menos de 10 segundos:
 
 1. **Abre el enlace** de Vacapp en Chrome (Android) o Safari (iPhone).
 2. Pulsa el botón de **"Opciones"** (los tres puntos en Android o el botón de compartir ⬆️ en iPhone).
 3. Selecciona la opción **"Añadir a la pantalla de inicio"**.
 4. Pulsa **"Añadir"**.
 
-¡Listo! Ya tienes el icono de la vaca en tu escritorio. Ahora puedes entrar siempre con un toque, ¡incluso si no tienes cobertura!
+¡Listo! Disfruta de la experiencia nativa de Vacapp con un solo toque desde tu escritorio, estés donde estés.
 
 ---
-*Vacapp: Tecnología de élite para la gente del campo.*
+*Vacapp: Tecnología de élite, diseñada por y para la gente del campo.*
+
 
 
 ==================================================
@@ -2610,42 +2614,18 @@ ARCHIVO: .\frontend\src\styles.scss
   --vac-accent: #A67C52;      /* Tierra/Cuero */
   --vac-text-main: #1A211E;   /* Negro profundo */
   --ion-background-color: var(--vac-bg-main);
+  /* Reducimos el tamaño de fuente base de Ionic */
+  --ion-font-family: 'Outfit', sans-serif;
+  font-size: 14px; /* Bajamos de los 16px por defecto a 14px */
 }
 
-/* Sidebar Blindada (Siempre arriba y siempre Verde Bosque) */
-ion-menu {
-  z-index: 9999 !important;
-  --background: var(--vac-primary) !important;
-  
-  ion-content {
-    --background: var(--vac-primary) !important;
-  }
 
-  ion-item {
-    --background: transparent !important;
-    --color: #FDFAF7 !important;
-    
-    ion-label {
-      color: #FDFAF7 !important; 
-      font-weight: 600;
-    }
-    
-    ion-icon {
-      color: var(--vac-accent) !important;
-    }
-  }
-}
 
 /* Botón Añadir (FAB) Estilizado */
 ion-fab-button {
   --background: var(--vac-accent) !important;
   --color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease !important;
-
-  &:active {
-    transform: scale(0.9) !important;
-  }
 }
 
 /* Tipografía Global Outfit */
@@ -2657,6 +2637,42 @@ ion-fab-button {
 body, ion-content {
   --background: var(--vac-bg-main) !important;
 }
+
+/* Contenedor scrolleable con margen para el botón de abajo */
+ion-content {
+  --padding-bottom: 80px; /* Deja espacio para el botón FAB */
+}
+
+/* Ajuste de tarjetas para que no se peguen */
+ion-grid {
+  display: block !important;
+  width: 100%;
+  --ion-grid-column-padding: 8px;
+}
+
+/* Ajuste del Grid para que no se pisen */
+ion-col {
+  padding: 4px !important; /* Menos espacio muerto entre columnas */
+}
+
+/* Reducir escala general para simular el 75% */
+ion-card {
+  margin: 8px 12px !important;
+  --border-radius: 16px !important;
+  min-height: 120px;
+}
+
+ion-card-header {
+  padding: 12px !important;
+}
+
+ion-card-title {
+  font-size: 1rem !important; /* Títulos más elegantes, no gigantes */
+  font-weight: 700;
+}
+
+/* Ionic maneja el alineamiento de ion-item internamente via Shadow DOM.
+   No forzar align-items globalmente para evitar conflictos. */
 
 /* ----------------------------------------------------
    QR DINÁMICO - Estilos Premium para Alert y Modal
@@ -2772,6 +2788,8 @@ ion-modal.vac-modal {
     }
   }
 }
+
+
 
 
 ==================================================
@@ -3049,7 +3067,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   IonSplitPane, IonMenu, IonContent, IonList, 
   IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
+  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons, IonFooter
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -3073,7 +3091,7 @@ import { SupabaseService } from '../../services/supabase.service';
     CommonModule, RouterLink, RouterLinkActive,
     IonSplitPane, IonMenu, IonContent, IonList, 
     IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
+    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons, IonFooter
   ],
   template: `
       <ion-split-pane contentId="main-content" [when]="'md'" [class.collapsed]="isCollapsed">
@@ -3100,58 +3118,67 @@ import { SupabaseService } from '../../services/supabase.service';
           </ion-header>
 
           <ion-content class="ion-no-padding">
-            <div class="vac-nav-container">
-              <ion-list lines="none" class="ion-no-padding vac-nav-list">
-                <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
-                  <ion-item 
-                    button
-                    lines="none"
-                    routerDirection="root" 
-                    [routerLink]="p.url" 
-                    routerLinkActive="active-link"
-                    [title]="p.title"
-                    class="vac-nav-item">
-                    <div slot="start" class="icon-frame">
-                      <ion-icon [name]="p.icon"></ion-icon>
-                    </div>
-                    <ion-label *ngIf="!isCollapsed" class="vac-label">{{ p.title }}</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item class="vac-nav-item" lines="none" button (click)="mostrarQr()">
-                    <div slot="start" class="icon-frame" style="color: var(--ion-color-secondary)">
-                      <ion-icon name="qr-code-outline"></ion-icon>
-                    </div>
-                    <ion-label *ngIf="!isCollapsed" class="vac-label" style="color: var(--ion-color-secondary)">Mostrar QR</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-                
-                <div class="nav-separator"></div>
-
-                <ion-item class="vac-nav-item logout-item" lines="none" button (click)="logout()">
-                  <div slot="start" class="icon-frame danger">
-                    <ion-icon name="log-out-outline"></ion-icon>
-                  </div>
-                  <ion-label *ngIf="!isCollapsed" class="vac-label">Cerrar Sesión</ion-label>
-                </ion-item>
-              </ion-list>
-            </div>
-
-            <div class="sidebar-bottom-badge flex-col items-center justify-center pb-lg gap-2" *ngIf="!isCollapsed">
-              <div class="flex-row items-center gap-2">
-                <ion-icon name="leaf-outline" size="small" class="color-medium"></ion-icon>
-                <span class="color-medium text-sm font-semibold">Gestión Ganadera</span>
-              </div>
-              <span class="color-medium opacity-80 text-xs mb-2">{{ profile.email }}</span>
+            <div style="display: flex; flex-direction: column; min-height: 100%;">
               
-              <!-- THEME TOGGLE BUTTON -->
-              <ion-button fill="clear" color="medium" (click)="toggleTheme()" class="theme-toggle-btn">
-                <ion-icon [name]="isDarkMode ? 'sunny-outline' : 'moon-outline'" slot="start"></ion-icon>
-                <span class="text-xs font-bold">{{ isDarkMode ? 'MODO CLARO' : 'MODO OSCURO' }}</span>
-              </ion-button>
+              <!-- Menú (Crece para ocupar espacio) -->
+              <div class="vac-nav-container" style="flex: 1;">
+                <ion-list lines="none" class="ion-no-padding vac-nav-list">
+                  <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
+                    <ion-item 
+                      button
+                      lines="none"
+                      routerDirection="root" 
+                      [routerLink]="p.url" 
+                      routerLinkActive="active-link"
+                      [title]="p.title"
+                      class="vac-nav-item">
+                      <div slot="start" class="icon-frame">
+                        <ion-icon [name]="p.icon"></ion-icon>
+                      </div>
+                      <ion-label *ngIf="!isCollapsed" class="vac-label">{{ p.title }}</ion-label>
+                    </ion-item>
+                  </ion-menu-toggle>
+                  <ion-menu-toggle auto-hide="false">
+                    <ion-item class="vac-nav-item" lines="none" button (click)="mostrarQr()">
+                      <div slot="start" class="icon-frame" style="color: var(--ion-color-secondary)">
+                        <ion-icon name="qr-code-outline"></ion-icon>
+                      </div>
+                      <ion-label *ngIf="!isCollapsed" class="vac-label" style="color: var(--ion-color-secondary)">Mostrar QR</ion-label>
+                    </ion-item>
+                  </ion-menu-toggle>
+                  
+                  <div class="nav-separator"></div>
+
+                  <ion-item class="vac-nav-item logout-item" lines="none" button (click)="logout()">
+                    <div slot="start" class="icon-frame danger">
+                      <ion-icon name="log-out-outline"></ion-icon>
+                    </div>
+                    <ion-label *ngIf="!isCollapsed" class="vac-label">Cerrar Sesión</ion-label>
+                  </ion-item>
+                </ion-list>
+              </div>
+
+              <!-- Footer integrado al final del scroll -->
+              <div class="sidebar-bottom-badge flex-col items-center justify-center pb-lg gap-2" *ngIf="!isCollapsed" style="margin-top: auto; padding-bottom: 30px;">
+                <div class="flex-row items-center gap-2" style="display: flex; justify-content: center;">
+                  <ion-icon name="leaf-outline" size="small" class="color-medium"></ion-icon>
+                  <span class="color-medium text-sm font-semibold">Gestión Ganadera</span>
+                </div>
+                <div style="text-align: center; margin-bottom: 10px;">
+                  <span class="color-medium opacity-80 text-xs">{{ profile.email }}</span>
+                </div>
+                
+                <!-- THEME TOGGLE BUTTON -->
+                <div style="text-align: center;">
+                  <ion-button fill="clear" color="medium" (click)="toggleTheme()" class="theme-toggle-btn">
+                    <ion-icon [name]="isDarkMode ? 'sunny-outline' : 'moon-outline'" slot="start"></ion-icon>
+                    <span class="text-xs font-bold">{{ isDarkMode ? 'MODO CLARO' : 'MODO OSCURO' }}</span>
+                  </ion-button>
+                </div>
+              </div>
+
             </div>
           </ion-content>
-
         </ion-menu>
         
         <div class="main-container" id="main-content">
@@ -3889,6 +3916,23 @@ export class FincaService {
     localStorage.setItem('vacapp_current_finca', fincaId);
   }
 
+  /**
+   * @description Registra una nueva finca en el sistema.
+   * @param {Partial<Finca>} finca Datos de la nueva finca.
+   * @returns {Promise<{data: Finca | null, error: any}>}
+   */
+  async createFinca(finca: Partial<Finca>) {
+    const { data, error } = await this.supabase.create<Finca>('fincas', finca);
+    if (data && !error) {
+      this.fincasSignal.update(fincas => [...fincas, data]);
+    }
+    return { data, error };
+  }
+
+  /**
+   * @description Carga los lotes asociados a una finca específica.
+   * @param {string} fincaId Identificador de la finca.
+   */
   async loadLotes(fincaId: string) {
     let { data, error } = await this.supabase.getAll<Lote>('lotes');
     if (data && !error) {
@@ -3896,15 +3940,6 @@ export class FincaService {
       data = data.filter(l => l.finca_id === fincaId);
       this.lotesSignal.set(data);
     }
-  }
-
-  // Futuras implementaciones (Crear Finca, Editar Finca)
-  async createFinca(finca: Partial<Finca>) {
-    const { data, error } = await this.supabase.create<Finca>('fincas', finca);
-    if (data && !error) {
-      this.fincasSignal.update(fincas => [...fincas, data]);
-    }
-    return { data, error };
   }
 }
 
@@ -5204,7 +5239,7 @@ export class SupabaseService {
           environment.supabaseKey
         );
       } catch (error) {
-        console.error('❌ Vacapp: Error crítico al inicializar el cliente de Supabase:', error);
+        // Error de inicialización manejado por el servicio de errores global
       }
     } else {
       // Determinamos la razón del modo Mock
@@ -5663,7 +5698,6 @@ export class SupabaseService {
         error: null 
       };
     } catch (e: unknown) {
-      console.error('Error en updateBovinoLote:', e);
       const errorMsg = e instanceof Error ? e.message : 'Error técnico al actualizar lote';
       return { data: null, error: errorMsg };
     }
@@ -6500,6 +6534,9 @@ export class AnimalDetailComponent implements OnInit {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
+  /**
+   * @description Función para seguimiento de elementos en bucles ngFor.
+   */
   trackById(index: number, item: any): string {
     return item?.id || index.toString();
   }
@@ -6520,12 +6557,19 @@ export class AnimalDetailComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Carga la información completa del animal desde Supabase.
+   * @param {string} id Identificador del bovino.
+   */
   async loadData(id: string) {
     const res = await this.supabase.getAnimalCompleteData(id);
     this.data.set(res.data);
   }
 
-  /** Selección y subida de foto del animal */
+  /**
+   * @description Selección y subida de foto del animal a almacenamiento y base de datos.
+   * @param {Event} event Evento de cambio de archivo.
+   */
   async onPhotoSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input?.files?.[0];
@@ -6546,7 +6590,6 @@ export class AnimalDetailComponent implements OnInit {
 
       await this.showToast('📷 Foto actualizada correctamente', 'success');
     } catch (err) {
-      console.error('Error subiendo foto:', err);
       await this.showToast('❌ Error al subir la foto', 'danger');
     } finally {
       this.isUploading.set(false);
@@ -6555,6 +6598,11 @@ export class AnimalDetailComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Muestra una notificación al usuario.
+   * @param {string} message Mensaje a mostrar.
+   * @param {string} color Color de la notificación.
+   */
   private async showToast(message: string, color: string) {
     const toast = await this.toastCtrl.create({
       message,
@@ -6567,6 +6615,11 @@ export class AnimalDetailComponent implements OnInit {
     await toast.present();
   }
 
+  /**
+   * @description Obtiene el color de badge según el estado reproductivo.
+   * @param {string} [status] Estado actual del animal.
+   * @returns {string} Color de Ionic.
+   */
   getStatusColor(status?: string) {
     switch (status) {
       case 'Gestante': return 'tertiary';
@@ -8132,7 +8185,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         <h2 class="vac-section-title">Movimientos Filtrados</h2>
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredRecords(); trackBy: trackById">
+            <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let r of filteredRecords(); trackBy: trackById">
               <article class="uniform-card" [class.clickable-card]="r.bovino_id" (click)="r.bovino_id ? goToDetail(r.bovino_id) : null">
                 <div class="vac-card-header-flex">
                   <div class="vac-icon-circle" [ngClass]="r.tipo === 'Ingreso' ? 'bg-forest' : 'bg-warning-soft'">
@@ -8620,7 +8673,7 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
 
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
-            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let lote of lotes; trackBy: trackById">
+            <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let lote of lotes; trackBy: trackById">
               <article class="uniform-card">
                 <div class="vac-card-header-flex">
                   <div class="vac-card-title-group">
@@ -8928,7 +8981,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]; trackBy: trackById">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let s of [1,2,3,4]; trackBy: trackById">
           <article class="uniform-card">
             <ion-item lines="none" class="vac-card-header ion-margin-bottom">
               <div class="vac-avatar ion-margin-end" slot="start">
@@ -8961,7 +9014,7 @@ ARCHIVO: .\frontend\src\app\features\manejo\manejo.component.html
     <!-- ANIMAL LIST -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredBovinos().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos(); trackBy: trackById">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let b of filteredBovinos(); trackBy: trackById">
           <article class="uniform-card clickable-card" [ngClass]="getStatusBorderClass(b)" (click)="goToDetail(b.id)">
             <ion-item lines="none" class="vac-card-header">
               <div class="ion-margin-end" slot="start">
@@ -9843,7 +9896,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            <!-- LISTA ESTANDARIZADA -->
            <ion-grid fixed class="ion-no-padding">
              <ion-row>
-                <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of filteredBovinos(); trackBy: trackById">
+                <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let b of filteredBovinos(); trackBy: trackById">
                   <article class="uniform-card clickable-card" [ngClass]="getStatusBorderClass(b)" (click)="selectBovino(b)">
                    <div class="vac-card-header-flex">
                       <div class="ion-margin-end">
@@ -9927,7 +9980,7 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
            
            <ion-grid fixed class="ion-no-padding">
              <ion-row>
-               <ion-col size="12" size-md="6" size-lg="4" *ngFor="let p of pesajesFiltrados; trackBy: trackById">
+               <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let p of pesajesFiltrados; trackBy: trackById">
                  <article class="uniform-card">
                    <div class="vac-card-header-flex">
                      <div class="vac-icon-avatar bg-light">
@@ -10473,7 +10526,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid fixed class="ion-no-padding mt-4" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let s of [1,2,3,4]">
           <article class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
@@ -10512,7 +10565,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <!-- Gestaciones confirmadas (Próximos Partos) -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredGestaciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredGestaciones(); trackBy: trackById">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let r of filteredGestaciones(); trackBy: trackById">
           <article class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-danger-soft" slot="start">
@@ -10555,7 +10608,7 @@ ARCHIVO: .\frontend\src\app\features\reproduccion\reproduccion.component.html
     <!-- Historial en Tarjetas Pro -->
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredReproducciones().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let r of filteredReproducciones(); trackBy: trackById">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let r of filteredReproducciones(); trackBy: trackById">
           <article class="uniform-card clickable-card" (click)="goToDetail(r.bovino_id)">
             <div class="vac-card-header">
               <div class="vac-card-icon bg-primary-soft" slot="start">
@@ -10925,10 +10978,17 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Maneja el evento de refresco deslizable.
+   * @param event Evento del componente IonRefresher.
+   */
   handleRefresh(event: Event) {
     this.loadData(event);
   }
 
+  /**
+   * @description Optimiza el renderizado de la lista.
+   */
   trackById(index: number, item: Reproduccion | any): string {
     return item.id || index.toString();
   }
@@ -10965,22 +11025,34 @@ export class ReproduccionComponent implements OnInit {
     );
   }
 
+  /**
+   * @description Actualiza el término de búsqueda al escribir.
+   */
   onSearch(event: Event) {
     const target = event.target as HTMLInputElement;
     this.searchTerm.set(target.value || '');
   }
 
   // --- LÓGICA DE FILTROS ---
+  /**
+   * @description Aplica el filtro de periodo al gráfico.
+   */
   applyGlobalFilter(periodo: 'Mensual' | 'Anual') {
     this.filterGlobal.set(periodo);
     this.chartPeriodo.set(periodo);
   }
 
+  /**
+   * @description Muestra el popover de filtros.
+   */
   presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
 
+  /**
+   * @description Limpia los filtros aplicados.
+   */
   clearFilters() {
     this.filterEstado.set('Todos');
     this.filterMetodo.set('Todos');
@@ -11000,6 +11072,10 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Calcula los días restantes para el parto.
+   * @param repro Evento reproductivo.
+   */
   getDaysToCalving(repro: Reproduccion): number {
     if (!repro.fecha_parto_prevista) return 0;
     const today = new Date();
@@ -11009,6 +11085,10 @@ export class ReproduccionComponent implements OnInit {
     return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
   }
 
+  /**
+   * @description Devuelve el color del badge según el estado reproductivo.
+   * @param estado Estado de la gestación.
+   */
   getStatusColor(estado: string): string {
     switch (estado) {
       case 'Confirmada': return 'success';
@@ -11048,6 +11128,9 @@ export class ReproduccionComponent implements OnInit {
    */
   closeModal() { this.isModalOpen = false; }
 
+  /**
+   * @description Guarda un registro reproductivo.
+   */
   async saveData() {
     if (this.reproForm.invalid) return;
 
@@ -11069,6 +11152,10 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Muestra una alerta de confirmación para eliminar.
+   * @param item Registro a eliminar.
+   */
   async confirmDelete(item: Reproduccion) {
     const alert = await this.alertCtrl.create({
       header: 'Auditoría de Linaje',
@@ -11081,6 +11168,10 @@ export class ReproduccionComponent implements OnInit {
     await alert.present();
   }
 
+  /**
+   * @description Elimina el registro de la base de datos.
+   * @param id Identificador del registro.
+   */
   async deleteRecord(id: string) {
     const res = await this.supa.deleteReproduccion(id);
     if (res.error) {
@@ -11091,6 +11182,9 @@ export class ReproduccionComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Muestra un mensaje flotante en la parte inferior.
+   */
   async presentToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({
       message,
@@ -11200,7 +11294,7 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
     <!-- SKELETON LOADER CON IONIC UTILITIES -->
     <ion-grid fixed class="ion-no-padding" *ngIf="isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4]">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let s of [1,2,3,4]">
           <article class="uniform-card">
             <div class="vac-card-header ion-padding-bottom">
               <ion-skeleton-text animated class="skeleton-avatar ion-margin-end" slot="start"></ion-skeleton-text>
@@ -11223,7 +11317,7 @@ ARCHIVO: .\frontend\src\app\features\sanidad\sanidad.component.html
 
     <ion-grid fixed class="ion-no-padding" *ngIf="filteredSanidad().length > 0 && !isLoading()">
       <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of filteredSanidad(); trackBy: trackById">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let s of filteredSanidad(); trackBy: trackById">
           <article class="uniform-card clickable-card" (click)="goToDetail(s.bovino_id)">
             <div class="vac-card-header">
                <div class="vac-card-icon" [ngClass]="getBadgeColor(s.tipo)" slot="start">
@@ -11616,13 +11710,19 @@ export class SanidadComponent implements OnInit {
    * @param {Event} [event] Evento opcional del componente IonRefresher.
    * @returns {Promise<void>}
    */
+  /**
+   * @description Carga los registros sanitarios desde el servicio central.
+   * Maneja estados de carga y errores de conexión de forma silenciosa para la UI.
+   * @param {Event} [event] Evento opcional del componente IonRefresher.
+   * @returns {Promise<void>}
+   */
   async loadData(event?: Event) {
     this.isLoading.set(true);
     try {
       const { data: records } = await this.supa.getSanidad();
       this.sanidadRecords.set(records || []);
     } catch (e) {
-      console.error('Error cargando datos sanitarios:', e);
+      // Error silencioso: la interfaz mostrará estado vacío o mensaje de error reactivo
     } finally {
       this.isLoading.set(false);
       if (event && (event as any).target) {
@@ -11631,14 +11731,28 @@ export class SanidadComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Maneja el evento de refresco (Pull-to-refresh) de la lista.
+   * @param {Event} event Evento emitido por el componente IonRefresher.
+   */
   handleRefresh(event: Event) {
     this.loadData(event);
   }
 
+  /**
+   * @description Función de optimización para el renderizado de listas (ngFor).
+   * @param {number} index Índice del elemento en la lista.
+   * @param {any} item Objeto o identificador.
+   * @returns {string} Identificador único.
+   */
   trackById(index: number, item: Sanidad | any): string {
     return item.id || index.toString();
   }
 
+  /**
+   * @description Navega a la vista de detalle de un animal específico.
+   * @param {string} bovinoId UUID del bovino a visualizar.
+   */
   goToDetail(bovinoId: string) {
     if (bovinoId) {
       this.router.navigate(['/animal-detail', bovinoId]);
@@ -11667,22 +11781,38 @@ export class SanidadComponent implements OnInit {
     );
   }
 
+  /**
+   * @description Actualiza el término de búsqueda al escribir en la barra.
+   * @param {Event} event Evento emitido por el searchbar.
+   */
   onSearch(event: Event) {
     const target = event.target as HTMLInputElement;
     this.searchTerm.set(target.value || '');
   }
 
   // --- LÓGICA DE FILTROS ---
+  
+  /**
+   * @description Aplica el filtro temporal global para el gráfico.
+   * @param {'3m' | '6m' | '12m'} periodo Periodo de tiempo a evaluar.
+   */
   applyGlobalFilter(periodo: '3m' | '6m' | '12m') {
     this.filterGlobal.set(periodo);
     this.chartPeriodo.set(periodo);
   }
 
+  /**
+   * @description Abre el popover de filtros avanzados.
+   * @param {Event} event Evento de clic en el botón de filtros.
+   */
   presentFilter(event: Event) {
     this.filterEvent = event;
     this.isFilterPopoverOpen = true;
   }
 
+  /**
+   * @description Restablece todos los filtros de búsqueda a sus valores por defecto.
+   */
   clearFilters() {
     this.filterTipo.set('Todos');
     this.filterLote.set('Todos');
@@ -11690,6 +11820,11 @@ export class SanidadComponent implements OnInit {
     this.isFilterPopoverOpen = false;
   }
 
+  /**
+   * @description Obtiene el icono correspondiente al tipo de intervención sanitaria.
+   * @param {string} tipo Tipo de intervención.
+   * @returns {string} Nombre del icono.
+   */
   getHealthIcon(tipo: string): string {
     switch (tipo) {
       case 'Vacunación': return 'medical-outline';
@@ -11700,6 +11835,11 @@ export class SanidadComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Obtiene la clase CSS de color del badge según el tipo de intervención.
+   * @param {string} tipo Tipo de intervención.
+   * @returns {string} Clase CSS.
+   */
   getBadgeColor(tipo: string): string {
     switch (tipo) {
       case 'Vacunación': return 'bg-success';
@@ -11710,6 +11850,11 @@ export class SanidadComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Calcula los días restantes de retiro en carne/leche tras un tratamiento.
+   * @param {Sanidad} s Registro sanitario a evaluar.
+   * @returns {number} Días restantes.
+   */
   getDiasRestantes(s: Sanidad): number {
     if (!s.fecha) return 0;
     const maxRetiro = Math.max(s.dias_retiro_carne || 0, s.dias_retiro_leche || 0);
@@ -11728,6 +11873,9 @@ export class SanidadComponent implements OnInit {
     return diffDays > 0 ? diffDays : 0;
   }
 
+  /**
+   * @description Abre el modal para crear un nuevo registro clínico.
+   */
   openAddModal() {
     this.editingItem = null;
     this.healthForm.reset({
@@ -11737,6 +11885,10 @@ export class SanidadComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  /**
+   * @description Abre el modal y carga los datos para editar un registro existente.
+   * @param {Sanidad} item Registro sanitario a editar.
+   */
   openEditModal(item: Sanidad) {
     this.editingItem = item;
     const { bovino, ...data } = item;
@@ -11744,8 +11896,14 @@ export class SanidadComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  /**
+   * @description Cierra el modal de formulario clínico.
+   */
   closeModal() { this.isModalOpen = false; }
 
+  /**
+   * @description Guarda el registro clínico, ya sea creando uno nuevo o actualizando.
+   */
   async saveData() {
     if (this.healthForm.invalid) return;
 
@@ -11767,6 +11925,10 @@ export class SanidadComponent implements OnInit {
     }
   }
 
+  /**
+   * @description Solicita confirmación antes de eliminar permanentemente un registro.
+   * @param {Sanidad} item Registro a eliminar.
+   */
   async confirmDelete(item: Sanidad) {
     const alert = await this.alertCtrl.create({
       header: 'Seguridad Sanitaria',
@@ -11779,6 +11941,10 @@ export class SanidadComponent implements OnInit {
     await alert.present();
   }
 
+  /**
+   * @description Ejecuta el borrado del registro tras su confirmación.
+   * @param {string} id UUID del registro a purgar.
+   */
   async deleteRecord(id: string) {
     const res = await this.supa.deleteSanidad(id);
     if (res.error) {
@@ -14008,40 +14174,8 @@ ion-menu ion-note {
   font-size: 0.75rem;
 }
 
-// Estilo de cada ítem del menú
-ion-menu ion-item {
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --min-height: 40px;
-  --border-radius: 6px;
-  margin: 0 8px variables.$spacing-xs 8px;
-  --transition: 0.3s;
-}
-
-// Estado SELECCIONADO del ítem
-ion-menu ion-item.selected {
-  // Fondo suave con el color tertiary (Wheat)
-  --background: rgba(var(--ion-color-tertiary-rgb), 0.15); 
-  --color: #{variables.$tertiary-color};
-  font-weight: 800;
-  border-right: 4px solid variables.$tertiary-color;
-  border-radius: variables.$border-radius-sm 0 0 variables.$border-radius-sm;
-
-  ion-icon {
-    color: variables.$tertiary-color; // Icono en trigo al estar seleccionado
-  }
-}
-
-// Iconos en estado normal (Grisáceo)
-ion-menu ion-item ion-icon {
-  color: #737373;
-}
-
-// Etiquetas de texto
-ion-menu ion-label {
-  font-weight: 500;
-  font-size: 0.9rem;
-}
+// Los estilos de ítems del menú lateral se gestionan en layout/_sidebar.scss
+// para evitar conflictos de especificidad.
 
 // Ajuste global para ítems seleccionados fuera del menú si fuera necesario
 ion-item.selected {
@@ -14602,11 +14736,16 @@ ARCHIVO: .\frontend\src\styles\layout\_sidebar.scss
 
 @use "../abstracts/variables";
 
-/* 1. LAYOUT PRINCIPAL & SIDEBAR */
+/* ==========================================================================
+   SIDEBAR NAVIGATION — Single Source of Truth
+   All sidebar styles are consolidated here. No other file should style
+   ion-menu items, icons, or labels to avoid specificity conflicts.
+   ========================================================================== */
+
+/* 1. SPLIT PANE LAYOUT */
 ion-split-pane {
-  --side-width: 280px;
-  --side-min-width: 280px;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --side-width: 260px;
+  --side-min-width: 260px;
   background: var(--ion-background-color);
 }
 
@@ -14614,33 +14753,37 @@ ion-split-pane.collapsed {
   --side-width: 0px !important;
   --side-min-width: 0px !important;
   --side-max-width: 0px !important;
-  
+
   ion-menu {
     display: none !important;
   }
 }
 
+/* 2. SIDEBAR CONTAINER */
 .vac-sidebar {
   --background: transparent !important;
   --ion-background-color: transparent !important;
   --ion-item-background: transparent !important;
-  background: transparent;
+  --width: 260px;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
-  transition: variables.$transition-base;
 }
 
 .vac-sidebar::part(container) {
-  background: linear-gradient(180deg, #{variables.$primary-color} 0%, #{variables.$dark-color} 100%) !important;
+  background: linear-gradient(
+    180deg,
+    #{variables.$primary-color} 0%,
+    #{variables.$dark-color} 100%
+  ) !important;
   box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2);
 }
 
 .vac-sidebar ion-content {
   --background: transparent !important;
-  --padding-bottom: 20px;
 }
 
+/* 3. SIDEBAR HEADER (Brand) */
 .vac-sidebar-header {
-  height: 100px;
+  height: 80px;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -14651,20 +14794,25 @@ ion-split-pane.collapsed {
 .brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
 .logo-circle {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #{variables.$tertiary-color}, #{variables.$success-color});
-  border-radius: 16px;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(
+    135deg,
+    #{variables.$tertiary-color},
+    #{variables.$success-color}
+  );
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 22px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   transform: rotate(-5deg);
+  flex-shrink: 0;
 }
 
 .brand-text {
@@ -14675,7 +14823,7 @@ ion-split-pane.collapsed {
 .main-brand {
   color: variables.$white;
   font-weight: 900;
-  font-size: 22px;
+  font-size: 20px;
   letter-spacing: 2px;
   line-height: 1;
 }
@@ -14689,70 +14837,83 @@ ion-split-pane.collapsed {
   opacity: 0.8;
 }
 
+/* 4. NAV CONTAINER */
 .vac-nav-container {
-  padding: 20px 10px;
+  padding: 12px 8px;
 }
 
 .vac-nav-list {
   background: transparent;
 }
 
+/* 5. NAV ITEMS — The core fix
+   We use Ionic CSS custom properties (--min-height, --padding-start, etc.)
+   instead of overriding display/flex on the host element, which breaks
+   Ionic's internal shadow DOM layout and causes overlapping/unclickable items. */
 .vac-nav-item {
   --background: transparent;
   --background-focused: rgba(255, 255, 255, 0.05);
   --background-hover: rgba(255, 255, 255, 0.08);
-  --border-radius: 16px;
-  margin-bottom: 8px;
-  height: 56px;
-  transition: variables.$transition-base;
-  --color: rgba(255, 255, 255, 0.6);
-  
-  &::part(native) {
-    padding-inline-start: 12px;
-  }
+  --border-radius: 10px;
+  --min-height: 44px;
+  --padding-start: 12px;
+  --inner-padding-end: 8px;
+  --color: rgba(255, 255, 255, 0.65);
+  --transition: background 0.2s ease, transform 0.2s ease;
+  margin: 3px 8px;
+  cursor: pointer;
 
+  /* Active state */
   &.active-link {
     --color: #{variables.$white};
-    --background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    
+    --background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
     .icon-frame {
-      background: variables.$tertiary-color;
-      color: variables.$primary-color;
-      box-shadow: 0 4px 12px rgba(variables.$tertiary-color, 0.3);
+      background: #{variables.$tertiary-color};
+      color: #{variables.$primary-color};
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    
-  .vac-label {
-      font-weight: 800;
-      letter-spacing: 0.5px;
+
+    .vac-label {
+      font-weight: 700;
+      letter-spacing: 0.3px;
     }
   }
 
+  /* Hover state */
   &:hover:not(.active-link) {
-    --background: rgba(255, 255, 255, 0.05);
-    transform: translateX(5px);
-    
+    --background: rgba(255, 255, 255, 0.06);
+    transform: translateX(3px);
+
     .icon-frame {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
       color: variables.$white;
     }
   }
 }
 
+/* 6. ICON FRAME — Properly sized and centered via flexbox.
+   Uses slot="start" so Ionic places it before the label automatically. */
 .icon-frame {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  margin-right: 15px;
-  font-size: 20px;
-  transition: variables.$transition-fast;
+  background: rgba(255, 255, 255, 0.06);
+  margin-right: 12px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
   color: rgba(255, 255, 255, 0.5);
+
+  ion-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
 
   &.danger {
     color: variables.$danger-color;
@@ -14760,53 +14921,76 @@ ion-split-pane.collapsed {
   }
 }
 
+/* 7. NAV LABEL */
 .vac-label {
-  font-size: 14px;
-  font-weight: 600;
-  transition: variables.$transition-fast;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s ease;
 }
 
+/* 8. NAV SEPARATOR */
 .nav-separator {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  margin: 20px 15px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  margin: 12px 15px;
 }
 
+/* 9. LOGOUT ITEM */
 .logout-item {
   &:hover {
-    --background: rgba(variables.$danger-color, 0.05) !important;
+    --background: rgba(variables.$danger-color, 0.08) !important;
+
     .icon-frame.danger {
       background: variables.$danger-color;
       color: white;
       box-shadow: 0 4px 12px rgba(variables.$danger-color, 0.3);
     }
+
     .vac-label {
       color: variables.$danger-color;
     }
   }
 }
 
-/* Theme Toggle Refined */
+/* 10. THEME TOGGLE BUTTON */
 .theme-toggle-btn {
   --background: rgba(255, 255, 255, 0.05);
-  --border-radius: 14px;
+  --border-radius: 10px;
   --color: rgba(255, 255, 255, 0.7);
   font-weight: 700;
-  margin: 20px 15px;
-  width: calc(100% - 30px);
+  margin: 12px 12px;
+  width: calc(100% - 24px);
   text-transform: uppercase;
   letter-spacing: 1.5px;
   font-size: 10px;
-  
+
   &:hover {
     --background: rgba(255, 255, 255, 0.1);
     --color: white;
   }
 }
 
+/* 11. SIDEBAR FOOTER BADGE */
 .sidebar-bottom-badge {
-  padding: 20px;
+  padding: 16px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  ion-icon {
+    font-size: 16px;
+  }
+
+  .text-sm {
+    font-size: 12px;
+  }
 }
 
 

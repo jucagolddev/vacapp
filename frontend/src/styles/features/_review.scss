@@ -1,0 +1,43 @@
+// _review.scss
+// Review and Feedback Features
+
+@use '../abstracts/variables' as v;
+@use '../abstracts/mixins' as m;
+
+// Component-specific variables
+$review-canvas-bg: rgba(255, 255, 255, 0.4);
+
+// Dark mode overrides
+html.ion-palette-dark {
+  .review-canvas {
+    background: rgba(10, 20, 15, 0.6) !important;
+    border-color: rgba(188, 138, 95, 0.1) !important;
+  }
+  .review-canvas__toolbar {
+    background: #050a07 !important;
+    border-color: rgba(188, 138, 95, 0.1) !important;
+  }
+  .review-zoom-controls {
+    background: #0a140f !important;
+  }
+  .review-sidebar {
+    background: #050a07 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+  }
+  .review-sidebar__header, .review-filters {
+    border-color: rgba(188, 138, 95, 0.1) !important;
+  }
+  .annotation-card {
+    background: #0a140f !important;
+    border-color: rgba(188, 138, 95, 0.2) !important;
+  }
+  .annotation-card:hover {
+    background: #111a14 !important;
+  }
+  .review-doc-info h3,
+  .review-sidebar__header h3,
+  .ann-author,
+  .annotation-card__text {
+    color: v.$white !important;
+  }
+}

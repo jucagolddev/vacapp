@@ -38,40 +38,8 @@ ion-menu ion-note {
   font-size: 0.75rem;
 }
 
-// Estilo de cada ítem del menú
-ion-menu ion-item {
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --min-height: 40px;
-  --border-radius: 6px;
-  margin: 0 8px variables.$spacing-xs 8px;
-  --transition: 0.3s;
-}
-
-// Estado SELECCIONADO del ítem
-ion-menu ion-item.selected {
-  // Fondo suave con el color tertiary (Wheat)
-  --background: rgba(var(--ion-color-tertiary-rgb), 0.15); 
-  --color: #{variables.$tertiary-color};
-  font-weight: 800;
-  border-right: 4px solid variables.$tertiary-color;
-  border-radius: variables.$border-radius-sm 0 0 variables.$border-radius-sm;
-
-  ion-icon {
-    color: variables.$tertiary-color; // Icono en trigo al estar seleccionado
-  }
-}
-
-// Iconos en estado normal (Grisáceo)
-ion-menu ion-item ion-icon {
-  color: #737373;
-}
-
-// Etiquetas de texto
-ion-menu ion-label {
-  font-weight: 500;
-  font-size: 0.9rem;
-}
+// Los estilos de ítems del menú lateral se gestionan en layout/_sidebar.scss
+// para evitar conflictos de especificidad.
 
 // Ajuste global para ítems seleccionados fuera del menú si fuera necesario
 ion-item.selected {
