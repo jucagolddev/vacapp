@@ -44,3 +44,26 @@ No busques en la App Store o Google Play. Vacapp se instala directamente desde t
 ---
 *Vacapp: Tecnología de élite, diseñada por y para la gente del campo.*
 
+## 🛠️ Guía de Inicio para Desarrolladores
+
+Si vas a trabajar en el código de Vacapp, sigue estos pasos para levantar el entorno local:
+
+1. **Requisitos**: Node.js (v20 o v22 LTS recomendados) y npm.
+2. **Instalación**:
+   ```bash
+   cd frontend
+   npm install --legacy-peer-deps
+   ```
+3. **Ejecución**:
+   ```bash
+   npm start
+   ```
+4. **Acceso**: Abre [http://localhost:4200](http://localhost:4200) en tu navegador.
+
+> [!WARNING]
+> **¿Problemas al arrancar? (Se queda en "Building...")**
+> Si tu proceso de compilación se queda bloqueado o experimentas errores, es probable que se deba a una versión inestable de Node.js (ej. v25.x). 
+> Lee la **[Guía de Arranque y Resolución de Problemas](GUIA_ARRANQUE.md)** para encontrar la solución inmediata y una alternativa rápida.
+
+*Nota: La aplicación utiliza **Modo Mock** por defecto. No necesitas configurar Supabase para las pruebas iniciales.*
+

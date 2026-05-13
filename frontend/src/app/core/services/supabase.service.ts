@@ -805,8 +805,8 @@ export class SupabaseService {
    * Genera un set de datos masivo, relacional y coherente para demostración.
    */
   private seedTestData() {
-    // Si ya existe la versión 3, no re-sembramos
-    if (localStorage.getItem('vacapp_seeded_v3') === 'true') return;
+    // Si ya existe la versión 4, no re-sembramos
+    if (localStorage.getItem('vacapp_seeded_v4') === 'true') return;
 
     const now = new Date();
     const daysAgo = (d: number) => {
@@ -846,6 +846,7 @@ export class SupabaseService {
         { id: 'abr-2', nombre: 'Pilón Central', lote_id: 'lote-repro', capacidad_litros: 1000, estado: 'Operativo', ultima_limpieza: daysAgo(5), nivel_llenado: 45 },
         { id: 'abr-3', nombre: 'Depósito Parideras', lote_id: 'lote-maternidad', capacidad_litros: 300, estado: 'Vacío', ultima_limpieza: daysAgo(15), nivel_llenado: 10 }
       ],
+      trazabilidad: [],
       bovinos: [],
       recria_pesajes: [],
       finanzas: [],
@@ -1121,9 +1122,34 @@ export class SupabaseService {
       localStorage.setItem(`mock_${table}`, JSON.stringify(mockData[table]));
     });
 
-    localStorage.setItem('vacapp_seeded_v3', 'true');
+    localStorage.setItem('vacapp_seeded_v4', 'true');
     localStorage.setItem('vacapp_seeded', 'true');
     // Inicialización de base de datos exitosa
+  }
+
+  /**
+   * Registra un evento de trazabilidad en el sistema.
+   * @param evento Descripción detallada del evento (ej: 'Alta de animal [Crotal] - ...')
+   * @param bovinoId Opcional, para enlazarlo a un animal concreto.
+   */
+  async logTrazabilidad(evento: string, bovinoId?: string): Promise<{error: any}> {
+    const payload = {
+      id: crypto.randomUUID(),
+      evento,
+      bovino_id: bovinoId || null,
+      fecha: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    };
+
+    if (this.supabase) {
+      const { error } = await this.supabase.from('trazabilidad').insert(payload);
+      return { error };
+    } else {
+      const db = JSON.parse(localStorage.getItem('mock_trazabilidad') || '[]');
+      db.push(payload);
+      localStorage.setItem('mock_trazabilidad', JSON.stringify(db));
+      return { error: null };
+    }
   }
 
 }

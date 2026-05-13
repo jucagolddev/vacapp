@@ -757,72 +757,115 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     this.initCharts();
   }
 
+  /**
+   * @description Gráfico de evolución de peso — Estilo trading con línea suave,
+   * gradiente sutil, puntos ocultos con reveal al hover y crosshair vertical.
+   */
   private initWeightChart() {
     const ctx = this.weightCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    // Usar la evolución según el periodo seleccionado
     const stats = this.weightPeriod() === 'Mensual' 
         ? this.pesajeService.getEvolucionMensualHerd()
-        : { labels: ['2023', '2024', '2025'], data: [450, 480, 510] }; // Fallback anual simple si no hay un agrupador anual en servicio
+        : { labels: ['2023', '2024', '2025'], data: [450, 480, 510] };
     
-    // Degradado Espectacular
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(27, 67, 50, 0.6)');
-    gradient.addColorStop(0.5, 'rgba(27, 67, 50, 0.2)');
-    gradient.addColorStop(1, 'rgba(27, 67, 50, 0.0)');
+    // Gradiente sutil día (Forest Green)
+    const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+    gradient.addColorStop(0, 'rgba(27, 67, 50, 0.18)');
+    gradient.addColorStop(0.5, 'rgba(27, 67, 50, 0.05)');
+    gradient.addColorStop(1, 'rgba(27, 67, 50, 0)');
+
+    // Crosshair plugin
+    const crosshair = {
+      id: 'weightCrosshair',
+      afterDraw: (chart: any) => {
+        if (chart.tooltip?._active?.length) {
+          const cx = chart.ctx;
+          const x = chart.tooltip._active[0].element.x;
+          cx.save();
+          cx.beginPath();
+          cx.setLineDash([3, 4]);
+          cx.moveTo(x, chart.scales.y.top);
+          cx.lineTo(x, chart.scales.y.bottom);
+          cx.lineWidth = 1;
+          cx.strokeStyle = 'rgba(27, 67, 50, 0.12)';
+          cx.stroke();
+          cx.restore();
+        }
+      }
+    };
 
     const chart = new Chart(ctx, {
       type: 'line',
+      plugins: [crosshair],
       data: {
         labels: stats.labels as any,
         datasets: [{
           label: 'Peso Medio (kg)',
           data: stats.data,
           borderColor: '#1b4332',
-          borderWidth: 4,
-          tension: 0.5, // Curvas más suaves
+          borderWidth: 2.5,
+          tension: 0.4,
           fill: true,
           backgroundColor: gradient,
-          pointBackgroundColor: '#fff',
-          pointBorderColor: '#1b4332',
-          pointBorderWidth: 3,
-          pointRadius: 6,
-          pointHoverRadius: 10,
-          pointHoverBackgroundColor: '#d4a373',
-          pointHoverBorderColor: '#1b4332'
+          pointRadius: 0,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: '#1b4332',
+          pointHoverBorderColor: '#ffffff',
+          pointHoverBorderWidth: 3
         }]
       },
       options: {
         responsive: true,
+        animation: { duration: 800, easing: 'easeOutQuart' },
+        interaction: { intersect: false, mode: 'index' },
         plugins: { 
           legend: { display: false },
           tooltip: {
+            backgroundColor: 'rgba(253, 251, 247, 0.97)',
+            titleColor: '#92949c',
+            bodyColor: '#1A211E',
+            borderColor: 'rgba(166, 124, 82, 0.2)',
+            borderWidth: 1,
+            padding: { top: 10, bottom: 10, left: 14, right: 14 },
+            cornerRadius: 12,
             usePointStyle: true,
-            boxPadding: 8
+            boxPadding: 6,
+            titleFont: { family: "'Outfit', sans-serif", size: 11, weight: 600 },
+            bodyFont: { family: "'Outfit', sans-serif", size: 13, weight: 500 },
+            callbacks: {
+              label: (ctx: any) => ` Peso Medio:  ${ctx.parsed.y} kg`
+            }
           }
         },
         scales: {
           x: { 
-            grid: { display: false }, 
-            ticks: { font: { weight: 600, family: 'Outfit' }, color: '#582f0e', padding: 10 } 
+            grid: { display: false },
+            border: { display: false },
+            ticks: { font: { weight: 600, family: "'Outfit', sans-serif", size: 10 }, color: '#582f0e', padding: 8, maxRotation: 0 } 
           },
           y: { 
-            grid: { display: true, color: 'rgba(0,0,0,0.04)' }, 
+            position: 'right',
+            grid: { color: 'rgba(0,0,0,0.04)', lineWidth: 1 }, 
             border: { display: false },
             beginAtZero: false,
-            ticks: { font: { weight: 600, family: 'Outfit' }, color: '#582f0e', padding: 10 }
+            ticks: {
+              font: { weight: 600, family: "'Outfit', sans-serif", size: 10 },
+              color: '#582f0e',
+              padding: 10,
+              callback: (value: any) => value + ' kg'
+            }
           }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
         },
       }
     });
     this.charts.push(chart);
   }
 
+  /**
+   * @description Doughnut de distribución por lote — Diseño limpio con cutout grande,
+   * bordes redondeados y hover con desplazamiento sutil.
+   */
   private initLotesChart() {
     const ctx = this.lotesCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
@@ -844,20 +887,43 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
             '#a3b18a', // Sage
             '#dda15e'  // Harvest
           ],
-          borderWidth: 3,
-          borderColor: '#ffffff',
-          hoverOffset: 25,
-          borderRadius: 6 // Bordes redondeados espectaculares
+          borderWidth: 2,
+          borderColor: '#FDFBF7',
+          hoverOffset: 16,
+          borderRadius: 4
         }]
       },
       options: {
         responsive: true,
-        cutout: '72%',
-        layout: { padding: 10 },
+        cutout: '74%',
+        layout: { padding: 8 },
+        animation: { animateRotate: true, duration: 900, easing: 'easeOutQuart' },
         plugins: {
           legend: { 
             position: 'bottom',
-            labels: { font: { family: 'Outfit', weight: 600, size: 13 }, color: '#1b4332', padding: 20 }
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              font: { family: "'Outfit', sans-serif", weight: 600, size: 11 },
+              color: '#582f0e',
+              padding: 16
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(253, 251, 247, 0.97)',
+            titleColor: '#92949c',
+            bodyColor: '#1A211E',
+            borderColor: 'rgba(166, 124, 82, 0.2)',
+            borderWidth: 1,
+            padding: { top: 10, bottom: 10, left: 14, right: 14 },
+            cornerRadius: 12,
+            usePointStyle: true,
+            boxPadding: 6,
+            titleFont: { family: "'Outfit', sans-serif", size: 11, weight: 600 },
+            bodyFont: { family: "'Outfit', sans-serif", size: 13, weight: 500 },
+            callbacks: {
+              label: (ctx: any) => ` ${ctx.label}:  ${ctx.parsed} cabezas`
+            }
           }
         }
       }
@@ -865,6 +931,11 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     this.charts.push(chart);
   }
 
+  /**
+   * @description Gráfico financiero del dashboard — Líneas suaves con gradiente,
+   * crosshair interactivo y tooltip con cálculo de balance.
+   * Estética consistente con el módulo de Finanzas (trading day-mode).
+   */
   private initFinanceChart() {
     const ctx = this.financeCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
@@ -874,63 +945,144 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     const ingresos = finData.map(d => d.ingresos);
     const gastos = finData.map(d => d.gastos);
 
-    // Degradados Cilíndricos
-    const gradIngresos = ctx.createLinearGradient(0, 0, 0, 400);
-    gradIngresos.addColorStop(0, '#1b4332');
-    gradIngresos.addColorStop(1, '#40916c');
+    // Gradientes día (Rustic-Luxe)
+    const gradIngresos = ctx.createLinearGradient(0, 0, 0, 350);
+    gradIngresos.addColorStop(0, 'rgba(27, 67, 50, 0.18)');
+    gradIngresos.addColorStop(0.5, 'rgba(27, 67, 50, 0.05)');
+    gradIngresos.addColorStop(1, 'rgba(27, 67, 50, 0)');
 
-    const gradGastos = ctx.createLinearGradient(0, 0, 0, 400);
-    gradGastos.addColorStop(0, '#bc4749');
-    gradGastos.addColorStop(1, '#e5989b');
+    const gradGastos = ctx.createLinearGradient(0, 0, 0, 350);
+    gradGastos.addColorStop(0, 'rgba(188, 71, 73, 0.15)');
+    gradGastos.addColorStop(0.5, 'rgba(188, 71, 73, 0.04)');
+    gradGastos.addColorStop(1, 'rgba(188, 71, 73, 0)');
+
+    // Crosshair plugin
+    const crosshair = {
+      id: 'financeCrosshair',
+      afterDraw: (chart: any) => {
+        if (chart.tooltip?._active?.length) {
+          const cx = chart.ctx;
+          const x = chart.tooltip._active[0].element.x;
+          cx.save();
+          cx.beginPath();
+          cx.setLineDash([3, 4]);
+          cx.moveTo(x, chart.scales.y.top);
+          cx.lineTo(x, chart.scales.y.bottom);
+          cx.lineWidth = 1;
+          cx.strokeStyle = 'rgba(27, 67, 50, 0.12)';
+          cx.stroke();
+          cx.restore();
+        }
+      }
+    };
 
     const chart = new Chart(ctx, {
-      type: 'bar',
+      type: 'line',
+      plugins: [crosshair],
       data: {
         labels: labels as any,
         datasets: [
           {
             label: 'Ingresos (€)',
             data: ingresos,
+            borderColor: '#1b4332',
+            borderWidth: 2.5,
             backgroundColor: gradIngresos,
-            borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 4, bottomRight: 4 },
-            borderSkipped: false,
-            barPercentage: 0.7,
-            categoryPercentage: 0.8
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 7,
+            pointHoverBackgroundColor: '#1b4332',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 3
           },
           {
             label: 'Gastos (€)',
             data: gastos,
+            borderColor: '#BC4749',
+            borderWidth: 2.5,
             backgroundColor: gradGastos,
-            borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 4, bottomRight: 4 },
-            borderSkipped: false,
-            barPercentage: 0.7,
-            categoryPercentage: 0.8
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 7,
+            pointHoverBackgroundColor: '#BC4749',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 3
           }
         ]
       },
       options: {
         responsive: true,
+        animation: { duration: 800, easing: 'easeOutQuart' },
+        interaction: { intersect: false, mode: 'index' },
         plugins: {
           legend: { 
             position: 'top',
-            labels: { font: { family: 'Outfit', weight: 600 }, color: '#1b4332', padding: 20 }
+            align: 'end',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              font: { family: "'Outfit', sans-serif", weight: 600, size: 11 },
+              color: '#582f0e',
+              padding: 20
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(253, 251, 247, 0.97)',
+            titleFont: { family: "'Outfit', sans-serif", size: 11, weight: 600 },
+            bodyFont: { family: "'Outfit', sans-serif", size: 13, weight: 500 },
+            titleColor: '#92949c',
+            bodyColor: '#1A211E',
+            borderColor: 'rgba(166, 124, 82, 0.2)',
+            borderWidth: 1,
+            padding: { top: 10, bottom: 10, left: 14, right: 14 },
+            cornerRadius: 12,
+            usePointStyle: true,
+            boxWidth: 8,
+            boxHeight: 8,
+            boxPadding: 6,
+            displayColors: true,
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: (ctx: any) => {
+                const val = ctx.parsed.y?.toLocaleString('es-ES') || '0';
+                const prefix = ctx.dataset.label?.includes('Ingreso') ? '+' : '-';
+                return ` ${ctx.dataset.label}:  ${prefix}${val} €`;
+              },
+              afterBody: (items: any) => {
+                if (items.length >= 2) {
+                  const diff = (items[0].parsed.y || 0) - (items[1].parsed.y || 0);
+                  const sign = diff >= 0 ? '+' : '';
+                  return [`─────────────────`, `  Balance:  ${sign}${diff.toLocaleString('es-ES')} €`];
+                }
+                return [];
+              }
+            }
           }
         },
         scales: {
           x: { 
             grid: { display: false },
-            ticks: { font: { family: 'Outfit', weight: 600 }, color: '#582f0e', padding: 10 }
+            border: { display: false },
+            ticks: { font: { family: "'Outfit', sans-serif", weight: 600, size: 10 }, color: '#582f0e', padding: 8, maxRotation: 0 }
           },
           y: { 
-            grid: { color: 'rgba(0,0,0,0.04)' }, 
+            position: 'right',
+            grid: { color: 'rgba(0,0,0,0.04)', lineWidth: 1 }, 
             border: { display: false },
             beginAtZero: true,
-            ticks: { font: { family: 'Outfit', weight: 600 }, color: '#582f0e', padding: 10 }
+            ticks: {
+              font: { family: "'Outfit', sans-serif", weight: 600, size: 10 },
+              color: '#582f0e',
+              padding: 10,
+              callback: (value: any) => {
+                if (value >= 1000) return (value / 1000).toFixed(1) + 'k €';
+                return value + ' €';
+              }
+            }
           }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
         },
       }
     });

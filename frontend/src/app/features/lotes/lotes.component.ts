@@ -67,9 +67,9 @@ import { PdfService } from '../../core/services/pdf.service';
            <ion-grid fixed class="ion-no-padding">
              <ion-row>
                <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let w of waterTroughs; trackBy: trackById">
-                 <ion-card class="uniform-card" style="--border-radius: 12px; font-size: 14px; box-shadow: none; border: 1px solid var(--ion-color-light-shade);">
+                 <ion-card class="uniform-card abrevadero-card" style="--border-radius: 12px; font-size: 14px; box-shadow: none;">
                    <ion-card-header class="pb-0 pt-3">
-                     <ion-card-title style="font-size: 1rem; font-weight: 700; color: var(--ion-color-dark);">
+                     <ion-card-title style="font-size: 1rem; font-weight: 700;">
                        {{ w.nombre }}
                      </ion-card-title>
                      <p class="text-xs mt-1 uppercase font-semibold" 
@@ -99,11 +99,11 @@ import { PdfService } from '../../core/services/pdf.service';
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let lote of lotes; trackBy: trackById">
-              <ion-card class="uniform-card" style="--border-radius: 12px; font-size: 14px; box-shadow: none; border: 1px solid var(--ion-color-light-shade);">
+              <ion-card class="uniform-card lote-card" style="--border-radius: 12px; font-size: 14px; box-shadow: none;">
                 <ion-card-header class="pb-0">
                   <div class="flex justify-between items-start">
                     <div>
-                      <ion-card-title style="font-size: 1.1rem; font-weight: 700; color: var(--ion-color-dark);">
+                      <ion-card-title style="font-size: 1.1rem; font-weight: 700;">
                         {{ lote.nombre }}
                       </ion-card-title>
                       <p class="text-xs color-medium mt-1 uppercase font-semibold tracking-wide">
@@ -403,6 +403,7 @@ export class LotesComponent implements OnInit {
     const actionSheet = await this.actionSheetCtrl.create({
       header: `Opciones: ${lote.nombre}`,
       subHeader: 'Trazabilidad y Manejo',
+      cssClass: 'vac-action-sheet',
       buttons: [
         {
           text: 'Añadir Animales',

@@ -6,7 +6,10 @@
     "schematicCollections": [
       "@ionic/angular-toolkit"
     ],
-    "analytics": "ae291886-87ed-447d-8d4d-a78069bb0a9d"
+    "analytics": "ae291886-87ed-447d-8d4d-a78069bb0a9d",
+    "cache": {
+      "enabled": false
+    }
   },
   "newProjectRoot": "projects",
   "projects": {

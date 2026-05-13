@@ -231,3 +231,123 @@ ion-card {
   margin: 8px !important;
   --border-radius: 12px !important;
 }
+
+/* ==========================================================================
+   FIX DE CONTRASTES: LOTES, RECINTOS Y ABREVADEROS
+   ========================================================================== */
+
+/* 1. Tarjetas Base (Abrevaderos y Lotes) — Tema Claro Rustic-Luxe */
+.lote-card, .abrevadero-card, ion-card {
+  --background: #FDFBF7 !important;
+  background: #FDFBF7 !important;
+  border: 1px solid rgba(166, 124, 82, 0.25) !important; /* Borde tierra sutil */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.2s ease-in-out;
+
+  /* Estado Seleccionado / Activo */
+  &.selected, &:active, &:hover {
+    --background: #F5F0EA !important;
+    background: #F5F0EA !important;
+    border-color: #A67C52 !important;
+    box-shadow: 0 4px 16px rgba(166, 124, 82, 0.15) !important;
+  }
+}
+
+/* 2. Contraste de Textos (Tema Claro) */
+ion-card-title {
+  color: #1A211E !important; /* Negro profundo para títulos */
+  font-weight: 700 !important;
+}
+
+ion-card-subtitle, .card-text {
+  color: #4B5563 !important; /* Gris oscuro legible para subtítulos */
+}
+
+ion-card-content p, ion-card-content .vac-label-mini {
+  color: #6B7280 !important; /* Gris medio para datos secundarios */
+}
+
+ion-card-content .vac-value-sm {
+  color: #1A211E !important; /* Valores numéricos en negro */
+}
+
+/* 3. Badges (Etiquetas de Estado) con Contraste Perfecto */
+ion-badge {
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+  padding: 4px 8px !important;
+}
+
+ion-badge[color="primary"], ion-badge[color="success"] {
+  --color: #050A07 !important;
+}
+
+ion-badge[color="warning"] {
+  --color: #050A07 !important;
+}
+
+ion-badge[color="danger"] {
+  --color: #FFFFFF !important;
+}
+
+/* 4. Progress Bar de Abrevaderos */
+ion-progress-bar {
+  background: rgba(27, 67, 50, 0.1) !important; /* Tinte verde bosque sutil */
+  border-radius: 4px;
+  height: 8px !important;
+}
+
+/* ==========================================================================
+   FIX DE CONTRASTES: ACTION SHEETS
+   ========================================================================== */
+ion-action-sheet.vac-action-sheet {
+  --background: var(--vac-bg-main, #EAE2D5);
+  --button-color: var(--vac-text-main, #1A211E);
+  --button-color-activated: var(--vac-primary, #1B4332);
+  --color: var(--vac-text-main, #1A211E);
+}
+
+.vac-action-sheet::part(button) {
+  color: var(--vac-text-main, #1A211E) !important;
+}
+
+.vac-action-sheet::part(icon) {
+  color: var(--vac-primary, #1B4332) !important;
+  opacity: 0.8;
+}
+
+.vac-action-sheet::part(destructive-button) {
+  color: var(--ion-color-danger, #ef4444) !important;
+}
+
+.vac-action-sheet::part(cancel-button) {
+  font-weight: 700 !important;
+}
+
+.vac-action-sheet .action-sheet-title {
+  color: var(--vac-primary, #1B4332) !important;
+  font-weight: 800 !important;
+  font-size: 1.1rem !important;
+}
+
+.vac-action-sheet .action-sheet-sub-title {
+  color: var(--vac-accent, #A67C52) !important;
+}
+
+/* Fallback agresivo para cualquier span o div dentro de los botones del action sheet */
+.vac-action-sheet .action-sheet-button,
+.vac-action-sheet .action-sheet-button-inner {
+  color: var(--vac-text-main, #1A211E) !important;
+}
+
+/* ==========================================================================
+   FINANZAS CHART — TERMINAL PROFESIONAL
+   ========================================================================== */
+.chart-wrapper {
+  position: relative;
+  overflow: hidden;
+
+  canvas {
+    min-height: 300px;
+  }
+}

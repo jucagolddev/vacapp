@@ -61,9 +61,10 @@ Este proyecto ha sido construido utilizando tecnologías de vanguardia para aseg
 
 3. **Ejecutar en desarrollo**:
    ```bash
-   ionic serve
+   npm start
    ```
-   *Nota: La aplicación se abrirá automáticamente en `http://localhost:4200`.*
+   *Nota: Si encuentras conflictos de dependencias, usa `npm install --legacy-peer-deps`.*
+   *La aplicación se abrirá en `http://localhost:4200`.*
 
 4. **Compilar para producción**:
    ```bash

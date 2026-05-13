@@ -46,12 +46,14 @@ export interface Bovino {
   
   // ERP Attributes
   raza?: string;
+  categoria?: 'Vaca Reproductora' | 'Semental' | 'Ternero/a' | 'Novilla de Reposición' | 'Descarte' | string;
   porcentaje_pureza?: number;
   aptitud?: 'Carne' | 'Leche' | 'Doble Propósito' | 'Trabajo/Lidia';
   estado_productivo: 'Alta' | 'Baja Venta' | 'Baja Muerte' | 'Baja Descarte';
   estado_reproductivo?: 'Vacía' | 'Gestante' | 'Lactante' | 'Seca';
   
   lote_id?: string;
+  abrevadero_id?: string;
   foto_url?: string;
   
   // Genealogía
@@ -156,4 +158,12 @@ export interface Tarea {
   creada_por_sistema: boolean;
   created_at?: string;
   bovino?: Bovino;
+}
+
+export interface Trazabilidad {
+  id: string;
+  bovino_id?: string;
+  evento: string;
+  fecha: string;
+  created_at?: string;
 }

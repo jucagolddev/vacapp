@@ -220,6 +220,9 @@
               <ion-label position="stacked">DIB / Crotal *</ion-label>
               <ion-input formControlName="crotal" placeholder="ES012345678901"></ion-input>
             </ion-item>
+            <div *ngIf="bovinoForm.get('crotal')?.invalid && bovinoForm.get('crotal')?.touched" class="color-danger mt-1 text-xs px-4" style="font-size: 12px; margin-bottom: 12px; margin-left: 16px;">
+              Formato DIB/Crotal incorrecto (ES + 12 dígitos).
+            </div>
             <ion-item class="vac-input">
               <ion-label position="stacked">Fotografía del Ejemplar</ion-label>
               <input type="file" accept="image/*" (change)="onFileSelected($event)" class="py-sm" />
@@ -243,14 +246,22 @@
             <ion-item class="vac-input">
               <ion-label position="stacked">Raza Prima *</ion-label>
               <ion-select formControlName="raza" interface="popover">
-                <ion-select-option *ngFor="let raza of ganadoService.constants.RAZAS_BOVINAS" [value]="raza">
-                  {{ raza }}
+                <ion-select-option *ngFor="let raza of razasOficiales" [value]="raza.id">
+                  {{ raza.label }}
                 </ion-select-option>
               </ion-select>
             </ion-item>
             <ion-item class="vac-input" *ngIf="bovinoForm.get('raza')?.value !== 'Cruce / Mestizo' && bovinoForm.get('raza')?.value !== 'Otro'">
               <ion-label position="stacked">Porcentaje de Pureza (%)</ion-label>
               <ion-input type="number" formControlName="porcentaje_pureza" placeholder="Ej: 100"></ion-input>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Categoría Zootécnica *</ion-label>
+              <ion-select formControlName="categoria" interface="popover">
+                <ion-select-option *ngFor="let cat of categoriasAnimal" [value]="cat">
+                  {{ cat }}
+                </ion-select-option>
+              </ion-select>
             </ion-item>
             <ion-item class="vac-input">
               <ion-label position="stacked">Aptitud Principal *</ion-label>
@@ -277,6 +288,14 @@
               <ion-select formControlName="lote_id" placeholder="Cargar Lotes..." interface="popover">
                 <ion-select-option *ngFor="let lote of lotes()" [value]="lote.id">
                   {{ lote.nombre }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Ubicación Actual (Recinto / Abrevadero) *</ion-label>
+              <ion-select formControlName="abrevadero_id" placeholder="Seleccionar ubicación inicial..." interface="popover">
+                <ion-select-option *ngFor="let abr of abrevaderos()" [value]="abr.id">
+                  {{ abr.nombre }} ({{ abr.estado }})
                 </ion-select-option>
               </ion-select>
             </ion-item>

@@ -1,0 +1,136 @@
+/* ═══════════════════════════════════════════════════════════ */
+/* FINANZAS MODULE — Trading Premium (Modo Día / Rustic-Luxe) */
+/* ═══════════════════════════════════════════════════════════ */
+
+/* ── Metric Cards (KPI superiores) ── */
+.finance-metrics {
+  ion-card.metric-card {
+    --background: transparent !important;
+    background: #FDFBF7 !important;
+    display: flex !important;
+    align-items: center;
+    padding: 18px 20px;
+    border: 1px solid rgba(166, 124, 82, 0.15) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05) !important;
+    margin: 4px !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+      border-color: rgba(166, 124, 82, 0.3) !important;
+    }
+
+    .icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .data-box {
+      p {
+        margin: 0;
+        font-size: 0.72rem;
+        color: #6B7280 !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 500;
+      }
+      h3 {
+        margin: 6px 0 0 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1A211E !important;
+        font-family: 'Outfit', sans-serif;
+        letter-spacing: -0.02em;
+      }
+    }
+
+    /* ── Colores por tipo ── */
+    &.income .icon-box {
+      background: rgba(27, 67, 50, 0.1);
+      color: #1B4332;
+    }
+    &.expense .icon-box {
+      background: rgba(188, 71, 73, 0.1);
+      color: #BC4749;
+    }
+    &.balance .icon-box {
+      background: rgba(166, 124, 82, 0.12);
+      color: #A67C52;
+    }
+  }
+}
+
+/* ── Chart Card (Contenedor principal del gráfico) ── */
+.chart-card {
+  background: #FDFBF7 !important;
+  border: 1px solid rgba(166, 124, 82, 0.15) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden;
+
+  /* Header del chart card */
+  .vac-card-header-flex {
+    padding: 20px 24px 12px;
+  }
+
+  .vac-card-title-group {
+    span {
+      color: #92949c !important;
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    strong {
+      color: #1A211E !important;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: block;
+      margin-top: 4px;
+    }
+  }
+}
+
+/* ── Chart Wrapper (altura fija profesional) ── */
+.chart-wrapper {
+  position: relative;
+  height: 320px;
+  padding: 0 16px 20px;
+
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 576px) {
+  .chart-wrapper {
+    height: 240px;
+    padding: 0 8px 16px;
+  }
+
+  .finance-metrics ion-card.metric-card {
+    padding: 14px 16px;
+
+    .icon-box {
+      width: 38px;
+      height: 38px;
+      font-size: 18px;
+      margin-right: 12px;
+    }
+    .data-box h3 {
+      font-size: 1.1rem;
+    }
+  }
+}

@@ -3,10 +3,10 @@
 ================================================================================
 
 ### ESTADÍSTICAS DEL PROYECTO
-- **Archivos procesados:** 111
-- **Líneas de código:** 26,295
-- **Tamaño total:** 0.89 MB
-- **Tokens estimados:** ~225,597 tokens
+- **Archivos procesados:** 114
+- **Líneas de código:** 27,619
+- **Tamaño total:** 0.94 MB
+- **Tokens estimados:** ~238,736 tokens
 
 ---
 
@@ -23,7 +23,10 @@ vacapp/
 │       ├── .temp
 │       │   └── cli-latest
 │       └── migrations
-│           └── 00_initial_schema.sql
+│           ├── 00_initial_schema.sql
+│           ├── 01_sanidad_trazabilidad.sql
+│           ├── 02_gestion_agua.sql
+│           └── 02_pastoreo_rotativo.sql
 ├── database
 │   └── 01_init_schema.sql
 ├── documentation
@@ -1252,6 +1255,347 @@ ALTER TABLE sanidad ENABLE ROW LEVEL SECURITY;
 ALTER TABLE recria_pesajes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE finanzas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tareas ENABLE ROW LEVEL SECURITY;
+```
+
+### ARCHIVO: backend/supabase/migrations/01_sanidad_trazabilidad.sql (74 líneas)
+```sql
+-- Migration: 01_sanidad_trazabilidad.sql
+-- Descripción: Actualización del esquema para trazabilidad y gestión sanitaria.
+-- Alineado con la nomenclatura existente (bovinos, lotes, sanidad).
+
+BEGIN;
+
+-- ==============================================================================
+-- 1. MODIFICACIÓN DE LA TABLA "lotes" (equivalente a "batches")
+-- ==============================================================================
+-- La tabla lotes ya existe (id, finca_id, nombre, etc.).
+-- Añadimos las columnas 'tipo' y 'estado' solicitadas.
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'lotes' AND column_name = 'tipo') THEN
+        ALTER TABLE lotes ADD COLUMN tipo VARCHAR(50) CHECK (tipo IN ('Cebo', 'Reposición', 'Venta', 'Sanitario'));
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'lotes' AND column_name = 'estado') THEN
+        ALTER TABLE lotes ADD COLUMN estado VARCHAR(50) DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Cerrado'));
+    END IF;
+END $$;
+
+COMMENT ON COLUMN lotes.tipo IS 'Clasificación del lote según su propósito productivo o sanitario.';
+COMMENT ON COLUMN lotes.estado IS 'Estado operativo del lote.';
+
+
+-- ==============================================================================
+-- 2. MODIFICACIÓN DE LA TABLA "bovinos" (equivalente a "animals")
+-- ==============================================================================
+-- La columna lote_id (equivalente a batch_id) YA EXISTE en 00_initial_schema.sql.
+-- Se verifica y añade restricción a raza y se crea la columna categoria.
+
+DO $$
+BEGIN
+    -- Añadir columna categoria si no existe
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'bovinos' AND column_name = 'categoria') THEN
+        ALTER TABLE bovinos ADD COLUMN categoria VARCHAR(50) CHECK (categoria IN ('Vaca', 'Semental', 'Ternero', 'Descarte'));
+    END IF;
+END $$;
+
+-- Documentación y restricción de la columna raza.
+-- Como 'raza' ya es TEXT, podemos añadir una restricción CHECK. Si ya existen datos, 
+-- se recomienda limpiar los datos antes, pero aquí definimos la regla.
+ALTER TABLE bovinos DROP CONSTRAINT IF EXISTS bovinos_raza_check;
+ALTER TABLE bovinos ADD CONSTRAINT bovinos_raza_check CHECK (raza IN ('Retinta', 'Limousin', 'F1_Cross') OR raza IS NULL);
+
+COMMENT ON COLUMN bovinos.lote_id IS 'Llave foránea a la tabla lotes (batch_id). Permite asociar al animal a un lote específico.';
+COMMENT ON COLUMN bovinos.raza IS 'Raza del bovino. Valores permitidos: Retinta, Limousin, F1_Cross.';
+COMMENT ON COLUMN bovinos.categoria IS 'Categoría zootécnica del animal dentro de la explotación.';
+
+
+-- ==============================================================================
+-- 3. MODIFICACIÓN DE LA TABLA "sanidad" (equivalente a "health_records")
+-- ==============================================================================
+-- Añadimos lote_id para registrar tratamientos masivos y fecha_retiro para el tiempo de espera.
+
+DO $$
+BEGIN
+    -- Añadir lote_id (batch_id) a sanidad
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'sanidad' AND column_name = 'lote_id') THEN
+        ALTER TABLE sanidad ADD COLUMN lote_id UUID REFERENCES lotes(id) ON DELETE SET NULL;
+    END IF;
+
+    -- Añadir fecha_retiro (withdrawal_date)
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'sanidad' AND column_name = 'fecha_retiro') THEN
+        ALTER TABLE sanidad ADD COLUMN fecha_retiro DATE;
+    END IF;
+END $$;
+
+COMMENT ON COLUMN sanidad.lote_id IS 'Llave foránea a lotes para el registro de tratamientos masivos a todo un lote.';
+COMMENT ON COLUMN sanidad.fecha_retiro IS 'Fecha límite del tiempo de espera del medicamento por seguridad alimentaria (withdrawal_date).';
+
+COMMIT;
+```
+
+### ARCHIVO: backend/supabase/migrations/02_gestion_agua.sql (60 líneas)
+```sql
+-- =========================================================================================
+-- MIGRACIÓN: Control de Recursos Hídricos (Bioseguridad y Sequía)
+-- Descripción: Creación de la tabla para gestión de abrevaderos y depósitos de agua.
+-- Creado para: Vacapp (Gestión Ganadera y Trazabilidad REGA)
+-- =========================================================================================
+
+-- Creamos la tabla 'abrevaderos' (manteniendo la nomenclatura en español del resto de la BD)
+CREATE TABLE IF NOT EXISTS public.abrevaderos (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL, -- ej: 'Abrevadero Norte', 'Depósito Parideras'
+    lote_id UUID REFERENCES public.lotes(id) ON DELETE SET NULL, -- FK a la tabla de recintos (location_id)
+    capacidad_litros INTEGER NOT NULL DEFAULT 0,
+    estado VARCHAR(50) NOT NULL DEFAULT 'Operativo' CHECK (estado IN ('Operativo', 'Vacío', 'Mantenimiento', 'Fuga')),
+    ultima_limpieza DATE, -- Control de bioseguridad del agua
+    nivel_llenado INTEGER DEFAULT 100 CHECK (nivel_llenado >= 0 AND nivel_llenado <= 100), -- Porcentaje
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- =========================================================================================
+-- CONFIGURACIÓN DE SEGURIDAD A NIVEL DE FILA (RLS)
+-- =========================================================================================
+
+-- 1. Habilitamos RLS en la tabla
+ALTER TABLE public.abrevaderos ENABLE ROW LEVEL SECURITY;
+
+-- 2. Política de LECTURA: Cualquier usuario autenticado puede ver los abrevaderos
+CREATE POLICY "Permitir lectura de abrevaderos a usuarios autenticados" 
+    ON public.abrevaderos 
+    FOR SELECT 
+    TO authenticated 
+    USING (true);
+
+-- 3. Política de INSERCIÓN: Usuarios autenticados pueden registrar nuevos abrevaderos
+CREATE POLICY "Permitir creación de abrevaderos a usuarios autenticados" 
+    ON public.abrevaderos 
+    FOR INSERT 
+    TO authenticated 
+    WITH CHECK (true);
+
+-- 4. Política de ACTUALIZACIÓN: Usuarios autenticados pueden actualizar el estado, nivel o limpiezas
+CREATE POLICY "Permitir actualización de abrevaderos a usuarios autenticados" 
+    ON public.abrevaderos 
+    FOR UPDATE 
+    TO authenticated 
+    USING (true);
+
+-- 5. Política de ELIMINACIÓN: Usuarios autenticados pueden dar de baja abrevaderos
+CREATE POLICY "Permitir eliminación de abrevaderos a usuarios autenticados" 
+    ON public.abrevaderos 
+    FOR DELETE 
+    TO authenticated 
+    USING (true);
+
+-- =========================================================================================
+-- COMENTARIOS TÉCNICOS PARA EL DICCIONARIO DE DATOS
+-- =========================================================================================
+COMMENT ON TABLE public.abrevaderos IS 'Gestión de puntos de agua para control de reservas durante sequías.';
+COMMENT ON COLUMN public.abrevaderos.lote_id IS 'Relación con el potrero/recinto donde está ubicado.';
+COMMENT ON COLUMN public.abrevaderos.ultima_limpieza IS 'Fecha de la última desinfección, clave para evitar focos de infección.';
+COMMENT ON COLUMN public.abrevaderos.nivel_llenado IS 'Porcentaje actual estimado de agua (0 al 100).';
+```
+
+### ARCHIVO: backend/supabase/migrations/02_pastoreo_rotativo.sql (195 líneas)
+```sql
+-- ============================================================================
+-- Migration: 02_pastoreo_rotativo.sql
+-- Descripción: Control de estrés de pastos y pastoreo rotativo regenerativo.
+--
+-- CONTEXTO TÉCNICO:
+-- El pastoreo rotativo es la práctica de dividir la finca en potreros (paddocks)
+-- y rotar el ganado entre ellos para permitir la regeneración del pasto.
+-- Un ciclo típico:
+--   1. El lote entra al potrero → pasture_status = 'En Uso', usage_start_date = HOY
+--   2. Tras 3-7 días de pastoreo intensivo, se mueve al siguiente potrero.
+--   3. El potrero anterior pasa a → pasture_status = 'En Descanso', rest_start_date = HOY
+--   4. Tras 21-45 días de descanso (según estación), el pasto se regenera.
+--   5. Si el descanso no fue suficiente → pasture_status = 'Agotado' (requiere intervención).
+--
+-- Este esquema permite calcular:
+--   - Días de ocupación actual (NOW() - usage_start_date)
+--   - Días de descanso acumulados (NOW() - rest_start_date)
+--   - Alertas de sobrepastoreo (uso > 7 días consecutivos)
+--   - Planificación de rotación (qué potrero está listo para recibir ganado)
+-- ============================================================================
+
+BEGIN;
+
+-- ==============================================================================
+-- 1. COLUMNAS DE PASTOREO ROTATIVO EN LA TABLA "lotes"
+-- ==============================================================================
+-- La tabla "lotes" actúa como nuestra tabla de potreros/recintos/paddocks.
+-- Añadimos las columnas necesarias para el control de rotación de pastos.
+
+DO $$
+BEGIN
+    -- Estado del pasto en el recinto.
+    -- 'En Descanso': Sin ganado, regenerándose. Estado por defecto.
+    -- 'En Uso':      Lote de ganado activo pastoreando.
+    -- 'Agotado':     Pasto degradado, requiere intervención (resiembra, fertilización).
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'lotes' AND column_name = 'pasture_status'
+    ) THEN
+        ALTER TABLE lotes 
+        ADD COLUMN pasture_status VARCHAR(20) DEFAULT 'En Descanso'
+        CHECK (pasture_status IN ('En Descanso', 'En Uso', 'Agotado'));
+    END IF;
+
+    -- Lote de ganado que actualmente ocupa este potrero.
+    -- Es una FK auto-referencial (un "lote" de ganado ocupa un "lote/potrero").
+    -- En una arquitectura más madura, se separarían "potreros" y "lotes de ganado".
+    -- Nullable: NULL = potrero vacío (en descanso o agotado).
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'lotes' AND column_name = 'current_batch_id'
+    ) THEN
+        ALTER TABLE lotes 
+        ADD COLUMN current_batch_id UUID REFERENCES lotes(id) ON DELETE SET NULL;
+    END IF;
+
+    -- Fecha en la que el ganado entró al potrero.
+    -- Permite calcular: días_de_uso = NOW() - usage_start_date.
+    -- Alerta si días_de_uso > 7 (sobrepastoreo en clima mediterráneo).
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'lotes' AND column_name = 'usage_start_date'
+    ) THEN
+        ALTER TABLE lotes 
+        ADD COLUMN usage_start_date DATE;
+    END IF;
+
+    -- Fecha en la que el ganado salió y el pasto empezó a descansar.
+    -- Permite calcular: días_de_descanso = NOW() - rest_start_date.
+    -- El potrero está "listo" cuando días_de_descanso >= 21 (primavera) o >= 45 (verano seco).
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'lotes' AND column_name = 'rest_start_date'
+    ) THEN
+        ALTER TABLE lotes 
+        ADD COLUMN rest_start_date DATE;
+    END IF;
+END $$;
+
+-- Documentación de las columnas
+COMMENT ON COLUMN lotes.pasture_status IS 
+    'Estado vegetativo del potrero: En Descanso (regenerándose), En Uso (ganado pastoreando), Agotado (requiere intervención).';
+
+COMMENT ON COLUMN lotes.current_batch_id IS 
+    'UUID del lote de ganado que actualmente ocupa este potrero. NULL si está vacío.';
+
+COMMENT ON COLUMN lotes.usage_start_date IS 
+    'Fecha de entrada del ganado al potrero. Para calcular días de ocupación y detectar sobrepastoreo.';
+
+COMMENT ON COLUMN lotes.rest_start_date IS 
+    'Fecha de salida del ganado. Inicio del periodo de descanso y regeneración del pasto.';
+
+
+-- ==============================================================================
+-- 2. ÍNDICES PARA CONSULTAS DE ROTACIÓN
+-- ==============================================================================
+-- Índice parcial: Solo potreros "En Uso" para alertas de sobrepastoreo.
+CREATE INDEX IF NOT EXISTS idx_lotes_pasture_in_use 
+    ON lotes (usage_start_date) 
+    WHERE pasture_status = 'En Uso';
+
+-- Índice parcial: Solo potreros "En Descanso" para planificación de rotación.
+CREATE INDEX IF NOT EXISTS idx_lotes_pasture_resting 
+    ON lotes (rest_start_date) 
+    WHERE pasture_status = 'En Descanso';
+
+
+-- ==============================================================================
+-- 3. POLÍTICAS RLS (Row Level Security)
+-- ==============================================================================
+-- Las políticas existentes de la tabla "lotes" ya cubren lectura/escritura
+-- para usuarios autenticados. Las nuevas columnas heredan esas políticas
+-- automáticamente. No se requieren políticas adicionales.
+
+-- Verificación de seguridad: asegurar que RLS está activado.
+ALTER TABLE lotes ENABLE ROW LEVEL SECURITY;
+
+-- Política de lectura (si no existe)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'lotes' AND policyname = 'lotes_select_authenticated'
+    ) THEN
+        CREATE POLICY lotes_select_authenticated ON lotes
+            FOR SELECT TO authenticated USING (true);
+    END IF;
+END $$;
+
+-- Política de escritura (si no existe)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'lotes' AND policyname = 'lotes_all_authenticated'
+    ) THEN
+        CREATE POLICY lotes_all_authenticated ON lotes
+            FOR ALL TO authenticated USING (true) WITH CHECK (true);
+    END IF;
+END $$;
+
+
+-- ==============================================================================
+-- 4. VISTA AUXILIAR: Estado de Rotación en Tiempo Real
+-- ==============================================================================
+-- Vista que calcula automáticamente los días de uso/descanso y genera alertas.
+CREATE OR REPLACE VIEW v_pasture_rotation_status AS
+SELECT
+    l.id,
+    l.nombre,
+    l.ubicacion,
+    l.pasture_status,
+    l.current_batch_id,
+    lb.nombre AS batch_name,
+    l.usage_start_date,
+    l.rest_start_date,
+    -- Días de uso actual (solo si está 'En Uso')
+    CASE 
+        WHEN l.pasture_status = 'En Uso' AND l.usage_start_date IS NOT NULL 
+        THEN (CURRENT_DATE - l.usage_start_date) 
+        ELSE NULL 
+    END AS dias_uso_actual,
+    -- Días de descanso actual (solo si está 'En Descanso')
+    CASE 
+        WHEN l.pasture_status = 'En Descanso' AND l.rest_start_date IS NOT NULL 
+        THEN (CURRENT_DATE - l.rest_start_date) 
+        ELSE NULL 
+    END AS dias_descanso_actual,
+    -- Alerta de sobrepastoreo: más de 7 días de uso continuo
+    CASE 
+        WHEN l.pasture_status = 'En Uso' 
+             AND l.usage_start_date IS NOT NULL 
+             AND (CURRENT_DATE - l.usage_start_date) > 7 
+        THEN TRUE 
+        ELSE FALSE 
+    END AS alerta_sobrepastoreo,
+    -- Potrero listo para recibir ganado: >= 21 días de descanso
+    CASE 
+        WHEN l.pasture_status = 'En Descanso' 
+             AND l.rest_start_date IS NOT NULL 
+             AND (CURRENT_DATE - l.rest_start_date) >= 21 
+        THEN TRUE 
+        ELSE FALSE 
+    END AS listo_para_uso
+FROM lotes l
+LEFT JOIN lotes lb ON l.current_batch_id = lb.id
+WHERE l.finca_id IS NOT NULL
+ORDER BY 
+    l.pasture_status DESC, -- 'En Uso' primero
+    l.usage_start_date ASC; -- Los más antiguos en uso primero (prioridad de rotación)
+
+COMMENT ON VIEW v_pasture_rotation_status IS 
+    'Vista de estado de rotación de pastos en tiempo real. Calcula días de uso/descanso y genera alertas de sobrepastoreo.';
+
+COMMIT;
 ```
 
 ### ARCHIVO: database/01_init_schema.sql (162 líneas)
@@ -13077,7 +13421,7 @@ bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));
 ```
 
-### ARCHIVO: frontend/src/styles.scss (189 líneas)
+### ARCHIVO: frontend/src/styles.scss (337 líneas)
 ```scss
 @use 'theme/variables.scss';
 @use 'styles/main';
@@ -13267,7 +13611,155 @@ ion-modal.vac-modal {
   }
 }
 
+/* ==========================================================================
+   MODO COMPACTO Y SIDEBAR
+   ========================================================================== */
 
+/* RESET DE ESCALA GLOBAL */
+:root {
+  font-size: 14px !important; /* Esto encoge todo proporcionalmente */
+}
+
+/* SIDEBAR COMPACTA Y ALINEADA */
+ion-menu {
+  --width: 250px !important;
+
+  .vac-nav-item {
+    --min-height: 40px !important; /* Items mas finos */
+    --padding-start: 12px !important;
+    margin: 2px 8px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .icon-frame {
+    flex-shrink: 0 !important; /* Evita que el icono se aplaste */
+    min-width: 28px !important;
+    margin-right: 10px !important;
+    display: flex;
+    justify-content: center;
+    ion-icon { font-size: 18px !important; }
+  }
+
+  .vac-label {
+    font-size: 0.9rem !important;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 !important;
+    flex-grow: 1;
+  }
+}
+
+/* TARJETAS ELEGANTES */
+ion-card {
+  margin: 8px !important;
+  --border-radius: 12px !important;
+}
+
+/* ==========================================================================
+   FIX DE CONTRASTES: LOTES, RECINTOS Y ABREVADEROS
+   ========================================================================== */
+
+/* 1. Tarjetas Base (Abrevaderos y Lotes) */
+.lote-card, .abrevadero-card, ion-card {
+  --background: var(--ion-color-step-50, #0A140F) !important;
+  background: var(--ion-color-step-50, #0A140F) !important;
+  border: 1px solid rgba(188, 138, 95, 0.2) !important; /* Borde tierra sutil */
+  transition: all 0.2s ease-in-out;
+  
+  /* Estado Seleccionado / Activo */
+  &.selected, &:active, &:hover {
+    --background: rgba(188, 138, 95, 0.15) !important; /* Iluminación tierra */
+    background: rgba(188, 138, 95, 0.15) !important;
+    border-color: #A67C52 !important; /* Borde más fuerte */
+  }
+}
+
+/* 2. Contraste Fuerte en Textos */
+ion-card-title {
+  color: #FDFAF7 !important; /* Blanco hueso innegociable para títulos */
+  font-weight: 700 !important;
+}
+
+ion-card-subtitle, ion-label, .card-text, p {
+  color: #A0A6A3 !important; /* Gris claro para subtítulos y datos */
+}
+
+/* Asegurar que el texto dentro de items seleccionados no se vuelva oscuro */
+ion-item {
+  --color: #FDFAF7 !important;
+}
+
+/* 3. Badges (Etiquetas de Estado) con Contraste Perfecto */
+/* Para que el texto sea legible según el color de fondo */
+ion-badge {
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+  padding: 4px 8px !important;
+}
+
+ion-badge[color="primary"], ion-badge[color="success"] {
+  --color: #050A07 !important; /* Texto oscuro sobre fondo verde para máximo contraste */
+}
+
+ion-badge[color="warning"] {
+  --color: #050A07 !important; /* Texto oscuro sobre naranja/amarillo */
+}
+
+ion-badge[color="danger"] {
+  --color: #FFFFFF !important; /* Texto blanco puro sobre rojo */
+}
+
+/* 4. Progress Bar de Abrevaderos (Para que destaque en fondo oscuro) */
+ion-progress-bar {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 4px;
+  height: 8px !important;
+}
+
+/* ==========================================================================
+   FIX DE CONTRASTES: ACTION SHEETS
+   ========================================================================== */
+ion-action-sheet.vac-action-sheet {
+  --background: var(--vac-bg-main, #EAE2D5);
+  --button-color: var(--vac-text-main, #1A211E);
+  --button-color-activated: var(--vac-primary, #1B4332);
+  --color: var(--vac-text-main, #1A211E);
+}
+
+.vac-action-sheet::part(button) {
+  color: var(--vac-text-main, #1A211E) !important;
+}
+
+.vac-action-sheet::part(icon) {
+  color: var(--vac-primary, #1B4332) !important;
+  opacity: 0.8;
+}
+
+.vac-action-sheet::part(destructive-button) {
+  color: var(--ion-color-danger, #ef4444) !important;
+}
+
+.vac-action-sheet::part(cancel-button) {
+  font-weight: 700 !important;
+}
+
+.vac-action-sheet .action-sheet-title {
+  color: var(--vac-primary, #1B4332) !important;
+  font-weight: 800 !important;
+  font-size: 1.1rem !important;
+}
+
+.vac-action-sheet .action-sheet-sub-title {
+  color: var(--vac-accent, #A67C52) !important;
+}
+
+/* Fallback agresivo para cualquier span o div dentro de los botones del action sheet */
+.vac-action-sheet .action-sheet-button,
+.vac-action-sheet .action-sheet-button-inner {
+  color: var(--vac-text-main, #1A211E) !important;
+}
 ```
 
 ### ARCHIVO: frontend/src/app/app.component.ts (16 líneas)
@@ -13529,7 +14021,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   IonSplitPane, IonMenu, IonContent, IonList, 
   IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons, IonFooter
+  IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -13553,7 +14045,7 @@ import { SupabaseService } from '../../services/supabase.service';
     CommonModule, RouterLink, RouterLinkActive,
     IonSplitPane, IonMenu, IonContent, IonList, 
     IonMenuToggle, IonItem, IonLabel, IonRouterOutlet,
-    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons, IonFooter
+    IonHeader, IonToolbar, IonIcon, IonButton, IonModal, IonTitle, IonButtons
   ],
   template: `
       <ion-split-pane contentId="main-content" [when]="'md'" [class.collapsed]="isCollapsed">
@@ -13780,7 +14272,7 @@ export class MainLayoutComponent {
 }
 ```
 
-### ARCHIVO: frontend/src/app/core/models/vacapp.models.ts (159 líneas)
+### ARCHIVO: frontend/src/app/core/models/vacapp.models.ts (169 líneas)
 ```ts
 export interface UserProfile {
   id: string; // Auth.uid
@@ -13830,12 +14322,14 @@ export interface Bovino {
   
   // ERP Attributes
   raza?: string;
+  categoria?: 'Vaca Reproductora' | 'Semental' | 'Ternero/a' | 'Novilla de Reposición' | 'Descarte' | string;
   porcentaje_pureza?: number;
   aptitud?: 'Carne' | 'Leche' | 'Doble Propósito' | 'Trabajo/Lidia';
   estado_productivo: 'Alta' | 'Baja Venta' | 'Baja Muerte' | 'Baja Descarte';
   estado_reproductivo?: 'Vacía' | 'Gestante' | 'Lactante' | 'Seca';
   
   lote_id?: string;
+  abrevadero_id?: string;
   foto_url?: string;
   
   // Genealogía
@@ -13940,6 +14434,14 @@ export interface Tarea {
   creada_por_sistema: boolean;
   created_at?: string;
   bovino?: Bovino;
+}
+
+export interface Trazabilidad {
+  id: string;
+  bovino_id?: string;
+  evento: string;
+  fecha: string;
+  created_at?: string;
 }
 ```
 
@@ -15638,7 +16140,7 @@ export class StorageService {
 }
 ```
 
-### ARCHIVO: frontend/src/app/core/services/supabase.service.ts (820 líneas)
+### ARCHIVO: frontend/src/app/core/services/supabase.service.ts (1155 líneas)
 ```ts
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -16139,12 +16641,316 @@ export class SupabaseService {
     }
   }
 
+  // =========================================================================
+  // GESTIÓN DE LOTES Y TRAZABILIDAD SANITARIA (Cumplimiento Normativa REGA)
+  // =========================================================================
+
+  /**
+   * @description Obtiene todos los lotes activos de la explotación.
+   * La gestión por lotes es fundamental para el cumplimiento de la normativa REGA 
+   * (Registro General de Explotaciones Ganaderas), permitiendo una trazabilidad 
+   * agrupada y precisa de los animales.
+   * @returns {Promise<{data: any[] | null, error: any}>} Lista de lotes activos.
+   */
+  async getBatches(): Promise<{ data: any[] | null; error: any }> {
+    try {
+      if (!this.supabase || environment.useMockData) {
+        const { data, error } = await this.getRawMock('lotes');
+        const activos = (data || []).filter((l: any) => l.estado === 'Activo' || !l.estado);
+        return { data: activos, error };
+      }
+
+      const { data, error } = await this.supabase
+        .from('lotes')
+        .select('*')
+        .eq('estado', 'Activo')
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al obtener lotes:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * @description Crea un nuevo lote (Batch) en el sistema.
+   * Cumple con los requerimientos REGA para la clasificación y separación epidemiológica.
+   * @param {string} name Nombre descriptivo del lote.
+   * @param {string} type Tipo de lote ('Cebo', 'Reposición', 'Venta', 'Sanitario').
+   * @returns {Promise<{data: any | null, error: any}>} Lote recién creado.
+   */
+  async createBatch(name: string, type: string): Promise<{ data: any | null; error: any }> {
+    try {
+      const payload = {
+        nombre: name,
+        tipo: type,
+        estado: 'Activo',
+        finca_id: 'finca-1' // Idealmente dinámico según el contexto del usuario
+      };
+
+      if (!this.supabase || environment.useMockData) {
+        return await this.create('lotes', payload);
+      }
+
+      const { data, error } = await this.supabase
+        .from('lotes')
+        .insert(payload)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al crear lote:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * @description Asigna múltiples animales a un lote específico mediante un update masivo.
+   * Vital para documentar movimientos internos según exigencias de trazabilidad REGA.
+   * @param {string[]} animalIds Array de identificadores UUID de los animales.
+   * @param {string} batchId Identificador UUID del lote destino.
+   * @returns {Promise<{error: any}>} Promesa de completitud.
+   */
+  async assignAnimalsToBatch(animalIds: string[], batchId: string): Promise<{ error: any }> {
+    try {
+      if (!this.supabase || environment.useMockData) {
+        const { data: bovinos } = await this.getRawMock('bovinos');
+        const updated = bovinos.map((b: any) => {
+          if (animalIds.includes(b.id)) {
+            return { ...b, lote_id: batchId };
+          }
+          return b;
+        });
+        localStorage.setItem('mock_bovinos', JSON.stringify(updated));
+        return { error: null };
+      }
+
+      const { error } = await this.supabase
+        .from('bovinos')
+        .update({ lote_id: batchId } as any)
+        .in('id', animalIds);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      console.error('Error al asignar animales a lote:', error);
+      return { error };
+    }
+  }
+
+  /**
+   * @description Aplica un tratamiento médico a todos los animales de un lote.
+   * Calcula automáticamente el tiempo de retiro del medicamento para asegurar 
+   * que los productos derivados cumplan con la seguridad alimentaria (REGA/Sanidad).
+   * @param {string} batchId UUID del lote a tratar.
+   * @param {any} treatmentData Datos base del tratamiento (producto, dosis, tipo, etc.).
+   * @param {number} withdrawalDays Días de retiro/espera estipulados por el fabricante.
+   * @returns {Promise<{error: any}>}
+   */
+  async applyMassTreatment(batchId: string, treatmentData: any, withdrawalDays: number): Promise<{ error: any }> {
+    try {
+      // 1. Calcular fecha de retiro
+      const today = new Date();
+      const withdrawalDate = new Date(today.getTime() + (withdrawalDays * 24 * 60 * 60 * 1000));
+      const fechaRetiroStr = withdrawalDate.toISOString().split('T')[0];
+
+      if (!this.supabase || environment.useMockData) {
+        // Lógica Mock
+        const { data: bovinos } = await this.getRawMock('bovinos');
+        const animalesEnLote = bovinos.filter((b: any) => b.lote_id === batchId);
+        
+        for (const animal of animalesEnLote) {
+          const sanidadRecord = {
+            ...treatmentData,
+            bovino_id: animal.id,
+            lote_id: batchId,
+            fecha_retiro: fechaRetiroStr,
+            fecha: today.toISOString().split('T')[0]
+          };
+          await this.create('sanidad', sanidadRecord);
+        }
+        return { error: null };
+      }
+
+      // 2. Obtener animales del lote real
+      const { data: animals, error: fetchError } = await this.supabase
+        .from('bovinos')
+        .select('id')
+        .eq('lote_id', batchId);
+
+      if (fetchError) throw fetchError;
+      if (!animals || animals.length === 0) return { error: new Error('El lote está vacío.') };
+
+      // 3. Preparar inserción masiva
+      const treatments = animals.map(animal => ({
+        ...treatmentData,
+        bovino_id: animal.id,
+        lote_id: batchId,
+        fecha_retiro: fechaRetiroStr,
+        fecha: today.toISOString().split('T')[0]
+      }));
+
+      // 4. Insertar en sanidad
+      const { error: insertError } = await this.supabase
+        .from('sanidad')
+        .insert(treatments);
+
+      if (insertError) throw insertError;
+      return { error: null };
+
+    } catch (error) {
+      console.error('Error al aplicar tratamiento masivo:', error);
+      return { error };
+    }
+  }
+
+  /**
+   * @description Verifica si un animal se encuentra en periodo de retiro farmacológico.
+   * Es una medida de bioseguridad obligatoria (REGA) antes del envío a matadero o 
+   * consumo lácteo (COVAP/Central lechera).
+   * @param {string} animalId Identificador UUID del bovino.
+   * @returns {Promise<{ isSafe: boolean; activeTreatments: any[] | null; error: any }>}
+   */
+  async checkWithdrawalStatus(animalId: string): Promise<{ isSafe: boolean; activeTreatments: any[] | null; error: any }> {
+    try {
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      if (!this.supabase || environment.useMockData) {
+        const { data: sanidad } = await this.getRawMock('sanidad');
+        const activeTreatments = sanidad.filter((s: any) => 
+          s.bovino_id === animalId && 
+          s.fecha_retiro && 
+          s.fecha_retiro >= todayStr
+        );
+        return { isSafe: activeTreatments.length === 0, activeTreatments, error: null };
+      }
+
+      const { data, error } = await this.supabase
+        .from('sanidad')
+        .select('*')
+        .eq('bovino_id', animalId)
+        .gte('fecha_retiro', todayStr);
+
+      if (error) throw error;
+
+      return { 
+        isSafe: !data || data.length === 0, 
+        activeTreatments: data, 
+        error: null 
+      };
+    } catch (error) {
+      console.error('Error al comprobar estatus de retiro farmacológico:', error);
+      return { isSafe: false, activeTreatments: null, error };
+    }
+  }
+
+  // =========================================================================
+  // GESTIÓN DE RECURSOS HÍDRICOS (Abrevaderos / Sequía)
+  // =========================================================================
+
+  /**
+   * @description Obtiene todos los abrevaderos y sus niveles actuales.
+   * @returns {Promise<{data: any[] | null, error: any}>}
+   */
+  async getWaterTroughs(): Promise<{ data: any[] | null; error: any }> {
+    try {
+      if (!this.supabase || environment.useMockData) {
+        const { data, error } = await this.getRawMock('abrevaderos');
+        return { data: data || [], error };
+      }
+
+      const { data, error } = await this.supabase
+        .from('abrevaderos')
+        .select('*')
+        .order('nombre', { ascending: true });
+        
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al obtener abrevaderos:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * @description Actualiza el porcentaje de agua (fill_level / nivel_llenado).
+   * Si el nivel baja del 20%, actualiza el status a 'Vacío'.
+   * @param {string} troughId UUID del abrevadero.
+   * @param {number} level Porcentaje de 0 a 100.
+   * @returns {Promise<{data: any | null, error: any}>}
+   */
+  async updateWaterLevel(troughId: string, level: number): Promise<{ data: any | null; error: any }> {
+    try {
+      const clampedLevel = Math.max(0, Math.min(100, level));
+      const status = clampedLevel <= 20 ? 'Vacío' : 'Operativo';
+
+      const payload = {
+        nivel_llenado: clampedLevel,
+        estado: status
+      };
+
+      if (!this.supabase || environment.useMockData) {
+        return await this.update('abrevaderos', troughId, payload);
+      }
+
+      const { data, error } = await this.supabase
+        .from('abrevaderos')
+        .update(payload)
+        .eq('id', troughId)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al actualizar nivel de agua:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * @description Actualiza la fecha last_cleaned_at a hoy.
+   * Vital para la prevención de enfermedades y bioseguridad.
+   * @param {string} troughId UUID del abrevadero.
+   * @returns {Promise<{data: any | null, error: any}>}
+   */
+  async registerTroughCleaning(troughId: string): Promise<{ data: any | null; error: any }> {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const payload = {
+        ultima_limpieza: today,
+        estado: 'Operativo' // Restauramos a operativo tras limpieza si estaba en mantenimiento
+      };
+
+      if (!this.supabase || environment.useMockData) {
+        return await this.update('abrevaderos', troughId, payload);
+      }
+
+      const { data, error } = await this.supabase
+        .from('abrevaderos')
+        .update(payload)
+        .eq('id', troughId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al registrar limpieza del abrevadero:', error);
+      return { data: null, error };
+    }
+  }
+
   /**
    * Genera un set de datos masivo, relacional y coherente para demostración.
    */
   private seedTestData() {
-    // Si ya existe la versión 2, no re-sembramos
-    if (localStorage.getItem('vacapp_seeded_v2') === 'true') return;
+    // Si ya existe la versión 4, no re-sembramos
+    if (localStorage.getItem('vacapp_seeded_v4') === 'true') return;
 
     const now = new Date();
     const daysAgo = (d: number) => {
@@ -16179,6 +16985,12 @@ export class SupabaseService {
       sementales: [
         { id: 'sem-1', nombre: 'Titán', raza: 'Limousin', finca_id: 'finca-1' }
       ],
+      abrevaderos: [
+        { id: 'abr-1', nombre: 'Abrevadero Norte', lote_id: 'lote-engorde', capacidad_litros: 500, estado: 'Operativo', ultima_limpieza: daysAgo(2), nivel_llenado: 85 },
+        { id: 'abr-2', nombre: 'Pilón Central', lote_id: 'lote-repro', capacidad_litros: 1000, estado: 'Operativo', ultima_limpieza: daysAgo(5), nivel_llenado: 45 },
+        { id: 'abr-3', nombre: 'Depósito Parideras', lote_id: 'lote-maternidad', capacidad_litros: 300, estado: 'Vacío', ultima_limpieza: daysAgo(15), nivel_llenado: 10 }
+      ],
+      trazabilidad: [],
       bovinos: [],
       recria_pesajes: [],
       finanzas: [],
@@ -16454,9 +17266,34 @@ export class SupabaseService {
       localStorage.setItem(`mock_${table}`, JSON.stringify(mockData[table]));
     });
 
-    localStorage.setItem('vacapp_seeded_v2', 'true');
+    localStorage.setItem('vacapp_seeded_v4', 'true');
     localStorage.setItem('vacapp_seeded', 'true');
     // Inicialización de base de datos exitosa
+  }
+
+  /**
+   * Registra un evento de trazabilidad en el sistema.
+   * @param evento Descripción detallada del evento (ej: 'Alta de animal [Crotal] - ...')
+   * @param bovinoId Opcional, para enlazarlo a un animal concreto.
+   */
+  async logTrazabilidad(evento: string, bovinoId?: string): Promise<{error: any}> {
+    const payload = {
+      id: crypto.randomUUID(),
+      evento,
+      bovino_id: bovinoId || null,
+      fecha: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    };
+
+    if (this.supabase) {
+      const { error } = await this.supabase.from('trazabilidad').insert(payload);
+      return { error };
+    } else {
+      const db = JSON.parse(localStorage.getItem('mock_trazabilidad') || '[]');
+      db.push(payload);
+      localStorage.setItem('mock_trazabilidad', JSON.stringify(db));
+      return { error: null };
+    }
   }
 
 }
@@ -16893,7 +17730,7 @@ export class TaskService {
 }
 ```
 
-### ARCHIVO: frontend/src/app/features/animal-detail/animal-detail.component.ts (488 líneas)
+### ARCHIVO: frontend/src/app/features/animal-detail/animal-detail.component.ts (567 líneas)
 ```ts
 import { Component, OnInit, signal, computed, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -16902,7 +17739,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, 
   IonBackButton, IonGrid, IonRow, IonCol, IonIcon, 
   IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText,
-  IonSpinner, ToastController
+  IonSpinner, ToastController, AlertController, IonButton
 } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { BaseChartDirective } from 'ng2-charts';
@@ -16914,7 +17751,7 @@ import {
   paw, medical, scale, calendar, cash, 
   chevronForwardOutline, fitnessOutline, 
   timeOutline, alertCircleOutline, checkmarkCircleOutline,
-  flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline
+  flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline, pricetagOutline
 } from 'ionicons/icons';
 
 interface TimelineEvent {
@@ -16948,7 +17785,7 @@ interface AnimalData {
     CommonModule, FormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonButtons, IonBackButton, IonGrid, IonRow, IonCol, IonIcon,
     IonSegment, IonSegmentButton, IonLabel, IonBadge, IonSkeletonText,
-    IonSpinner, BaseChartDirective
+    IonSpinner, BaseChartDirective, IonButton
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -16958,7 +17795,9 @@ interface AnimalData {
         </ion-buttons>
         <ion-title class="ion-text-center">Inteligencia Animal</ion-title>
         <ion-buttons slot="end">
-           <div style="width: 48px"></div>
+          <ion-button (click)="venderAnimal()" color="danger" aria-label="Vender o Dar de Baja">
+            <ion-icon name="pricetag-outline"></ion-icon>
+          </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -16984,7 +17823,14 @@ interface AnimalData {
               <div class="animal-main-info">
                  <h1 class="crotal-id">{{ data()?.bovino?.crotal }}</h1>
                  <p class="animal-name">{{ data()?.bovino?.nombre || 'Res S/N' }} • {{ data()?.bovino?.raza }}</p>
-                 <ion-badge [color]="getStatusColor(data()?.bovino?.estado_reproductivo)" class="status-badge" mode="ios">
+                 
+                 <!-- BADGE REGA: TIEMPO DE ESPERA (Bloqueante) -->
+                 <ion-badge *ngIf="inWithdrawal().active" color="danger" class="status-badge mt-2" style="font-size: 0.95rem; padding: 10px 14px; display: inline-flex; align-items: center; gap: 6px;">
+                    <ion-icon name="alert-circle-outline" style="font-size: 1.2rem;"></ion-icon> 🚨 EN TIEMPO DE ESPERA - NO APTO PARA VENTA
+                 </ion-badge>
+
+                 <!-- Badge normal de estado reproductivo -->
+                 <ion-badge *ngIf="!inWithdrawal().active" [color]="getStatusColor(data()?.bovino?.estado_reproductivo)" class="status-badge" mode="ios">
                     {{ data()?.bovino?.estado_reproductivo || 'Activo' }}
                  </ion-badge>
               </div>
@@ -17160,6 +18006,7 @@ export class AnimalDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private supabase = inject(SupabaseService);
   private toastCtrl = inject(ToastController);
+  private alertCtrl = inject(AlertController);
   
   activeSegment = signal('history');
   data = signal<AnimalData | null>(null);
@@ -17179,7 +18026,7 @@ export class AnimalDetailComponent implements OnInit {
       paw, medical, scale, calendar, cash, 
       chevronForwardOutline, fitnessOutline, 
       timeOutline, alertCircleOutline, checkmarkCircleOutline,
-      flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline
+      flaskOutline, gitBranchOutline, medkitOutline, cameraOutline, cashOutline, pricetagOutline
     });
   }
 
@@ -17260,6 +18107,75 @@ export class AnimalDetailComponent implements OnInit {
       case 'Seca': return 'medium';
       default: return 'primary';
     }
+  }
+
+  // =========================================================================
+  // GESTIÓN REGA - SEGURIDAD ALIMENTARIA Y TRAZABILIDAD
+  // =========================================================================
+
+  /**
+   * @description Calcula de forma reactiva si el animal está en periodo de
+   * supresión de medicamentos, bloqueando legalmente su venta.
+   */
+  inWithdrawal = computed(() => {
+    const records = this.data()?.sanidad || [];
+    const now = new Date().getTime();
+    for (const s of records) {
+      const fechaRetiro = (s as any).fecha_retiro || (s as any).withdrawal_date;
+      if (fechaRetiro && new Date(fechaRetiro).getTime() > now) {
+        return { active: true, date: fechaRetiro };
+      }
+    }
+    return { active: false, date: null };
+  });
+
+  /**
+   * @description Lógica para vender o dar de baja a un animal.
+   * Incluye un Guard/Validación estricto para evitar vender animales con residuos
+   * de antibióticos (Cumplimiento de Bioseguridad REGA).
+   */
+  async venderAnimal() {
+    const withdrawalInfo = this.inWithdrawal();
+    const crotal = this.data()?.bovino?.crotal || 'Desconocido';
+
+    if (withdrawalInfo.active) {
+      const fechaFormat = new Date(withdrawalInfo.date!).toLocaleDateString('es-ES', { 
+        year: 'numeric', month: 'long', day: 'numeric' 
+      });
+
+      const alertBlock = await this.alertCtrl.create({
+        header: 'Operación denegada',
+        subHeader: 'Bloqueo Normativa REGA 🚨',
+        message: `El animal <strong>${crotal}</strong> se encuentra en periodo de supresión de medicamentos hasta el <strong>${fechaFormat}</strong>.<br><br>Para garantizar la seguridad alimentaria, no es apto para venta ni envío a matadero.`,
+        buttons: ['Entendido'],
+        cssClass: 'vac-alert-danger',
+        mode: 'ios'
+      });
+      await alertBlock.present();
+      return;
+    }
+
+    const alertConfirm = await this.alertCtrl.create({
+      header: 'Vender o Dar de Baja',
+      message: `¿Deseas dar de baja o registrar la venta del animal ${crotal}? Esta acción actualizará su estado en la explotación.`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'color-medium'
+        },
+        {
+          text: 'Continuar',
+          role: 'confirm',
+          handler: async () => {
+            await this.showToast('Trámite de venta iniciado correctamente.', 'success');
+          }
+        }
+      ],
+      mode: 'ios'
+    });
+    
+    await alertConfirm.present();
   }
 
   // KPIs
@@ -18703,9 +19619,9 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 }
 ```
 
-### ARCHIVO: frontend/src/app/features/finanzas/finanzas.component.ts (525 líneas)
+### ARCHIVO: frontend/src/app/features/finanzas/finanzas.component.ts (600 líneas)
 ```ts
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -18718,8 +19634,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { PdfService } from '../../core/services/pdf.service';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartOptions } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 import { FinanzasService } from '../../core/services/finanzas.service';
 import { Finanzas } from '../../core/models/vacapp.models';
 import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline } from 'ionicons/icons';
@@ -18740,8 +19655,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
     IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
     IonGrid, IonRow, IonCol,
-    IonPopover, IonSegment, IonSegmentButton,
-    BaseChartDirective
+    IonPopover, IonSegment, IonSegmentButton
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -18804,7 +19718,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
             </div>
           </header>
           <div class="p-4">
-             <canvas baseChart class="chart-canvas-finance" [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
+             <canvas id="financeChart" class="chart-canvas-finance"></canvas>
           </div>
         </section>
 
@@ -18977,6 +19891,7 @@ export class FinanzasComponent {
   isModalOpen = false;
   editingItem: Finanzas | null = null;
   finanzasForm: FormGroup;
+  chart: any = null; // Instancia de Chart.js
 
   // Filtros Avanzados
   filterTipo = signal<string>('Todos');
@@ -19008,47 +19923,8 @@ export class FinanzasComponent {
   categoriasGasto = ['Alimentación y Pastos', 'Veterinaria y Semen', 'Mantenimiento y Equipos', 'Sueldos', 'Otros Gastos'];
   categoriasDisponibles: string[] = [];
   
-  // Gráfico de Finanzas (ROI) - Agrupado Mensual por defecto
   chartPeriodo = signal<'Mensual' | 'Anual'>('Mensual');
   filterGlobal = signal<'Mensual' | 'Anual'>('Mensual');
-
-  chartFinanzas = computed<ChartConfiguration<'bar'>['data']>(() => {
-    const data = this.finanzasService.getDatosFinancierosPorPeriodo(this.chartPeriodo());
-    return {
-      labels: data.map(d => d.label),
-      datasets: [
-        { 
-          label: 'Ingresos (€)', 
-          data: data.map(d => d.ingresos), 
-          backgroundColor: '#1b4332', 
-          borderColor: '#1b4332',
-          borderWidth: 0,
-          borderRadius: 8 
-        },
-        { 
-          label: 'Gastos (€)', 
-          data: data.map(d => -d.gastos), 
-          backgroundColor: '#bc4749', // Rojo Ladrillo ($danger-color)
-          borderColor: '#bc4749',
-          borderWidth: 0,
-          borderRadius: 8 
-        }
-      ]
-    };
-  });
-
-  public chartOptionsROI: ChartOptions<'bar'> = {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: '#6c757d', font: { size: 12, weight: 'bold' } } } },
-    scales: {
-      x: { stacked: true, grid: { display: false }, ticks: { color: '#6c757d' } },
-      y: { 
-        stacked: true, 
-        grid: { color: 'rgba(0,0,0,0.05)' }, 
-        ticks: { color: '#6c757d', callback: (val) => '€' + Math.abs(Number(val)) } 
-      }
-    }
-  };
 
   goToDetail(id: string) {
     if (id) {
@@ -19062,6 +19938,7 @@ export class FinanzasComponent {
 
   constructor() {
     addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline });
+    Chart.register(...registerables);
     this.finanzasForm = this.fb.group({
       tipo: ['Gasto', Validators.required],
       categoria: ['Alimentación y Pastos', Validators.required],
@@ -19069,6 +19946,120 @@ export class FinanzasComponent {
       fecha: [new Date().toISOString().split('T')[0], Validators.required]
     });
     this.categoriasDisponibles = [...this.categoriasGasto];
+
+    // Efecto reactivo para dibujar el gráfico cuando cambia el periodo o los datos
+    effect(() => {
+      const data = this.finanzasService.getDatosFinancierosPorPeriodo(this.chartPeriodo());
+      setTimeout(() => this.renderChart(data), 50); // Pequeño delay para asegurar que el canvas está en el DOM
+    });
+  }
+
+  renderChart(data: any[]) {
+    // Asegúrate de destruir el gráfico anterior si existe
+    if (this.chart) {
+      this.chart.destroy();
+    }
+
+    const ctx = document.getElementById('financeChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    // 1. Crear Gradientes Profesionales
+    const gradBalance = ctx.getContext('2d')?.createLinearGradient(0, 0, 0, 400);
+    gradBalance?.addColorStop(0, 'rgba(46, 204, 113, 0.5)'); // Verde neón brillante
+    gradBalance?.addColorStop(1, 'rgba(46, 204, 113, 0.0)'); // Transparente abajo
+
+    const gradGastos = ctx.getContext('2d')?.createLinearGradient(0, 0, 0, 400);
+    gradGastos?.addColorStop(0, 'rgba(231, 76, 60, 0.8)'); // Rojo profundo
+    gradGastos?.addColorStop(1, 'rgba(231, 76, 60, 0.2)'); 
+
+    // 2. Calcular el Balance Neto (Ingresos - Gastos) para la línea principal
+    const balanceData = data.map(d => d.ingresos - d.gastos);
+    const labels = data.map(d => d.label);
+
+    this.chart = new Chart(ctx, {
+      type: 'line', // El tipo principal será línea
+      data: {
+        labels: labels as any,
+        datasets: [
+          {
+            type: 'line',
+            label: 'Balance Neto (€)',
+            data: balanceData,
+            borderColor: '#2ecc71', // Verde estilo bolsa
+            borderWidth: 3,
+            backgroundColor: gradBalance,
+            fill: true, // Esto crea el efecto de área de mercado
+            tension: 0.4, // Curva suave (fluidez)
+            pointRadius: 0, // Ocultar puntos hasta que se pase el ratón
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#2ecc71',
+            pointBorderWidth: 2,
+            order: 1 // Dibuja la línea por encima de las barras
+          },
+          {
+            type: 'bar',
+            label: 'Gastos (€)',
+            data: data.map(d => d.gastos),
+            backgroundColor: gradGastos,
+            borderRadius: 4,
+            barPercentage: 0.5,
+            order: 2 // Barras en el fondo como "volumen"
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index', // Mostrar datos de ambas series al hacer hover
+          intersect: false, // Efecto "crosshair" profesional
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: { color: '#a0a6a3', usePointStyle: true, boxWidth: 8 }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(10, 20, 15, 0.9)',
+            titleColor: '#fdfaf7',
+            bodyColor: '#fdfaf7',
+            borderColor: 'rgba(188, 138, 95, 0.3)',
+            borderWidth: 1,
+            padding: 12,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) label += ': ';
+                if (context.parsed.y !== null) {
+                  label += new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(context.parsed.y);
+                }
+                return label;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false }, // Limpiar eje X
+            ticks: { color: '#a0a6a3', font: { family: 'Outfit' } }
+          },
+          y: {
+            border: { display: false },
+            grid: { 
+              color: 'rgba(255, 255, 255, 0.05)' // Líneas horizontales muy sutiles
+            },
+            ticks: {
+              color: '#a0a6a3',
+              font: { family: 'Outfit' },
+              callback: function(value) { return '€' + value; }
+            }
+          }
+        }
+      }
+    });
   }
 
   async exportarPDF() {
@@ -19849,34 +20840,34 @@ export class KanbanComponent {
 }
 ```
 
-### ARCHIVO: frontend/src/app/features/lotes/lotes.component.ts (298 líneas)
+### ARCHIVO: frontend/src/app/features/lotes/lotes.component.ts (598 líneas)
 ```ts
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonItem, 
   IonLabel, IonIcon, IonButtons, IonMenuButton, IonFab, IonFabButton,
-  IonModal, IonButton, IonInput,
-  IonGrid, IonRow, IonCol
+  IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
+  IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardContent,
+  IonList, IonCheckbox, ActionSheetController, ToastController, AlertController,
+  IonProgressBar
 } from '@ionic/angular/standalone';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { GanadoService } from '../../core/services/ganado.service';
-import { Lote } from '../../core/models/vacapp.models';
+import { Lote, Bovino } from '../../core/models/vacapp.models';
 import { addIcons } from 'ionicons';
-import { PdfService } from '../../core/services/pdf.service';
 import { 
   businessOutline, gridOutline, addCircle, closeOutline, saveOutline, locationOutline, 
-  statsChartOutline, createOutline, trashOutline, leafOutline, waterOutline, arrowForwardOutline, filterOutline, layersOutline, documentTextOutline
+  statsChartOutline, createOutline, trashOutline, leafOutline, waterOutline, arrowForwardOutline, filterOutline, layersOutline, documentTextOutline, ellipsisVertical, medicalOutline, moveOutline, listOutline
 } from 'ionicons/icons';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ToastController, AlertController } from '@ionic/angular/standalone';
+import { PdfService } from '../../core/services/pdf.service';
 
 /**
  * @class LotesComponent
- * @description Módulo de gestión territorial y división del hato.
- * Permite organizar los animales en potreros o recintos específicos,
- * calculando automáticamente la carga animal (UGB) por unidad de superficie
- * para optimizar el pastoreo rotacional.
+ * @description Módulo de gestión territorial y sanitaria del hato.
+ * Permite organizar los animales en lotes, asignar tratamientos masivos
+ * y asegurar la trazabilidad exigida por REGA.
  */
 @Component({
   selector: 'app-lotes',
@@ -19884,8 +20875,9 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
   imports: [
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, 
     IonItem, IonLabel, IonIcon, IonButtons, IonMenuButton, 
-    IonFab, IonFabButton, IonModal, IonButton, IonInput, 
-    IonGrid, IonRow, IonCol
+    IonModal, IonButton, IonInput, IonSelect, IonSelectOption,
+    IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardContent,
+    IonList, IonCheckbox, IonProgressBar
   ],
   template: `
     <ion-header class="ion-no-border">
@@ -19893,13 +20885,11 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
         <ion-buttons slot="start">
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title class="ion-text-center">Potreros y Recintos</ion-title>
+        <ion-title class="ion-text-center">Manejo por Lotes</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="exportarPDF()" fill="clear" aria-label="Exportar PDF">
-            <ion-icon name="document-text-outline"></ion-icon>
-          </ion-button>
-          <ion-button fill="clear" aria-label="Filtrar">
-            <ion-icon name="filter-outline"></ion-icon>
+          <ion-button (click)="openAddModal()" fill="clear" color="primary">
+            <ion-icon name="add-circle" slot="start"></ion-icon>
+            Nuevo Lote
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -19909,47 +20899,84 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
       <main class="vac-container animate-fade-in">
         
         <div class="vac-text-stack mb-8">
-          <h1 class="vac-page-title">Gestión de Potreros</h1>
-          <p class="vac-page-subtitle">Organiza y monitorea la carga animal por recinto</p>
+          <h1 class="vac-page-title">Gestión de Lotes</h1>
+          <p class="vac-page-subtitle">Trazabilidad sanitaria y agrupamiento estratégico</p>
+        </div>
+
+        <!-- SECCIÓN: ESTADO HÍDRICO (ABREVADEROS) -->
+        <div class="water-section mb-8" *ngIf="waterTroughs.length > 0">
+           <h2 class="vac-section-title" style="font-size: 1.1rem; font-weight: 700; color: var(--ion-color-dark); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+             <ion-icon name="water-outline" color="primary"></ion-icon> Estado Hídrico
+           </h2>
+           <ion-grid fixed class="ion-no-padding">
+             <ion-row>
+               <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let w of waterTroughs; trackBy: trackById">
+                 <ion-card class="uniform-card abrevadero-card" style="--border-radius: 12px; font-size: 14px; box-shadow: none;">
+                   <ion-card-header class="pb-0 pt-3">
+                     <ion-card-title style="font-size: 1rem; font-weight: 700;">
+                       {{ w.nombre }}
+                     </ion-card-title>
+                     <p class="text-xs mt-1 uppercase font-semibold" 
+                        [class.color-danger]="w.nivel_llenado < 20" 
+                        [class.color-warning]="w.nivel_llenado >= 20 && w.nivel_llenado <= 50" 
+                        [class.color-primary]="w.nivel_llenado > 50">
+                       Nivel: {{ w.nivel_llenado }}%
+                     </p>
+                   </ion-card-header>
+                   <ion-card-content class="pt-2 pb-2">
+                     <ion-progress-bar [value]="w.nivel_llenado / 100" [color]="getWaterColor(w.nivel_llenado)" class="mb-3" style="height: 6px; border-radius: 4px;"></ion-progress-bar>
+                     <div class="flex justify-between items-center mt-2">
+                       <ion-button fill="clear" size="small" (click)="cleanTrough(w.id)" color="medium" style="font-size: 12px; text-transform: none; --padding-start: 0; --padding-end: 0;">
+                         <ion-icon name="water-outline" slot="start"></ion-icon> Registrar Limpieza
+                       </ion-button>
+                       <ion-button fill="clear" size="small" (click)="updateTroughLevel(w)" color="primary" style="font-size: 12px; text-transform: none; --padding-start: 0; --padding-end: 0;">
+                         Actualizar Nivel
+                       </ion-button>
+                     </div>
+                   </ion-card-content>
+                 </ion-card>
+               </ion-col>
+             </ion-row>
+           </ion-grid>
         </div>
 
         <ion-grid fixed class="ion-no-padding">
           <ion-row>
             <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let lote of lotes; trackBy: trackById">
-              <article class="uniform-card">
-                <div class="vac-card-header-flex">
-                  <div class="vac-card-title-group">
-                    <h3 class="vac-card-title">{{ lote.nombre }}</h3>
-                    <p class="vac-card-subtitle">
-                      <ion-icon name="location-outline" class="mr-1"></ion-icon>
-                      {{ lote.ubicacion || 'Sector General' }}
-                    </p>
+              <ion-card class="uniform-card lote-card" style="--border-radius: 12px; font-size: 14px; box-shadow: none;">
+                <ion-card-header class="pb-0">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <ion-card-title style="font-size: 1.1rem; font-weight: 700;">
+                        {{ lote.nombre }}
+                      </ion-card-title>
+                      <p class="text-xs color-medium mt-1 uppercase font-semibold tracking-wide">
+                        {{ lote['tipo'] || 'General' }}
+                      </p>
+                    </div>
+                    <div class="vac-icon-circle bg-forest-light">
+                      <ion-icon name="layers-outline" class="color-forest"></ion-icon>
+                    </div>
                   </div>
-                  <div class="vac-icon-circle bg-forest-light">
-                    <ion-icon name="layers-outline" class="color-forest"></ion-icon>
-                  </div>
-                </div>
+                </ion-card-header>
 
-                <div class="mt-6 flex items-center justify-between">
-                  <div class="vac-info-item">
-                    <span class="vac-label-mini">Animales</span>
-                    <span class="vac-value-sm">{{ getAnimalCount(lote.id) }} <small>Cabezas</small></span>
+                <ion-card-content class="pt-4">
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="vac-info-item">
+                      <span class="vac-label-mini">Cabezas</span>
+                      <span class="vac-value-sm">{{ getAnimalCount(lote.id) }}</span>
+                    </div>
+                    <div class="vac-info-item text-right">
+                      <span class="vac-label-mini">Carga (UGB)</span>
+                      <span class="vac-value-sm color-forest">{{ getUgbForLote(lote.id) }}</span>
+                    </div>
                   </div>
-                  <div class="vac-info-item text-right">
-                    <span class="vac-label-mini">Carga Total</span>
-                    <span class="vac-value-sm color-forest">{{ getUgbForLote(lote.id) }} <small>UGB</small></span>
-                  </div>
-                </div>
 
-                <div class="vac-card-footer mt-6 pt-4 border-t-light flex justify-end gap-2">
-                   <button class="vac-btn-icon bg-light" (click)="openEditModal(lote)" aria-label="Editar">
-                      <ion-icon name="create-outline"></ion-icon>
-                   </button>
-                   <button class="vac-btn-icon bg-light color-danger" (click)="confirmDelete(lote.id)" aria-label="Eliminar">
-                      <ion-icon name="trash-outline"></ion-icon>
-                   </button>
-                </div>
-              </article>
+                  <ion-button expand="block" fill="outline" color="primary" class="mt-2" (click)="openAcciones(lote)">
+                    Acciones <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
+                  </ion-button>
+                </ion-card-content>
+              </ion-card>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -19960,51 +20987,44 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           </div>
           <h2>Sin lotes configurados</h2>
           <p>Crea recintos o potreros para empezar a organizar tu ganado.</p>
-          <ion-button fill="solid" (click)="openAddModal()" class="btn-vac-primary mt-4">
-            <ion-icon name="add" slot="start"></ion-icon> Crear Nuevo Lote
-          </ion-button>
         </div>
 
       </main>
 
-      <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="animate-jump-in">
-        <ion-fab-button (click)="openAddModal()" class="vac-fab" aria-label="Añadir lote">
-          <ion-icon name="add"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
-
-      <!-- MODAL DE LOTE -->
+      <!-- MODAL DE CREACIÓN/EDICIÓN DE LOTE -->
       <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()" class="vac-modal">
         <ng-template>
           <ion-header class="ion-no-border">
             <ion-toolbar>
-              <ion-title>{{ editingItem ? 'Actualizar Recinto' : 'Nuevo Recinto' }}</ion-title>
+              <ion-title>{{ editingItem ? 'Actualizar Lote' : 'Nuevo Lote' }}</ion-title>
               <ion-buttons slot="end">
-                <ion-button (click)="closeModal()" class="color-medium" aria-label="Cerrar modal">
+                <ion-button (click)="closeModal()" class="color-medium">
                   <ion-icon name="close"></ion-icon>
                 </ion-button>
               </ion-buttons>
             </ion-toolbar>
           </ion-header>
           
-           <ion-content class="ion-padding vac-modal-content">
-            <div class="vac-modal-header ion-text-center ion-padding-vertical">
-               <div class="vac-icon-ring ion-margin-bottom">
-                  <ion-icon name="layers-outline"></ion-icon>
-               </div>
-               <h3 class="vac-modal-title">Configuración de Espacio</h3>
-               <p class="vac-modal-subtitle">Define las características del potrero o recinto.</p>
-            </div>
-
+          <ion-content class="ion-padding vac-modal-content">
             <form [formGroup]="loteForm">
               <ion-item class="vac-input">
                 <ion-label position="stacked">Nombre del Lote *</ion-label>
-                <ion-input type="text" formControlName="nombre" placeholder="Ej: Potrero El Roble"></ion-input>
+                <ion-input type="text" formControlName="nombre" placeholder="Ej: Lote Engorde 1"></ion-input>
+              </ion-item>
+
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Tipo de Lote *</ion-label>
+                <ion-select formControlName="tipo" interface="action-sheet" placeholder="Selecciona el propósito">
+                  <ion-select-option value="Cebo">Cebo</ion-select-option>
+                  <ion-select-option value="Reposición">Reposición</ion-select-option>
+                  <ion-select-option value="Venta">Venta</ion-select-option>
+                  <ion-select-option value="Sanitario">Sanitario (Cuarentena)</ion-select-option>
+                </ion-select>
               </ion-item>
 
               <ion-item class="vac-input">
                 <ion-label position="stacked">Ubicación / Coordenadas</ion-label>
-                <ion-input type="text" formControlName="ubicacion" placeholder="Ej: Zona Norte - Sector A"></ion-input>
+                <ion-input type="text" formControlName="ubicacion" placeholder="Ej: Zona Norte"></ion-input>
               </ion-item>
 
               <ion-item class="vac-input">
@@ -20022,6 +21042,97 @@ import { ToastController, AlertController } from '@ionic/angular/standalone';
           </ion-content>
         </ng-template>
       </ion-modal>
+
+      <!-- MODAL AÑADIR ANIMALES -->
+      <ion-modal [isOpen]="isAddAnimalsModalOpen" (didDismiss)="closeAddAnimalsModal()" class="vac-modal">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar>
+              <ion-title>Asignar a: {{ currentLote?.nombre }}</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="closeAddAnimalsModal()" class="color-medium">
+                  <ion-icon name="close"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding">
+            <p class="text-sm color-medium mb-4">Selecciona los animales para moverlos a este lote.</p>
+            <ion-list>
+              <ion-item *ngFor="let bovino of availableAnimals">
+                <ion-checkbox slot="start" (ionChange)="toggleAnimalSelection(bovino.id, $event)"></ion-checkbox>
+                <ion-label>
+                  <h2>{{ bovino.crotal }} - {{ bovino.nombre || 'Sin Nombre' }}</h2>
+                  <p>{{ bovino.raza }} | Peso actual: {{ $any(bovino).peso || 'N/D' }} kg</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+            
+            <div class="mt-6" *ngIf="availableAnimals.length === 0">
+              <p class="text-center color-medium">No hay animales disponibles para asignar.</p>
+            </div>
+
+            <div class="mt-8">
+              <ion-button (click)="confirmAddAnimals()" expand="block" [disabled]="selectedAnimalIds.length === 0">
+                Asignar {{ selectedAnimalIds.length }} Animales
+              </ion-button>
+            </div>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
+      <!-- MODAL TRATAMIENTO MASIVO -->
+      <ion-modal [isOpen]="isTreatmentModalOpen" (didDismiss)="closeTreatmentModal()" class="vac-modal">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar>
+              <ion-title>Tratamiento Sanitario</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="closeTreatmentModal()" class="color-medium">
+                  <ion-icon name="close"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding">
+            <div class="vac-icon-ring ion-text-center mb-4">
+              <ion-icon name="medical-outline" color="danger"></ion-icon>
+            </div>
+            <h3 class="text-center font-bold mb-2">Tratamiento para: {{ currentLote?.nombre }}</h3>
+            <p class="text-center text-sm color-medium mb-6">Aplica medicación a todos los animales del lote cumpliendo con la normativa REGA.</p>
+            
+            <form [formGroup]="treatmentForm">
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Producto / Medicamento *</ion-label>
+                <ion-input type="text" formControlName="producto" placeholder="Ej: Ivermectina"></ion-input>
+              </ion-item>
+
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Tipo de Tratamiento *</ion-label>
+                <ion-select formControlName="tipo" interface="popover">
+                  <ion-select-option value="Vacunación">Vacunación</ion-select-option>
+                  <ion-select-option value="Desparasitación">Desparasitación</ion-select-option>
+                  <ion-select-option value="Tratamiento">Tratamiento Curativo</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item class="vac-input">
+                <ion-label position="stacked">Días de Retiro (Espera Carne/Leche) *</ion-label>
+                <ion-input type="number" formControlName="dias_retiro" placeholder="Ej: 21"></ion-input>
+              </ion-item>
+              <p class="text-xs color-danger mt-1 ml-4">* Fundamental para seguridad alimentaria.</p>
+
+              <div class="mt-8">
+                <ion-button (click)="confirmMassTreatment()" [disabled]="treatmentForm.invalid" color="danger" expand="block">
+                  <ion-icon name="medical-outline" slot="start"></ion-icon>
+                  Aplicar a todo el Lote
+                </ion-button>
+              </div>
+            </form>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
     </ion-content>
   `
 })
@@ -20029,52 +21140,67 @@ export class LotesComponent implements OnInit {
   private supa = inject(SupabaseService);
   public ganadoService = inject(GanadoService);
   private fb = inject(FormBuilder);
+  private actionSheetCtrl = inject(ActionSheetController);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
-  private pdfService = inject(PdfService);
   
-  lotes: Lote[] = [];
+  lotes: any[] = []; // Usamos any o interfaz extendida para incluir tipo y estado
+  waterTroughs: any[] = []; // Para el Estado Hídrico
+  
+  // Modals state
   isModalOpen = false;
-  editingItem: Lote | null = null;
+  isAddAnimalsModalOpen = false;
+  isTreatmentModalOpen = false;
+  
+  editingItem: any | null = null;
+  currentLote: any | null = null;
+  
   loteForm: FormGroup;
+  treatmentForm: FormGroup;
+  
+  // Selection
+  availableAnimals: Bovino[] = [];
+  selectedAnimalIds: string[] = [];
 
   constructor() {
-    addIcons({ businessOutline, gridOutline, addCircle, closeOutline, saveOutline, locationOutline, statsChartOutline, createOutline, trashOutline, leafOutline, waterOutline, arrowForwardOutline, filterOutline, layersOutline, documentTextOutline });
+    addIcons({ businessOutline, gridOutline, addCircle, closeOutline, saveOutline, locationOutline, statsChartOutline, createOutline, trashOutline, leafOutline, waterOutline, arrowForwardOutline, filterOutline, layersOutline, documentTextOutline, ellipsisVertical, medicalOutline, moveOutline, listOutline });
+    
     this.loteForm = this.fb.group({
       nombre: ['', Validators.required],
+      tipo: ['Cebo', Validators.required],
       ubicacion: [''],
       capacidad: [null]
+    });
+
+    this.treatmentForm = this.fb.group({
+      producto: ['', Validators.required],
+      tipo: ['Vacunación', Validators.required],
+      dias_retiro: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
   async ngOnInit() {
-    this.loadData();
+    await this.loadData();
   }
 
   async loadData() {
-    const { data } = await this.supa.getAll<Lote>('lotes');
-    this.lotes = data || [];
+    // Usamos el nuevo método optimizado REGA
+    const { data, error } = await this.supa.getBatches();
+    if (!error) {
+      this.lotes = data || [];
+    } else {
+      this.presentToast('Error al cargar lotes', 'danger');
+    }
+
+    // Cargar estado hídrico
+    const { data: wData } = await this.supa.getWaterTroughs();
+    if (wData) {
+      this.waterTroughs = wData;
+    }
   }
 
   trackById(index: number, item: any): string {
     return item?.id || index.toString();
-  }
-
-  async exportarPDF() {
-    const headers = [['Código/Nombre', 'Capacidad', 'Ubicación', 'Bovinos']];
-    const body = this.lotes.map(l => [
-      l.nombre || 'S/N',
-      l.capacidad || '0',
-      l.ubicacion || '-',
-      (this.ganadoService.bovinos().filter(b => b.lote_id === l.id).length) + ' Cabezas'
-    ]);
-
-    await this.pdfService.generateTablePDF(
-      'Inventario de Potreros y Recintos - Vacapp',
-      headers,
-      body,
-      'inventario_lotes_vacapp'
-    );
   }
 
   getAnimalCount(loteId: string): number {
@@ -20089,13 +21215,7 @@ export class LotesComponent implements OnInit {
 
   openAddModal() {
     this.editingItem = null;
-    this.loteForm.reset();
-    this.isModalOpen = true;
-  }
-
-  openEditModal(lote: Lote) {
-    this.editingItem = lote;
-    this.loteForm.patchValue(lote);
+    this.loteForm.reset({ tipo: 'Cebo' });
     this.isModalOpen = true;
   }
 
@@ -20107,17 +21227,129 @@ export class LotesComponent implements OnInit {
 
     const res = this.editingItem?.id 
       ? await this.supa.update('lotes', this.editingItem.id, payload)
-      : await this.supa.create('lotes', payload);
+      : await this.supa.createBatch(payload.nombre, payload.tipo);
 
     if (res.error) {
       this.presentToast('Error al guardar: ' + res.error, 'danger');
     } else {
-      this.presentToast('Configuración de lote salvaguardada');
+      this.presentToast('Lote configurado exitosamente');
       this.isModalOpen = false;
       this.loadData();
     }
   }
 
+  // =========================================================================
+  // ACTION SHEET Y OPERACIONES REGA
+  // =========================================================================
+
+  async openAcciones(lote: any) {
+    this.currentLote = lote;
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: `Opciones: ${lote.nombre}`,
+      subHeader: 'Trazabilidad y Manejo',
+      cssClass: 'vac-action-sheet',
+      buttons: [
+        {
+          text: 'Añadir Animales',
+          icon: 'list-outline',
+          handler: () => {
+            this.openAddAnimalsModal();
+          }
+        },
+        {
+          text: 'Aplicar Tratamiento Masivo',
+          icon: 'medical-outline',
+          handler: () => {
+            this.openTreatmentModal();
+          }
+        },
+        {
+          text: 'Editar Lote',
+          icon: 'create-outline',
+          handler: () => {
+            this.editingItem = lote;
+            this.loteForm.patchValue(lote);
+            this.isModalOpen = true;
+          }
+        },
+        {
+          text: 'Eliminar / Purgar',
+          icon: 'trash-outline',
+          role: 'destructive',
+          handler: () => {
+            this.confirmDelete(lote.id);
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  // AÑADIR ANIMALES
+  openAddAnimalsModal() {
+    // Buscar animales que no están en este lote
+    this.availableAnimals = this.ganadoService.bovinos().filter(b => b.lote_id !== this.currentLote.id);
+    this.selectedAnimalIds = [];
+    this.isAddAnimalsModalOpen = true;
+  }
+
+  closeAddAnimalsModal() {
+    this.isAddAnimalsModalOpen = false;
+  }
+
+  toggleAnimalSelection(id: string, event: any) {
+    if (event.detail.checked) {
+      this.selectedAnimalIds.push(id);
+    } else {
+      this.selectedAnimalIds = this.selectedAnimalIds.filter(aid => aid !== id);
+    }
+  }
+
+  async confirmAddAnimals() {
+    if (this.selectedAnimalIds.length === 0) return;
+    
+    const { error } = await this.supa.assignAnimalsToBatch(this.selectedAnimalIds, this.currentLote.id);
+    
+    if (error) {
+      this.presentToast('Error al asignar animales', 'danger');
+    } else {
+      this.presentToast(`${this.selectedAnimalIds.length} animales asignados a ${this.currentLote.nombre}`);
+      this.closeAddAnimalsModal();
+    }
+  }
+
+  // TRATAMIENTO MASIVO
+  openTreatmentModal() {
+    this.treatmentForm.reset({ tipo: 'Vacunación', dias_retiro: 0 });
+    this.isTreatmentModalOpen = true;
+  }
+
+  closeTreatmentModal() {
+    this.isTreatmentModalOpen = false;
+  }
+
+  async confirmMassTreatment() {
+    if (this.treatmentForm.invalid) return;
+    
+    const formData = this.treatmentForm.value;
+    const { dias_retiro, ...treatmentData } = formData;
+    
+    const { error } = await this.supa.applyMassTreatment(this.currentLote.id, treatmentData, dias_retiro);
+    
+    if (error) {
+      this.presentToast('Error en el tratamiento masivo: ' + error.message, 'danger');
+    } else {
+      this.presentToast('Tratamiento registrado. Tiempo de retiro aplicado.', 'success');
+      this.closeTreatmentModal();
+    }
+  }
+
+  // ELIMINAR LOTE
   async confirmDelete(id: string) {
     const alert = await this.alertCtrl.create({
       header: 'Purgar Lote',
@@ -20148,10 +21380,69 @@ export class LotesComponent implements OnInit {
     });
     toast.present();
   }
+
+  // =========================================================================
+  // GESTIÓN HÍDRICA (Abrevaderos)
+  // =========================================================================
+  
+  getWaterColor(level: number): string {
+    if (level > 50) return 'primary';
+    if (level >= 20) return 'warning';
+    return 'danger';
+  }
+
+  async cleanTrough(id: string) {
+    const { error } = await this.supa.registerTroughCleaning(id);
+    if (!error) {
+      this.presentToast('Limpieza registrada con éxito. Estado: Operativo', 'success');
+      this.loadData();
+    } else {
+      this.presentToast('Error al registrar limpieza de bioseguridad', 'danger');
+    }
+  }
+
+  async updateTroughLevel(w: any) {
+    const alert = await this.alertCtrl.create({
+      header: 'Actualizar Nivel',
+      message: `Introduce el porcentaje de agua actual para ${w.nombre} (0 - 100%).`,
+      inputs: [
+        {
+          name: 'level',
+          type: 'number',
+          min: 0,
+          max: 100,
+          value: w.nivel_llenado,
+          placeholder: '%'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel', cssClass: 'color-medium' },
+        {
+          text: 'Guardar',
+          handler: async (data) => {
+            const num = parseInt(data.level, 10);
+            if (!isNaN(num)) {
+              const { error } = await this.supa.updateWaterLevel(w.id, num);
+              if (!error) {
+                this.presentToast(`Nivel actualizado a ${num}%`, 'success');
+                this.loadData();
+              } else {
+                this.presentToast('Error al actualizar nivel', 'danger');
+              }
+            }
+          }
+        }
+      ],
+      mode: 'ios',
+      cssClass: 'vac-alert'
+    });
+    await alert.present();
+  }
 }
+
 ```
 
-### ARCHIVO: frontend/src/app/features/manejo/manejo.component.html (397 líneas)
+### ARCHIVO: frontend/src/app/features/manejo/manejo.component.html (416 líneas)
 ```html
 <ion-header class="ion-no-border">
   <ion-toolbar>
@@ -20375,6 +21666,9 @@ export class LotesComponent implements OnInit {
               <ion-label position="stacked">DIB / Crotal *</ion-label>
               <ion-input formControlName="crotal" placeholder="ES012345678901"></ion-input>
             </ion-item>
+            <div *ngIf="bovinoForm.get('crotal')?.invalid && bovinoForm.get('crotal')?.touched" class="color-danger mt-1 text-xs px-4" style="font-size: 12px; margin-bottom: 12px; margin-left: 16px;">
+              Formato DIB/Crotal incorrecto (ES + 12 dígitos).
+            </div>
             <ion-item class="vac-input">
               <ion-label position="stacked">Fotografía del Ejemplar</ion-label>
               <input type="file" accept="image/*" (change)="onFileSelected($event)" class="py-sm" />
@@ -20398,14 +21692,22 @@ export class LotesComponent implements OnInit {
             <ion-item class="vac-input">
               <ion-label position="stacked">Raza Prima *</ion-label>
               <ion-select formControlName="raza" interface="popover">
-                <ion-select-option *ngFor="let raza of ganadoService.constants.RAZAS_BOVINAS" [value]="raza">
-                  {{ raza }}
+                <ion-select-option *ngFor="let raza of razasOficiales" [value]="raza.id">
+                  {{ raza.label }}
                 </ion-select-option>
               </ion-select>
             </ion-item>
             <ion-item class="vac-input" *ngIf="bovinoForm.get('raza')?.value !== 'Cruce / Mestizo' && bovinoForm.get('raza')?.value !== 'Otro'">
               <ion-label position="stacked">Porcentaje de Pureza (%)</ion-label>
               <ion-input type="number" formControlName="porcentaje_pureza" placeholder="Ej: 100"></ion-input>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Categoría Zootécnica *</ion-label>
+              <ion-select formControlName="categoria" interface="popover">
+                <ion-select-option *ngFor="let cat of categoriasAnimal" [value]="cat">
+                  {{ cat }}
+                </ion-select-option>
+              </ion-select>
             </ion-item>
             <ion-item class="vac-input">
               <ion-label position="stacked">Aptitud Principal *</ion-label>
@@ -20432,6 +21734,14 @@ export class LotesComponent implements OnInit {
               <ion-select formControlName="lote_id" placeholder="Cargar Lotes..." interface="popover">
                 <ion-select-option *ngFor="let lote of lotes()" [value]="lote.id">
                   {{ lote.nombre }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item class="vac-input">
+              <ion-label position="stacked">Ubicación Actual (Recinto / Abrevadero) *</ion-label>
+              <ion-select formControlName="abrevadero_id" placeholder="Seleccionar ubicación inicial..." interface="popover">
+                <ion-select-option *ngFor="let abr of abrevaderos()" [value]="abr.id">
+                  {{ abr.nombre }} ({{ abr.estado }})
                 </ion-select-option>
               </ion-select>
             </ion-item>
@@ -20589,7 +21899,7 @@ export class LotesComponent implements OnInit {
 }
 ```
 
-### ARCHIVO: frontend/src/app/features/manejo/manejo.component.ts (439 líneas)
+### ARCHIVO: frontend/src/app/features/manejo/manejo.component.ts (468 líneas)
 ```ts
 import { Component, inject, OnInit, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -20658,9 +21968,11 @@ export class ManejoComponent {
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
   private router = inject(Router);
+  private supabaseService = inject(SupabaseService);
   
   bovinos = this.ganadoService.bovinos;
   lotes = this.fincaService.lotes;
+  abrevaderos = signal<any[]>([]);
   
   // Estados de interfaz reactivos (Signals)
   /** Estado de carga asíncrona del servicio. */
@@ -20736,6 +22048,13 @@ export class ManejoComponent {
   currentStep = 1;
   isUploadingFile = false;
 
+  razasOficiales = [
+    { id: 'retinta', label: 'Retinta (Autóctona - Madres)' },
+    { id: 'limousin', label: 'Limousin (Sementales)' },
+    { id: 'f1_cross', label: 'Cruce F1 (Cebo)' }
+  ];
+  categoriasAnimal = ['Vaca Reproductora', 'Semental', 'Ternero/a', 'Novilla de Reposición', 'Descarte'];
+
   bovinoForm: FormGroup;
 
   /**
@@ -20748,17 +22067,21 @@ export class ManejoComponent {
     addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline, 'qr-code-outline': qrCodeOutline, 'scan-outline': scanOutline });
     this.bovinoForm = this.fb.group({
       nombre: ['', Validators.required],
-      crotal: ['', Validators.required],
+      crotal: ['', [Validators.required, Validators.pattern(/^ES\d{12}$/)]],
       sexo: ['Hembra', Validators.required],
-      raza: ['Cruce / Mestizo', Validators.required],
+      raza: ['retinta', Validators.required],
       porcentaje_pureza: [100.0],
       aptitud: ['Carne', Validators.required],
+      categoria: ['Vaca Reproductora', Validators.required],
       fecha_nacimiento: ['', Validators.required],
-      lote_id: [''],
+      lote_id: ['', Validators.required],
+      abrevadero_id: ['', Validators.required],
       estado_productivo: ['Alta', Validators.required],
       estado_reproductivo: ['Vacía'],
       foto_url: ['']
     });
+
+    this.cargarAbrevaderos();
 
     // Enlazamos el estado de carga del servicio de ganado (sync service effect)
     effect(() => {
@@ -20909,9 +22232,12 @@ export class ManejoComponent {
     this.currentStep = 1;
     this.bovinoForm.reset({ 
       sexo: 'Hembra', 
-      raza: 'Cruce / Mestizo',
+      raza: 'retinta',
       porcentaje_pureza: 100,
       aptitud: 'Carne',
+      categoria: 'Vaca Reproductora',
+      lote_id: '',
+      abrevadero_id: '',
       estado_productivo: 'Alta',
       estado_reproductivo: 'Vacía'
     });
@@ -20973,6 +22299,12 @@ export class ManejoComponent {
           return;
        }
        res = await this.ganadoService.createBovino(payload);
+       if (!res?.error) {
+         // Generar log de trazabilidad
+         const ubicacion = this.abrevaderos().find(a => a.id === payload.abrevadero_id)?.nombre || 'Desconocida';
+         const logText = `Alta de animal ${payload.crotal} - Raza ${payload.raza} - Ubicación Inicial ${ubicacion}`;
+         await this.supabaseService.logTrazabilidad(logText, (res as any).data?.id || (res as any).data?.[0]?.id);
+       }
     }
 
     if (res?.error) {
@@ -21028,6 +22360,13 @@ export class ManejoComponent {
       mode: 'ios'
     });
     toast.present();
+  }
+
+  async cargarAbrevaderos() {
+    const { data } = await this.supabaseService.getWaterTroughs();
+    if (data) {
+      this.abrevaderos.set(data);
+    }
   }
 }
 ```

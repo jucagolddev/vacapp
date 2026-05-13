@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -7,12 +7,11 @@ import {
   IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
   IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
   IonGrid, IonRow, IonCol, IonPopover, IonSegment, IonSegmentButton,
-  ToastController, AlertController
+  ToastController, AlertController, IonCard
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { PdfService } from '../../core/services/pdf.service';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartOptions } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 import { FinanzasService } from '../../core/services/finanzas.service';
 import { Finanzas } from '../../core/models/vacapp.models';
 import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline } from 'ionicons/icons';
@@ -32,10 +31,10 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle,
     IonButtons, IonMenuButton, IonFab, IonFabButton, IonIcon,
     IonModal, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton,
-    IonGrid, IonRow, IonCol,
-    IonPopover, IonSegment, IonSegmentButton,
-    BaseChartDirective
+    IonGrid, IonRow, IonCol, IonCard,
+    IonPopover, IonSegment, IonSegmentButton
   ],
+  styleUrls: ['./finanzas.component.scss'],
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar>
@@ -54,6 +53,39 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
     <ion-content class="ion-padding-vertical">
       <main class="vac-container animate-fade-in pb-12">
         
+        <!-- DASHBOARD METRICS -->
+        <ion-grid class="finance-metrics mb-6">
+          <ion-row>
+            <ion-col size="12" size-md="4">
+              <ion-card class="metric-card income">
+                <div class="icon-box"><ion-icon name="trending-up-outline"></ion-icon></div>
+                <div class="data-box">
+                  <p>Ingresos Totales</p>
+                  <h3>{{ totalIngresos | currency:'EUR' }}</h3>
+                </div>
+              </ion-card>
+            </ion-col>
+            <ion-col size="12" size-md="4">
+              <ion-card class="metric-card expense">
+                <div class="icon-box"><ion-icon name="trending-down-outline"></ion-icon></div>
+                <div class="data-box">
+                  <p>Gastos Totales</p>
+                  <h3>{{ totalGastos | currency:'EUR' }}</h3>
+                </div>
+              </ion-card>
+            </ion-col>
+            <ion-col size="12" size-md="4">
+              <ion-card class="metric-card balance">
+                <div class="icon-box"><ion-icon name="wallet-outline"></ion-icon></div>
+                <div class="data-box">
+                  <p>Balance Neto</p>
+                  <h3>{{ (totalIngresos - totalGastos) | currency:'EUR' }}</h3>
+                </div>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
         <!-- CONTROL MANDO COLECTIVO (NUEVO) -->
         <div class="vac-master-filter-bar mb-6 animate-fade-in">
            <div class="flex items-center gap-3">
@@ -74,7 +106,7 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
         </div>
 
         <!-- GRÁFICO DE ROI (Relocado) -->
-        <section class="vac-main-card animate-slide-up mb-8">
+        <section class="vac-main-card chart-card animate-slide-up mb-8">
           <header class="vac-card-header-flex">
             <div class="vac-card-title-group">
               <span>ESTADO DE CUENTAS</span>
@@ -96,8 +128,8 @@ import { addCircle, closeOutline, saveOutline, createOutline, trashOutline, wall
                </div>
             </div>
           </header>
-          <div class="p-4">
-             <canvas baseChart class="chart-canvas-finance" [data]="chartFinanzas()" [options]="chartOptionsROI" [type]="'bar'"></canvas>
+          <div class="chart-wrapper">
+             <canvas id="financeChart"></canvas>
           </div>
         </section>
 
@@ -270,6 +302,15 @@ export class FinanzasComponent {
   isModalOpen = false;
   editingItem: Finanzas | null = null;
   finanzasForm: FormGroup;
+  chart: any = null; // Instancia de Chart.js
+
+  get totalIngresos() {
+    return this.finanzasService.records().filter(r => r.tipo === 'Ingreso').reduce((acc, r) => acc + (r.monto || 0), 0);
+  }
+
+  get totalGastos() {
+    return this.finanzasService.records().filter(r => r.tipo === 'Gasto').reduce((acc, r) => acc + (r.monto || 0), 0);
+  }
 
   // Filtros Avanzados
   filterTipo = signal<string>('Todos');
@@ -301,47 +342,8 @@ export class FinanzasComponent {
   categoriasGasto = ['Alimentación y Pastos', 'Veterinaria y Semen', 'Mantenimiento y Equipos', 'Sueldos', 'Otros Gastos'];
   categoriasDisponibles: string[] = [];
   
-  // Gráfico de Finanzas (ROI) - Agrupado Mensual por defecto
   chartPeriodo = signal<'Mensual' | 'Anual'>('Mensual');
   filterGlobal = signal<'Mensual' | 'Anual'>('Mensual');
-
-  chartFinanzas = computed<ChartConfiguration<'bar'>['data']>(() => {
-    const data = this.finanzasService.getDatosFinancierosPorPeriodo(this.chartPeriodo());
-    return {
-      labels: data.map(d => d.label),
-      datasets: [
-        { 
-          label: 'Ingresos (€)', 
-          data: data.map(d => d.ingresos), 
-          backgroundColor: '#1b4332', 
-          borderColor: '#1b4332',
-          borderWidth: 0,
-          borderRadius: 8 
-        },
-        { 
-          label: 'Gastos (€)', 
-          data: data.map(d => -d.gastos), 
-          backgroundColor: '#bc4749', // Rojo Ladrillo ($danger-color)
-          borderColor: '#bc4749',
-          borderWidth: 0,
-          borderRadius: 8 
-        }
-      ]
-    };
-  });
-
-  public chartOptionsROI: ChartOptions<'bar'> = {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: '#6c757d', font: { size: 12, weight: 'bold' } } } },
-    scales: {
-      x: { stacked: true, grid: { display: false }, ticks: { color: '#6c757d' } },
-      y: { 
-        stacked: true, 
-        grid: { color: 'rgba(0,0,0,0.05)' }, 
-        ticks: { color: '#6c757d', callback: (val) => '€' + Math.abs(Number(val)) } 
-      }
-    }
-  };
 
   goToDetail(id: string) {
     if (id) {
@@ -355,6 +357,7 @@ export class FinanzasComponent {
 
   constructor() {
     addIcons({ addCircle, closeOutline, saveOutline, createOutline, trashOutline, walletOutline, trendingUpOutline, trendingDownOutline, cashOutline, arrowDownOutline, arrowUpOutline, documentTextOutline, filterOutline, statsChartOutline });
+    Chart.register(...registerables);
     this.finanzasForm = this.fb.group({
       tipo: ['Gasto', Validators.required],
       categoria: ['Alimentación y Pastos', Validators.required],
@@ -362,6 +365,191 @@ export class FinanzasComponent {
       fecha: [new Date().toISOString().split('T')[0], Validators.required]
     });
     this.categoriasDisponibles = [...this.categoriasGasto];
+
+    // Efecto reactivo para dibujar el gráfico cuando cambia el periodo o los datos
+    effect(() => {
+      const data = this.finanzasService.getDatosFinancierosPorPeriodo(this.chartPeriodo());
+      setTimeout(() => this.renderChart(data), 50); // Pequeño delay para asegurar que el canvas está en el DOM
+    });
+  }
+
+  /**
+   * @description Renderiza el gráfico financiero principal con estética de app de trading.
+   * Utiliza gráficos de líneas suaves con relleno de gradiente, crosshair interactivo,
+   * tooltips profesionales y marcadores animados estilo Bitget/TradingView.
+   * @param data Array de datos financieros agrupados por periodo con {label, ingresos, gastos}.
+   */
+  renderChart(data: any[]) {
+    if (this.chart) { this.chart.destroy(); }
+    const labels = data.map(d => d.label);
+
+    const canvas = document.getElementById('financeChart') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // ── Gradientes de relleno (Modo Día — Rustic-Luxe) ──
+    const gradientIngresos = ctx.createLinearGradient(0, 0, 0, canvas.offsetHeight || 320);
+    gradientIngresos.addColorStop(0, 'rgba(27, 67, 50, 0.18)');
+    gradientIngresos.addColorStop(0.5, 'rgba(27, 67, 50, 0.05)');
+    gradientIngresos.addColorStop(1, 'rgba(27, 67, 50, 0)');
+
+    const gradientGastos = ctx.createLinearGradient(0, 0, 0, canvas.offsetHeight || 320);
+    gradientGastos.addColorStop(0, 'rgba(188, 71, 73, 0.15)');
+    gradientGastos.addColorStop(0.5, 'rgba(188, 71, 73, 0.04)');
+    gradientGastos.addColorStop(1, 'rgba(188, 71, 73, 0)');
+
+    // ── Plugin de crosshair vertical (estilo plataforma trading) ──
+    const crosshairPlugin = {
+      id: 'crosshairLine',
+      afterDraw: (chart: any) => {
+        if (chart.tooltip?._active?.length) {
+          const activePoint = chart.tooltip._active[0];
+          const chartCtx = chart.ctx;
+          const x = activePoint.element.x;
+          const topY = chart.scales.y.top;
+          const bottomY = chart.scales.y.bottom;
+
+          chartCtx.save();
+          chartCtx.beginPath();
+          chartCtx.setLineDash([3, 4]);
+          chartCtx.moveTo(x, topY);
+          chartCtx.lineTo(x, bottomY);
+          chartCtx.lineWidth = 1;
+          chartCtx.strokeStyle = 'rgba(27, 67, 50, 0.12)';
+          chartCtx.stroke();
+          chartCtx.restore();
+        }
+      }
+    };
+
+    this.chart = new Chart(ctx, {
+      type: 'line',
+      plugins: [crosshairPlugin],
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Ingresos',
+            data: data.map(d => d.ingresos),
+            borderColor: '#1B4332',
+            borderWidth: 2.5,
+            backgroundColor: gradientIngresos,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 7,
+            pointHoverBackgroundColor: '#1B4332',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 3
+          },
+          {
+            label: 'Gastos',
+            data: data.map(d => d.gastos),
+            borderColor: '#BC4749',
+            borderWidth: 2.5,
+            backgroundColor: gradientGastos,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 7,
+            pointHoverBackgroundColor: '#BC4749',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          duration: 800,
+          easing: 'easeOutQuart'
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            align: 'end',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              padding: 20,
+              color: '#582f0e',
+              font: { family: "'Outfit', sans-serif", size: 11, weight: 600 }
+            }
+          },
+          tooltip: {
+            enabled: true,
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(253, 251, 247, 0.97)',
+            titleFont: { family: "'Outfit', sans-serif", size: 12, weight: 600 },
+            bodyFont: { family: "'Outfit', sans-serif", size: 13, weight: 500 },
+            titleColor: '#92949c',
+            bodyColor: '#1A211E',
+            borderColor: 'rgba(166, 124, 82, 0.2)',
+            borderWidth: 1,
+            padding: { top: 12, bottom: 12, left: 16, right: 16 },
+            cornerRadius: 12,
+            displayColors: true,
+            boxWidth: 8,
+            boxHeight: 8,
+            boxPadding: 6,
+            usePointStyle: true,
+            callbacks: {
+              title: (items) => items[0]?.label || '',
+              label: (ctx) => {
+                const value = ctx.parsed.y?.toLocaleString('es-ES') || '0';
+                const prefix = ctx.dataset.label === 'Ingresos' ? '+' : '-';
+                return ` ${ctx.dataset.label}:  ${prefix}${value} €`;
+              },
+              afterBody: (items) => {
+                if (items.length >= 2) {
+                  const diff = (items[0].parsed.y || 0) - (items[1].parsed.y || 0);
+                  const sign = diff >= 0 ? '+' : '';
+                  return [`─────────────────`, `  Balance:  ${sign}${diff.toLocaleString('es-ES')} €`];
+                }
+                return [];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            border: { display: false },
+            ticks: {
+              color: '#582f0e',
+              font: { family: "'Outfit', sans-serif", size: 10, weight: 600 },
+              padding: 8,
+              maxRotation: 0
+            }
+          },
+          y: {
+            position: 'right',
+            grid: {
+              color: 'rgba(0, 0, 0, 0.04)',
+              lineWidth: 1
+            },
+            border: { display: false },
+            ticks: {
+              color: '#582f0e',
+              font: { family: "'Outfit', sans-serif", size: 10, weight: 600 },
+              padding: 12,
+              callback: (value: any) => {
+                if (value >= 1000) return (value / 1000).toFixed(1) + 'k €';
+                return value + ' €';
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   async exportarPDF() {

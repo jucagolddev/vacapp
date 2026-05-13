@@ -65,9 +65,11 @@ export class ManejoComponent {
   private alertCtrl = inject(AlertController);
   private pdfService = inject(PdfService);
   private router = inject(Router);
+  private supabaseService = inject(SupabaseService);
   
   bovinos = this.ganadoService.bovinos;
   lotes = this.fincaService.lotes;
+  abrevaderos = signal<any[]>([]);
   
   // Estados de interfaz reactivos (Signals)
   /** Estado de carga asíncrona del servicio. */
@@ -143,6 +145,13 @@ export class ManejoComponent {
   currentStep = 1;
   isUploadingFile = false;
 
+  razasOficiales = [
+    { id: 'retinta', label: 'Retinta (Autóctona - Madres)' },
+    { id: 'limousin', label: 'Limousin (Sementales)' },
+    { id: 'f1_cross', label: 'Cruce F1 (Cebo)' }
+  ];
+  categoriasAnimal = ['Vaca Reproductora', 'Semental', 'Ternero/a', 'Novilla de Reposición', 'Descarte'];
+
   bovinoForm: FormGroup;
 
   /**
@@ -155,17 +164,21 @@ export class ManejoComponent {
     addIcons({ pawOutline, listOutline, addCircle, closeOutline, checkmarkCircleOutline, personOutline, maleOutline, femaleOutline, calendarOutline, barChartOutline, leafOutline, createOutline, trashOutline, arrowForwardOutline, chevronForwardOutline, megaphoneOutline, layersOutline, trendingUpOutline, 'filter-outline': filterOutline, searchOutline, documentTextOutline, 'qr-code-outline': qrCodeOutline, 'scan-outline': scanOutline });
     this.bovinoForm = this.fb.group({
       nombre: ['', Validators.required],
-      crotal: ['', Validators.required],
+      crotal: ['', [Validators.required, Validators.pattern(/^ES\d{12}$/)]],
       sexo: ['Hembra', Validators.required],
-      raza: ['Cruce / Mestizo', Validators.required],
+      raza: ['retinta', Validators.required],
       porcentaje_pureza: [100.0],
       aptitud: ['Carne', Validators.required],
+      categoria: ['Vaca Reproductora', Validators.required],
       fecha_nacimiento: ['', Validators.required],
-      lote_id: [''],
+      lote_id: ['', Validators.required],
+      abrevadero_id: ['', Validators.required],
       estado_productivo: ['Alta', Validators.required],
       estado_reproductivo: ['Vacía'],
       foto_url: ['']
     });
+
+    this.cargarAbrevaderos();
 
     // Enlazamos el estado de carga del servicio de ganado (sync service effect)
     effect(() => {
@@ -316,9 +329,12 @@ export class ManejoComponent {
     this.currentStep = 1;
     this.bovinoForm.reset({ 
       sexo: 'Hembra', 
-      raza: 'Cruce / Mestizo',
+      raza: 'retinta',
       porcentaje_pureza: 100,
       aptitud: 'Carne',
+      categoria: 'Vaca Reproductora',
+      lote_id: '',
+      abrevadero_id: '',
       estado_productivo: 'Alta',
       estado_reproductivo: 'Vacía'
     });
@@ -380,6 +396,12 @@ export class ManejoComponent {
           return;
        }
        res = await this.ganadoService.createBovino(payload);
+       if (!res?.error) {
+         // Generar log de trazabilidad
+         const ubicacion = this.abrevaderos().find(a => a.id === payload.abrevadero_id)?.nombre || 'Desconocida';
+         const logText = `Alta de animal ${payload.crotal} - Raza ${payload.raza} - Ubicación Inicial ${ubicacion}`;
+         await this.supabaseService.logTrazabilidad(logText, (res as any).data?.id || (res as any).data?.[0]?.id);
+       }
     }
 
     if (res?.error) {
@@ -435,5 +457,12 @@ export class ManejoComponent {
       mode: 'ios'
     });
     toast.present();
+  }
+
+  async cargarAbrevaderos() {
+    const { data } = await this.supabaseService.getWaterTroughs();
+    if (data) {
+      this.abrevaderos.set(data);
+    }
   }
 }
